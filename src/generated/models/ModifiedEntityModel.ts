@@ -13,14 +13,14 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { ExistenceEntityDescription } from './ExistenceEntityDescription';
 import {
-    ExistenceEntityDescription,
     ExistenceEntityDescriptionFromJSON,
     ExistenceEntityDescriptionFromJSONTyped,
     ExistenceEntityDescriptionToJSON,
 } from './ExistenceEntityDescription';
+import type { PropertyModification } from './PropertyModification';
 import {
-    PropertyModification,
     PropertyModificationFromJSON,
     PropertyModificationFromJSONTyped,
     PropertyModificationToJSON,
@@ -62,6 +62,16 @@ export interface ModifiedEntityModel {
      * @memberof ModifiedEntityModel
      */
     _exists?: boolean;
+}
+
+/**
+ * Check if a given object implements the ModifiedEntityModel interface.
+ */
+export function instanceOfModifiedEntityModel(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "entityId" in value;
+
+    return isInstance;
 }
 
 export function ModifiedEntityModelFromJSON(json: any): ModifiedEntityModel {

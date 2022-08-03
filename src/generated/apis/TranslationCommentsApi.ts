@@ -14,64 +14,73 @@
 
 
 import * as runtime from '../runtime';
+import type {
+  PagedModelTranslationCommentModel,
+  TranslationCommentDto,
+  TranslationCommentModel,
+  TranslationCommentWithLangKeyDto,
+  TranslationWithCommentModel,
+} from '../models';
 import {
-    PagedModelTranslationCommentModel,
     PagedModelTranslationCommentModelFromJSON,
     PagedModelTranslationCommentModelToJSON,
-    TranslationCommentDto,
     TranslationCommentDtoFromJSON,
     TranslationCommentDtoToJSON,
-    TranslationCommentModel,
     TranslationCommentModelFromJSON,
     TranslationCommentModelToJSON,
-    TranslationCommentWithLangKeyDto,
     TranslationCommentWithLangKeyDtoFromJSON,
     TranslationCommentWithLangKeyDtoToJSON,
-    TranslationWithCommentModel,
     TranslationWithCommentModelFromJSON,
     TranslationWithCommentModelToJSON,
 } from '../models';
 
-export interface TranslationCommentsApiCreate5Request {
+export interface Create5Request {
     translationId: number;
     translationCommentDto: TranslationCommentDto;
     ak?: string;
+    xAPIKey?: string;
 }
 
-export interface TranslationCommentsApiCreate7Request {
+export interface Create7Request {
     translationCommentWithLangKeyDto: TranslationCommentWithLangKeyDto;
     ak?: string;
+    xAPIKey?: string;
 }
 
-export interface TranslationCommentsApiDelete3Request {
+export interface Delete5Request {
     commentId: number;
     ak?: string;
+    xAPIKey?: string;
 }
 
-export interface TranslationCommentsApiGet2Request {
+export interface Get2Request {
     translationId: number;
     commentId: number;
     ak?: string;
+    xAPIKey?: string;
 }
 
-export interface TranslationCommentsApiGetAll4Request {
+export interface GetAll4Request {
     translationId: number;
     page?: number;
     size?: number;
     sort?: Array<string>;
     ak?: string;
+    xAPIKey?: string;
 }
 
-export interface TranslationCommentsApiSetState1Request {
+export interface SetState1Request {
     commentId: number;
     state: SetState1StateEnum;
     ak?: string;
+    xAPIKey?: string;
 }
 
-export interface TranslationCommentsApiUpdate1Request {
+export interface Update1Request {
     commentId: number;
     translationCommentDto: TranslationCommentDto;
     ak?: string;
+    xAPIKey?: string;
 }
 
 /**
@@ -82,7 +91,7 @@ export class TranslationCommentsApi extends runtime.BaseAPI {
     /**
      * Creates a translation comment
      */
-    async create5Raw(requestParameters: TranslationCommentsApiCreate5Request, initOverrides?: RequestInit): Promise<runtime.ApiResponse<TranslationCommentModel>> {
+    async create5Raw(requestParameters: Create5Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TranslationCommentModel>> {
         if (requestParameters.translationId === null || requestParameters.translationId === undefined) {
             throw new runtime.RequiredError('translationId','Required parameter requestParameters.translationId was null or undefined when calling create5.');
         }
@@ -101,6 +110,10 @@ export class TranslationCommentsApi extends runtime.BaseAPI {
 
         headerParameters['Content-Type'] = 'application/json';
 
+        if (requestParameters.xAPIKey !== undefined && requestParameters.xAPIKey !== null) {
+            headerParameters['X-API-Key'] = String(requestParameters.xAPIKey);
+        }
+
         const response = await this.request({
             path: `/v2/projects/translations/{translationId}/comments`.replace(`{${"translationId"}}`, encodeURIComponent(String(requestParameters.translationId))),
             method: 'POST',
@@ -115,7 +128,7 @@ export class TranslationCommentsApi extends runtime.BaseAPI {
     /**
      * Creates a translation comment
      */
-    async create5(requestParameters: TranslationCommentsApiCreate5Request, initOverrides?: RequestInit): Promise<TranslationCommentModel> {
+    async create5(requestParameters: Create5Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TranslationCommentModel> {
         const response = await this.create5Raw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -123,7 +136,7 @@ export class TranslationCommentsApi extends runtime.BaseAPI {
     /**
      * Creates a translation comment. Empty translation is stored, when not exists.
      */
-    async create7Raw(requestParameters: TranslationCommentsApiCreate7Request, initOverrides?: RequestInit): Promise<runtime.ApiResponse<TranslationWithCommentModel>> {
+    async create7Raw(requestParameters: Create7Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TranslationWithCommentModel>> {
         if (requestParameters.translationCommentWithLangKeyDto === null || requestParameters.translationCommentWithLangKeyDto === undefined) {
             throw new runtime.RequiredError('translationCommentWithLangKeyDto','Required parameter requestParameters.translationCommentWithLangKeyDto was null or undefined when calling create7.');
         }
@@ -137,6 +150,10 @@ export class TranslationCommentsApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         headerParameters['Content-Type'] = 'application/json';
+
+        if (requestParameters.xAPIKey !== undefined && requestParameters.xAPIKey !== null) {
+            headerParameters['X-API-Key'] = String(requestParameters.xAPIKey);
+        }
 
         const response = await this.request({
             path: `/v2/projects/translations/create-comment`,
@@ -152,7 +169,7 @@ export class TranslationCommentsApi extends runtime.BaseAPI {
     /**
      * Creates a translation comment. Empty translation is stored, when not exists.
      */
-    async create7(requestParameters: TranslationCommentsApiCreate7Request, initOverrides?: RequestInit): Promise<TranslationWithCommentModel> {
+    async create7(requestParameters: Create7Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TranslationWithCommentModel> {
         const response = await this.create7Raw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -160,9 +177,9 @@ export class TranslationCommentsApi extends runtime.BaseAPI {
     /**
      * Deletes the translation comment
      */
-    async delete3Raw(requestParameters: TranslationCommentsApiDelete3Request, initOverrides?: RequestInit): Promise<runtime.ApiResponse<void>> {
+    async delete5Raw(requestParameters: Delete5Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters.commentId === null || requestParameters.commentId === undefined) {
-            throw new runtime.RequiredError('commentId','Required parameter requestParameters.commentId was null or undefined when calling delete3.');
+            throw new runtime.RequiredError('commentId','Required parameter requestParameters.commentId was null or undefined when calling delete5.');
         }
 
         const queryParameters: any = {};
@@ -172,6 +189,10 @@ export class TranslationCommentsApi extends runtime.BaseAPI {
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
+
+        if (requestParameters.xAPIKey !== undefined && requestParameters.xAPIKey !== null) {
+            headerParameters['X-API-Key'] = String(requestParameters.xAPIKey);
+        }
 
         const response = await this.request({
             path: `/v2/projects/translations/{translationId}/comments/{commentId}`.replace(`{${"commentId"}}`, encodeURIComponent(String(requestParameters.commentId))),
@@ -186,14 +207,14 @@ export class TranslationCommentsApi extends runtime.BaseAPI {
     /**
      * Deletes the translation comment
      */
-    async delete3(requestParameters: TranslationCommentsApiDelete3Request, initOverrides?: RequestInit): Promise<void> {
-        await this.delete3Raw(requestParameters, initOverrides);
+    async delete5(requestParameters: Delete5Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.delete5Raw(requestParameters, initOverrides);
     }
 
     /**
      * Returns single translation comment
      */
-    async get2Raw(requestParameters: TranslationCommentsApiGet2Request, initOverrides?: RequestInit): Promise<runtime.ApiResponse<TranslationCommentModel>> {
+    async get2Raw(requestParameters: Get2Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TranslationCommentModel>> {
         if (requestParameters.translationId === null || requestParameters.translationId === undefined) {
             throw new runtime.RequiredError('translationId','Required parameter requestParameters.translationId was null or undefined when calling get2.');
         }
@@ -210,6 +231,10 @@ export class TranslationCommentsApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+        if (requestParameters.xAPIKey !== undefined && requestParameters.xAPIKey !== null) {
+            headerParameters['X-API-Key'] = String(requestParameters.xAPIKey);
+        }
+
         const response = await this.request({
             path: `/v2/projects/translations/{translationId}/comments/{commentId}`.replace(`{${"translationId"}}`, encodeURIComponent(String(requestParameters.translationId))).replace(`{${"commentId"}}`, encodeURIComponent(String(requestParameters.commentId))),
             method: 'GET',
@@ -223,7 +248,7 @@ export class TranslationCommentsApi extends runtime.BaseAPI {
     /**
      * Returns single translation comment
      */
-    async get2(requestParameters: TranslationCommentsApiGet2Request, initOverrides?: RequestInit): Promise<TranslationCommentModel> {
+    async get2(requestParameters: Get2Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TranslationCommentModel> {
         const response = await this.get2Raw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -231,7 +256,7 @@ export class TranslationCommentsApi extends runtime.BaseAPI {
     /**
      * Returns translation comments of translation
      */
-    async getAll4Raw(requestParameters: TranslationCommentsApiGetAll4Request, initOverrides?: RequestInit): Promise<runtime.ApiResponse<PagedModelTranslationCommentModel>> {
+    async getAll4Raw(requestParameters: GetAll4Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PagedModelTranslationCommentModel>> {
         if (requestParameters.translationId === null || requestParameters.translationId === undefined) {
             throw new runtime.RequiredError('translationId','Required parameter requestParameters.translationId was null or undefined when calling getAll4.');
         }
@@ -256,6 +281,10 @@ export class TranslationCommentsApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+        if (requestParameters.xAPIKey !== undefined && requestParameters.xAPIKey !== null) {
+            headerParameters['X-API-Key'] = String(requestParameters.xAPIKey);
+        }
+
         const response = await this.request({
             path: `/v2/projects/translations/{translationId}/comments`.replace(`{${"translationId"}}`, encodeURIComponent(String(requestParameters.translationId))),
             method: 'GET',
@@ -269,7 +298,7 @@ export class TranslationCommentsApi extends runtime.BaseAPI {
     /**
      * Returns translation comments of translation
      */
-    async getAll4(requestParameters: TranslationCommentsApiGetAll4Request, initOverrides?: RequestInit): Promise<PagedModelTranslationCommentModel> {
+    async getAll4(requestParameters: GetAll4Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PagedModelTranslationCommentModel> {
         const response = await this.getAll4Raw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -277,7 +306,7 @@ export class TranslationCommentsApi extends runtime.BaseAPI {
     /**
      * Sets state of translation comment
      */
-    async setState1Raw(requestParameters: TranslationCommentsApiSetState1Request, initOverrides?: RequestInit): Promise<runtime.ApiResponse<TranslationCommentModel>> {
+    async setState1Raw(requestParameters: SetState1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TranslationCommentModel>> {
         if (requestParameters.commentId === null || requestParameters.commentId === undefined) {
             throw new runtime.RequiredError('commentId','Required parameter requestParameters.commentId was null or undefined when calling setState1.');
         }
@@ -294,6 +323,10 @@ export class TranslationCommentsApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+        if (requestParameters.xAPIKey !== undefined && requestParameters.xAPIKey !== null) {
+            headerParameters['X-API-Key'] = String(requestParameters.xAPIKey);
+        }
+
         const response = await this.request({
             path: `/v2/projects/translations/{translationId}/comments/{commentId}/set-state/{state}`.replace(`{${"commentId"}}`, encodeURIComponent(String(requestParameters.commentId))).replace(`{${"state"}}`, encodeURIComponent(String(requestParameters.state))),
             method: 'PUT',
@@ -307,7 +340,7 @@ export class TranslationCommentsApi extends runtime.BaseAPI {
     /**
      * Sets state of translation comment
      */
-    async setState1(requestParameters: TranslationCommentsApiSetState1Request, initOverrides?: RequestInit): Promise<TranslationCommentModel> {
+    async setState1(requestParameters: SetState1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TranslationCommentModel> {
         const response = await this.setState1Raw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -315,7 +348,7 @@ export class TranslationCommentsApi extends runtime.BaseAPI {
     /**
      * Updates single translation comment
      */
-    async update1Raw(requestParameters: TranslationCommentsApiUpdate1Request, initOverrides?: RequestInit): Promise<runtime.ApiResponse<TranslationCommentModel>> {
+    async update1Raw(requestParameters: Update1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TranslationCommentModel>> {
         if (requestParameters.commentId === null || requestParameters.commentId === undefined) {
             throw new runtime.RequiredError('commentId','Required parameter requestParameters.commentId was null or undefined when calling update1.');
         }
@@ -334,6 +367,10 @@ export class TranslationCommentsApi extends runtime.BaseAPI {
 
         headerParameters['Content-Type'] = 'application/json';
 
+        if (requestParameters.xAPIKey !== undefined && requestParameters.xAPIKey !== null) {
+            headerParameters['X-API-Key'] = String(requestParameters.xAPIKey);
+        }
+
         const response = await this.request({
             path: `/v2/projects/translations/{translationId}/comments/{commentId}`.replace(`{${"commentId"}}`, encodeURIComponent(String(requestParameters.commentId))),
             method: 'PUT',
@@ -348,7 +385,7 @@ export class TranslationCommentsApi extends runtime.BaseAPI {
     /**
      * Updates single translation comment
      */
-    async update1(requestParameters: TranslationCommentsApiUpdate1Request, initOverrides?: RequestInit): Promise<TranslationCommentModel> {
+    async update1(requestParameters: Update1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TranslationCommentModel> {
         const response = await this.update1Raw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -356,11 +393,11 @@ export class TranslationCommentsApi extends runtime.BaseAPI {
 }
 
 /**
-    * @export
-    * @enum {string}
-    */
-export enum SetState1StateEnum {
-    ResolutionNotNeeded = 'RESOLUTION_NOT_NEEDED',
-    NeedsResolution = 'NEEDS_RESOLUTION',
-    Resolved = 'RESOLVED'
-}
+ * @export
+ */
+export const SetState1StateEnum = {
+    ResolutionNotNeeded: 'RESOLUTION_NOT_NEEDED',
+    NeedsResolution: 'NEEDS_RESOLUTION',
+    Resolved: 'RESOLVED'
+} as const;
+export type SetState1StateEnum = typeof SetState1StateEnum[keyof typeof SetState1StateEnum];

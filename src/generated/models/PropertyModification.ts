@@ -33,6 +33,15 @@ export interface PropertyModification {
     _new?: object;
 }
 
+/**
+ * Check if a given object implements the PropertyModification interface.
+ */
+export function instanceOfPropertyModification(value: object): boolean {
+    let isInstance = true;
+
+    return isInstance;
+}
+
 export function PropertyModificationFromJSON(json: any): PropertyModification {
     return PropertyModificationFromJSONTyped(json, false);
 }

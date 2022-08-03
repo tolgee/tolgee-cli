@@ -13,8 +13,8 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { EntityModelImportFileIssueView } from './EntityModelImportFileIssueView';
 import {
-    EntityModelImportFileIssueView,
     EntityModelImportFileIssueViewFromJSON,
     EntityModelImportFileIssueViewFromJSONTyped,
     EntityModelImportFileIssueViewToJSON,
@@ -32,6 +32,15 @@ export interface PagedModelEntityModelImportFileIssueViewEmbedded {
      * @memberof PagedModelEntityModelImportFileIssueViewEmbedded
      */
     importFileIssueViews?: Array<EntityModelImportFileIssueView>;
+}
+
+/**
+ * Check if a given object implements the PagedModelEntityModelImportFileIssueViewEmbedded interface.
+ */
+export function instanceOfPagedModelEntityModelImportFileIssueViewEmbedded(value: object): boolean {
+    let isInstance = true;
+
+    return isInstance;
 }
 
 export function PagedModelEntityModelImportFileIssueViewEmbeddedFromJSON(json: any): PagedModelEntityModelImportFileIssueViewEmbedded {

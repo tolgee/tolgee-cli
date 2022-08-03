@@ -45,6 +45,15 @@ export interface PageMetadata {
     number?: number;
 }
 
+/**
+ * Check if a given object implements the PageMetadata interface.
+ */
+export function instanceOfPageMetadata(value: object): boolean {
+    let isInstance = true;
+
+    return isInstance;
+}
+
 export function PageMetadataFromJSON(json: any): PageMetadata {
     return PageMetadataFromJSONTyped(json, false);
 }

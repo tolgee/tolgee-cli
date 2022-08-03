@@ -13,8 +13,8 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { ImportFileIssueParamView } from './ImportFileIssueParamView';
 import {
-    ImportFileIssueParamView,
     ImportFileIssueParamViewFromJSON,
     ImportFileIssueParamViewFromJSONTyped,
     ImportFileIssueParamViewToJSON,
@@ -46,20 +46,34 @@ export interface EntityModelImportFileIssueView {
     params: Array<ImportFileIssueParamView>;
 }
 
+
 /**
-* @export
-* @enum {string}
-*/
-export enum EntityModelImportFileIssueViewTypeEnum {
-    KeyIsNotString = 'KEY_IS_NOT_STRING',
-    MultipleValuesForKeyAndLanguage = 'MULTIPLE_VALUES_FOR_KEY_AND_LANGUAGE',
-    ValueIsNotString = 'VALUE_IS_NOT_STRING',
-    KeyIsEmpty = 'KEY_IS_EMPTY',
-    ValueIsEmpty = 'VALUE_IS_EMPTY',
-    PoMsgctxtNotSupported = 'PO_MSGCTXT_NOT_SUPPORTED',
-    IdAttributeNotProvided = 'ID_ATTRIBUTE_NOT_PROVIDED',
-    TargetNotProvided = 'TARGET_NOT_PROVIDED',
-    TranslationTooLong = 'TRANSLATION_TOO_LONG'
+ * @export
+ */
+export const EntityModelImportFileIssueViewTypeEnum = {
+    KeyIsNotString: 'KEY_IS_NOT_STRING',
+    MultipleValuesForKeyAndLanguage: 'MULTIPLE_VALUES_FOR_KEY_AND_LANGUAGE',
+    ValueIsNotString: 'VALUE_IS_NOT_STRING',
+    KeyIsEmpty: 'KEY_IS_EMPTY',
+    ValueIsEmpty: 'VALUE_IS_EMPTY',
+    PoMsgctxtNotSupported: 'PO_MSGCTXT_NOT_SUPPORTED',
+    IdAttributeNotProvided: 'ID_ATTRIBUTE_NOT_PROVIDED',
+    TargetNotProvided: 'TARGET_NOT_PROVIDED',
+    TranslationTooLong: 'TRANSLATION_TOO_LONG'
+} as const;
+export type EntityModelImportFileIssueViewTypeEnum = typeof EntityModelImportFileIssueViewTypeEnum[keyof typeof EntityModelImportFileIssueViewTypeEnum];
+
+
+/**
+ * Check if a given object implements the EntityModelImportFileIssueView interface.
+ */
+export function instanceOfEntityModelImportFileIssueView(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "id" in value;
+    isInstance = isInstance && "type" in value;
+    isInstance = isInstance && "params" in value;
+
+    return isInstance;
 }
 
 export function EntityModelImportFileIssueViewFromJSON(json: any): EntityModelImportFileIssueView {

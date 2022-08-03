@@ -13,8 +13,8 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { EntityDescriptionWithRelations } from './EntityDescriptionWithRelations';
 import {
-    EntityDescriptionWithRelations,
     EntityDescriptionWithRelationsFromJSON,
     EntityDescriptionWithRelationsFromJSONTyped,
     EntityDescriptionWithRelationsToJSON,
@@ -56,6 +56,19 @@ export interface ExistenceEntityDescription {
      * @memberof ExistenceEntityDescription
      */
     _exists?: boolean;
+}
+
+/**
+ * Check if a given object implements the ExistenceEntityDescription interface.
+ */
+export function instanceOfExistenceEntityDescription(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "entityClass" in value;
+    isInstance = isInstance && "entityId" in value;
+    isInstance = isInstance && "data" in value;
+    isInstance = isInstance && "relations" in value;
+
+    return isInstance;
 }
 
 export function ExistenceEntityDescriptionFromJSON(json: any): ExistenceEntityDescription {

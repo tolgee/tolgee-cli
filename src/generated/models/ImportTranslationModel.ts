@@ -69,6 +69,20 @@ export interface ImportTranslationModel {
     resolved: boolean;
 }
 
+/**
+ * Check if a given object implements the ImportTranslationModel interface.
+ */
+export function instanceOfImportTranslationModel(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "id" in value;
+    isInstance = isInstance && "keyName" in value;
+    isInstance = isInstance && "keyId" in value;
+    isInstance = isInstance && "override" in value;
+    isInstance = isInstance && "resolved" in value;
+
+    return isInstance;
+}
+
 export function ImportTranslationModelFromJSON(json: any): ImportTranslationModel {
     return ImportTranslationModelFromJSONTyped(json, false);
 }

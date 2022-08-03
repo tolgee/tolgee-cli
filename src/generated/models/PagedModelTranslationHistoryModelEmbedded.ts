@@ -13,8 +13,8 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { TranslationHistoryModel } from './TranslationHistoryModel';
 import {
-    TranslationHistoryModel,
     TranslationHistoryModelFromJSON,
     TranslationHistoryModelFromJSONTyped,
     TranslationHistoryModelToJSON,
@@ -32,6 +32,15 @@ export interface PagedModelTranslationHistoryModelEmbedded {
      * @memberof PagedModelTranslationHistoryModelEmbedded
      */
     revisions?: Array<TranslationHistoryModel>;
+}
+
+/**
+ * Check if a given object implements the PagedModelTranslationHistoryModelEmbedded interface.
+ */
+export function instanceOfPagedModelTranslationHistoryModelEmbedded(value: object): boolean {
+    let isInstance = true;
+
+    return isInstance;
 }
 
 export function PagedModelTranslationHistoryModelEmbeddedFromJSON(json: any): PagedModelTranslationHistoryModelEmbedded {

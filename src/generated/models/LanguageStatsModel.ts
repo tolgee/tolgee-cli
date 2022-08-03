@@ -105,6 +105,24 @@ export interface LanguageStatsModel {
     untranslatedPercentage: number;
 }
 
+/**
+ * Check if a given object implements the LanguageStatsModel interface.
+ */
+export function instanceOfLanguageStatsModel(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "translatedKeyCount" in value;
+    isInstance = isInstance && "translatedWordCount" in value;
+    isInstance = isInstance && "translatedPercentage" in value;
+    isInstance = isInstance && "reviewedKeyCount" in value;
+    isInstance = isInstance && "reviewedWordCount" in value;
+    isInstance = isInstance && "reviewedPercentage" in value;
+    isInstance = isInstance && "untranslatedKeyCount" in value;
+    isInstance = isInstance && "untranslatedWordCount" in value;
+    isInstance = isInstance && "untranslatedPercentage" in value;
+
+    return isInstance;
+}
+
 export function LanguageStatsModelFromJSON(json: any): LanguageStatsModel {
     return LanguageStatsModelFromJSONTyped(json, false);
 }

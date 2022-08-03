@@ -72,6 +72,20 @@ export interface ApiKeyWithLanguagesModel {
     permittedLanguageIds?: Array<number>;
 }
 
+/**
+ * Check if a given object implements the ApiKeyWithLanguagesModel interface.
+ */
+export function instanceOfApiKeyWithLanguagesModel(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "id" in value;
+    isInstance = isInstance && "key" in value;
+    isInstance = isInstance && "projectId" in value;
+    isInstance = isInstance && "projectName" in value;
+    isInstance = isInstance && "scopes" in value;
+
+    return isInstance;
+}
+
 export function ApiKeyWithLanguagesModelFromJSON(json: any): ApiKeyWithLanguagesModel {
     return ApiKeyWithLanguagesModelFromJSONTyped(json, false);
 }

@@ -1,11 +1,13 @@
 import {Fetcher} from "openapi-typescript-fetch";
 import {paths} from "./generated/apiSchema.generated";
-import {ImportApi} from "./generated";
+import {ExportApi, ImportApi, LanguagesApi, ResponseError} from "./generated";
 
 export class Client {
 
   private fetcher = Fetcher.for<paths>()
   private importApi = new ImportApi()
+  private exportApi = new ExportApi()
+  private languagesApi = new LanguagesApi()
 
   constructor(apiUrl: string, private apiKey: string) {
     this.fetcher.configure({
@@ -18,15 +20,44 @@ export class Client {
   }
 
   async deleteImport() {
-    return this.importApi.cancelImport1({ak: this.apiKey}).catch(this.errorHandler)
+    return this.importApi.cancelImport1({xAPIKey: this.apiKey}).catch(this.errorHandler)
   }
 
   async addFiles(files: any) {
-    return this.importApi.addFiles1({ak: this.apiKey, files: files}).catch(this.errorHandler)
+    return this.importApi.addFiles1({xAPIKey: this.apiKey, files: files}).catch(this.errorHandler)
   }
 
   async applyImport() {
-    return this.importApi.applyImport1({ak: this.apiKey}).catch(this.errorHandler)
+    return this.importApi.applyImport1({xAPIKey: this.apiKey}).catch(this.errorHandler)
+  }
+
+  async getAllKeys() {
+    const tag = await this.getAnyLanguage();
+    if (!tag) {
+      throw Error('No language found.')
+    }
+    try {
+      const response = await this.exportApi.exportPost1({
+        xAPIKey: this.apiKey,
+        // @ts-ignore
+        exportParams: {
+          filterState: ['REVIEWED', 'TRANSLATED', 'UNTRANSLATED'],
+          // @ts-ignore
+          languages: [tag],
+          splitByScopeDelimiter: "",
+          zip: false
+        }
+      },)
+      return Object.keys(response);
+    } catch (e) {
+      console.error(await (e as ResponseError).response.json())
+      throw e;
+    }
+  }
+
+  async getAnyLanguage() {
+    const result = await this.languagesApi.getAll6({xAPIKey: this.apiKey, size: 1})
+    return result.embedded?.languages?.[0]?.tag
   }
 
   private errorHandler = async (e: any) => {

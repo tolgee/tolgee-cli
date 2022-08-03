@@ -14,14 +14,17 @@
 
 
 import * as runtime from '../runtime';
+import type {
+  ApiKeyWithLanguagesModel,
+} from '../models';
 import {
-    ApiKeyWithLanguagesModel,
     ApiKeyWithLanguagesModelFromJSON,
     ApiKeyWithLanguagesModelToJSON,
 } from '../models';
 
-export interface APIKeysApiGetCurrentRequest {
+export interface GetCurrentRequest {
     ak?: string;
+    xAPIKey?: string;
 }
 
 /**
@@ -32,7 +35,7 @@ export class APIKeysApi extends runtime.BaseAPI {
     /**
      * Returns current API key info
      */
-    async getCurrentRaw(requestParameters: APIKeysApiGetCurrentRequest, initOverrides?: RequestInit): Promise<runtime.ApiResponse<ApiKeyWithLanguagesModel>> {
+    async getCurrentRaw(requestParameters: GetCurrentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ApiKeyWithLanguagesModel>> {
         const queryParameters: any = {};
 
         if (requestParameters.ak !== undefined) {
@@ -40,6 +43,10 @@ export class APIKeysApi extends runtime.BaseAPI {
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
+
+        if (requestParameters.xAPIKey !== undefined && requestParameters.xAPIKey !== null) {
+            headerParameters['X-API-Key'] = String(requestParameters.xAPIKey);
+        }
 
         const response = await this.request({
             path: `/v2/api-keys/current`,
@@ -54,7 +61,7 @@ export class APIKeysApi extends runtime.BaseAPI {
     /**
      * Returns current API key info
      */
-    async getCurrent(requestParameters: APIKeysApiGetCurrentRequest = {}, initOverrides?: RequestInit): Promise<ApiKeyWithLanguagesModel> {
+    async getCurrent(requestParameters: GetCurrentRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ApiKeyWithLanguagesModel> {
         const response = await this.getCurrentRaw(requestParameters, initOverrides);
         return await response.value();
     }

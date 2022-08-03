@@ -13,14 +13,14 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { PageMetadata } from './PageMetadata';
 import {
-    PageMetadata,
     PageMetadataFromJSON,
     PageMetadataFromJSONTyped,
     PageMetadataToJSON,
 } from './PageMetadata';
+import type { PagedModelTranslationMemoryItemModelEmbedded } from './PagedModelTranslationMemoryItemModelEmbedded';
 import {
-    PagedModelTranslationMemoryItemModelEmbedded,
     PagedModelTranslationMemoryItemModelEmbeddedFromJSON,
     PagedModelTranslationMemoryItemModelEmbeddedFromJSONTyped,
     PagedModelTranslationMemoryItemModelEmbeddedToJSON,
@@ -44,6 +44,15 @@ export interface PagedModelTranslationMemoryItemModel {
      * @memberof PagedModelTranslationMemoryItemModel
      */
     page?: PageMetadata;
+}
+
+/**
+ * Check if a given object implements the PagedModelTranslationMemoryItemModel interface.
+ */
+export function instanceOfPagedModelTranslationMemoryItemModel(value: object): boolean {
+    let isInstance = true;
+
+    return isInstance;
 }
 
 export function PagedModelTranslationMemoryItemModelFromJSON(json: any): PagedModelTranslationMemoryItemModel {

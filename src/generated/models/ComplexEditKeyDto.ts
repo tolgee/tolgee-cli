@@ -51,6 +51,16 @@ export interface ComplexEditKeyDto {
     screenshotUploadedImageIds?: Array<number>;
 }
 
+/**
+ * Check if a given object implements the ComplexEditKeyDto interface.
+ */
+export function instanceOfComplexEditKeyDto(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "name" in value;
+
+    return isInstance;
+}
+
 export function ComplexEditKeyDtoFromJSON(json: any): ComplexEditKeyDto {
     return ComplexEditKeyDtoFromJSONTyped(json, false);
 }

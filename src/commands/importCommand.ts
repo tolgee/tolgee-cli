@@ -1,10 +1,10 @@
 import {createReadStream, promises as fs} from "fs";
 import path from "path";
-import {BadRequestError, Client, NotFoundError} from "./Client";
-import {logError, logProcess} from "./logger";
-import {ImportAddFilesResultModel} from "./generated";
+import {BadRequestError, Client, NotFoundError} from "../Client";
+import {logError, logProcess} from "../logger";
+import {ImportAddFilesResultModel} from "../generated";
 
-export class Import {
+export class ImportCommand {
 
   private client: Client
 

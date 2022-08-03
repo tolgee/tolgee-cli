@@ -13,8 +13,8 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { ProjectActivityModel } from './ProjectActivityModel';
 import {
-    ProjectActivityModel,
     ProjectActivityModelFromJSON,
     ProjectActivityModelFromJSONTyped,
     ProjectActivityModelToJSON,
@@ -32,6 +32,15 @@ export interface PagedModelProjectActivityModelEmbedded {
      * @memberof PagedModelProjectActivityModelEmbedded
      */
     activities?: Array<ProjectActivityModel>;
+}
+
+/**
+ * Check if a given object implements the PagedModelProjectActivityModelEmbedded interface.
+ */
+export function instanceOfPagedModelProjectActivityModelEmbedded(value: object): boolean {
+    let isInstance = true;
+
+    return isInstance;
 }
 
 export function PagedModelProjectActivityModelEmbeddedFromJSON(json: any): PagedModelProjectActivityModelEmbedded {

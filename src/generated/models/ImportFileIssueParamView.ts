@@ -33,18 +33,30 @@ export interface ImportFileIssueParamView {
     type: ImportFileIssueParamViewTypeEnum;
 }
 
+
 /**
-* @export
-* @enum {string}
-*/
-export enum ImportFileIssueParamViewTypeEnum {
-    KeyName = 'KEY_NAME',
-    KeyId = 'KEY_ID',
-    LanguageId = 'LANGUAGE_ID',
-    KeyIndex = 'KEY_INDEX',
-    Value = 'VALUE',
-    Line = 'LINE',
-    FileNodeOriginal = 'FILE_NODE_ORIGINAL'
+ * @export
+ */
+export const ImportFileIssueParamViewTypeEnum = {
+    KeyName: 'KEY_NAME',
+    KeyId: 'KEY_ID',
+    LanguageId: 'LANGUAGE_ID',
+    KeyIndex: 'KEY_INDEX',
+    Value: 'VALUE',
+    Line: 'LINE',
+    FileNodeOriginal: 'FILE_NODE_ORIGINAL'
+} as const;
+export type ImportFileIssueParamViewTypeEnum = typeof ImportFileIssueParamViewTypeEnum[keyof typeof ImportFileIssueParamViewTypeEnum];
+
+
+/**
+ * Check if a given object implements the ImportFileIssueParamView interface.
+ */
+export function instanceOfImportFileIssueParamView(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "type" in value;
+
+    return isInstance;
 }
 
 export function ImportFileIssueParamViewFromJSON(json: any): ImportFileIssueParamView {

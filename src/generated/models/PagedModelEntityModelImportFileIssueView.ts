@@ -13,14 +13,14 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { PageMetadata } from './PageMetadata';
 import {
-    PageMetadata,
     PageMetadataFromJSON,
     PageMetadataFromJSONTyped,
     PageMetadataToJSON,
 } from './PageMetadata';
+import type { PagedModelEntityModelImportFileIssueViewEmbedded } from './PagedModelEntityModelImportFileIssueViewEmbedded';
 import {
-    PagedModelEntityModelImportFileIssueViewEmbedded,
     PagedModelEntityModelImportFileIssueViewEmbeddedFromJSON,
     PagedModelEntityModelImportFileIssueViewEmbeddedFromJSONTyped,
     PagedModelEntityModelImportFileIssueViewEmbeddedToJSON,
@@ -44,6 +44,15 @@ export interface PagedModelEntityModelImportFileIssueView {
      * @memberof PagedModelEntityModelImportFileIssueView
      */
     page?: PageMetadata;
+}
+
+/**
+ * Check if a given object implements the PagedModelEntityModelImportFileIssueView interface.
+ */
+export function instanceOfPagedModelEntityModelImportFileIssueView(value: object): boolean {
+    let isInstance = true;
+
+    return isInstance;
 }
 
 export function PagedModelEntityModelImportFileIssueViewFromJSON(json: any): PagedModelEntityModelImportFileIssueView {

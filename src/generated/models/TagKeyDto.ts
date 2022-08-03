@@ -27,6 +27,16 @@ export interface TagKeyDto {
     name: string;
 }
 
+/**
+ * Check if a given object implements the TagKeyDto interface.
+ */
+export function instanceOfTagKeyDto(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "name" in value;
+
+    return isInstance;
+}
+
 export function TagKeyDtoFromJSON(json: any): TagKeyDto {
     return TagKeyDtoFromJSONTyped(json, false);
 }

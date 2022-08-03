@@ -13,14 +13,14 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { ErrorResponseBody } from './ErrorResponseBody';
 import {
-    ErrorResponseBody,
     ErrorResponseBodyFromJSON,
     ErrorResponseBodyFromJSONTyped,
     ErrorResponseBodyToJSON,
 } from './ErrorResponseBody';
+import type { PagedModelImportLanguageModel } from './PagedModelImportLanguageModel';
 import {
-    PagedModelImportLanguageModel,
     PagedModelImportLanguageModelFromJSON,
     PagedModelImportLanguageModelFromJSONTyped,
     PagedModelImportLanguageModelToJSON,
@@ -44,6 +44,16 @@ export interface ImportAddFilesResultModel {
      * @memberof ImportAddFilesResultModel
      */
     result?: PagedModelImportLanguageModel;
+}
+
+/**
+ * Check if a given object implements the ImportAddFilesResultModel interface.
+ */
+export function instanceOfImportAddFilesResultModel(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "errors" in value;
+
+    return isInstance;
 }
 
 export function ImportAddFilesResultModelFromJSON(json: any): ImportAddFilesResultModel {

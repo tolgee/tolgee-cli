@@ -14,17 +14,20 @@
 
 
 import * as runtime from '../runtime';
+import type {
+  PagedModelLanguageModel,
+} from '../models';
 import {
-    PagedModelLanguageModel,
     PagedModelLanguageModelFromJSON,
     PagedModelLanguageModelToJSON,
 } from '../models';
 
-export interface LanguagesApiGetAll6Request {
+export interface GetAll6Request {
     page?: number;
     size?: number;
     sort?: Array<string>;
     ak?: string;
+    xAPIKey?: string;
 }
 
 /**
@@ -35,7 +38,7 @@ export class LanguagesApi extends runtime.BaseAPI {
     /**
      * Returns all project languages
      */
-    async getAll6Raw(requestParameters: LanguagesApiGetAll6Request, initOverrides?: RequestInit): Promise<runtime.ApiResponse<PagedModelLanguageModel>> {
+    async getAll6Raw(requestParameters: GetAll6Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PagedModelLanguageModel>> {
         const queryParameters: any = {};
 
         if (requestParameters.page !== undefined) {
@@ -56,6 +59,10 @@ export class LanguagesApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+        if (requestParameters.xAPIKey !== undefined && requestParameters.xAPIKey !== null) {
+            headerParameters['X-API-Key'] = String(requestParameters.xAPIKey);
+        }
+
         const response = await this.request({
             path: `/v2/projects/languages`,
             method: 'GET',
@@ -69,7 +76,7 @@ export class LanguagesApi extends runtime.BaseAPI {
     /**
      * Returns all project languages
      */
-    async getAll6(requestParameters: LanguagesApiGetAll6Request = {}, initOverrides?: RequestInit): Promise<PagedModelLanguageModel> {
+    async getAll6(requestParameters: GetAll6Request = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PagedModelLanguageModel> {
         const response = await this.getAll6Raw(requestParameters, initOverrides);
         return await response.value();
     }

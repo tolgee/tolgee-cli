@@ -13,8 +13,8 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { Avatar } from './Avatar';
 import {
-    Avatar,
     AvatarFromJSON,
     AvatarFromJSONTyped,
     AvatarToJSON,
@@ -50,6 +50,16 @@ export interface ProjectActivityAuthorModel {
      * @memberof ProjectActivityAuthorModel
      */
     avatar?: Avatar;
+}
+
+/**
+ * Check if a given object implements the ProjectActivityAuthorModel interface.
+ */
+export function instanceOfProjectActivityAuthorModel(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "id" in value;
+
+    return isInstance;
 }
 
 export function ProjectActivityAuthorModelFromJSON(json: any): ProjectActivityAuthorModel {

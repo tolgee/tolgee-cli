@@ -27,6 +27,16 @@ export interface EditKeyDto {
     name: string;
 }
 
+/**
+ * Check if a given object implements the EditKeyDto interface.
+ */
+export function instanceOfEditKeyDto(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "name" in value;
+
+    return isInstance;
+}
+
 export function EditKeyDtoFromJSON(json: any): EditKeyDto {
     return EditKeyDtoFromJSONTyped(json, false);
 }

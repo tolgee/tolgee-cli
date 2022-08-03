@@ -51,21 +51,38 @@ export interface TranslationModel {
     mtProvider?: TranslationModelMtProviderEnum;
 }
 
+
 /**
-* @export
-* @enum {string}
-*/
-export enum TranslationModelStateEnum {
-    Untranslated = 'UNTRANSLATED',
-    Translated = 'TRANSLATED',
-    Reviewed = 'REVIEWED'
-}/**
-* @export
-* @enum {string}
-*/
-export enum TranslationModelMtProviderEnum {
-    Google = 'GOOGLE',
-    Aws = 'AWS'
+ * @export
+ */
+export const TranslationModelStateEnum = {
+    Untranslated: 'UNTRANSLATED',
+    Translated: 'TRANSLATED',
+    Reviewed: 'REVIEWED'
+} as const;
+export type TranslationModelStateEnum = typeof TranslationModelStateEnum[keyof typeof TranslationModelStateEnum];
+
+/**
+ * @export
+ */
+export const TranslationModelMtProviderEnum = {
+    Google: 'GOOGLE',
+    Aws: 'AWS',
+    Deepl: 'DEEPL'
+} as const;
+export type TranslationModelMtProviderEnum = typeof TranslationModelMtProviderEnum[keyof typeof TranslationModelMtProviderEnum];
+
+
+/**
+ * Check if a given object implements the TranslationModel interface.
+ */
+export function instanceOfTranslationModel(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "id" in value;
+    isInstance = isInstance && "state" in value;
+    isInstance = isInstance && "auto" in value;
+
+    return isInstance;
 }
 
 export function TranslationModelFromJSON(json: any): TranslationModel {

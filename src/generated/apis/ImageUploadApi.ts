@@ -14,20 +14,24 @@
 
 
 import * as runtime from '../runtime';
+import type {
+  UploadedImageModel,
+} from '../models';
 import {
-    UploadedImageModel,
     UploadedImageModelFromJSON,
     UploadedImageModelToJSON,
 } from '../models';
 
-export interface ImageUploadApiDelete5Request {
+export interface Delete7Request {
     ids: Set<number>;
     ak?: string;
+    xAPIKey?: string;
 }
 
-export interface ImageUploadApiUploadRequest {
+export interface UploadRequest {
     image: Blob;
     ak?: string;
+    xAPIKey?: string;
 }
 
 /**
@@ -38,9 +42,9 @@ export class ImageUploadApi extends runtime.BaseAPI {
     /**
      * Deletes uploaded images
      */
-    async delete5Raw(requestParameters: ImageUploadApiDelete5Request, initOverrides?: RequestInit): Promise<runtime.ApiResponse<void>> {
+    async delete7Raw(requestParameters: Delete7Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters.ids === null || requestParameters.ids === undefined) {
-            throw new runtime.RequiredError('ids','Required parameter requestParameters.ids was null or undefined when calling delete5.');
+            throw new runtime.RequiredError('ids','Required parameter requestParameters.ids was null or undefined when calling delete7.');
         }
 
         const queryParameters: any = {};
@@ -50,6 +54,10 @@ export class ImageUploadApi extends runtime.BaseAPI {
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
+
+        if (requestParameters.xAPIKey !== undefined && requestParameters.xAPIKey !== null) {
+            headerParameters['X-API-Key'] = String(requestParameters.xAPIKey);
+        }
 
         const response = await this.request({
             path: `/v2/image-upload/{ids}`.replace(`{${"ids"}}`, encodeURIComponent(String(requestParameters.ids))),
@@ -64,14 +72,14 @@ export class ImageUploadApi extends runtime.BaseAPI {
     /**
      * Deletes uploaded images
      */
-    async delete5(requestParameters: ImageUploadApiDelete5Request, initOverrides?: RequestInit): Promise<void> {
-        await this.delete5Raw(requestParameters, initOverrides);
+    async delete7(requestParameters: Delete7Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.delete7Raw(requestParameters, initOverrides);
     }
 
     /**
      * Uploads an image for later use
      */
-    async uploadRaw(requestParameters: ImageUploadApiUploadRequest, initOverrides?: RequestInit): Promise<runtime.ApiResponse<UploadedImageModel>> {
+    async uploadRaw(requestParameters: UploadRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UploadedImageModel>> {
         if (requestParameters.image === null || requestParameters.image === undefined) {
             throw new runtime.RequiredError('image','Required parameter requestParameters.image was null or undefined when calling upload.');
         }
@@ -83,6 +91,10 @@ export class ImageUploadApi extends runtime.BaseAPI {
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
+
+        if (requestParameters.xAPIKey !== undefined && requestParameters.xAPIKey !== null) {
+            headerParameters['X-API-Key'] = String(requestParameters.xAPIKey);
+        }
 
         const consumes: runtime.Consume[] = [
             { contentType: 'multipart/form-data' },
@@ -118,7 +130,7 @@ export class ImageUploadApi extends runtime.BaseAPI {
     /**
      * Uploads an image for later use
      */
-    async upload(requestParameters: ImageUploadApiUploadRequest, initOverrides?: RequestInit): Promise<UploadedImageModel> {
+    async upload(requestParameters: UploadRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UploadedImageModel> {
         const response = await this.uploadRaw(requestParameters, initOverrides);
         return await response.value();
     }

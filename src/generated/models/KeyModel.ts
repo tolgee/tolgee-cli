@@ -33,6 +33,17 @@ export interface KeyModel {
     name: string;
 }
 
+/**
+ * Check if a given object implements the KeyModel interface.
+ */
+export function instanceOfKeyModel(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "id" in value;
+    isInstance = isInstance && "name" in value;
+
+    return isInstance;
+}
+
 export function KeyModelFromJSON(json: any): KeyModel {
     return KeyModelFromJSONTyped(json, false);
 }

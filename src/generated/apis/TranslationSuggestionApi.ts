@@ -14,29 +14,33 @@
 
 
 import * as runtime from '../runtime';
+import type {
+  PagedModelTranslationMemoryItemModel,
+  SuggestRequestDto,
+  SuggestResultModel,
+} from '../models';
 import {
-    PagedModelTranslationMemoryItemModel,
     PagedModelTranslationMemoryItemModelFromJSON,
     PagedModelTranslationMemoryItemModelToJSON,
-    SuggestRequestDto,
     SuggestRequestDtoFromJSON,
     SuggestRequestDtoToJSON,
-    SuggestResultModel,
     SuggestResultModelFromJSON,
     SuggestResultModelToJSON,
 } from '../models';
 
-export interface TranslationSuggestionApiSuggestMachineTranslations1Request {
+export interface SuggestMachineTranslations1Request {
     suggestRequestDto: SuggestRequestDto;
     ak?: string;
+    xAPIKey?: string;
 }
 
-export interface TranslationSuggestionApiSuggestTranslationMemory1Request {
+export interface SuggestTranslationMemory1Request {
     suggestRequestDto: SuggestRequestDto;
     page?: number;
     size?: number;
     sort?: Array<string>;
     ak?: string;
+    xAPIKey?: string;
 }
 
 /**
@@ -47,7 +51,7 @@ export class TranslationSuggestionApi extends runtime.BaseAPI {
     /**
      * Suggests machine translations from enabled services
      */
-    async suggestMachineTranslations1Raw(requestParameters: TranslationSuggestionApiSuggestMachineTranslations1Request, initOverrides?: RequestInit): Promise<runtime.ApiResponse<SuggestResultModel>> {
+    async suggestMachineTranslations1Raw(requestParameters: SuggestMachineTranslations1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SuggestResultModel>> {
         if (requestParameters.suggestRequestDto === null || requestParameters.suggestRequestDto === undefined) {
             throw new runtime.RequiredError('suggestRequestDto','Required parameter requestParameters.suggestRequestDto was null or undefined when calling suggestMachineTranslations1.');
         }
@@ -61,6 +65,10 @@ export class TranslationSuggestionApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         headerParameters['Content-Type'] = 'application/json';
+
+        if (requestParameters.xAPIKey !== undefined && requestParameters.xAPIKey !== null) {
+            headerParameters['X-API-Key'] = String(requestParameters.xAPIKey);
+        }
 
         const response = await this.request({
             path: `/v2/projects/suggest/machine-translations`,
@@ -76,7 +84,7 @@ export class TranslationSuggestionApi extends runtime.BaseAPI {
     /**
      * Suggests machine translations from enabled services
      */
-    async suggestMachineTranslations1(requestParameters: TranslationSuggestionApiSuggestMachineTranslations1Request, initOverrides?: RequestInit): Promise<SuggestResultModel> {
+    async suggestMachineTranslations1(requestParameters: SuggestMachineTranslations1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SuggestResultModel> {
         const response = await this.suggestMachineTranslations1Raw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -84,7 +92,7 @@ export class TranslationSuggestionApi extends runtime.BaseAPI {
     /**
      * Suggests machine translations from translation memory.  The result is always sorted by similarity, so sorting is not supported.
      */
-    async suggestTranslationMemory1Raw(requestParameters: TranslationSuggestionApiSuggestTranslationMemory1Request, initOverrides?: RequestInit): Promise<runtime.ApiResponse<PagedModelTranslationMemoryItemModel>> {
+    async suggestTranslationMemory1Raw(requestParameters: SuggestTranslationMemory1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PagedModelTranslationMemoryItemModel>> {
         if (requestParameters.suggestRequestDto === null || requestParameters.suggestRequestDto === undefined) {
             throw new runtime.RequiredError('suggestRequestDto','Required parameter requestParameters.suggestRequestDto was null or undefined when calling suggestTranslationMemory1.');
         }
@@ -111,6 +119,10 @@ export class TranslationSuggestionApi extends runtime.BaseAPI {
 
         headerParameters['Content-Type'] = 'application/json';
 
+        if (requestParameters.xAPIKey !== undefined && requestParameters.xAPIKey !== null) {
+            headerParameters['X-API-Key'] = String(requestParameters.xAPIKey);
+        }
+
         const response = await this.request({
             path: `/v2/projects/suggest/translation-memory`,
             method: 'POST',
@@ -125,7 +137,7 @@ export class TranslationSuggestionApi extends runtime.BaseAPI {
     /**
      * Suggests machine translations from translation memory.  The result is always sorted by similarity, so sorting is not supported.
      */
-    async suggestTranslationMemory1(requestParameters: TranslationSuggestionApiSuggestTranslationMemory1Request, initOverrides?: RequestInit): Promise<PagedModelTranslationMemoryItemModel> {
+    async suggestTranslationMemory1(requestParameters: SuggestTranslationMemory1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PagedModelTranslationMemoryItemModel> {
         const response = await this.suggestTranslationMemory1Raw(requestParameters, initOverrides);
         return await response.value();
     }

@@ -13,8 +13,8 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { Avatar } from './Avatar';
 import {
-    Avatar,
     AvatarFromJSON,
     AvatarFromJSONTyped,
     AvatarToJSON,
@@ -50,6 +50,17 @@ export interface SimpleUserAccountModel {
      * @memberof SimpleUserAccountModel
      */
     avatar?: Avatar;
+}
+
+/**
+ * Check if a given object implements the SimpleUserAccountModel interface.
+ */
+export function instanceOfSimpleUserAccountModel(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "id" in value;
+    isInstance = isInstance && "username" in value;
+
+    return isInstance;
 }
 
 export function SimpleUserAccountModelFromJSON(json: any): SimpleUserAccountModel {

@@ -14,49 +14,65 @@
 
 
 import * as runtime from '../runtime';
+import type {
+  ComplexEditKeyDto,
+  CreateKeyDto,
+  DeleteKeysDto,
+  EditKeyDto,
+  KeyModel,
+  KeyWithDataModel,
+} from '../models';
 import {
-    ComplexEditKeyDto,
     ComplexEditKeyDtoFromJSON,
     ComplexEditKeyDtoToJSON,
-    CreateKeyDto,
     CreateKeyDtoFromJSON,
     CreateKeyDtoToJSON,
-    EditKeyDto,
+    DeleteKeysDtoFromJSON,
+    DeleteKeysDtoToJSON,
     EditKeyDtoFromJSON,
     EditKeyDtoToJSON,
-    KeyModel,
     KeyModelFromJSON,
     KeyModelToJSON,
-    KeyWithDataModel,
     KeyWithDataModelFromJSON,
     KeyWithDataModelToJSON,
 } from '../models';
 
-export interface LocalizationKeysApiComplexEdit1Request {
+export interface ComplexEdit1Request {
     id: number;
     complexEditKeyDto: ComplexEditKeyDto;
     ak?: string;
+    xAPIKey?: string;
 }
 
-export interface LocalizationKeysApiCreate2Request {
+export interface Create2Request {
     createKeyDto: CreateKeyDto;
     ak?: string;
+    xAPIKey?: string;
 }
 
-export interface LocalizationKeysApiCreate3Request {
+export interface Create3Request {
     createKeyDto: CreateKeyDto;
     ak?: string;
+    xAPIKey?: string;
 }
 
-export interface LocalizationKeysApiDelete1Request {
+export interface Delete1Request {
     ids: Set<number>;
     ak?: string;
+    xAPIKey?: string;
 }
 
-export interface LocalizationKeysApiEdit1Request {
+export interface Delete3Request {
+    deleteKeysDto: DeleteKeysDto;
+    ak?: string;
+    xAPIKey?: string;
+}
+
+export interface Edit1Request {
     id: number;
     editKeyDto: EditKeyDto;
     ak?: string;
+    xAPIKey?: string;
 }
 
 /**
@@ -67,7 +83,7 @@ export class LocalizationKeysApi extends runtime.BaseAPI {
     /**
      * More
      */
-    async complexEdit1Raw(requestParameters: LocalizationKeysApiComplexEdit1Request, initOverrides?: RequestInit): Promise<runtime.ApiResponse<KeyWithDataModel>> {
+    async complexEdit1Raw(requestParameters: ComplexEdit1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<KeyWithDataModel>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
             throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling complexEdit1.');
         }
@@ -86,6 +102,10 @@ export class LocalizationKeysApi extends runtime.BaseAPI {
 
         headerParameters['Content-Type'] = 'application/json';
 
+        if (requestParameters.xAPIKey !== undefined && requestParameters.xAPIKey !== null) {
+            headerParameters['X-API-Key'] = String(requestParameters.xAPIKey);
+        }
+
         const response = await this.request({
             path: `/v2/projects/keys/{id}/complex-update`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
             method: 'PUT',
@@ -100,7 +120,7 @@ export class LocalizationKeysApi extends runtime.BaseAPI {
     /**
      * More
      */
-    async complexEdit1(requestParameters: LocalizationKeysApiComplexEdit1Request, initOverrides?: RequestInit): Promise<KeyWithDataModel> {
+    async complexEdit1(requestParameters: ComplexEdit1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<KeyWithDataModel> {
         const response = await this.complexEdit1Raw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -108,7 +128,7 @@ export class LocalizationKeysApi extends runtime.BaseAPI {
     /**
      * Creates new key
      */
-    async create2Raw(requestParameters: LocalizationKeysApiCreate2Request, initOverrides?: RequestInit): Promise<runtime.ApiResponse<KeyWithDataModel>> {
+    async create2Raw(requestParameters: Create2Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<KeyWithDataModel>> {
         if (requestParameters.createKeyDto === null || requestParameters.createKeyDto === undefined) {
             throw new runtime.RequiredError('createKeyDto','Required parameter requestParameters.createKeyDto was null or undefined when calling create2.');
         }
@@ -122,6 +142,10 @@ export class LocalizationKeysApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         headerParameters['Content-Type'] = 'application/json';
+
+        if (requestParameters.xAPIKey !== undefined && requestParameters.xAPIKey !== null) {
+            headerParameters['X-API-Key'] = String(requestParameters.xAPIKey);
+        }
 
         const response = await this.request({
             path: `/v2/projects/keys/create`,
@@ -137,7 +161,7 @@ export class LocalizationKeysApi extends runtime.BaseAPI {
     /**
      * Creates new key
      */
-    async create2(requestParameters: LocalizationKeysApiCreate2Request, initOverrides?: RequestInit): Promise<KeyWithDataModel> {
+    async create2(requestParameters: Create2Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<KeyWithDataModel> {
         const response = await this.create2Raw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -145,7 +169,7 @@ export class LocalizationKeysApi extends runtime.BaseAPI {
     /**
      * Creates new key
      */
-    async create3Raw(requestParameters: LocalizationKeysApiCreate3Request, initOverrides?: RequestInit): Promise<runtime.ApiResponse<KeyWithDataModel>> {
+    async create3Raw(requestParameters: Create3Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<KeyWithDataModel>> {
         if (requestParameters.createKeyDto === null || requestParameters.createKeyDto === undefined) {
             throw new runtime.RequiredError('createKeyDto','Required parameter requestParameters.createKeyDto was null or undefined when calling create3.');
         }
@@ -159,6 +183,10 @@ export class LocalizationKeysApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         headerParameters['Content-Type'] = 'application/json';
+
+        if (requestParameters.xAPIKey !== undefined && requestParameters.xAPIKey !== null) {
+            headerParameters['X-API-Key'] = String(requestParameters.xAPIKey);
+        }
 
         const response = await this.request({
             path: `/v2/projects/keys`,
@@ -174,7 +202,7 @@ export class LocalizationKeysApi extends runtime.BaseAPI {
     /**
      * Creates new key
      */
-    async create3(requestParameters: LocalizationKeysApiCreate3Request, initOverrides?: RequestInit): Promise<KeyWithDataModel> {
+    async create3(requestParameters: Create3Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<KeyWithDataModel> {
         const response = await this.create3Raw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -182,7 +210,7 @@ export class LocalizationKeysApi extends runtime.BaseAPI {
     /**
      * Deletes one or multiple keys by their IDs
      */
-    async delete1Raw(requestParameters: LocalizationKeysApiDelete1Request, initOverrides?: RequestInit): Promise<runtime.ApiResponse<void>> {
+    async delete1Raw(requestParameters: Delete1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters.ids === null || requestParameters.ids === undefined) {
             throw new runtime.RequiredError('ids','Required parameter requestParameters.ids was null or undefined when calling delete1.');
         }
@@ -194,6 +222,10 @@ export class LocalizationKeysApi extends runtime.BaseAPI {
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
+
+        if (requestParameters.xAPIKey !== undefined && requestParameters.xAPIKey !== null) {
+            headerParameters['X-API-Key'] = String(requestParameters.xAPIKey);
+        }
 
         const response = await this.request({
             path: `/v2/projects/keys/{ids}`.replace(`{${"ids"}}`, encodeURIComponent(String(requestParameters.ids))),
@@ -208,14 +240,54 @@ export class LocalizationKeysApi extends runtime.BaseAPI {
     /**
      * Deletes one or multiple keys by their IDs
      */
-    async delete1(requestParameters: LocalizationKeysApiDelete1Request, initOverrides?: RequestInit): Promise<void> {
+    async delete1(requestParameters: Delete1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.delete1Raw(requestParameters, initOverrides);
+    }
+
+    /**
+     * Deletes one or multiple keys by their IDs in request body
+     */
+    async delete3Raw(requestParameters: Delete3Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters.deleteKeysDto === null || requestParameters.deleteKeysDto === undefined) {
+            throw new runtime.RequiredError('deleteKeysDto','Required parameter requestParameters.deleteKeysDto was null or undefined when calling delete3.');
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters.ak !== undefined) {
+            queryParameters['ak'] = requestParameters.ak;
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (requestParameters.xAPIKey !== undefined && requestParameters.xAPIKey !== null) {
+            headerParameters['X-API-Key'] = String(requestParameters.xAPIKey);
+        }
+
+        const response = await this.request({
+            path: `/v2/projects/keys`,
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+            body: DeleteKeysDtoToJSON(requestParameters.deleteKeysDto),
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Deletes one or multiple keys by their IDs in request body
+     */
+    async delete3(requestParameters: Delete3Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.delete3Raw(requestParameters, initOverrides);
     }
 
     /**
      * Edits key name
      */
-    async edit1Raw(requestParameters: LocalizationKeysApiEdit1Request, initOverrides?: RequestInit): Promise<runtime.ApiResponse<KeyModel>> {
+    async edit1Raw(requestParameters: Edit1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<KeyModel>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
             throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling edit1.');
         }
@@ -234,6 +306,10 @@ export class LocalizationKeysApi extends runtime.BaseAPI {
 
         headerParameters['Content-Type'] = 'application/json';
 
+        if (requestParameters.xAPIKey !== undefined && requestParameters.xAPIKey !== null) {
+            headerParameters['X-API-Key'] = String(requestParameters.xAPIKey);
+        }
+
         const response = await this.request({
             path: `/v2/projects/keys/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
             method: 'PUT',
@@ -248,7 +324,7 @@ export class LocalizationKeysApi extends runtime.BaseAPI {
     /**
      * Edits key name
      */
-    async edit1(requestParameters: LocalizationKeysApiEdit1Request, initOverrides?: RequestInit): Promise<KeyModel> {
+    async edit1(requestParameters: Edit1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<KeyModel> {
         const response = await this.edit1Raw(requestParameters, initOverrides);
         return await response.value();
     }

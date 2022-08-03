@@ -14,28 +14,33 @@
 
 
 import * as runtime from '../runtime';
+import type {
+  PagedModelProjectActivityModel,
+  ProjectStatsModel,
+} from '../models';
 import {
-    PagedModelProjectActivityModel,
     PagedModelProjectActivityModelFromJSON,
     PagedModelProjectActivityModelToJSON,
-    ProjectStatsModel,
     ProjectStatsModelFromJSON,
     ProjectStatsModelToJSON,
 } from '../models';
 
-export interface ProjectsApiGetActivity1Request {
+export interface GetActivity1Request {
     page?: number;
     size?: number;
     sort?: Array<string>;
     ak?: string;
+    xAPIKey?: string;
 }
 
-export interface ProjectsApiGetProjectDailyActivity1Request {
+export interface GetProjectDailyActivity1Request {
     ak?: string;
+    xAPIKey?: string;
 }
 
-export interface ProjectsApiGetProjectStats1Request {
+export interface GetProjectStats1Request {
     ak?: string;
+    xAPIKey?: string;
 }
 
 /**
@@ -46,7 +51,7 @@ export class ProjectsApi extends runtime.BaseAPI {
     /**
      * Returns project history
      */
-    async getActivity1Raw(requestParameters: ProjectsApiGetActivity1Request, initOverrides?: RequestInit): Promise<runtime.ApiResponse<PagedModelProjectActivityModel>> {
+    async getActivity1Raw(requestParameters: GetActivity1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PagedModelProjectActivityModel>> {
         const queryParameters: any = {};
 
         if (requestParameters.page !== undefined) {
@@ -67,6 +72,10 @@ export class ProjectsApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+        if (requestParameters.xAPIKey !== undefined && requestParameters.xAPIKey !== null) {
+            headerParameters['X-API-Key'] = String(requestParameters.xAPIKey);
+        }
+
         const response = await this.request({
             path: `/v2/projects/activity`,
             method: 'GET',
@@ -80,7 +89,7 @@ export class ProjectsApi extends runtime.BaseAPI {
     /**
      * Returns project history
      */
-    async getActivity1(requestParameters: ProjectsApiGetActivity1Request = {}, initOverrides?: RequestInit): Promise<PagedModelProjectActivityModel> {
+    async getActivity1(requestParameters: GetActivity1Request = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PagedModelProjectActivityModel> {
         const response = await this.getActivity1Raw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -88,7 +97,7 @@ export class ProjectsApi extends runtime.BaseAPI {
     /**
      * Returns project daily amount of events
      */
-    async getProjectDailyActivity1Raw(requestParameters: ProjectsApiGetProjectDailyActivity1Request, initOverrides?: RequestInit): Promise<runtime.ApiResponse<{ [key: string]: number; }>> {
+    async getProjectDailyActivity1Raw(requestParameters: GetProjectDailyActivity1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<{ [key: string]: number; }>> {
         const queryParameters: any = {};
 
         if (requestParameters.ak !== undefined) {
@@ -96,6 +105,10 @@ export class ProjectsApi extends runtime.BaseAPI {
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
+
+        if (requestParameters.xAPIKey !== undefined && requestParameters.xAPIKey !== null) {
+            headerParameters['X-API-Key'] = String(requestParameters.xAPIKey);
+        }
 
         const response = await this.request({
             path: `/v2/projects/stats/daily-activity`,
@@ -110,7 +123,7 @@ export class ProjectsApi extends runtime.BaseAPI {
     /**
      * Returns project daily amount of events
      */
-    async getProjectDailyActivity1(requestParameters: ProjectsApiGetProjectDailyActivity1Request = {}, initOverrides?: RequestInit): Promise<{ [key: string]: number; }> {
+    async getProjectDailyActivity1(requestParameters: GetProjectDailyActivity1Request = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<{ [key: string]: number; }> {
         const response = await this.getProjectDailyActivity1Raw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -118,7 +131,7 @@ export class ProjectsApi extends runtime.BaseAPI {
     /**
      * Returns project stats
      */
-    async getProjectStats1Raw(requestParameters: ProjectsApiGetProjectStats1Request, initOverrides?: RequestInit): Promise<runtime.ApiResponse<ProjectStatsModel>> {
+    async getProjectStats1Raw(requestParameters: GetProjectStats1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ProjectStatsModel>> {
         const queryParameters: any = {};
 
         if (requestParameters.ak !== undefined) {
@@ -126,6 +139,10 @@ export class ProjectsApi extends runtime.BaseAPI {
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
+
+        if (requestParameters.xAPIKey !== undefined && requestParameters.xAPIKey !== null) {
+            headerParameters['X-API-Key'] = String(requestParameters.xAPIKey);
+        }
 
         const response = await this.request({
             path: `/v2/projects/stats`,
@@ -140,7 +157,7 @@ export class ProjectsApi extends runtime.BaseAPI {
     /**
      * Returns project stats
      */
-    async getProjectStats1(requestParameters: ProjectsApiGetProjectStats1Request = {}, initOverrides?: RequestInit): Promise<ProjectStatsModel> {
+    async getProjectStats1(requestParameters: GetProjectStats1Request = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ProjectStatsModel> {
         const response = await this.getProjectStats1Raw(requestParameters, initOverrides);
         return await response.value();
     }

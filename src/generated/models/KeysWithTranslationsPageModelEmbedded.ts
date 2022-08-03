@@ -13,8 +13,8 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { KeyWithTranslationsModel } from './KeyWithTranslationsModel';
 import {
-    KeyWithTranslationsModel,
     KeyWithTranslationsModelFromJSON,
     KeyWithTranslationsModelFromJSONTyped,
     KeyWithTranslationsModelToJSON,
@@ -32,6 +32,15 @@ export interface KeysWithTranslationsPageModelEmbedded {
      * @memberof KeysWithTranslationsPageModelEmbedded
      */
     keys?: Array<KeyWithTranslationsModel>;
+}
+
+/**
+ * Check if a given object implements the KeysWithTranslationsPageModelEmbedded interface.
+ */
+export function instanceOfKeysWithTranslationsPageModelEmbedded(value: object): boolean {
+    let isInstance = true;
+
+    return isInstance;
 }
 
 export function KeysWithTranslationsPageModelEmbeddedFromJSON(json: any): KeysWithTranslationsPageModelEmbedded {

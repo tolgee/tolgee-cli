@@ -13,14 +13,14 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { PropertyModification } from './PropertyModification';
 import {
-    PropertyModification,
     PropertyModificationFromJSON,
     PropertyModificationFromJSONTyped,
     PropertyModificationToJSON,
 } from './PropertyModification';
+import type { SimpleUserAccountModel } from './SimpleUserAccountModel';
 import {
-    SimpleUserAccountModel,
     SimpleUserAccountModelFromJSON,
     SimpleUserAccountModelFromJSONTyped,
     SimpleUserAccountModelToJSON,
@@ -58,14 +58,27 @@ export interface TranslationHistoryModel {
     revisionType: TranslationHistoryModelRevisionTypeEnum;
 }
 
+
 /**
-* @export
-* @enum {string}
-*/
-export enum TranslationHistoryModelRevisionTypeEnum {
-    Add = 'ADD',
-    Mod = 'MOD',
-    Del = 'DEL'
+ * @export
+ */
+export const TranslationHistoryModelRevisionTypeEnum = {
+    Add: 'ADD',
+    Mod: 'MOD',
+    Del: 'DEL'
+} as const;
+export type TranslationHistoryModelRevisionTypeEnum = typeof TranslationHistoryModelRevisionTypeEnum[keyof typeof TranslationHistoryModelRevisionTypeEnum];
+
+
+/**
+ * Check if a given object implements the TranslationHistoryModel interface.
+ */
+export function instanceOfTranslationHistoryModel(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "timestamp" in value;
+    isInstance = isInstance && "revisionType" in value;
+
+    return isInstance;
 }
 
 export function TranslationHistoryModelFromJSON(json: any): TranslationHistoryModel {

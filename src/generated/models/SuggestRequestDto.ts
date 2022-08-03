@@ -39,6 +39,17 @@ export interface SuggestRequestDto {
     baseText?: string;
 }
 
+/**
+ * Check if a given object implements the SuggestRequestDto interface.
+ */
+export function instanceOfSuggestRequestDto(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "keyId" in value;
+    isInstance = isInstance && "targetLanguageId" in value;
+
+    return isInstance;
+}
+
 export function SuggestRequestDtoFromJSON(json: any): SuggestRequestDto {
     return SuggestRequestDtoFromJSONTyped(json, false);
 }

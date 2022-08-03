@@ -57,6 +57,19 @@ export interface LanguageModel {
     base: boolean;
 }
 
+/**
+ * Check if a given object implements the LanguageModel interface.
+ */
+export function instanceOfLanguageModel(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "id" in value;
+    isInstance = isInstance && "name" in value;
+    isInstance = isInstance && "tag" in value;
+    isInstance = isInstance && "base" in value;
+
+    return isInstance;
+}
+
 export function LanguageModelFromJSON(json: any): LanguageModel {
     return LanguageModelFromJSONTyped(json, false);
 }

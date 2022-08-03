@@ -13,8 +13,8 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { UserAccountModel } from './UserAccountModel';
 import {
-    UserAccountModel,
     UserAccountModelFromJSON,
     UserAccountModelFromJSONTyped,
     UserAccountModelToJSON,
@@ -64,14 +64,31 @@ export interface TranslationCommentModel {
     updatedAt: Date;
 }
 
+
 /**
-* @export
-* @enum {string}
-*/
-export enum TranslationCommentModelStateEnum {
-    ResolutionNotNeeded = 'RESOLUTION_NOT_NEEDED',
-    NeedsResolution = 'NEEDS_RESOLUTION',
-    Resolved = 'RESOLVED'
+ * @export
+ */
+export const TranslationCommentModelStateEnum = {
+    ResolutionNotNeeded: 'RESOLUTION_NOT_NEEDED',
+    NeedsResolution: 'NEEDS_RESOLUTION',
+    Resolved: 'RESOLVED'
+} as const;
+export type TranslationCommentModelStateEnum = typeof TranslationCommentModelStateEnum[keyof typeof TranslationCommentModelStateEnum];
+
+
+/**
+ * Check if a given object implements the TranslationCommentModel interface.
+ */
+export function instanceOfTranslationCommentModel(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "id" in value;
+    isInstance = isInstance && "text" in value;
+    isInstance = isInstance && "state" in value;
+    isInstance = isInstance && "author" in value;
+    isInstance = isInstance && "createdAt" in value;
+    isInstance = isInstance && "updatedAt" in value;
+
+    return isInstance;
 }
 
 export function TranslationCommentModelFromJSON(json: any): TranslationCommentModel {

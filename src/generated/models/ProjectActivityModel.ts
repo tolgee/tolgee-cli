@@ -13,14 +13,14 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { ModifiedEntityModel } from './ModifiedEntityModel';
 import {
-    ModifiedEntityModel,
     ModifiedEntityModelFromJSON,
     ModifiedEntityModelFromJSONTyped,
     ModifiedEntityModelToJSON,
 } from './ModifiedEntityModel';
+import type { ProjectActivityAuthorModel } from './ProjectActivityAuthorModel';
 import {
-    ProjectActivityAuthorModel,
     ProjectActivityAuthorModelFromJSON,
     ProjectActivityAuthorModelFromJSONTyped,
     ProjectActivityAuthorModelToJSON,
@@ -76,32 +76,46 @@ export interface ProjectActivityModel {
     counts?: { [key: string]: number; };
 }
 
+
 /**
-* @export
-* @enum {string}
-*/
-export enum ProjectActivityModelTypeEnum {
-    Unknown = 'UNKNOWN',
-    SetTranslationState = 'SET_TRANSLATION_STATE',
-    SetTranslations = 'SET_TRANSLATIONS',
-    DismissAutoTranslatedState = 'DISMISS_AUTO_TRANSLATED_STATE',
-    TranslationCommentAdd = 'TRANSLATION_COMMENT_ADD',
-    TranslationCommentDelete = 'TRANSLATION_COMMENT_DELETE',
-    TranslationCommentEdit = 'TRANSLATION_COMMENT_EDIT',
-    TranslationCommentSetState = 'TRANSLATION_COMMENT_SET_STATE',
-    ScreenshotDelete = 'SCREENSHOT_DELETE',
-    ScreenshotAdd = 'SCREENSHOT_ADD',
-    KeyTagsEdit = 'KEY_TAGS_EDIT',
-    KeyNameEdit = 'KEY_NAME_EDIT',
-    KeyDelete = 'KEY_DELETE',
-    CreateKey = 'CREATE_KEY',
-    ComplexEdit = 'COMPLEX_EDIT',
-    Import = 'IMPORT',
-    CreateLanguage = 'CREATE_LANGUAGE',
-    EditLanguage = 'EDIT_LANGUAGE',
-    DeleteLanguage = 'DELETE_LANGUAGE',
-    CreateProject = 'CREATE_PROJECT',
-    EditProject = 'EDIT_PROJECT'
+ * @export
+ */
+export const ProjectActivityModelTypeEnum = {
+    Unknown: 'UNKNOWN',
+    SetTranslationState: 'SET_TRANSLATION_STATE',
+    SetTranslations: 'SET_TRANSLATIONS',
+    DismissAutoTranslatedState: 'DISMISS_AUTO_TRANSLATED_STATE',
+    TranslationCommentAdd: 'TRANSLATION_COMMENT_ADD',
+    TranslationCommentDelete: 'TRANSLATION_COMMENT_DELETE',
+    TranslationCommentEdit: 'TRANSLATION_COMMENT_EDIT',
+    TranslationCommentSetState: 'TRANSLATION_COMMENT_SET_STATE',
+    ScreenshotDelete: 'SCREENSHOT_DELETE',
+    ScreenshotAdd: 'SCREENSHOT_ADD',
+    KeyTagsEdit: 'KEY_TAGS_EDIT',
+    KeyNameEdit: 'KEY_NAME_EDIT',
+    KeyDelete: 'KEY_DELETE',
+    CreateKey: 'CREATE_KEY',
+    ComplexEdit: 'COMPLEX_EDIT',
+    Import: 'IMPORT',
+    CreateLanguage: 'CREATE_LANGUAGE',
+    EditLanguage: 'EDIT_LANGUAGE',
+    DeleteLanguage: 'DELETE_LANGUAGE',
+    CreateProject: 'CREATE_PROJECT',
+    EditProject: 'EDIT_PROJECT'
+} as const;
+export type ProjectActivityModelTypeEnum = typeof ProjectActivityModelTypeEnum[keyof typeof ProjectActivityModelTypeEnum];
+
+
+/**
+ * Check if a given object implements the ProjectActivityModel interface.
+ */
+export function instanceOfProjectActivityModel(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "revisionId" in value;
+    isInstance = isInstance && "timestamp" in value;
+    isInstance = isInstance && "type" in value;
+
+    return isInstance;
 }
 
 export function ProjectActivityModelFromJSON(json: any): ProjectActivityModel {

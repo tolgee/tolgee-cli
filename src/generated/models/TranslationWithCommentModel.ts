@@ -13,14 +13,14 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { TranslationCommentModel } from './TranslationCommentModel';
 import {
-    TranslationCommentModel,
     TranslationCommentModelFromJSON,
     TranslationCommentModelFromJSONTyped,
     TranslationCommentModelToJSON,
 } from './TranslationCommentModel';
+import type { TranslationModel } from './TranslationModel';
 import {
-    TranslationModel,
     TranslationModelFromJSON,
     TranslationModelFromJSONTyped,
     TranslationModelToJSON,
@@ -44,6 +44,17 @@ export interface TranslationWithCommentModel {
      * @memberof TranslationWithCommentModel
      */
     comment: TranslationCommentModel;
+}
+
+/**
+ * Check if a given object implements the TranslationWithCommentModel interface.
+ */
+export function instanceOfTranslationWithCommentModel(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "translation" in value;
+    isInstance = isInstance && "comment" in value;
+
+    return isInstance;
 }
 
 export function TranslationWithCommentModelFromJSON(json: any): TranslationWithCommentModel {

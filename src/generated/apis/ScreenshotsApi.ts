@@ -14,29 +14,34 @@
 
 
 import * as runtime from '../runtime';
+import type {
+  CollectionModelScreenshotModel,
+  ScreenshotModel,
+} from '../models';
 import {
-    CollectionModelScreenshotModel,
     CollectionModelScreenshotModelFromJSON,
     CollectionModelScreenshotModelToJSON,
-    ScreenshotModel,
     ScreenshotModelFromJSON,
     ScreenshotModelToJSON,
 } from '../models';
 
-export interface ScreenshotsApiDeleteScreenshotsRequest {
+export interface DeleteScreenshotsRequest {
     ids: Set<number>;
     ak?: string;
+    xAPIKey?: string;
 }
 
-export interface ScreenshotsApiGetKeyScreenshotsRequest {
+export interface GetKeyScreenshotsRequest {
     keyId: number;
     ak?: string;
+    xAPIKey?: string;
 }
 
-export interface ScreenshotsApiUploadScreenshotRequest {
+export interface UploadScreenshotRequest {
     keyId: number;
     screenshot: Blob;
     ak?: string;
+    xAPIKey?: string;
 }
 
 /**
@@ -47,7 +52,7 @@ export class ScreenshotsApi extends runtime.BaseAPI {
     /**
      * Deletes multiple screenshots by ids
      */
-    async deleteScreenshotsRaw(requestParameters: ScreenshotsApiDeleteScreenshotsRequest, initOverrides?: RequestInit): Promise<runtime.ApiResponse<void>> {
+    async deleteScreenshotsRaw(requestParameters: DeleteScreenshotsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters.ids === null || requestParameters.ids === undefined) {
             throw new runtime.RequiredError('ids','Required parameter requestParameters.ids was null or undefined when calling deleteScreenshots.');
         }
@@ -59,6 +64,10 @@ export class ScreenshotsApi extends runtime.BaseAPI {
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
+
+        if (requestParameters.xAPIKey !== undefined && requestParameters.xAPIKey !== null) {
+            headerParameters['X-API-Key'] = String(requestParameters.xAPIKey);
+        }
 
         const response = await this.request({
             path: `/v2/projects/keys/{keyId}/screenshots/{ids}`.replace(`{${"ids"}}`, encodeURIComponent(String(requestParameters.ids))),
@@ -73,14 +82,14 @@ export class ScreenshotsApi extends runtime.BaseAPI {
     /**
      * Deletes multiple screenshots by ids
      */
-    async deleteScreenshots(requestParameters: ScreenshotsApiDeleteScreenshotsRequest, initOverrides?: RequestInit): Promise<void> {
+    async deleteScreenshots(requestParameters: DeleteScreenshotsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.deleteScreenshotsRaw(requestParameters, initOverrides);
     }
 
     /**
      * Returns all screenshots for specified key
      */
-    async getKeyScreenshotsRaw(requestParameters: ScreenshotsApiGetKeyScreenshotsRequest, initOverrides?: RequestInit): Promise<runtime.ApiResponse<CollectionModelScreenshotModel>> {
+    async getKeyScreenshotsRaw(requestParameters: GetKeyScreenshotsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CollectionModelScreenshotModel>> {
         if (requestParameters.keyId === null || requestParameters.keyId === undefined) {
             throw new runtime.RequiredError('keyId','Required parameter requestParameters.keyId was null or undefined when calling getKeyScreenshots.');
         }
@@ -92,6 +101,10 @@ export class ScreenshotsApi extends runtime.BaseAPI {
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
+
+        if (requestParameters.xAPIKey !== undefined && requestParameters.xAPIKey !== null) {
+            headerParameters['X-API-Key'] = String(requestParameters.xAPIKey);
+        }
 
         const response = await this.request({
             path: `/v2/projects/keys/{keyId}/screenshots`.replace(`{${"keyId"}}`, encodeURIComponent(String(requestParameters.keyId))),
@@ -106,7 +119,7 @@ export class ScreenshotsApi extends runtime.BaseAPI {
     /**
      * Returns all screenshots for specified key
      */
-    async getKeyScreenshots(requestParameters: ScreenshotsApiGetKeyScreenshotsRequest, initOverrides?: RequestInit): Promise<CollectionModelScreenshotModel> {
+    async getKeyScreenshots(requestParameters: GetKeyScreenshotsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CollectionModelScreenshotModel> {
         const response = await this.getKeyScreenshotsRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -114,7 +127,7 @@ export class ScreenshotsApi extends runtime.BaseAPI {
     /**
      * Upload screenshot for specific key
      */
-    async uploadScreenshotRaw(requestParameters: ScreenshotsApiUploadScreenshotRequest, initOverrides?: RequestInit): Promise<runtime.ApiResponse<ScreenshotModel>> {
+    async uploadScreenshotRaw(requestParameters: UploadScreenshotRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ScreenshotModel>> {
         if (requestParameters.keyId === null || requestParameters.keyId === undefined) {
             throw new runtime.RequiredError('keyId','Required parameter requestParameters.keyId was null or undefined when calling uploadScreenshot.');
         }
@@ -130,6 +143,10 @@ export class ScreenshotsApi extends runtime.BaseAPI {
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
+
+        if (requestParameters.xAPIKey !== undefined && requestParameters.xAPIKey !== null) {
+            headerParameters['X-API-Key'] = String(requestParameters.xAPIKey);
+        }
 
         const consumes: runtime.Consume[] = [
             { contentType: 'multipart/form-data' },
@@ -165,7 +182,7 @@ export class ScreenshotsApi extends runtime.BaseAPI {
     /**
      * Upload screenshot for specific key
      */
-    async uploadScreenshot(requestParameters: ScreenshotsApiUploadScreenshotRequest, initOverrides?: RequestInit): Promise<ScreenshotModel> {
+    async uploadScreenshot(requestParameters: UploadScreenshotRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ScreenshotModel> {
         const response = await this.uploadScreenshotRaw(requestParameters, initOverrides);
         return await response.value();
     }

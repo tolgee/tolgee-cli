@@ -45,6 +45,16 @@ export interface CreateKeyDto {
     screenshotUploadedImageIds?: Array<number>;
 }
 
+/**
+ * Check if a given object implements the CreateKeyDto interface.
+ */
+export function instanceOfCreateKeyDto(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "name" in value;
+
+    return isInstance;
+}
+
 export function CreateKeyDtoFromJSON(json: any): CreateKeyDto {
     return CreateKeyDtoFromJSONTyped(json, false);
 }

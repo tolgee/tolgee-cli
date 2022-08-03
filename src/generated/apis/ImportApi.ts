@@ -14,74 +14,73 @@
 
 
 import * as runtime from '../runtime';
+import type {
+  ImportAddFilesResultModel,
+  ImportLanguageModel,
+  PagedModelEntityModelImportFileIssueView,
+  PagedModelImportLanguageModel,
+  PagedModelImportTranslationModel,
+} from '../models';
 import {
-    ImportAddFilesResultModel,
     ImportAddFilesResultModelFromJSON,
     ImportAddFilesResultModelToJSON,
-    ImportLanguageModel,
     ImportLanguageModelFromJSON,
     ImportLanguageModelToJSON,
-    PagedModelEntityModelImportFileIssueView,
     PagedModelEntityModelImportFileIssueViewFromJSON,
     PagedModelEntityModelImportFileIssueViewToJSON,
-    PagedModelImportLanguageModel,
     PagedModelImportLanguageModelFromJSON,
     PagedModelImportLanguageModelToJSON,
-    PagedModelImportTranslationModel,
     PagedModelImportTranslationModelFromJSON,
     PagedModelImportTranslationModelToJSON,
-    PagedModelLanguageModel,
-    PagedModelLanguageModelFromJSON,
-    PagedModelLanguageModelToJSON,
 } from '../models';
 
-export interface ImportApiAddFiles1Request {
+export interface AddFiles1Request {
     files: Array<Blob>;
     ak?: string;
+    xAPIKey?: string;
 }
 
-export interface ImportApiApplyImport1Request {
+export interface ApplyImport1Request {
     forceMode?: ApplyImport1ForceModeEnum;
     ak?: string;
+    xAPIKey?: string;
 }
 
-export interface ImportApiCancelImport1Request {
+export interface CancelImport1Request {
     ak?: string;
+    xAPIKey?: string;
 }
 
-export interface ImportApiDeleteLanguage1Request {
+export interface DeleteLanguage1Request {
     languageId: number;
     ak?: string;
+    xAPIKey?: string;
 }
 
-export interface ImportApiGetAll6Request {
-    page?: number;
-    size?: number;
-    sort?: Array<string>;
-    ak?: string;
-}
-
-export interface ImportApiGetImportFileIssues1Request {
+export interface GetImportFileIssues1Request {
     importFileId: number;
     page?: number;
     size?: number;
     sort?: Array<string>;
     ak?: string;
+    xAPIKey?: string;
 }
 
-export interface ImportApiGetImportLanguage1Request {
+export interface GetImportLanguage1Request {
     languageId: number;
     ak?: string;
+    xAPIKey?: string;
 }
 
-export interface ImportApiGetImportResult1Request {
+export interface GetImportResult1Request {
     page?: number;
     size?: number;
     sort?: Array<string>;
     ak?: string;
+    xAPIKey?: string;
 }
 
-export interface ImportApiGetImportTranslations1Request {
+export interface GetImportTranslations1Request {
     languageId: number;
     onlyConflicts?: boolean;
     onlyUnresolved?: boolean;
@@ -90,39 +89,46 @@ export interface ImportApiGetImportTranslations1Request {
     size?: number;
     sort?: Array<string>;
     ak?: string;
+    xAPIKey?: string;
 }
 
-export interface ImportApiResetExistingLanguage1Request {
+export interface ResetExistingLanguage1Request {
     importLanguageId: number;
     ak?: string;
+    xAPIKey?: string;
 }
 
-export interface ImportApiResolveTranslationSetKeepExisting1Request {
+export interface ResolveTranslationSetKeepExisting1Request {
     languageId: number;
     translationId: number;
     ak?: string;
+    xAPIKey?: string;
 }
 
-export interface ImportApiResolveTranslationSetKeepExisting3Request {
+export interface ResolveTranslationSetKeepExisting3Request {
     languageId: number;
     ak?: string;
+    xAPIKey?: string;
 }
 
-export interface ImportApiResolveTranslationSetOverride1Request {
+export interface ResolveTranslationSetOverride1Request {
     languageId: number;
     translationId: number;
     ak?: string;
+    xAPIKey?: string;
 }
 
-export interface ImportApiResolveTranslationSetOverride3Request {
+export interface ResolveTranslationSetOverride3Request {
     languageId: number;
     ak?: string;
+    xAPIKey?: string;
 }
 
-export interface ImportApiSelectExistingLanguage1Request {
+export interface SelectExistingLanguage1Request {
     importLanguageId: number;
     existingLanguageId: number;
     ak?: string;
+    xAPIKey?: string;
 }
 
 /**
@@ -131,9 +137,10 @@ export interface ImportApiSelectExistingLanguage1Request {
 export class ImportApi extends runtime.BaseAPI {
 
     /**
-     * Prepares provided files to import
+     * Prepares provided files to import.
+     * Add files
      */
-    async addFiles1Raw(requestParameters: ImportApiAddFiles1Request, initOverrides?: RequestInit): Promise<runtime.ApiResponse<ImportAddFilesResultModel>> {
+    async addFiles1Raw(requestParameters: AddFiles1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ImportAddFilesResultModel>> {
         if (requestParameters.files === null || requestParameters.files === undefined) {
             throw new runtime.RequiredError('files','Required parameter requestParameters.files was null or undefined when calling addFiles1.');
         }
@@ -145,6 +152,10 @@ export class ImportApi extends runtime.BaseAPI {
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
+
+        if (requestParameters.xAPIKey !== undefined && requestParameters.xAPIKey !== null) {
+            headerParameters['X-API-Key'] = String(requestParameters.xAPIKey);
+        }
 
         const consumes: runtime.Consume[] = [
             { contentType: 'multipart/form-data' },
@@ -180,17 +191,19 @@ export class ImportApi extends runtime.BaseAPI {
     }
 
     /**
-     * Prepares provided files to import
+     * Prepares provided files to import.
+     * Add files
      */
-    async addFiles1(requestParameters: ImportApiAddFiles1Request, initOverrides?: RequestInit): Promise<ImportAddFilesResultModel> {
+    async addFiles1(requestParameters: AddFiles1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ImportAddFilesResultModel> {
         const response = await this.addFiles1Raw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
      * Imports the data prepared in previous step
+     * Apply
      */
-    async applyImport1Raw(requestParameters: ImportApiApplyImport1Request, initOverrides?: RequestInit): Promise<runtime.ApiResponse<void>> {
+    async applyImport1Raw(requestParameters: ApplyImport1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         const queryParameters: any = {};
 
         if (requestParameters.forceMode !== undefined) {
@@ -202,6 +215,10 @@ export class ImportApi extends runtime.BaseAPI {
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
+
+        if (requestParameters.xAPIKey !== undefined && requestParameters.xAPIKey !== null) {
+            headerParameters['X-API-Key'] = String(requestParameters.xAPIKey);
+        }
 
         const response = await this.request({
             path: `/v2/projects/import/apply`,
@@ -215,14 +232,17 @@ export class ImportApi extends runtime.BaseAPI {
 
     /**
      * Imports the data prepared in previous step
+     * Apply
      */
-    async applyImport1(requestParameters: ImportApiApplyImport1Request = {}, initOverrides?: RequestInit): Promise<void> {
+    async applyImport1(requestParameters: ApplyImport1Request = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.applyImport1Raw(requestParameters, initOverrides);
     }
 
     /**
+     * Deletes prepared import data.
+     * Delete
      */
-    async cancelImport1Raw(requestParameters: ImportApiCancelImport1Request, initOverrides?: RequestInit): Promise<runtime.ApiResponse<void>> {
+    async cancelImport1Raw(requestParameters: CancelImport1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         const queryParameters: any = {};
 
         if (requestParameters.ak !== undefined) {
@@ -230,6 +250,10 @@ export class ImportApi extends runtime.BaseAPI {
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
+
+        if (requestParameters.xAPIKey !== undefined && requestParameters.xAPIKey !== null) {
+            headerParameters['X-API-Key'] = String(requestParameters.xAPIKey);
+        }
 
         const response = await this.request({
             path: `/v2/projects/import`,
@@ -242,14 +266,18 @@ export class ImportApi extends runtime.BaseAPI {
     }
 
     /**
+     * Deletes prepared import data.
+     * Delete
      */
-    async cancelImport1(requestParameters: ImportApiCancelImport1Request = {}, initOverrides?: RequestInit): Promise<void> {
+    async cancelImport1(requestParameters: CancelImport1Request = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.cancelImport1Raw(requestParameters, initOverrides);
     }
 
     /**
+     * Deletes language prepared to import.
+     * Delete language
      */
-    async deleteLanguage1Raw(requestParameters: ImportApiDeleteLanguage1Request, initOverrides?: RequestInit): Promise<runtime.ApiResponse<void>> {
+    async deleteLanguage1Raw(requestParameters: DeleteLanguage1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters.languageId === null || requestParameters.languageId === undefined) {
             throw new runtime.RequiredError('languageId','Required parameter requestParameters.languageId was null or undefined when calling deleteLanguage1.');
         }
@@ -262,6 +290,10 @@ export class ImportApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+        if (requestParameters.xAPIKey !== undefined && requestParameters.xAPIKey !== null) {
+            headerParameters['X-API-Key'] = String(requestParameters.xAPIKey);
+        }
+
         const response = await this.request({
             path: `/v2/projects/import/result/languages/{languageId}`.replace(`{${"languageId"}}`, encodeURIComponent(String(requestParameters.languageId))),
             method: 'DELETE',
@@ -273,56 +305,18 @@ export class ImportApi extends runtime.BaseAPI {
     }
 
     /**
+     * Deletes language prepared to import.
+     * Delete language
      */
-    async deleteLanguage1(requestParameters: ImportApiDeleteLanguage1Request, initOverrides?: RequestInit): Promise<void> {
+    async deleteLanguage1(requestParameters: DeleteLanguage1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.deleteLanguage1Raw(requestParameters, initOverrides);
     }
 
     /**
-     * Returns all project languages
+     * Returns issues for uploaded file.
+     * Get file issues.
      */
-    async getAll6Raw(requestParameters: ImportApiGetAll6Request, initOverrides?: RequestInit): Promise<runtime.ApiResponse<PagedModelLanguageModel>> {
-        const queryParameters: any = {};
-
-        if (requestParameters.page !== undefined) {
-            queryParameters['page'] = requestParameters.page;
-        }
-
-        if (requestParameters.size !== undefined) {
-            queryParameters['size'] = requestParameters.size;
-        }
-
-        if (requestParameters.sort) {
-            queryParameters['sort'] = requestParameters.sort;
-        }
-
-        if (requestParameters.ak !== undefined) {
-            queryParameters['ak'] = requestParameters.ak;
-        }
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/v2/projects/languages`,
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => PagedModelLanguageModelFromJSON(jsonValue));
-    }
-
-    /**
-     * Returns all project languages
-     */
-    async getAll6(requestParameters: ImportApiGetAll6Request = {}, initOverrides?: RequestInit): Promise<PagedModelLanguageModel> {
-        const response = await this.getAll6Raw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
-     */
-    async getImportFileIssues1Raw(requestParameters: ImportApiGetImportFileIssues1Request, initOverrides?: RequestInit): Promise<runtime.ApiResponse<PagedModelEntityModelImportFileIssueView>> {
+    async getImportFileIssues1Raw(requestParameters: GetImportFileIssues1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PagedModelEntityModelImportFileIssueView>> {
         if (requestParameters.importFileId === null || requestParameters.importFileId === undefined) {
             throw new runtime.RequiredError('importFileId','Required parameter requestParameters.importFileId was null or undefined when calling getImportFileIssues1.');
         }
@@ -347,6 +341,10 @@ export class ImportApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+        if (requestParameters.xAPIKey !== undefined && requestParameters.xAPIKey !== null) {
+            headerParameters['X-API-Key'] = String(requestParameters.xAPIKey);
+        }
+
         const response = await this.request({
             path: `/v2/projects/import/result/files/{importFileId}/issues`.replace(`{${"importFileId"}}`, encodeURIComponent(String(requestParameters.importFileId))),
             method: 'GET',
@@ -358,15 +356,19 @@ export class ImportApi extends runtime.BaseAPI {
     }
 
     /**
+     * Returns issues for uploaded file.
+     * Get file issues.
      */
-    async getImportFileIssues1(requestParameters: ImportApiGetImportFileIssues1Request, initOverrides?: RequestInit): Promise<PagedModelEntityModelImportFileIssueView> {
+    async getImportFileIssues1(requestParameters: GetImportFileIssues1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PagedModelEntityModelImportFileIssueView> {
         const response = await this.getImportFileIssues1Raw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
+     * Returns language prepared to import.
+     * Get import language
      */
-    async getImportLanguage1Raw(requestParameters: ImportApiGetImportLanguage1Request, initOverrides?: RequestInit): Promise<runtime.ApiResponse<ImportLanguageModel>> {
+    async getImportLanguage1Raw(requestParameters: GetImportLanguage1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ImportLanguageModel>> {
         if (requestParameters.languageId === null || requestParameters.languageId === undefined) {
             throw new runtime.RequiredError('languageId','Required parameter requestParameters.languageId was null or undefined when calling getImportLanguage1.');
         }
@@ -379,6 +381,10 @@ export class ImportApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+        if (requestParameters.xAPIKey !== undefined && requestParameters.xAPIKey !== null) {
+            headerParameters['X-API-Key'] = String(requestParameters.xAPIKey);
+        }
+
         const response = await this.request({
             path: `/v2/projects/import/result/languages/{languageId}`.replace(`{${"languageId"}}`, encodeURIComponent(String(requestParameters.languageId))),
             method: 'GET',
@@ -390,15 +396,19 @@ export class ImportApi extends runtime.BaseAPI {
     }
 
     /**
+     * Returns language prepared to import.
+     * Get import language
      */
-    async getImportLanguage1(requestParameters: ImportApiGetImportLanguage1Request, initOverrides?: RequestInit): Promise<ImportLanguageModel> {
+    async getImportLanguage1(requestParameters: GetImportLanguage1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ImportLanguageModel> {
         const response = await this.getImportLanguage1Raw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
+     * Returns the result of preparation.
+     * Get result
      */
-    async getImportResult1Raw(requestParameters: ImportApiGetImportResult1Request, initOverrides?: RequestInit): Promise<runtime.ApiResponse<PagedModelImportLanguageModel>> {
+    async getImportResult1Raw(requestParameters: GetImportResult1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PagedModelImportLanguageModel>> {
         const queryParameters: any = {};
 
         if (requestParameters.page !== undefined) {
@@ -419,6 +429,10 @@ export class ImportApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+        if (requestParameters.xAPIKey !== undefined && requestParameters.xAPIKey !== null) {
+            headerParameters['X-API-Key'] = String(requestParameters.xAPIKey);
+        }
+
         const response = await this.request({
             path: `/v2/projects/import/result`,
             method: 'GET',
@@ -430,15 +444,19 @@ export class ImportApi extends runtime.BaseAPI {
     }
 
     /**
+     * Returns the result of preparation.
+     * Get result
      */
-    async getImportResult1(requestParameters: ImportApiGetImportResult1Request = {}, initOverrides?: RequestInit): Promise<PagedModelImportLanguageModel> {
+    async getImportResult1(requestParameters: GetImportResult1Request = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PagedModelImportLanguageModel> {
         const response = await this.getImportResult1Raw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
+     * Returns translations prepared to import.
+     * Get translations
      */
-    async getImportTranslations1Raw(requestParameters: ImportApiGetImportTranslations1Request, initOverrides?: RequestInit): Promise<runtime.ApiResponse<PagedModelImportTranslationModel>> {
+    async getImportTranslations1Raw(requestParameters: GetImportTranslations1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PagedModelImportTranslationModel>> {
         if (requestParameters.languageId === null || requestParameters.languageId === undefined) {
             throw new runtime.RequiredError('languageId','Required parameter requestParameters.languageId was null or undefined when calling getImportTranslations1.');
         }
@@ -475,6 +493,10 @@ export class ImportApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+        if (requestParameters.xAPIKey !== undefined && requestParameters.xAPIKey !== null) {
+            headerParameters['X-API-Key'] = String(requestParameters.xAPIKey);
+        }
+
         const response = await this.request({
             path: `/v2/projects/import/result/languages/{languageId}/translations`.replace(`{${"languageId"}}`, encodeURIComponent(String(requestParameters.languageId))),
             method: 'GET',
@@ -486,15 +508,19 @@ export class ImportApi extends runtime.BaseAPI {
     }
 
     /**
+     * Returns translations prepared to import.
+     * Get translations
      */
-    async getImportTranslations1(requestParameters: ImportApiGetImportTranslations1Request, initOverrides?: RequestInit): Promise<PagedModelImportTranslationModel> {
+    async getImportTranslations1(requestParameters: GetImportTranslations1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PagedModelImportTranslationModel> {
         const response = await this.getImportTranslations1Raw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
+     * Resets existing language paired with language to import.
+     * Reset existing language pairing
      */
-    async resetExistingLanguage1Raw(requestParameters: ImportApiResetExistingLanguage1Request, initOverrides?: RequestInit): Promise<runtime.ApiResponse<void>> {
+    async resetExistingLanguage1Raw(requestParameters: ResetExistingLanguage1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters.importLanguageId === null || requestParameters.importLanguageId === undefined) {
             throw new runtime.RequiredError('importLanguageId','Required parameter requestParameters.importLanguageId was null or undefined when calling resetExistingLanguage1.');
         }
@@ -507,6 +533,10 @@ export class ImportApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+        if (requestParameters.xAPIKey !== undefined && requestParameters.xAPIKey !== null) {
+            headerParameters['X-API-Key'] = String(requestParameters.xAPIKey);
+        }
+
         const response = await this.request({
             path: `/v2/projects/import/result/languages/{importLanguageId}/reset-existing`.replace(`{${"importLanguageId"}}`, encodeURIComponent(String(requestParameters.importLanguageId))),
             method: 'PUT',
@@ -518,14 +548,18 @@ export class ImportApi extends runtime.BaseAPI {
     }
 
     /**
+     * Resets existing language paired with language to import.
+     * Reset existing language pairing
      */
-    async resetExistingLanguage1(requestParameters: ImportApiResetExistingLanguage1Request, initOverrides?: RequestInit): Promise<void> {
+    async resetExistingLanguage1(requestParameters: ResetExistingLanguage1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.resetExistingLanguage1Raw(requestParameters, initOverrides);
     }
 
     /**
+     * Resolves translation conflict. The old translation will be kept.
+     * Resolve conflict (keep existing)
      */
-    async resolveTranslationSetKeepExisting1Raw(requestParameters: ImportApiResolveTranslationSetKeepExisting1Request, initOverrides?: RequestInit): Promise<runtime.ApiResponse<void>> {
+    async resolveTranslationSetKeepExisting1Raw(requestParameters: ResolveTranslationSetKeepExisting1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters.languageId === null || requestParameters.languageId === undefined) {
             throw new runtime.RequiredError('languageId','Required parameter requestParameters.languageId was null or undefined when calling resolveTranslationSetKeepExisting1.');
         }
@@ -542,6 +576,10 @@ export class ImportApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+        if (requestParameters.xAPIKey !== undefined && requestParameters.xAPIKey !== null) {
+            headerParameters['X-API-Key'] = String(requestParameters.xAPIKey);
+        }
+
         const response = await this.request({
             path: `/v2/projects/import/result/languages/{languageId}/translations/{translationId}/resolve/set-keep-existing`.replace(`{${"languageId"}}`, encodeURIComponent(String(requestParameters.languageId))).replace(`{${"translationId"}}`, encodeURIComponent(String(requestParameters.translationId))),
             method: 'PUT',
@@ -553,14 +591,18 @@ export class ImportApi extends runtime.BaseAPI {
     }
 
     /**
+     * Resolves translation conflict. The old translation will be kept.
+     * Resolve conflict (keep existing)
      */
-    async resolveTranslationSetKeepExisting1(requestParameters: ImportApiResolveTranslationSetKeepExisting1Request, initOverrides?: RequestInit): Promise<void> {
+    async resolveTranslationSetKeepExisting1(requestParameters: ResolveTranslationSetKeepExisting1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.resolveTranslationSetKeepExisting1Raw(requestParameters, initOverrides);
     }
 
     /**
+     * Resolves all translation conflicts for provided language. The old translations will be kept.
+     * Resolve all translation conflicts (keep existing)
      */
-    async resolveTranslationSetKeepExisting3Raw(requestParameters: ImportApiResolveTranslationSetKeepExisting3Request, initOverrides?: RequestInit): Promise<runtime.ApiResponse<void>> {
+    async resolveTranslationSetKeepExisting3Raw(requestParameters: ResolveTranslationSetKeepExisting3Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters.languageId === null || requestParameters.languageId === undefined) {
             throw new runtime.RequiredError('languageId','Required parameter requestParameters.languageId was null or undefined when calling resolveTranslationSetKeepExisting3.');
         }
@@ -573,6 +615,10 @@ export class ImportApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+        if (requestParameters.xAPIKey !== undefined && requestParameters.xAPIKey !== null) {
+            headerParameters['X-API-Key'] = String(requestParameters.xAPIKey);
+        }
+
         const response = await this.request({
             path: `/v2/projects/import/result/languages/{languageId}/resolve-all/set-keep-existing`.replace(`{${"languageId"}}`, encodeURIComponent(String(requestParameters.languageId))),
             method: 'PUT',
@@ -584,14 +630,18 @@ export class ImportApi extends runtime.BaseAPI {
     }
 
     /**
+     * Resolves all translation conflicts for provided language. The old translations will be kept.
+     * Resolve all translation conflicts (keep existing)
      */
-    async resolveTranslationSetKeepExisting3(requestParameters: ImportApiResolveTranslationSetKeepExisting3Request, initOverrides?: RequestInit): Promise<void> {
+    async resolveTranslationSetKeepExisting3(requestParameters: ResolveTranslationSetKeepExisting3Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.resolveTranslationSetKeepExisting3Raw(requestParameters, initOverrides);
     }
 
     /**
+     * Resolves translation conflict. The old translation will be overridden.
+     * Resolve conflict (override)
      */
-    async resolveTranslationSetOverride1Raw(requestParameters: ImportApiResolveTranslationSetOverride1Request, initOverrides?: RequestInit): Promise<runtime.ApiResponse<void>> {
+    async resolveTranslationSetOverride1Raw(requestParameters: ResolveTranslationSetOverride1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters.languageId === null || requestParameters.languageId === undefined) {
             throw new runtime.RequiredError('languageId','Required parameter requestParameters.languageId was null or undefined when calling resolveTranslationSetOverride1.');
         }
@@ -608,6 +658,10 @@ export class ImportApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+        if (requestParameters.xAPIKey !== undefined && requestParameters.xAPIKey !== null) {
+            headerParameters['X-API-Key'] = String(requestParameters.xAPIKey);
+        }
+
         const response = await this.request({
             path: `/v2/projects/import/result/languages/{languageId}/translations/{translationId}/resolve/set-override`.replace(`{${"languageId"}}`, encodeURIComponent(String(requestParameters.languageId))).replace(`{${"translationId"}}`, encodeURIComponent(String(requestParameters.translationId))),
             method: 'PUT',
@@ -619,14 +673,18 @@ export class ImportApi extends runtime.BaseAPI {
     }
 
     /**
+     * Resolves translation conflict. The old translation will be overridden.
+     * Resolve conflict (override)
      */
-    async resolveTranslationSetOverride1(requestParameters: ImportApiResolveTranslationSetOverride1Request, initOverrides?: RequestInit): Promise<void> {
+    async resolveTranslationSetOverride1(requestParameters: ResolveTranslationSetOverride1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.resolveTranslationSetOverride1Raw(requestParameters, initOverrides);
     }
 
     /**
+     * Resolves all translation conflicts for provided language. The old translations will be overridden.
+     * Resolve all translation conflicts (override)
      */
-    async resolveTranslationSetOverride3Raw(requestParameters: ImportApiResolveTranslationSetOverride3Request, initOverrides?: RequestInit): Promise<runtime.ApiResponse<void>> {
+    async resolveTranslationSetOverride3Raw(requestParameters: ResolveTranslationSetOverride3Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters.languageId === null || requestParameters.languageId === undefined) {
             throw new runtime.RequiredError('languageId','Required parameter requestParameters.languageId was null or undefined when calling resolveTranslationSetOverride3.');
         }
@@ -639,6 +697,10 @@ export class ImportApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+        if (requestParameters.xAPIKey !== undefined && requestParameters.xAPIKey !== null) {
+            headerParameters['X-API-Key'] = String(requestParameters.xAPIKey);
+        }
+
         const response = await this.request({
             path: `/v2/projects/import/result/languages/{languageId}/resolve-all/set-override`.replace(`{${"languageId"}}`, encodeURIComponent(String(requestParameters.languageId))),
             method: 'PUT',
@@ -650,14 +712,18 @@ export class ImportApi extends runtime.BaseAPI {
     }
 
     /**
+     * Resolves all translation conflicts for provided language. The old translations will be overridden.
+     * Resolve all translation conflicts (override)
      */
-    async resolveTranslationSetOverride3(requestParameters: ImportApiResolveTranslationSetOverride3Request, initOverrides?: RequestInit): Promise<void> {
+    async resolveTranslationSetOverride3(requestParameters: ResolveTranslationSetOverride3Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.resolveTranslationSetOverride3Raw(requestParameters, initOverrides);
     }
 
     /**
+     * Sets existing language to pair with language to import. Data will be imported to selected existing language when applied.
+     * Pair existing language
      */
-    async selectExistingLanguage1Raw(requestParameters: ImportApiSelectExistingLanguage1Request, initOverrides?: RequestInit): Promise<runtime.ApiResponse<void>> {
+    async selectExistingLanguage1Raw(requestParameters: SelectExistingLanguage1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters.importLanguageId === null || requestParameters.importLanguageId === undefined) {
             throw new runtime.RequiredError('importLanguageId','Required parameter requestParameters.importLanguageId was null or undefined when calling selectExistingLanguage1.');
         }
@@ -674,6 +740,10 @@ export class ImportApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+        if (requestParameters.xAPIKey !== undefined && requestParameters.xAPIKey !== null) {
+            headerParameters['X-API-Key'] = String(requestParameters.xAPIKey);
+        }
+
         const response = await this.request({
             path: `/v2/projects/import/result/languages/{importLanguageId}/select-existing/{existingLanguageId}`.replace(`{${"importLanguageId"}}`, encodeURIComponent(String(requestParameters.importLanguageId))).replace(`{${"existingLanguageId"}}`, encodeURIComponent(String(requestParameters.existingLanguageId))),
             method: 'PUT',
@@ -685,19 +755,21 @@ export class ImportApi extends runtime.BaseAPI {
     }
 
     /**
+     * Sets existing language to pair with language to import. Data will be imported to selected existing language when applied.
+     * Pair existing language
      */
-    async selectExistingLanguage1(requestParameters: ImportApiSelectExistingLanguage1Request, initOverrides?: RequestInit): Promise<void> {
+    async selectExistingLanguage1(requestParameters: SelectExistingLanguage1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.selectExistingLanguage1Raw(requestParameters, initOverrides);
     }
 
 }
 
 /**
-    * @export
-    * @enum {string}
-    */
-export enum ApplyImport1ForceModeEnum {
-    Override = 'OVERRIDE',
-    Keep = 'KEEP',
-    NoForce = 'NO_FORCE'
-}
+ * @export
+ */
+export const ApplyImport1ForceModeEnum = {
+    Override: 'OVERRIDE',
+    Keep: 'KEEP',
+    NoForce: 'NO_FORCE'
+} as const;
+export type ApplyImport1ForceModeEnum = typeof ApplyImport1ForceModeEnum[keyof typeof ApplyImport1ForceModeEnum];

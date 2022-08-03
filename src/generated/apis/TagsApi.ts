@@ -14,36 +14,41 @@
 
 
 import * as runtime from '../runtime';
+import type {
+  PagedModelTagModel,
+  TagKeyDto,
+  TagModel,
+} from '../models';
 import {
-    PagedModelTagModel,
     PagedModelTagModelFromJSON,
     PagedModelTagModelToJSON,
-    TagKeyDto,
     TagKeyDtoFromJSON,
     TagKeyDtoToJSON,
-    TagModel,
     TagModelFromJSON,
     TagModelToJSON,
 } from '../models';
 
-export interface TagsApiGetAll2Request {
+export interface GetAll2Request {
     search?: string;
     page?: number;
     size?: number;
     sort?: Array<string>;
     ak?: string;
+    xAPIKey?: string;
 }
 
-export interface TagsApiRemoveTag1Request {
+export interface RemoveTag1Request {
     keyId: number;
     tagId: number;
     ak?: string;
+    xAPIKey?: string;
 }
 
-export interface TagsApiTagKey1Request {
+export interface TagKey1Request {
     keyId: number;
     tagKeyDto: TagKeyDto;
     ak?: string;
+    xAPIKey?: string;
 }
 
 /**
@@ -54,7 +59,7 @@ export class TagsApi extends runtime.BaseAPI {
     /**
      * Returns project tags
      */
-    async getAll2Raw(requestParameters: TagsApiGetAll2Request, initOverrides?: RequestInit): Promise<runtime.ApiResponse<PagedModelTagModel>> {
+    async getAll2Raw(requestParameters: GetAll2Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PagedModelTagModel>> {
         const queryParameters: any = {};
 
         if (requestParameters.search !== undefined) {
@@ -79,6 +84,10 @@ export class TagsApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+        if (requestParameters.xAPIKey !== undefined && requestParameters.xAPIKey !== null) {
+            headerParameters['X-API-Key'] = String(requestParameters.xAPIKey);
+        }
+
         const response = await this.request({
             path: `/v2/projects/tags`,
             method: 'GET',
@@ -92,7 +101,7 @@ export class TagsApi extends runtime.BaseAPI {
     /**
      * Returns project tags
      */
-    async getAll2(requestParameters: TagsApiGetAll2Request = {}, initOverrides?: RequestInit): Promise<PagedModelTagModel> {
+    async getAll2(requestParameters: GetAll2Request = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PagedModelTagModel> {
         const response = await this.getAll2Raw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -100,7 +109,7 @@ export class TagsApi extends runtime.BaseAPI {
     /**
      * Removes tag with provided id from key with provided id
      */
-    async removeTag1Raw(requestParameters: TagsApiRemoveTag1Request, initOverrides?: RequestInit): Promise<runtime.ApiResponse<void>> {
+    async removeTag1Raw(requestParameters: RemoveTag1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters.keyId === null || requestParameters.keyId === undefined) {
             throw new runtime.RequiredError('keyId','Required parameter requestParameters.keyId was null or undefined when calling removeTag1.');
         }
@@ -117,6 +126,10 @@ export class TagsApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+        if (requestParameters.xAPIKey !== undefined && requestParameters.xAPIKey !== null) {
+            headerParameters['X-API-Key'] = String(requestParameters.xAPIKey);
+        }
+
         const response = await this.request({
             path: `/v2/projects/keys/{keyId}/tags/{tagId}`.replace(`{${"keyId"}}`, encodeURIComponent(String(requestParameters.keyId))).replace(`{${"tagId"}}`, encodeURIComponent(String(requestParameters.tagId))),
             method: 'DELETE',
@@ -130,14 +143,14 @@ export class TagsApi extends runtime.BaseAPI {
     /**
      * Removes tag with provided id from key with provided id
      */
-    async removeTag1(requestParameters: TagsApiRemoveTag1Request, initOverrides?: RequestInit): Promise<void> {
+    async removeTag1(requestParameters: RemoveTag1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.removeTag1Raw(requestParameters, initOverrides);
     }
 
     /**
      * Tags a key with tag. If tag with provided name doesn\'t exist, it is created
      */
-    async tagKey1Raw(requestParameters: TagsApiTagKey1Request, initOverrides?: RequestInit): Promise<runtime.ApiResponse<TagModel>> {
+    async tagKey1Raw(requestParameters: TagKey1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TagModel>> {
         if (requestParameters.keyId === null || requestParameters.keyId === undefined) {
             throw new runtime.RequiredError('keyId','Required parameter requestParameters.keyId was null or undefined when calling tagKey1.');
         }
@@ -156,6 +169,10 @@ export class TagsApi extends runtime.BaseAPI {
 
         headerParameters['Content-Type'] = 'application/json';
 
+        if (requestParameters.xAPIKey !== undefined && requestParameters.xAPIKey !== null) {
+            headerParameters['X-API-Key'] = String(requestParameters.xAPIKey);
+        }
+
         const response = await this.request({
             path: `/v2/projects/keys/{keyId}/tags`.replace(`{${"keyId"}}`, encodeURIComponent(String(requestParameters.keyId))),
             method: 'PUT',
@@ -170,7 +187,7 @@ export class TagsApi extends runtime.BaseAPI {
     /**
      * Tags a key with tag. If tag with provided name doesn\'t exist, it is created
      */
-    async tagKey1(requestParameters: TagsApiTagKey1Request, initOverrides?: RequestInit): Promise<TagModel> {
+    async tagKey1(requestParameters: TagKey1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TagModel> {
         const response = await this.tagKey1Raw(requestParameters, initOverrides);
         return await response.value();
     }

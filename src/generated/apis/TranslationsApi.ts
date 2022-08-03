@@ -14,43 +14,48 @@
 
 
 import * as runtime from '../runtime';
+import type {
+  KeysWithTranslationsPageModel,
+  PagedModelTranslationHistoryModel,
+  SelectAllResponse,
+  SetTranslationsResponseModel,
+  SetTranslationsWithKeyDto,
+  TranslationModel,
+} from '../models';
 import {
-    KeysWithTranslationsPageModel,
     KeysWithTranslationsPageModelFromJSON,
     KeysWithTranslationsPageModelToJSON,
-    PagedModelTranslationHistoryModel,
     PagedModelTranslationHistoryModelFromJSON,
     PagedModelTranslationHistoryModelToJSON,
-    SelectAllResponse,
     SelectAllResponseFromJSON,
     SelectAllResponseToJSON,
-    SetTranslationsResponseModel,
     SetTranslationsResponseModelFromJSON,
     SetTranslationsResponseModelToJSON,
-    SetTranslationsWithKeyDto,
     SetTranslationsWithKeyDtoFromJSON,
     SetTranslationsWithKeyDtoToJSON,
-    TranslationModel,
     TranslationModelFromJSON,
     TranslationModelToJSON,
 } from '../models';
 
-export interface TranslationsApiCreateOrUpdateTranslations1Request {
+export interface CreateOrUpdateTranslations1Request {
     setTranslationsWithKeyDto: SetTranslationsWithKeyDto;
     ak?: string;
+    xAPIKey?: string;
 }
 
-export interface TranslationsApiDismissAutoTranslatedState1Request {
+export interface DismissAutoTranslatedState1Request {
     translationId: number;
     ak?: string;
+    xAPIKey?: string;
 }
 
-export interface TranslationsApiGetAllTranslations1Request {
+export interface GetAllTranslations1Request {
     languages: Set<string>;
     ak?: string;
+    xAPIKey?: string;
 }
 
-export interface TranslationsApiGetSelectAllKeyIds1Request {
+export interface GetSelectAllKeyIds1Request {
     filterState?: Array<string>;
     languages?: Set<string>;
     search?: string;
@@ -64,17 +69,19 @@ export interface TranslationsApiGetSelectAllKeyIds1Request {
     filterHasNoScreenshot?: boolean;
     filterTag?: Array<string>;
     ak?: string;
+    xAPIKey?: string;
 }
 
-export interface TranslationsApiGetTranslationHistory1Request {
+export interface GetTranslationHistory1Request {
     translationId: number;
     page?: number;
     size?: number;
     sort?: Array<string>;
     ak?: string;
+    xAPIKey?: string;
 }
 
-export interface TranslationsApiGetTranslations1Request {
+export interface GetTranslations1Request {
     cursor?: string;
     filterState?: Array<string>;
     languages?: Set<string>;
@@ -92,17 +99,20 @@ export interface TranslationsApiGetTranslations1Request {
     size?: number;
     sort?: Array<string>;
     ak?: string;
+    xAPIKey?: string;
 }
 
-export interface TranslationsApiSetTranslationState1Request {
+export interface SetTranslationState1Request {
     translationId: number;
     state: SetTranslationState1StateEnum;
     ak?: string;
+    xAPIKey?: string;
 }
 
-export interface TranslationsApiSetTranslations1Request {
+export interface SetTranslations1Request {
     setTranslationsWithKeyDto: SetTranslationsWithKeyDto;
     ak?: string;
+    xAPIKey?: string;
 }
 
 /**
@@ -113,7 +123,7 @@ export class TranslationsApi extends runtime.BaseAPI {
     /**
      * Sets translations for existing or not existing key
      */
-    async createOrUpdateTranslations1Raw(requestParameters: TranslationsApiCreateOrUpdateTranslations1Request, initOverrides?: RequestInit): Promise<runtime.ApiResponse<SetTranslationsResponseModel>> {
+    async createOrUpdateTranslations1Raw(requestParameters: CreateOrUpdateTranslations1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SetTranslationsResponseModel>> {
         if (requestParameters.setTranslationsWithKeyDto === null || requestParameters.setTranslationsWithKeyDto === undefined) {
             throw new runtime.RequiredError('setTranslationsWithKeyDto','Required parameter requestParameters.setTranslationsWithKeyDto was null or undefined when calling createOrUpdateTranslations1.');
         }
@@ -127,6 +137,10 @@ export class TranslationsApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         headerParameters['Content-Type'] = 'application/json';
+
+        if (requestParameters.xAPIKey !== undefined && requestParameters.xAPIKey !== null) {
+            headerParameters['X-API-Key'] = String(requestParameters.xAPIKey);
+        }
 
         const response = await this.request({
             path: `/v2/projects/translations`,
@@ -142,7 +156,7 @@ export class TranslationsApi extends runtime.BaseAPI {
     /**
      * Sets translations for existing or not existing key
      */
-    async createOrUpdateTranslations1(requestParameters: TranslationsApiCreateOrUpdateTranslations1Request, initOverrides?: RequestInit): Promise<SetTranslationsResponseModel> {
+    async createOrUpdateTranslations1(requestParameters: CreateOrUpdateTranslations1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SetTranslationsResponseModel> {
         const response = await this.createOrUpdateTranslations1Raw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -150,7 +164,7 @@ export class TranslationsApi extends runtime.BaseAPI {
     /**
      * Removes \"auto translated\" indication
      */
-    async dismissAutoTranslatedState1Raw(requestParameters: TranslationsApiDismissAutoTranslatedState1Request, initOverrides?: RequestInit): Promise<runtime.ApiResponse<TranslationModel>> {
+    async dismissAutoTranslatedState1Raw(requestParameters: DismissAutoTranslatedState1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TranslationModel>> {
         if (requestParameters.translationId === null || requestParameters.translationId === undefined) {
             throw new runtime.RequiredError('translationId','Required parameter requestParameters.translationId was null or undefined when calling dismissAutoTranslatedState1.');
         }
@@ -162,6 +176,10 @@ export class TranslationsApi extends runtime.BaseAPI {
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
+
+        if (requestParameters.xAPIKey !== undefined && requestParameters.xAPIKey !== null) {
+            headerParameters['X-API-Key'] = String(requestParameters.xAPIKey);
+        }
 
         const response = await this.request({
             path: `/v2/projects/translations/{translationId}/dismiss-auto-translated-state`.replace(`{${"translationId"}}`, encodeURIComponent(String(requestParameters.translationId))),
@@ -176,7 +194,7 @@ export class TranslationsApi extends runtime.BaseAPI {
     /**
      * Removes \"auto translated\" indication
      */
-    async dismissAutoTranslatedState1(requestParameters: TranslationsApiDismissAutoTranslatedState1Request, initOverrides?: RequestInit): Promise<TranslationModel> {
+    async dismissAutoTranslatedState1(requestParameters: DismissAutoTranslatedState1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TranslationModel> {
         const response = await this.dismissAutoTranslatedState1Raw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -184,7 +202,7 @@ export class TranslationsApi extends runtime.BaseAPI {
     /**
      * Returns all translations for specified languages
      */
-    async getAllTranslations1Raw(requestParameters: TranslationsApiGetAllTranslations1Request, initOverrides?: RequestInit): Promise<runtime.ApiResponse<string>> {
+    async getAllTranslations1Raw(requestParameters: GetAllTranslations1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<string>> {
         if (requestParameters.languages === null || requestParameters.languages === undefined) {
             throw new runtime.RequiredError('languages','Required parameter requestParameters.languages was null or undefined when calling getAllTranslations1.');
         }
@@ -196,6 +214,10 @@ export class TranslationsApi extends runtime.BaseAPI {
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
+
+        if (requestParameters.xAPIKey !== undefined && requestParameters.xAPIKey !== null) {
+            headerParameters['X-API-Key'] = String(requestParameters.xAPIKey);
+        }
 
         const response = await this.request({
             path: `/v2/projects/translations/{languages}`.replace(`{${"languages"}}`, encodeURIComponent(String(requestParameters.languages))),
@@ -210,7 +232,7 @@ export class TranslationsApi extends runtime.BaseAPI {
     /**
      * Returns all translations for specified languages
      */
-    async getAllTranslations1(requestParameters: TranslationsApiGetAllTranslations1Request, initOverrides?: RequestInit): Promise<string> {
+    async getAllTranslations1(requestParameters: GetAllTranslations1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<string> {
         const response = await this.getAllTranslations1Raw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -218,7 +240,7 @@ export class TranslationsApi extends runtime.BaseAPI {
     /**
      * Get select all keys
      */
-    async getSelectAllKeyIds1Raw(requestParameters: TranslationsApiGetSelectAllKeyIds1Request, initOverrides?: RequestInit): Promise<runtime.ApiResponse<SelectAllResponse>> {
+    async getSelectAllKeyIds1Raw(requestParameters: GetSelectAllKeyIds1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SelectAllResponse>> {
         const queryParameters: any = {};
 
         if (requestParameters.filterState) {
@@ -275,6 +297,10 @@ export class TranslationsApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+        if (requestParameters.xAPIKey !== undefined && requestParameters.xAPIKey !== null) {
+            headerParameters['X-API-Key'] = String(requestParameters.xAPIKey);
+        }
+
         const response = await this.request({
             path: `/v2/projects/translations/select-all`,
             method: 'GET',
@@ -288,7 +314,7 @@ export class TranslationsApi extends runtime.BaseAPI {
     /**
      * Get select all keys
      */
-    async getSelectAllKeyIds1(requestParameters: TranslationsApiGetSelectAllKeyIds1Request = {}, initOverrides?: RequestInit): Promise<SelectAllResponse> {
+    async getSelectAllKeyIds1(requestParameters: GetSelectAllKeyIds1Request = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SelectAllResponse> {
         const response = await this.getSelectAllKeyIds1Raw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -296,7 +322,7 @@ export class TranslationsApi extends runtime.BaseAPI {
     /**
      * Returns history of specific translation.   Sorting is not supported for supported. It is automatically sorted from newest to oldest.
      */
-    async getTranslationHistory1Raw(requestParameters: TranslationsApiGetTranslationHistory1Request, initOverrides?: RequestInit): Promise<runtime.ApiResponse<PagedModelTranslationHistoryModel>> {
+    async getTranslationHistory1Raw(requestParameters: GetTranslationHistory1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PagedModelTranslationHistoryModel>> {
         if (requestParameters.translationId === null || requestParameters.translationId === undefined) {
             throw new runtime.RequiredError('translationId','Required parameter requestParameters.translationId was null or undefined when calling getTranslationHistory1.');
         }
@@ -321,6 +347,10 @@ export class TranslationsApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+        if (requestParameters.xAPIKey !== undefined && requestParameters.xAPIKey !== null) {
+            headerParameters['X-API-Key'] = String(requestParameters.xAPIKey);
+        }
+
         const response = await this.request({
             path: `/v2/projects/translations/{translationId}/history`.replace(`{${"translationId"}}`, encodeURIComponent(String(requestParameters.translationId))),
             method: 'GET',
@@ -334,7 +364,7 @@ export class TranslationsApi extends runtime.BaseAPI {
     /**
      * Returns history of specific translation.   Sorting is not supported for supported. It is automatically sorted from newest to oldest.
      */
-    async getTranslationHistory1(requestParameters: TranslationsApiGetTranslationHistory1Request, initOverrides?: RequestInit): Promise<PagedModelTranslationHistoryModel> {
+    async getTranslationHistory1(requestParameters: GetTranslationHistory1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PagedModelTranslationHistoryModel> {
         const response = await this.getTranslationHistory1Raw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -342,7 +372,7 @@ export class TranslationsApi extends runtime.BaseAPI {
     /**
      * Returns translations in project
      */
-    async getTranslations1Raw(requestParameters: TranslationsApiGetTranslations1Request, initOverrides?: RequestInit): Promise<runtime.ApiResponse<KeysWithTranslationsPageModel>> {
+    async getTranslations1Raw(requestParameters: GetTranslations1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<KeysWithTranslationsPageModel>> {
         const queryParameters: any = {};
 
         if (requestParameters.cursor !== undefined) {
@@ -415,6 +445,10 @@ export class TranslationsApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+        if (requestParameters.xAPIKey !== undefined && requestParameters.xAPIKey !== null) {
+            headerParameters['X-API-Key'] = String(requestParameters.xAPIKey);
+        }
+
         const response = await this.request({
             path: `/v2/projects/translations`,
             method: 'GET',
@@ -428,7 +462,7 @@ export class TranslationsApi extends runtime.BaseAPI {
     /**
      * Returns translations in project
      */
-    async getTranslations1(requestParameters: TranslationsApiGetTranslations1Request = {}, initOverrides?: RequestInit): Promise<KeysWithTranslationsPageModel> {
+    async getTranslations1(requestParameters: GetTranslations1Request = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<KeysWithTranslationsPageModel> {
         const response = await this.getTranslations1Raw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -436,7 +470,7 @@ export class TranslationsApi extends runtime.BaseAPI {
     /**
      * Sets translation state
      */
-    async setTranslationState1Raw(requestParameters: TranslationsApiSetTranslationState1Request, initOverrides?: RequestInit): Promise<runtime.ApiResponse<TranslationModel>> {
+    async setTranslationState1Raw(requestParameters: SetTranslationState1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TranslationModel>> {
         if (requestParameters.translationId === null || requestParameters.translationId === undefined) {
             throw new runtime.RequiredError('translationId','Required parameter requestParameters.translationId was null or undefined when calling setTranslationState1.');
         }
@@ -453,6 +487,10 @@ export class TranslationsApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+        if (requestParameters.xAPIKey !== undefined && requestParameters.xAPIKey !== null) {
+            headerParameters['X-API-Key'] = String(requestParameters.xAPIKey);
+        }
+
         const response = await this.request({
             path: `/v2/projects/translations/{translationId}/set-state/{state}`.replace(`{${"translationId"}}`, encodeURIComponent(String(requestParameters.translationId))).replace(`{${"state"}}`, encodeURIComponent(String(requestParameters.state))),
             method: 'PUT',
@@ -466,7 +504,7 @@ export class TranslationsApi extends runtime.BaseAPI {
     /**
      * Sets translation state
      */
-    async setTranslationState1(requestParameters: TranslationsApiSetTranslationState1Request, initOverrides?: RequestInit): Promise<TranslationModel> {
+    async setTranslationState1(requestParameters: SetTranslationState1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TranslationModel> {
         const response = await this.setTranslationState1Raw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -474,7 +512,7 @@ export class TranslationsApi extends runtime.BaseAPI {
     /**
      * Sets translations for existing key
      */
-    async setTranslations1Raw(requestParameters: TranslationsApiSetTranslations1Request, initOverrides?: RequestInit): Promise<runtime.ApiResponse<SetTranslationsResponseModel>> {
+    async setTranslations1Raw(requestParameters: SetTranslations1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SetTranslationsResponseModel>> {
         if (requestParameters.setTranslationsWithKeyDto === null || requestParameters.setTranslationsWithKeyDto === undefined) {
             throw new runtime.RequiredError('setTranslationsWithKeyDto','Required parameter requestParameters.setTranslationsWithKeyDto was null or undefined when calling setTranslations1.');
         }
@@ -488,6 +526,10 @@ export class TranslationsApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         headerParameters['Content-Type'] = 'application/json';
+
+        if (requestParameters.xAPIKey !== undefined && requestParameters.xAPIKey !== null) {
+            headerParameters['X-API-Key'] = String(requestParameters.xAPIKey);
+        }
 
         const response = await this.request({
             path: `/v2/projects/translations`,
@@ -503,7 +545,7 @@ export class TranslationsApi extends runtime.BaseAPI {
     /**
      * Sets translations for existing key
      */
-    async setTranslations1(requestParameters: TranslationsApiSetTranslations1Request, initOverrides?: RequestInit): Promise<SetTranslationsResponseModel> {
+    async setTranslations1(requestParameters: SetTranslations1Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SetTranslationsResponseModel> {
         const response = await this.setTranslations1Raw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -511,11 +553,11 @@ export class TranslationsApi extends runtime.BaseAPI {
 }
 
 /**
-    * @export
-    * @enum {string}
-    */
-export enum SetTranslationState1StateEnum {
-    Untranslated = 'UNTRANSLATED',
-    Translated = 'TRANSLATED',
-    Reviewed = 'REVIEWED'
-}
+ * @export
+ */
+export const SetTranslationState1StateEnum = {
+    Untranslated: 'UNTRANSLATED',
+    Translated: 'TRANSLATED',
+    Reviewed: 'REVIEWED'
+} as const;
+export type SetTranslationState1StateEnum = typeof SetTranslationState1StateEnum[keyof typeof SetTranslationState1StateEnum];

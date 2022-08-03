@@ -45,14 +45,29 @@ export interface TranslationCommentWithLangKeyDto {
     state: TranslationCommentWithLangKeyDtoStateEnum;
 }
 
+
 /**
-* @export
-* @enum {string}
-*/
-export enum TranslationCommentWithLangKeyDtoStateEnum {
-    ResolutionNotNeeded = 'RESOLUTION_NOT_NEEDED',
-    NeedsResolution = 'NEEDS_RESOLUTION',
-    Resolved = 'RESOLVED'
+ * @export
+ */
+export const TranslationCommentWithLangKeyDtoStateEnum = {
+    ResolutionNotNeeded: 'RESOLUTION_NOT_NEEDED',
+    NeedsResolution: 'NEEDS_RESOLUTION',
+    Resolved: 'RESOLVED'
+} as const;
+export type TranslationCommentWithLangKeyDtoStateEnum = typeof TranslationCommentWithLangKeyDtoStateEnum[keyof typeof TranslationCommentWithLangKeyDtoStateEnum];
+
+
+/**
+ * Check if a given object implements the TranslationCommentWithLangKeyDto interface.
+ */
+export function instanceOfTranslationCommentWithLangKeyDto(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "keyId" in value;
+    isInstance = isInstance && "languageId" in value;
+    isInstance = isInstance && "text" in value;
+    isInstance = isInstance && "state" in value;
+
+    return isInstance;
 }
 
 export function TranslationCommentWithLangKeyDtoFromJSON(json: any): TranslationCommentWithLangKeyDto {

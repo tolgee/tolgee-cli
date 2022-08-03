@@ -27,6 +27,16 @@ export interface SelectAllResponse {
     ids: Array<number>;
 }
 
+/**
+ * Check if a given object implements the SelectAllResponse interface.
+ */
+export function instanceOfSelectAllResponse(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "ids" in value;
+
+    return isInstance;
+}
+
 export function SelectAllResponseFromJSON(json: any): SelectAllResponse {
     return SelectAllResponseFromJSONTyped(json, false);
 }

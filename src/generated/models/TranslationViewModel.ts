@@ -69,21 +69,41 @@ export interface TranslationViewModel {
     fromTranslationMemory: boolean;
 }
 
+
 /**
-* @export
-* @enum {string}
-*/
-export enum TranslationViewModelStateEnum {
-    Untranslated = 'UNTRANSLATED',
-    Translated = 'TRANSLATED',
-    Reviewed = 'REVIEWED'
-}/**
-* @export
-* @enum {string}
-*/
-export enum TranslationViewModelMtProviderEnum {
-    Google = 'GOOGLE',
-    Aws = 'AWS'
+ * @export
+ */
+export const TranslationViewModelStateEnum = {
+    Untranslated: 'UNTRANSLATED',
+    Translated: 'TRANSLATED',
+    Reviewed: 'REVIEWED'
+} as const;
+export type TranslationViewModelStateEnum = typeof TranslationViewModelStateEnum[keyof typeof TranslationViewModelStateEnum];
+
+/**
+ * @export
+ */
+export const TranslationViewModelMtProviderEnum = {
+    Google: 'GOOGLE',
+    Aws: 'AWS',
+    Deepl: 'DEEPL'
+} as const;
+export type TranslationViewModelMtProviderEnum = typeof TranslationViewModelMtProviderEnum[keyof typeof TranslationViewModelMtProviderEnum];
+
+
+/**
+ * Check if a given object implements the TranslationViewModel interface.
+ */
+export function instanceOfTranslationViewModel(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "id" in value;
+    isInstance = isInstance && "state" in value;
+    isInstance = isInstance && "auto" in value;
+    isInstance = isInstance && "commentCount" in value;
+    isInstance = isInstance && "unresolvedCommentCount" in value;
+    isInstance = isInstance && "fromTranslationMemory" in value;
+
+    return isInstance;
 }
 
 export function TranslationViewModelFromJSON(json: any): TranslationViewModel {

@@ -13,8 +13,8 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { TagModel } from './TagModel';
 import {
-    TagModel,
     TagModelFromJSON,
     TagModelFromJSONTyped,
     TagModelToJSON,
@@ -32,6 +32,15 @@ export interface PagedModelTagModelEmbedded {
      * @memberof PagedModelTagModelEmbedded
      */
     tags?: Array<TagModel>;
+}
+
+/**
+ * Check if a given object implements the PagedModelTagModelEmbedded interface.
+ */
+export function instanceOfPagedModelTagModelEmbedded(value: object): boolean {
+    let isInstance = true;
+
+    return isInstance;
 }
 
 export function PagedModelTagModelEmbeddedFromJSON(json: any): PagedModelTagModelEmbedded {

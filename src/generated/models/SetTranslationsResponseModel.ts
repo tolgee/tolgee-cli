@@ -13,8 +13,8 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { TranslationModel } from './TranslationModel';
 import {
-    TranslationModel,
     TranslationModelFromJSON,
     TranslationModelFromJSONTyped,
     TranslationModelToJSON,
@@ -44,6 +44,18 @@ export interface SetTranslationsResponseModel {
      * @memberof SetTranslationsResponseModel
      */
     translations: { [key: string]: TranslationModel; };
+}
+
+/**
+ * Check if a given object implements the SetTranslationsResponseModel interface.
+ */
+export function instanceOfSetTranslationsResponseModel(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "keyId" in value;
+    isInstance = isInstance && "keyName" in value;
+    isInstance = isInstance && "translations" in value;
+
+    return isInstance;
 }
 
 export function SetTranslationsResponseModelFromJSON(json: any): SetTranslationsResponseModel {

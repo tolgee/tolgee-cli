@@ -45,6 +45,19 @@ export interface TranslationMemoryItemModel {
     similarity: number;
 }
 
+/**
+ * Check if a given object implements the TranslationMemoryItemModel interface.
+ */
+export function instanceOfTranslationMemoryItemModel(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "targetText" in value;
+    isInstance = isInstance && "baseText" in value;
+    isInstance = isInstance && "keyName" in value;
+    isInstance = isInstance && "similarity" in value;
+
+    return isInstance;
+}
+
 export function TranslationMemoryItemModelFromJSON(json: any): TranslationMemoryItemModel {
     return TranslationMemoryItemModelFromJSONTyped(json, false);
 }

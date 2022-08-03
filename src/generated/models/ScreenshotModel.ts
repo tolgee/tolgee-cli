@@ -48,6 +48,18 @@ export interface ScreenshotModel {
     createdAt?: Date;
 }
 
+/**
+ * Check if a given object implements the ScreenshotModel interface.
+ */
+export function instanceOfScreenshotModel(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "id" in value;
+    isInstance = isInstance && "filename" in value;
+    isInstance = isInstance && "fileUrl" in value;
+
+    return isInstance;
+}
+
 export function ScreenshotModelFromJSON(json: any): ScreenshotModel {
     return ScreenshotModelFromJSONTyped(json, false);
 }

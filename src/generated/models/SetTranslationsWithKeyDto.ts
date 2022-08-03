@@ -42,6 +42,17 @@ export interface SetTranslationsWithKeyDto {
     languagesToReturn?: Set<string>;
 }
 
+/**
+ * Check if a given object implements the SetTranslationsWithKeyDto interface.
+ */
+export function instanceOfSetTranslationsWithKeyDto(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "key" in value;
+    isInstance = isInstance && "translations" in value;
+
+    return isInstance;
+}
+
 export function SetTranslationsWithKeyDtoFromJSON(json: any): SetTranslationsWithKeyDto {
     return SetTranslationsWithKeyDtoFromJSONTyped(json, false);
 }

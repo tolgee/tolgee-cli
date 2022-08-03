@@ -33,6 +33,16 @@ export interface ErrorResponseBody {
     params?: Array<object>;
 }
 
+/**
+ * Check if a given object implements the ErrorResponseBody interface.
+ */
+export function instanceOfErrorResponseBody(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "code" in value;
+
+    return isInstance;
+}
+
 export function ErrorResponseBodyFromJSON(json: any): ErrorResponseBody {
     return ErrorResponseBodyFromJSONTyped(json, false);
 }

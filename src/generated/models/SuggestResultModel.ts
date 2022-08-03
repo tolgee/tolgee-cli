@@ -39,6 +39,17 @@ export interface SuggestResultModel {
     translationCreditsBalanceAfter: number;
 }
 
+/**
+ * Check if a given object implements the SuggestResultModel interface.
+ */
+export function instanceOfSuggestResultModel(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "translationCreditsBalanceBefore" in value;
+    isInstance = isInstance && "translationCreditsBalanceAfter" in value;
+
+    return isInstance;
+}
+
 export function SuggestResultModelFromJSON(json: any): SuggestResultModel {
     return SuggestResultModelFromJSONTyped(json, false);
 }

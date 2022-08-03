@@ -51,6 +51,20 @@ export interface UploadedImageModel {
     createdAt: Date;
 }
 
+/**
+ * Check if a given object implements the UploadedImageModel interface.
+ */
+export function instanceOfUploadedImageModel(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "id" in value;
+    isInstance = isInstance && "filename" in value;
+    isInstance = isInstance && "fileUrl" in value;
+    isInstance = isInstance && "requestFilename" in value;
+    isInstance = isInstance && "createdAt" in value;
+
+    return isInstance;
+}
+
 export function UploadedImageModelFromJSON(json: any): UploadedImageModel {
     return UploadedImageModelFromJSONTyped(json, false);
 }

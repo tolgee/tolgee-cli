@@ -13,14 +13,14 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { PageMetadata } from './PageMetadata';
 import {
-    PageMetadata,
     PageMetadataFromJSON,
     PageMetadataFromJSONTyped,
     PageMetadataToJSON,
 } from './PageMetadata';
+import type { PagedModelLanguageModelEmbedded } from './PagedModelLanguageModelEmbedded';
 import {
-    PagedModelLanguageModelEmbedded,
     PagedModelLanguageModelEmbeddedFromJSON,
     PagedModelLanguageModelEmbeddedFromJSONTyped,
     PagedModelLanguageModelEmbeddedToJSON,
@@ -44,6 +44,15 @@ export interface PagedModelLanguageModel {
      * @memberof PagedModelLanguageModel
      */
     page?: PageMetadata;
+}
+
+/**
+ * Check if a given object implements the PagedModelLanguageModel interface.
+ */
+export function instanceOfPagedModelLanguageModel(value: object): boolean {
+    let isInstance = true;
+
+    return isInstance;
 }
 
 export function PagedModelLanguageModelFromJSON(json: any): PagedModelLanguageModel {

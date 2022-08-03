@@ -33,6 +33,17 @@ export interface Avatar {
     thumbnail: string;
 }
 
+/**
+ * Check if a given object implements the Avatar interface.
+ */
+export function instanceOfAvatar(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "large" in value;
+    isInstance = isInstance && "thumbnail" in value;
+
+    return isInstance;
+}
+
 export function AvatarFromJSON(json: any): Avatar {
     return AvatarFromJSONTyped(json, false);
 }

@@ -93,6 +93,23 @@ export interface ImportLanguageModel {
     resolvedCount: number;
 }
 
+/**
+ * Check if a given object implements the ImportLanguageModel interface.
+ */
+export function instanceOfImportLanguageModel(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "id" in value;
+    isInstance = isInstance && "name" in value;
+    isInstance = isInstance && "importFileName" in value;
+    isInstance = isInstance && "importFileId" in value;
+    isInstance = isInstance && "importFileIssueCount" in value;
+    isInstance = isInstance && "totalCount" in value;
+    isInstance = isInstance && "conflictCount" in value;
+    isInstance = isInstance && "resolvedCount" in value;
+
+    return isInstance;
+}
+
 export function ImportLanguageModelFromJSON(json: any): ImportLanguageModel {
     return ImportLanguageModelFromJSONTyped(json, false);
 }

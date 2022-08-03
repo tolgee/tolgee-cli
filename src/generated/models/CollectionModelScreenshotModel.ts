@@ -13,8 +13,8 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { CollectionModelScreenshotModelEmbedded } from './CollectionModelScreenshotModelEmbedded';
 import {
-    CollectionModelScreenshotModelEmbedded,
     CollectionModelScreenshotModelEmbeddedFromJSON,
     CollectionModelScreenshotModelEmbeddedFromJSONTyped,
     CollectionModelScreenshotModelEmbeddedToJSON,
@@ -32,6 +32,15 @@ export interface CollectionModelScreenshotModel {
      * @memberof CollectionModelScreenshotModel
      */
     embedded?: CollectionModelScreenshotModelEmbedded;
+}
+
+/**
+ * Check if a given object implements the CollectionModelScreenshotModel interface.
+ */
+export function instanceOfCollectionModelScreenshotModel(value: object): boolean {
+    let isInstance = true;
+
+    return isInstance;
 }
 
 export function CollectionModelScreenshotModelFromJSON(json: any): CollectionModelScreenshotModel {

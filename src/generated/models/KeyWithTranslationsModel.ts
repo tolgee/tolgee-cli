@@ -13,20 +13,20 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { ScreenshotModel } from './ScreenshotModel';
 import {
-    ScreenshotModel,
     ScreenshotModelFromJSON,
     ScreenshotModelFromJSONTyped,
     ScreenshotModelToJSON,
 } from './ScreenshotModel';
+import type { TagModel } from './TagModel';
 import {
-    TagModel,
     TagModelFromJSON,
     TagModelFromJSONTyped,
     TagModelToJSON,
 } from './TagModel';
+import type { TranslationViewModel } from './TranslationViewModel';
 import {
-    TranslationViewModel,
     TranslationViewModelFromJSON,
     TranslationViewModelFromJSONTyped,
     TranslationViewModelToJSON,
@@ -74,6 +74,20 @@ export interface KeyWithTranslationsModel {
      * @memberof KeyWithTranslationsModel
      */
     translations: { [key: string]: TranslationViewModel; };
+}
+
+/**
+ * Check if a given object implements the KeyWithTranslationsModel interface.
+ */
+export function instanceOfKeyWithTranslationsModel(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "keyId" in value;
+    isInstance = isInstance && "keyName" in value;
+    isInstance = isInstance && "keyTags" in value;
+    isInstance = isInstance && "screenshotCount" in value;
+    isInstance = isInstance && "translations" in value;
+
+    return isInstance;
 }
 
 export function KeyWithTranslationsModelFromJSON(json: any): KeyWithTranslationsModel {

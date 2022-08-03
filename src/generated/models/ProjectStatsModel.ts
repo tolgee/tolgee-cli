@@ -13,8 +13,8 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { LanguageStatsModel } from './LanguageStatsModel';
 import {
-    LanguageStatsModel,
     LanguageStatsModelFromJSON,
     LanguageStatsModelFromJSONTyped,
     LanguageStatsModelToJSON,
@@ -80,6 +80,24 @@ export interface ProjectStatsModel {
      * @memberof ProjectStatsModel
      */
     languageStats: Array<LanguageStatsModel>;
+}
+
+/**
+ * Check if a given object implements the ProjectStatsModel interface.
+ */
+export function instanceOfProjectStatsModel(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "projectId" in value;
+    isInstance = isInstance && "languageCount" in value;
+    isInstance = isInstance && "keyCount" in value;
+    isInstance = isInstance && "baseWordsCount" in value;
+    isInstance = isInstance && "translatedPercentage" in value;
+    isInstance = isInstance && "reviewedPercentage" in value;
+    isInstance = isInstance && "membersCount" in value;
+    isInstance = isInstance && "tagCount" in value;
+    isInstance = isInstance && "languageStats" in value;
+
+    return isInstance;
 }
 
 export function ProjectStatsModelFromJSON(json: any): ProjectStatsModel {

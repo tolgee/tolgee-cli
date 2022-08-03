@@ -33,14 +33,27 @@ export interface TranslationCommentDto {
     state: TranslationCommentDtoStateEnum;
 }
 
+
 /**
-* @export
-* @enum {string}
-*/
-export enum TranslationCommentDtoStateEnum {
-    ResolutionNotNeeded = 'RESOLUTION_NOT_NEEDED',
-    NeedsResolution = 'NEEDS_RESOLUTION',
-    Resolved = 'RESOLVED'
+ * @export
+ */
+export const TranslationCommentDtoStateEnum = {
+    ResolutionNotNeeded: 'RESOLUTION_NOT_NEEDED',
+    NeedsResolution: 'NEEDS_RESOLUTION',
+    Resolved: 'RESOLVED'
+} as const;
+export type TranslationCommentDtoStateEnum = typeof TranslationCommentDtoStateEnum[keyof typeof TranslationCommentDtoStateEnum];
+
+
+/**
+ * Check if a given object implements the TranslationCommentDto interface.
+ */
+export function instanceOfTranslationCommentDto(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "text" in value;
+    isInstance = isInstance && "state" in value;
+
+    return isInstance;
 }
 
 export function TranslationCommentDtoFromJSON(json: any): TranslationCommentDto {

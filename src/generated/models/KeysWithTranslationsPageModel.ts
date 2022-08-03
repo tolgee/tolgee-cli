@@ -13,20 +13,20 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { KeysWithTranslationsPageModelEmbedded } from './KeysWithTranslationsPageModelEmbedded';
 import {
-    KeysWithTranslationsPageModelEmbedded,
     KeysWithTranslationsPageModelEmbeddedFromJSON,
     KeysWithTranslationsPageModelEmbeddedFromJSONTyped,
     KeysWithTranslationsPageModelEmbeddedToJSON,
 } from './KeysWithTranslationsPageModelEmbedded';
+import type { LanguageModel } from './LanguageModel';
 import {
-    LanguageModel,
     LanguageModelFromJSON,
     LanguageModelFromJSONTyped,
     LanguageModelToJSON,
 } from './LanguageModel';
+import type { PageMetadata } from './PageMetadata';
 import {
-    PageMetadata,
     PageMetadataFromJSON,
     PageMetadataFromJSONTyped,
     PageMetadataToJSON,
@@ -62,6 +62,16 @@ export interface KeysWithTranslationsPageModel {
      * @memberof KeysWithTranslationsPageModel
      */
     nextCursor?: string;
+}
+
+/**
+ * Check if a given object implements the KeysWithTranslationsPageModel interface.
+ */
+export function instanceOfKeysWithTranslationsPageModel(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "selectedLanguages" in value;
+
+    return isInstance;
 }
 
 export function KeysWithTranslationsPageModelFromJSON(json: any): KeysWithTranslationsPageModel {

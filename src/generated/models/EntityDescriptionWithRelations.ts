@@ -39,6 +39,18 @@ export interface EntityDescriptionWithRelations {
     data: { [key: string]: object; };
 }
 
+/**
+ * Check if a given object implements the EntityDescriptionWithRelations interface.
+ */
+export function instanceOfEntityDescriptionWithRelations(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "entityClass" in value;
+    isInstance = isInstance && "entityId" in value;
+    isInstance = isInstance && "data" in value;
+
+    return isInstance;
+}
+
 export function EntityDescriptionWithRelationsFromJSON(json: any): EntityDescriptionWithRelations {
     return EntityDescriptionWithRelationsFromJSONTyped(json, false);
 }
