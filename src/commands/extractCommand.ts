@@ -3,6 +3,7 @@ import {promises as fs} from 'fs';
 import path from "path";
 import {Client} from "../Client";
 import {debug} from "../index";
+import { KEY_REGEX } from "../keyRegexp";
 
 export type PossibleKey = {
   string: string,
@@ -11,9 +12,10 @@ export type PossibleKey = {
 }
 
 export type Extractor = {
-  extract: (fileContent: string) => {
-    keys: string[], possibleKeys: PossibleKey[]
-  }
+  /** Code references that will be dynamically injected into the extractor via `$<key>$` */
+  references: Record<string, string | RegExp>
+  /** Regexes that'll be used to extract the strings. `%string%` must be present (internally: KEY_REGEX) */
+  extraction: Array<string>
 }
 
 export class ExtractCommand {
@@ -23,9 +25,11 @@ export class ExtractCommand {
   constructor(private args: { input: string, customExtractor: string, preset: string, apiKey: string, apiUrl: string }) {
     this.client = new Client(args.apiUrl, args.apiKey);
     this.extractor = this.args.customExtractor ? require(path.resolve(this.args.customExtractor).toString()) : require(`../extractors/${args.preset}`);
-    if (typeof this.extractor?.extract !== 'function') {
-      throw new Error('Invalid extractor. Extract method is not a function.');
-    }
+
+    // xxx: validate user-provided extractor
+    // if (typeof this.extractor?.extract !== 'function') {
+    //   throw new Error('Invalid extractor. Extract method is not a function.');
+    // }
   }
 
   async print() {
@@ -76,38 +80,85 @@ export class ExtractCommand {
 
   private async extractKeys() {
     const files = await this.getFiles();
-    const foundKeys: string[] = [];
     const possibleKeys: Map<string, { fileName: string, line: number, position: number }[]> = new Map()
+    const discoveredKeys = new Set<string>()
 
     for (const file of files) {
       debug(`Extracting file: ${file}`)
-      const fileContent = await fs.readFile(file);
-      const content = fileContent.toString();
-      const extracted = this.extractor.extract(content);
-      debug(`File extracted: ${file}`);
-      foundKeys.push(...extracted.keys.map(key => key.trim()));
-      extracted.possibleKeys.forEach((possibleKey) => {
-        if (!possibleKeys.has(possibleKey.string)) {
-          possibleKeys.set(possibleKey.string, []);
+      const content = await fs.readFile(file, 'utf8');
+
+      debug(`\tExtracting references`)
+      const refs = new Map<string, string[]>()
+      for (const refId in this.extractor.references) {
+        if (refId in this.extractor.references) {
+          const extractedRefs: string[] = []
+          const regex = new RegExp(this.extractor.references[refId], 'g')
+          for (const match of content.matchAll(regex)) {
+            extractedRefs.push(match[1])
+          }
+
+          if (extractedRefs.length)
+            refs.set(refId, extractedRefs)
         }
-        try {
-          possibleKeys.get(possibleKey.string)?.push({fileName: file, line: possibleKey.line, position: possibleKey.position})
-        }catch (e){
-          console.log(e, possibleKey.string)
+      }
+
+      debug(`\tPreparing extraction regexes`)
+      const regexes = []
+      const rawRegexes = [ ...this.extractor.extraction ]
+      const referenceRegex = /\$([a-z0-9_]+)\$/
+      for (const rawRegex of rawRegexes) {
+        const referenceMatch = rawRegex.match(referenceRegex)
+        if (referenceMatch) {
+          if (refs.has(referenceMatch[1])) {
+            for (const resolvedRef of refs.get(referenceMatch[1])!) {
+              rawRegexes.push(rawRegex.replace(referenceMatch[0], resolvedRef))
+            }
+          }
+
+          continue
+        }
+
+        regexes.push(new RegExp(rawRegex.replace('%string%', `(${KEY_REGEX})`), 'g'))
+      }
+
+      debug(`\tExtracting strings`)
+      debug(`\t\tLooking for key-like strings`)
+      const lines = content.split(/\r?\n/)
+      lines.forEach((lineContent, lineNum) => {
+        for (const match of lineContent.matchAll(new RegExp(KEY_REGEX, 'g'))) {
+          const string = match[0].trim()
+          if (string) {
+            if (!possibleKeys.has(string))
+              possibleKeys.set(string, [])
+
+            possibleKeys.get(string)!.push({
+              fileName: file,
+              line: lineNum + 1,
+              position: match.index!,
+            })
+          }
         }
       })
+
+      debug(`\t\tLooking for key usage`)
+      for (const regex of regexes) {
+        const keys = content.matchAll(regex)
+        for (const k of keys) discoveredKeys.add(k[1].trim())
+      }
     }
+
     return {
-      keys: [...new Set(foundKeys)],
+      keys: [ ...discoveredKeys ],
       possibleKeys: possibleKeys
     }
   }
 
   private async getFiles() {
     return new Promise<string[]>((resolve, reject) => {
-      glob(this.args.input, {nodir: true}, async (err, files) => {
+      glob(this.args.input, {nodir: true}, (err, files) => {
         if (err) {
           reject(err)
+          return
         }
         resolve(files)
       })
