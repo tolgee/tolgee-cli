@@ -11,12 +11,18 @@ export type PossibleKey = {
   position: number
 }
 
-export type Extractor = {
+export type ExtractorRegExp = {
   /** Code references that will be dynamically injected into the extractor via `$<key>$` */
   references: Record<string, string | RegExp>
   /** Regexes that'll be used to extract the strings. `%string%` must be present (internally: KEY_REGEX) */
   extraction: Array<string>
 }
+
+export type ExtractorFunction = {
+  extractor: (fileContents: string) => string[]
+}
+
+export type Extractor = ExtractorRegExp | ExtractorFunction
 
 export class ExtractCommand {
   private readonly extractor: Extractor;
@@ -24,7 +30,9 @@ export class ExtractCommand {
 
   constructor(private args: { input: string, customExtractor: string, preset: string, apiKey: string, apiUrl: string }) {
     this.client = new Client(args.apiUrl, args.apiKey);
-    this.extractor = this.args.customExtractor ? require(path.resolve(this.args.customExtractor).toString()) : require(`../extractors/${args.preset}`);
+    this.extractor = this.args.customExtractor
+      ? require(path.resolve(this.args.customExtractor).toString())
+      : require(`../extractors/${args.preset}`);
 
     // xxx: validate user-provided extractor
     // if (typeof this.extractor?.extract !== 'function') {
@@ -87,42 +95,7 @@ export class ExtractCommand {
       debug(`Extracting file: ${file}`)
       const content = await fs.readFile(file, 'utf8');
 
-      debug(`\tExtracting references`)
-      const refs = new Map<string, string[]>()
-      for (const refId in this.extractor.references) {
-        if (refId in this.extractor.references) {
-          const extractedRefs: string[] = []
-          const regex = new RegExp(this.extractor.references[refId], 'g')
-          for (const match of content.matchAll(regex)) {
-            extractedRefs.push(match[1])
-          }
-
-          if (extractedRefs.length)
-            refs.set(refId, extractedRefs)
-        }
-      }
-
-      debug(`\tPreparing extraction regexes`)
-      const regexes = []
-      const rawRegexes = [ ...this.extractor.extraction ]
-      const referenceRegex = /\$([a-z0-9_]+)\$/
-      for (const rawRegex of rawRegexes) {
-        const referenceMatch = rawRegex.match(referenceRegex)
-        if (referenceMatch) {
-          if (refs.has(referenceMatch[1])) {
-            for (const resolvedRef of refs.get(referenceMatch[1])!) {
-              rawRegexes.push(rawRegex.replace(referenceMatch[0], resolvedRef))
-            }
-          }
-
-          continue
-        }
-
-        regexes.push(new RegExp(rawRegex.replace('%string%', `(${KEY_REGEX})`), 'g'))
-      }
-
-      debug(`\tExtracting strings`)
-      debug(`\t\tLooking for key-like strings`)
+      debug(`\tExtracting key-like strings`)
       const lines = content.split(/\r?\n/)
       lines.forEach((lineContent, lineNum) => {
         for (const match of lineContent.matchAll(new RegExp(KEY_REGEX, 'g'))) {
@@ -140,10 +113,13 @@ export class ExtractCommand {
         }
       })
 
-      debug(`\t\tLooking for key usage`)
-      for (const regex of regexes) {
-        const keys = content.matchAll(regex)
-        for (const k of keys) discoveredKeys.add(k[1].trim())
+      debug(`\tLooking for key usage`)
+      if ('extraction' in this.extractor) {
+        debug(`\t\tUsing RegExp extractor`)
+        this.regexExtractorRunner(content).forEach((s) => discoveredKeys.add(s))
+      } else {
+        debug(`\t\tUsing user-provided extractor`)
+        this.extractor.extractor(content).forEach((s) => discoveredKeys.add(s))
       }
     }
 
@@ -151,6 +127,55 @@ export class ExtractCommand {
       keys: [ ...discoveredKeys ],
       possibleKeys: possibleKeys
     }
+  }
+
+  private regexExtractorRunner (content: string): string[] {
+    const extractor = this.extractor as ExtractorRegExp
+
+    // perf: deduplicating here is not necessary and would not be worth doing since an additional
+    // dedupe would be necessary to remove dupes across different files. as such, let's use a plain array.
+    const discoveredKeys = []
+
+    debug(`\t\tExtracting references`)
+    const refs = new Map<string, string[]>()
+    for (const refId in extractor.references) {
+      if (refId in extractor.references) {
+        const extractedRefs: string[] = []
+        const regex = new RegExp(extractor.references[refId], 'g')
+        for (const match of content.matchAll(regex)) {
+          extractedRefs.push(match[1])
+        }
+
+        if (extractedRefs.length)
+          refs.set(refId, extractedRefs)
+      }
+    }
+
+    debug(`\t\tPreparing extraction regexes`)
+    const regexes = []
+    const rawRegexes = [ ...extractor.extraction ]
+    const referenceRegex = /\$([a-z0-9_]+)\$/
+    for (const rawRegex of rawRegexes) {
+      const referenceMatch = rawRegex.match(referenceRegex)
+      if (referenceMatch) {
+        if (refs.has(referenceMatch[1])) {
+          for (const resolvedRef of refs.get(referenceMatch[1])!) {
+            rawRegexes.push(rawRegex.replace(referenceMatch[0], resolvedRef))
+          }
+        }
+
+        continue
+      }
+
+      regexes.push(new RegExp(rawRegex.replace('%string%', `(${KEY_REGEX})`), 'g'))
+    }
+
+    for (const regex of regexes) {
+      const keys = content.matchAll(regex)
+      for (const k of keys) discoveredKeys.push(k[1].trim())
+    }
+
+    return discoveredKeys
   }
 
   private async getFiles() {
