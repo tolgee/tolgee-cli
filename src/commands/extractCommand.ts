@@ -13,7 +13,7 @@ export type PossibleKey = {
 
 export type ExtractorRegExp = {
   /** Code references that will be dynamically injected into the extractor via `$<key>$` */
-  references: Record<string, string | RegExp>
+  references?: Record<string, string | RegExp>
   /** Regexes that'll be used to extract the strings. `%string%` must be present (internally: KEY_REGEX) */
   extraction: Array<string>
 }
@@ -30,14 +30,48 @@ export class ExtractCommand {
 
   constructor(private args: { input: string, customExtractor: string, preset: string, apiKey: string, apiUrl: string }) {
     this.client = new Client(args.apiUrl, args.apiKey);
-    this.extractor = this.args.customExtractor
-      ? require(path.resolve(this.args.customExtractor).toString())
-      : require(`../extractors/${args.preset}`);
+    if (this.args.customExtractor) {
+      this.extractor = require(path.resolve(this.args.customExtractor).toString())
 
-    // xxx: validate user-provided extractor
-    // if (typeof this.extractor?.extract !== 'function') {
-    //   throw new Error('Invalid extractor. Extract method is not a function.');
-    // }
+      if (!this.extractor || typeof this.extractor !== 'object' || Array.isArray(this.extractor))
+        throw new TypeError('Invalid extractor provided: The provided extractor is not an object!')
+
+      if ('extraction' in this.extractor)
+        this.validateRegExpExtractor(this.extractor)
+      else
+        this.validateFunctionExtractor(this.extractor)
+    } else {
+      // No validation required
+      this.extractor = require(`../extractors/${args.preset}`);
+    }
+  }
+
+  private validateRegExpExtractor (extractor: ExtractorRegExp) {
+    if (typeof extractor.references !== 'undefined') {
+      if (typeof extractor.references !== 'object' || Array.isArray(extractor))
+        throw new TypeError('Invalid RegExp extractor provided: `references` is not an object!')
+
+      for (const k in extractor.references) {
+        if (k in extractor.references) {
+          if (typeof extractor.references[k] !== 'string' && (typeof extractor.references[k] !== 'object' || !(extractor.references[k] instanceof RegExp)))
+            throw new TypeError(`Invalid RegExp extractor provided: \`references.${k}\` is not a string or a RegExp!`)
+        }
+      }
+
+      for (let i = 0; i < extractor.extraction.length; i++) {
+        const extract = extractor.extraction[i]
+        if (typeof extract !== 'string')
+          throw new TypeError(`Invalid RegExp extractor provided: \`extraction[${i}]\` is not a string!`)
+        if (!extract.includes('%string%'))
+          throw new TypeError(`Invalid RegExp extractor provided: \`extraction[${i}]\` doesn't include %string%!`)
+      }
+    }
+  }
+
+
+  private validateFunctionExtractor (extractor: ExtractorFunction) {
+    if (typeof extractor.extractor !== 'function')
+      throw new TypeError('Invalid functional extractor provided: `extractor` is not a function!')
   }
 
   async print() {
@@ -134,6 +168,27 @@ export class ExtractCommand {
     return this.extractor.extractor(content)
   }
 
+  private regexExtractorRunner (content: string): string[] {
+    const extractor = this.extractor as ExtractorRegExp
+
+    // perf: deduplicating here is not necessary and would not be worth doing since an additional
+    // dedupe would be necessary to remove dupes across different files. as such, let's use a plain array.
+    const discoveredKeys = []
+
+    debug(`\t\tExtracting references`)
+    const refs = this.extractReferences(content, extractor)
+
+    debug(`\t\tPreparing extraction regexes`)
+    const regexes = this.prepareRegexes(refs, extractor)
+
+    for (const regex of regexes) {
+      const keys = content.matchAll(regex)
+      for (const k of keys) discoveredKeys.push(k[1].trim())
+    }
+
+    return discoveredKeys
+  }
+
   private extractReferences (content: string, extractor: ExtractorRegExp): Map<string, string[]> {
     const refs = new Map<string, string[]>()
     for (const refId in extractor.references) {
@@ -172,27 +227,6 @@ export class ExtractCommand {
     }
 
     return regexes
-  }
-
-  private regexExtractorRunner (content: string): string[] {
-    const extractor = this.extractor as ExtractorRegExp
-
-    // perf: deduplicating here is not necessary and would not be worth doing since an additional
-    // dedupe would be necessary to remove dupes across different files. as such, let's use a plain array.
-    const discoveredKeys = []
-
-    debug(`\t\tExtracting references`)
-    const refs = this.extractReferences(content, extractor)
-
-    debug(`\t\tPreparing extraction regexes`)
-    const regexes = this.prepareRegexes(refs, extractor)
-
-    for (const regex of regexes) {
-      const keys = content.matchAll(regex)
-      for (const k of keys) discoveredKeys.push(k[1].trim())
-    }
-
-    return discoveredKeys
   }
 
   private async getFiles() {
