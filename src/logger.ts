@@ -1,37 +1,43 @@
-export const logError = (error: string) => {
-  console.log(`🔴 ${error}`)
+import { setTimeout as wait } from "timers/promises";
+
+const SYMBOLS = ["      🐁", "    🐁  ", "  🐁    ", "🐁      "];
+
+/**
+ * Logs an error to the console.
+ * @param err The error.
+ */
+export function error(err: string) {
+  console.log(`🔴 ${err}`);
 }
 
-export const logProcess = async <T>(comment: string, promiseProvider: () => Promise<T>): Promise<T> => {
-  process.stdout.write("\n");
-  write(comment, 0)
-  let iterations = 0;
-  let done = false
-  const promise = promiseProvider()
-
-  const start = () => setTimeout(() => {
-    iterations++;
-    if (iterations % 20 === 0) {
-      const divided = iterations / 20;
-      write(comment, divided % 4)
+/**
+ * Shows a loading indicator for a Promise until it resolves.
+ *
+ * @param comment Comment to display.
+ * @param promise The promise to watch.
+ * @returns The promise passed in parameter. Useful for decorating without using a buffer variable.
+ */
+export function loading<T>(comment: string, promise: Promise<T>): Promise<T> {
+  let completed = false;
+  promise.then(
+    () => {
+      completed = true;
+      process.stdout.write(`\r🐭✅     ${comment}\n`);
+    },
+    () => {
+      completed = true;
+      process.stdout.write(`\r🐭🔴     ${comment}\n`);
     }
-    if (!done) {
-      start()
+  );
+
+  setImmediate(async () => {
+    let symbolPosition = 0;
+    while (!completed) {
+      process.stdout.write(`\r${SYMBOLS[symbolPosition]} ${comment}`);
+      symbolPosition = (symbolPosition + 1) % 4;
+      await wait(250);
     }
-  }, 10)
+  });
 
-  start();
-
-  promise.finally(() => {
-    done = true
-    process.stdout.write(`\r🐭✅      ${comment}`)
-  }).catch((e) => {
-  })
-
-  return promise
-}
-
-const write = (comment: string, symbolIdx: number) => {
-  const symbols = ["      🐁", "    🐁  ", "  🐁    ", "🐁      "];
-  process.stdout.write(`\r${symbols[symbolIdx]} ${comment}`)
+  return promise;
 }

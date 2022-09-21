@@ -16,35 +16,35 @@ import { exists, mapValues } from "../runtime";
 /**
  *
  * @export
- * @interface SelectAllResponse
+ * @interface DeleteKeysDto
  */
-export interface SelectAllResponse {
+export interface DeleteKeysDto {
   /**
-   *
-   * @type {Array<number>}
-   * @memberof SelectAllResponse
+   * IDs of keys to delete
+   * @type {Set<number>}
+   * @memberof DeleteKeysDto
    */
-  ids: Array<number>;
+  ids: Set<number>;
 }
 
 /**
- * Check if a given object implements the SelectAllResponse interface.
+ * Check if a given object implements the DeleteKeysDto interface.
  */
-export function instanceOfSelectAllResponse(value: object): boolean {
+export function instanceOfDeleteKeysDto(value: object): boolean {
   let isInstance = true;
   isInstance = isInstance && "ids" in value;
 
   return isInstance;
 }
 
-export function SelectAllResponseFromJSON(json: any): SelectAllResponse {
-  return SelectAllResponseFromJSONTyped(json, false);
+export function DeleteKeysDtoFromJSON(json: any): DeleteKeysDto {
+  return DeleteKeysDtoFromJSONTyped(json, false);
 }
 
-export function SelectAllResponseFromJSONTyped(
+export function DeleteKeysDtoFromJSONTyped(
   json: any,
   ignoreDiscriminator: boolean
-): SelectAllResponse {
+): DeleteKeysDto {
   if (json === undefined || json === null) {
     return json;
   }
@@ -53,7 +53,7 @@ export function SelectAllResponseFromJSONTyped(
   };
 }
 
-export function SelectAllResponseToJSON(value?: SelectAllResponse | null): any {
+export function DeleteKeysDtoToJSON(value?: DeleteKeysDto | null): any {
   if (value === undefined) {
     return undefined;
   }
@@ -61,6 +61,6 @@ export function SelectAllResponseToJSON(value?: SelectAllResponse | null): any {
     return null;
   }
   return {
-    ids: value.ids,
+    ids: Array.from(value.ids as Set<any>),
   };
 }

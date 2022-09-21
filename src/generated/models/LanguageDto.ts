@@ -16,84 +16,67 @@ import { exists, mapValues } from "../runtime";
 /**
  *
  * @export
- * @interface LanguageModel
+ * @interface LanguageDto
  */
-export interface LanguageModel {
-  /**
-   *
-   * @type {number}
-   * @memberof LanguageModel
-   */
-  id: number;
+export interface LanguageDto {
   /**
    * Language name in english
    * @type {string}
-   * @memberof LanguageModel
+   * @memberof LanguageDto
    */
   name: string;
   /**
    * Language tag according to BCP 47 definition
    * @type {string}
-   * @memberof LanguageModel
+   * @memberof LanguageDto
    */
-  tag: string;
+  originalName: string;
   /**
    * Language name in this language
    * @type {string}
-   * @memberof LanguageModel
+   * @memberof LanguageDto
    */
-  originalName?: string;
+  tag: string;
   /**
    * Language flag emoji as UTF-8 emoji
    * @type {string}
-   * @memberof LanguageModel
+   * @memberof LanguageDto
    */
   flagEmoji?: string;
-  /**
-   * Whether is base language of project
-   * @type {boolean}
-   * @memberof LanguageModel
-   */
-  base: boolean;
 }
 
 /**
- * Check if a given object implements the LanguageModel interface.
+ * Check if a given object implements the LanguageDto interface.
  */
-export function instanceOfLanguageModel(value: object): boolean {
+export function instanceOfLanguageDto(value: object): boolean {
   let isInstance = true;
-  isInstance = isInstance && "id" in value;
   isInstance = isInstance && "name" in value;
+  isInstance = isInstance && "originalName" in value;
   isInstance = isInstance && "tag" in value;
-  isInstance = isInstance && "base" in value;
 
   return isInstance;
 }
 
-export function LanguageModelFromJSON(json: any): LanguageModel {
-  return LanguageModelFromJSONTyped(json, false);
+export function LanguageDtoFromJSON(json: any): LanguageDto {
+  return LanguageDtoFromJSONTyped(json, false);
 }
 
-export function LanguageModelFromJSONTyped(
+export function LanguageDtoFromJSONTyped(
   json: any,
   ignoreDiscriminator: boolean
-): LanguageModel {
+): LanguageDto {
   if (json === undefined || json === null) {
     return json;
   }
   return {
-    id: json["id"],
     name: json["name"],
+    originalName: json["originalName"],
     tag: json["tag"],
-    originalName: !exists(json, "originalName")
-      ? undefined
-      : json["originalName"],
     flagEmoji: !exists(json, "flagEmoji") ? undefined : json["flagEmoji"],
-    base: json["base"],
   };
 }
 
-export function LanguageModelToJSON(value?: LanguageModel | null): any {
+export function LanguageDtoToJSON(value?: LanguageDto | null): any {
   if (value === undefined) {
     return undefined;
   }
@@ -101,11 +84,9 @@ export function LanguageModelToJSON(value?: LanguageModel | null): any {
     return null;
   }
   return {
-    id: value.id,
     name: value.name,
-    tag: value.tag,
     originalName: value.originalName,
+    tag: value.tag,
     flagEmoji: value.flagEmoji,
-    base: value.base,
   };
 }
