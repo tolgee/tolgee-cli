@@ -3,6 +3,7 @@ import { readFile } from 'fs/promises';
 import FormData from 'form-data';
 import { fetch } from 'undici';
 import { HttpError } from './errors';
+import { debug } from '../logger';
 
 type ClientParams =
   | { apiUrl: string; apiKey: `tgpat_${string}`; projectId: number }
@@ -26,18 +27,10 @@ readFile(packageJson, 'utf8').then(
 );
 
 export default abstract class Client {
-  constructor(private params: ClientParams) {
-    const isPak =
-      params.apiKey.startsWith('tgpak_') || !params.apiKey.startsWith('tg');
-    if (!isPak && !params.projectId) {
-      throw new Error(
-        'Project ID is required when not using a Project API Key.'
-      );
-    }
-  }
+  constructor(private params: ClientParams) {}
 
   protected get projectUrl() {
-    return 'projectId' in this.params
+    return 'projectId' in this.params && this.params.projectId !== -1
       ? `/v2/projects/${this.params.projectId}`
       : '/v2/projects';
   }
@@ -72,11 +65,17 @@ export default abstract class Client {
       }
     }
 
+    debug(`[HTTP] Requesting: ${req.method} ${url.href}`);
+
     const res = await fetch(url, {
       method: req.method,
       headers: headers,
       body: body,
     });
+
+    debug(
+      `[HTTP] ${req.method} ${url.href} -> ${res.status} ${res.statusText}`
+    );
 
     if (!res.ok) throw new HttpError(res);
     return res.headers.get('content-type') === 'application/json'

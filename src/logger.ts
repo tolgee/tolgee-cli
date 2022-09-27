@@ -1,12 +1,61 @@
 const SYMBOLS = ['      🐁', '    🐁  ', '  🐁    ', '🐁      '];
 
+let debugEnabled = false;
+
 /**
- * Logs an error to the console.
+ * Enables or disables debugging messages
  *
- * @param err The error.
+ * @param enabled Whether debugging messages should be logged
  */
-export function error(err: string) {
-  console.log(`🔴 ${err}`);
+export function setDebug(enabled: boolean) {
+  debugEnabled = enabled;
+}
+
+/**
+ * Logs a debug message to the console if debugging is enabled.
+ *
+ * @param msg The message.
+ */
+export function debug(msg: string) {
+  if (debugEnabled) {
+    console.log(`⚪ ${msg}`);
+  }
+}
+
+/**
+ * Logs an informative message to the console.
+ *
+ * @param msg The message.
+ */
+export function info(msg: string) {
+  console.log(`🔵 ${msg}`);
+}
+
+/**
+ * Logs a success to the console.
+ *
+ * @param msg The message.
+ */
+export function success(msg: string) {
+  console.log(`✅ ${msg}`);
+}
+
+/**
+ * Logs a warning message to the console.
+ *
+ * @param msg The message.
+ */
+export function warn(msg: string) {
+  console.log(`🟡 ${msg}`);
+}
+
+/**
+ * Logs an error message to the console.
+ *
+ * @param msg The message.
+ */
+export function error(msg: string) {
+  console.log(`🔴 ${msg}`);
 }
 
 /**

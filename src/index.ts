@@ -1,34 +1,53 @@
+#!/usr/bin/env node
+
 import { Command } from 'commander';
-import { Import } from './import';
+import { HttpError } from './client/errors';
+import registerImportCommand from './commands/import';
+import { setDebug, error } from './logger';
 
-const program = new Command('tolgee-cli');
+function preHandler(prog: Command, cmd: Command) {
+  const opts = cmd.opts();
+  // Validate --project-id and --api-key if necessary
+  if ('apiKey' in opts && opts.project === -1) {
+    if (!opts.apiKey.startsWith('tgpak_')) {
+      error('Project ID is required when not using a Project API Key.');
+      process.exit(1);
+    }
+  }
 
-program.description('Command Line Interface to interact with Tolgee');
+  // Apply verbosity
+  setDebug(prog.opts().verbose);
+}
 
-program
-  .command('import')
-  .description('Imports data from Tolgee')
-  .option('-i, --input <inputPath>', 'Directory or single file to import', '.')
-  .option('-ak, --apiKey <apiKey>')
-  .option(
-    '-au, --apiUrl <apiUrl>',
-    'The url of Tolgee API',
-    'https://app.tolgee.io'
-  )
-  .option(
-    '-f, --forceMode <OVERRIDE | KEEP | NO>',
-    'What should we do with possible conflicts?',
-    'NO_FORCE'
-  )
-  .action(async (options) => {
-    await new Import({
-      apiUrl: options.apiUrl,
-      apiKey: options.apiKey,
-      inputPath: options.input,
-      forceMode: options.forceMode,
-    }).execute();
-  });
+const program = new Command('tolgee-cli')
+  .description('Command Line Interface to interact with the Tolgee Platform')
+  .option('-v, --verbose', 'Enable verbose logging.')
+  .hook('preAction', preHandler);
 
-program.parse();
+// Register commands
+registerImportCommand(program);
 
-process.stdout.write('\n\n');
+// Run & handle potential uncaught failure
+try {
+  program.parse();
+} catch (e: any) {
+  if (e instanceof HttpError) {
+    if (e.response.status === 503) {
+      error(
+        'The Tolgee server is temporarily unavailable. Please try again later.'
+      );
+      process.exit(1);
+    }
+
+    if (e.response.status >= 500) {
+      error(
+        'The Tolgee server reported an unexpected server error. Please try again later.'
+      );
+      process.exit(1);
+    }
+  }
+
+  error(`Uncaught Error: ${e.message}`);
+  console.log(e);
+  process.exit(1);
+}

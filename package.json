@@ -1,9 +1,11 @@
 {
-  "name": "tolgee-import",
-  "version": "1.0.0",
+  "name": "tolgee-cli",
+  "version": "0.1.0",
   "type": "commonjs",
-  "description": "A tool to import data to Tolgee platform",
-  "main": "index.js",
+  "description": "A tool to interact with the Tolgee Platform through CLI",
+  "bin": {
+    "tolgee-cli": "./dist/index.js"
+  },
   "scripts": {
     "build": "tsc",
     "prettier": "prettier --write ./src",

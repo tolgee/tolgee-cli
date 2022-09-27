@@ -4,7 +4,7 @@ import FormData from 'form-data';
 import Client from './client';
 import { HttpError } from './errors';
 
-type File = { name: string; data: string | Buffer | Blob };
+export type File = { name: string; data: string | Buffer | Blob };
 export type AddFileRequest = Omit<
   BodyOf<'/v2/projects/import', 'post'>,
   'files'
