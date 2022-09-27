@@ -66,8 +66,6 @@ async function applyImport(client: ImportClient) {
 }
 
 async function importHandler(params: ImportParams) {
-  if (1 + 1 === 2) throw new Error('test');
-
   const client = new ImportClient({
     apiUrl: params.apiUrl,
     apiKey: params.apiKey,
