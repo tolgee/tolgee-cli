@@ -1,21 +1,26 @@
-import { createReadStream, promises as fs } from "fs";
-import path from "path";
-import { BadRequestError, Client, NotFoundError } from "./Client";
-import { error, loading } from "./logger";
-import { ImportAddFilesResultModel } from "./generated";
+import type { AddFileResponse } from './client/import';
+import { promises as fs } from 'fs';
+import path from 'path';
+import { error, loading } from './logger';
+
+import { HttpError } from './client/errors';
+import ImportClient from './client/import';
+
+type ImportParams = {
+  apiUrl: string;
+  apiKey: string;
+  inputPath: string;
+  forceMode: 'KEEP' | 'OVERRIDE' | 'NO';
+};
 
 export class Import {
-  private client: Client;
+  private client: ImportClient;
 
-  constructor(
-    private args: {
-      apiUrl: string;
-      apiKey: string;
-      inputPath: string;
-      forceMode: "KEEP" | "OVERRIDE" | "NO";
-    }
-  ) {
-    this.client = new Client(args.apiUrl, args.apiKey);
+  constructor(private args: ImportParams) {
+    this.client = new ImportClient({
+      apiUrl: args.apiUrl,
+      apiKey: args.apiKey,
+    });
   }
 
   async execute() {
@@ -28,34 +33,25 @@ export class Import {
     }
   }
 
-  async deleteImportIfExists() {
-    try {
-      await loading("Deleting import", this.client.deleteImport());
-    } catch (e) {
-      if (e instanceof NotFoundError) {
-        return;
-      }
-      throw e;
-    }
-  }
-
   async getFiles() {
     const dir = await fs.readdir(this.args.inputPath);
-    return dir.map((item) => {
-      const filePath = path.resolve(`${this.args.inputPath}/${item}`);
-      return createReadStream(filePath);
-    });
+    return Promise.all(
+      dir.map((item) => {
+        const filePath = path.resolve(`${this.args.inputPath}/${item}`);
+        return fs.readFile(filePath).then((b) => ({ name: item, data: b }));
+      })
+    );
   }
 
   async importDirectory() {
-    const files = await loading("Reading files...", this.getFiles());
+    const files = await loading('Reading files...', this.getFiles());
 
-    await this.deleteImportIfExists();
+    await loading('Deleting import', this.client.deleteImportIfExists());
 
     try {
       const result = await loading(
-        "Uploading files...",
-        this.client.addFiles(files)
+        'Uploading files...',
+        this.client.addFiles({ files: files })
       );
       const isConflicts = this.checkForConflicts(result);
 
@@ -66,11 +62,11 @@ export class Import {
         return;
       }
 
-      await loading("Applying changes...", this.client.applyImport());
+      await loading('Applying changes...', this.client.applyImport());
     } catch (e) {
-      if (e instanceof BadRequestError) {
+      if (e instanceof HttpError && e.response.status === 400) {
         error(
-          "Some of the imported languages wasn't recongnozed. Please create a language with corresponding tag in the Tolgee Platform."
+          "Some of the imported languages weren't recognized. Please create a language with corresponding tag in the Tolgee Platform."
         );
         return;
       }
@@ -78,10 +74,10 @@ export class Import {
     }
   }
 
-  private checkForConflicts(result: ImportAddFilesResultModel) {
+  private checkForConflicts(result: AddFileResponse) {
     let isConflicts: boolean = false;
-    if (this.args.forceMode === "NO") {
-      result.result?.embedded?.languages?.forEach((l) => {
+    if (this.args.forceMode === 'NO') {
+      result.result?._embedded?.languages?.forEach((l) => {
         if (l.conflictCount > 0) {
           isConflicts = true;
         }

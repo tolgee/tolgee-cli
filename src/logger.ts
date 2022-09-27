@@ -1,9 +1,8 @@
-import { setTimeout as wait } from "timers/promises";
-
-const SYMBOLS = ["      🐁", "    🐁  ", "  🐁    ", "🐁      "];
+const SYMBOLS = ['      🐁', '    🐁  ', '  🐁    ', '🐁      '];
 
 /**
  * Logs an error to the console.
+ *
  * @param err The error.
  */
 export function error(err: string) {
@@ -18,26 +17,22 @@ export function error(err: string) {
  * @returns The promise passed in parameter. Useful for decorating without using a buffer variable.
  */
 export function loading<T>(comment: string, promise: Promise<T>): Promise<T> {
-  let completed = false;
+  let symbolPosition = 0;
+  const interval = setInterval(() => {
+    process.stdout.write(`\r${SYMBOLS[symbolPosition]} ${comment}`);
+    symbolPosition = (symbolPosition + 1) % 4;
+  }, 250);
+
   promise.then(
     () => {
-      completed = true;
+      clearInterval(interval);
       process.stdout.write(`\r🐭✅     ${comment}\n`);
     },
     () => {
-      completed = true;
+      clearInterval(interval);
       process.stdout.write(`\r🐭🔴     ${comment}\n`);
     }
   );
-
-  setImmediate(async () => {
-    let symbolPosition = 0;
-    while (!completed) {
-      process.stdout.write(`\r${SYMBOLS[symbolPosition]} ${comment}`);
-      symbolPosition = (symbolPosition + 1) % 4;
-      await wait(250);
-    }
-  });
 
   return promise;
 }

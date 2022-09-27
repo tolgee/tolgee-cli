@@ -1,26 +1,24 @@
-import { Command } from "commander";
-import { Import } from "./import";
+import { Command } from 'commander';
+import { Import } from './import';
 
-const program = new Command();
+const program = new Command('tolgee-cli');
 
-program
-  .name("Tolgee-cli: Tolgee Command Line Interface")
-  .description("Tools to work with Tolgee more powerfully");
+program.description('Command Line Interface to interact with Tolgee');
 
 program
-  .command("import")
-  .description("Imports data from Tolgee")
-  .option("-i, --input <inputPath>", "Directory or single file to import", ".")
-  .option("-ak, --apiKey <apiKey>")
+  .command('import')
+  .description('Imports data from Tolgee')
+  .option('-i, --input <inputPath>', 'Directory or single file to import', '.')
+  .option('-ak, --apiKey <apiKey>')
   .option(
-    "-au, --apiUrl <apiUrl>",
-    "The url of Tolgee API",
-    "https://app.tolgee.io"
+    '-au, --apiUrl <apiUrl>',
+    'The url of Tolgee API',
+    'https://app.tolgee.io'
   )
   .option(
-    "-f, --forceMode <OVERRIDE | KEEP | NO>",
-    "What should we do with possible conflicts?",
-    "NO"
+    '-f, --forceMode <OVERRIDE | KEEP | NO>',
+    'What should we do with possible conflicts?',
+    'NO_FORCE'
   )
   .action(async (options) => {
     await new Import({
@@ -33,4 +31,4 @@ program
 
 program.parse();
 
-process.stdout.write("\n\n");
+process.stdout.write('\n\n');
