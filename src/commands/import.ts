@@ -1,6 +1,7 @@
 import type { Command } from 'commander';
 import type { File, AddFileResponse } from '../client/import';
 
+import { existsSync } from 'fs';
 import { readdir, readFile, stat } from 'fs/promises';
 import { join } from 'path';
 
@@ -13,7 +14,6 @@ import { error, loading } from '../logger';
 type ImportParams = {
   apiUrl: string;
   apiKey: string;
-  input: string;
   forceMode: 'KEEP' | 'OVERRIDE' | 'NO';
 };
 
@@ -65,16 +65,28 @@ async function applyImport(client: ImportClient) {
   }
 }
 
-async function importHandler(params: ImportParams) {
+async function importHandler(path: string, params: ImportParams) {
+  try {
+    const stats = await stat(path);
+    if (!stats.isDirectory()) {
+      error('The specified path is not a directory.')
+      process.exit(1)
+    }
+  } catch (e: any) {
+    if (e.code === 'ENOENT') {
+      error('The specified path does not exist.')
+      process.exit(1)
+    }
+
+    throw e
+  }
+
   const client = new ImportClient({
     apiUrl: params.apiUrl,
     apiKey: params.apiKey,
   });
 
-  const stats = await stat(params.input);
-  if (!stats.isDirectory()) return;
-
-  const files = await loading('Reading files...', readDirectory(params.input));
+  const files = await loading('Reading files...', readDirectory(path));
   if (files.length === 0) {
     error('Nothing to import.');
     return;
