@@ -13,7 +13,7 @@
     "schema": "openapi-typescript https://app.tolgee.io/v3/api-docs/V2%20Accessible%20with%20API%20key%20V2 --output src/client/schema.generated.ts"
   },
   "author": "Jan Cizmar",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "commander": "^9.4.0",
     "form-data": "^4.0.0",
