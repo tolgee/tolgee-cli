@@ -2,8 +2,10 @@
 
 import { Command } from 'commander';
 import { HttpError } from './client/errors';
-import registerImportCommand from './commands/import';
-import { setDebug, error } from './logger';
+import { setDebug, error } from './utils/logger';
+
+import PushCommand from './commands/push';
+import PullCommand from './commands/pull';
 
 function preHandler(prog: Command, cmd: Command) {
   const opts = cmd.opts();
@@ -25,29 +27,34 @@ const program = new Command('tolgee-cli')
   .hook('preAction', preHandler);
 
 // Register commands
-registerImportCommand(program);
+program.addCommand(PushCommand);
+program.addCommand(PullCommand);
 
 // Run & handle potential uncaught failure
-try {
-  program.parse();
-} catch (e: any) {
-  if (e instanceof HttpError) {
-    if (e.response.status === 503) {
-      error(
-        'The Tolgee server is temporarily unavailable. Please try again later.'
-      );
-      process.exit(1);
+async function run() {
+  try {
+    await program.parseAsync();
+  } catch (e: any) {
+    if (e instanceof HttpError) {
+      if (e.response.status === 503) {
+        error(
+          'The Tolgee server is temporarily unavailable. Please try again later.'
+        );
+        process.exit(1);
+      }
+
+      if (e.response.status >= 500) {
+        error(
+          'The Tolgee server reported an unexpected server error. Please try again later.'
+        );
+        process.exit(1);
+      }
     }
 
-    if (e.response.status >= 500) {
-      error(
-        'The Tolgee server reported an unexpected server error. Please try again later.'
-      );
-      process.exit(1);
-    }
+    error(`Uncaught Error: ${e.message}`);
+    console.log(e);
+    process.exit(1);
   }
-
-  error(`Uncaught Error: ${e.message}`);
-  console.log(e);
-  process.exit(1);
 }
+
+run();

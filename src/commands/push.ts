@@ -1,19 +1,19 @@
-import type { Command } from 'commander';
 import type { File, AddFileResponse } from '../client/import';
 
-import { existsSync } from 'fs';
-import { readdir, readFile, stat } from 'fs/promises';
 import { join } from 'path';
+import { readdir, readFile, stat } from 'fs/promises';
+import { Command, Option } from 'commander';
 
 import { API_URL_OPT, API_KEY_OPT, PROJECT_ID_OPT } from '../options';
 import { HttpError } from '../client/errors';
 import ImportClient from '../client/import';
 
-import { error, loading } from '../logger';
+import { loading, success, error } from '../utils/logger';
 
-type ImportParams = {
-  apiUrl: string;
+type PushParams = {
+  apiUrl: URL;
   apiKey: string;
+  projectId: number;
   forceMode: 'KEEP' | 'OVERRIDE' | 'NO';
 };
 
@@ -65,25 +65,26 @@ async function applyImport(client: ImportClient) {
   }
 }
 
-async function importHandler(path: string, params: ImportParams) {
+async function pushHandler(path: string, params: PushParams) {
   try {
     const stats = await stat(path);
     if (!stats.isDirectory()) {
-      error('The specified path is not a directory.')
-      process.exit(1)
+      error('The specified path is not a directory.');
+      process.exit(1);
     }
   } catch (e: any) {
     if (e.code === 'ENOENT') {
-      error('The specified path does not exist.')
-      process.exit(1)
+      error('The specified path does not exist.');
+      process.exit(1);
     }
 
-    throw e
+    throw e;
   }
 
   const client = new ImportClient({
     apiUrl: params.apiUrl,
     apiKey: params.apiKey,
+    projectId: params.projectId,
   });
 
   const files = await loading('Reading files...', readDirectory(path));
@@ -95,24 +96,29 @@ async function importHandler(path: string, params: ImportParams) {
   const result = await prepareImport(client, files);
   if (params.forceMode === 'NO' && hasConflicts(result)) {
     error(
-      "There are conflicts. Resolve them in the browser or set --forceMode option to 'KEEP' or 'OVERRIDE'."
+      "There are conflicts. Resolve them in the browser or set --force-mode option to 'KEEP' or 'OVERRIDE'."
     );
     return;
   }
 
   await applyImport(client);
+  success('Done!');
 }
 
-export default function registerCommand(program: Command) {
-  program
-    .command('import <path>')
-    .addOption(API_URL_OPT)
-    .addOption(API_KEY_OPT)
-    .addOption(PROJECT_ID_OPT)
-    .option(
-      '-f, --forceMode <OVERRIDE | KEEP | NO>',
-      'What should we do with possible conflicts?',
-      'NO'
+export default new Command()
+  .name('push')
+  .description('Pushes translations to Tolgee')
+  .argument('<path>', 'Path to the files to push to Tolgee')
+  .addOption(API_URL_OPT)
+  .addOption(API_KEY_OPT)
+  .addOption(PROJECT_ID_OPT)
+  .addOption(
+    new Option(
+      '-f, --force-mode <mode>',
+      'What should we do with possible conflicts?'
     )
-    .action(importHandler);
-}
+      .choices(['OVERRIDE', 'KEEP', 'NO'])
+      .default('NO')
+      .argParser((v) => v.toUpperCase())
+  )
+  .action(pushHandler);
