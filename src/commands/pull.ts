@@ -108,7 +108,6 @@ async function extractZip(zipBlob: Blob, path: string) {
 }
 
 async function pullHandler(path: string, params: PullParams) {
-  console.log(params);
   await validatePath(path, params.overwrite);
   await mkdir(path, { recursive: true });
 
