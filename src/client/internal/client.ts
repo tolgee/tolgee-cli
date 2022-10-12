@@ -32,6 +32,28 @@ readFile(packageJson, 'utf8').then(
   (pkg) => (version = JSON.parse(pkg).version)
 );
 
+export async function request(
+  url: URL,
+  method: string,
+  headers: Record<string, string>,
+  body?: string | Buffer
+) {
+  debug(`[HTTP] Requesting: ${method} ${url.href}`);
+
+  headers[
+    'user-agent'
+  ] = `Tolgee-CLI/${version} (+https://github.com/tolgee/tolgee-cli)`;
+  const res = await fetch(url, {
+    method: method,
+    headers: headers,
+    body: body,
+  });
+
+  debug(`[HTTP] ${method} ${url.href} -> ${res.status} ${res.statusText}`);
+  if (!res.ok) throw new HttpError(res);
+  return res;
+}
+
 export default abstract class Client {
   constructor(private params: ClientParams) {}
 
@@ -41,6 +63,12 @@ export default abstract class Client {
       : '/v2/projects';
   }
 
+  /**
+   * Performs an HTTP request to the API
+   *
+   * @param req Request data
+   * @returns The response
+   */
   protected async request(req: RequestData): Promise<Response> {
     const url = new URL(req.path, this.params.apiUrl);
 
@@ -64,7 +92,6 @@ export default abstract class Client {
     const headers: Record<string, string> = {
       ...(req.headers || {}),
       'x-api-key': this.params.apiKey,
-      'user-agent': `Tolgee-CLI/${version} (+https://github.com/tolgee/tolgee-cli)`,
     };
 
     let body = undefined;
@@ -80,27 +107,39 @@ export default abstract class Client {
       }
     }
 
-    debug(`[HTTP] Requesting: ${req.method} ${url.href}`);
-
-    const res = await fetch(url, {
-      method: req.method,
-      headers: headers,
-      body: body,
-    });
-
-    debug(
-      `[HTTP] ${req.method} ${url.href} -> ${res.status} ${res.statusText}`
-    );
-
-    if (!res.ok) throw new HttpError(res);
-    return res;
+    return request(url, req.method, headers, body);
   }
 
+  /**
+   * Performs an HTTP request to the API and returns the result as a JSON object
+   *
+   * @param req Request data
+   * @returns The response data
+   */
   protected async requestJson<T = unknown>(req: RequestData): Promise<T> {
     return <Promise<T>>this.request(req).then((r) => r.json());
   }
 
+  /**
+   * Performs an HTTP request to the API and returns the result as a Blob
+   *
+   * @param req Request data
+   * @returns The response blob
+   */
   protected async requestBlob(req: RequestData): Promise<Blob> {
     return this.request(req).then((r) => r.blob());
+  }
+
+  /**
+   * Performs an HTTP request to the API and forces the consumption of the body, according to recommendations by Undici
+   *
+   * @see https://github.com/nodejs/undici#garbage-collection
+   * @param req Request data
+   */
+  protected async requestVoid(req: RequestData): Promise<void> {
+    const res = await this.request(req);
+    if (res.body) {
+      for await (const _chunk of res.body);
+    }
   }
 }

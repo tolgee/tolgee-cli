@@ -26,10 +26,22 @@ export default class ImportClient extends Client {
     });
   }
 
+  async conflictsOverrideAll(languageId: number): Promise<void> {
+    await this.requestVoid({
+      method: 'PUT',
+      path: `${this.projectUrl}/import/result/languages/${languageId}/resolve-all/set-override`,
+    });
+  }
+
+  async conflictsKeepExistingAll(languageId: number): Promise<void> {
+    await this.requestVoid({
+      method: 'PUT',
+      path: `${this.projectUrl}/import/result/languages/${languageId}/resolve-all/set-keep-existing`,
+    });
+  }
+
   async applyImport(req?: ApplyImportRequest): Promise<void> {
-    // .requestBlob here to force the consumption of the body, according to recommendations by Undici
-    // ref: https://github.com/nodejs/undici#garbage-collection
-    await this.requestBlob({
+    await this.requestVoid({
       method: 'PUT',
       path: `${this.projectUrl}/import/apply`,
       query: { forceMode: req?.forceMode },
@@ -37,9 +49,7 @@ export default class ImportClient extends Client {
   }
 
   async deleteImport(): Promise<void> {
-    // .requestBlob here to force the consumption of the body, according to recommendations by Undici
-    // ref: https://github.com/nodejs/undici#garbage-collection
-    await this.requestBlob({
+    await this.requestVoid({
       method: 'DELETE',
       path: `${this.projectUrl}/import`,
     });

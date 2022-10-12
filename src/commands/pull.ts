@@ -69,9 +69,10 @@ async function fetchZipBlob(params: PullParams): Promise<Blob> {
     filterState: params.states,
     zip: true,
 
-    splitByScope: false, // these as marked as required in the API :shrug:
-    splitByScopeDelimiter: '', // these as marked as required in the API :shrug:
-    splitByScopeDepth: 0, // these as marked as required in the API :shrug:
+    // these below as marked as required in the API types ¯\_(ツ)_/¯
+    splitByScope: false,
+    splitByScopeDelimiter: '',
+    splitByScopeDepth: 0,
   });
 }
 
@@ -83,25 +84,35 @@ async function extractZip(zipBlob: Blob, path: string) {
       decodeStrings: true,
       lazyEntries: true,
     };
+
     zipFromBuffer(Buffer.from(zipAb), opts, (err, zip) => {
       if (err) return reject(err);
       zip.on('error', reject);
 
       zip.readEntry();
       zip.on('entry', (entry: Entry) => {
-        // Shouldn't be necessary but harmless :shrug:
-        // Directory traversal is protected by yauzl's `decodeStrings`
+        // Security note: yauzl *does* sanitize the string and protects from path traversal.
+        const entryPath = join(path, entry.fileName);
+
         if (entry.fileName.endsWith('/')) {
-          return mkdir(join(path, entry.fileName)).then(() => zip.readEntry());
+          // Entry is a directory
+          // This branch shouldn't be necessary as the archive doesn't contain directories.
+          // Handling is done to ensure future-proofing
+          mkdir(entryPath).then(() => zip.readEntry());
+          return;
         }
 
         zip.openReadStream(entry, (err, stream) => {
           if (err) return reject(err);
-          stream.pipe(createWriteStream(join(path, entry.fileName)));
+          const writeStream = createWriteStream(entryPath);
+          stream.pipe(writeStream);
+
+          // Once we're done, read the next entry
           stream.on('end', () => zip.readEntry());
         });
       });
 
+      // Done reading!
       zip.on('end', () => resolve());
     });
   });
@@ -115,6 +126,7 @@ async function pullHandler(path: string, params: PullParams) {
     'Fetching strings from Tolgee...',
     fetchZipBlob(params)
   );
+
   await loading('Extracting strings...', extractZip(zipBlob, path));
 
   success('Done!');
@@ -150,6 +162,6 @@ export default new Command()
   )
   .option(
     '-o, --overwrite',
-    'Whether to automatically overwrite existing files. BE CAREFUL, THIS WILL *WIPE* ALL THE CONTENTS OF THE TARGET FOLDER. If unspecified, the user will be prompted interactively, or the command will fail when in non-interactive.'
+    'Whether to automatically overwrite existing files. BE CAREFUL, THIS WILL WIPE *ALL* THE CONTENTS OF THE TARGET FOLDER. If unspecified, the user will be prompted interactively, or the command will fail when in non-interactive.'
   )
   .action(pullHandler);

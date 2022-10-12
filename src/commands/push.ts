@@ -5,10 +5,12 @@ import { readdir, readFile, stat } from 'fs/promises';
 import { Command, Option } from 'commander';
 
 import { API_URL_OPT, API_KEY_OPT, PROJECT_ID_OPT } from '../options';
-import { HttpError } from '../client/errors';
 import ImportClient from '../client/import';
+import { HttpError } from '../client/errors';
+import { projectIdOfPak } from '../client/utils';
 
-import { loading, success, error } from '../utils/logger';
+import { askString } from '../utils/ask';
+import { loading, success, warn, error } from '../utils/logger';
 
 type PushParams = {
   apiUrl: URL;
@@ -33,21 +35,81 @@ async function readDirectory(directory: string): Promise<File[]> {
   return files;
 }
 
-function hasConflicts(result: AddFileResponse) {
+function getConflictingLanguages(result: AddFileResponse) {
+  const conflicts = [];
   const languages = result.result?._embedded?.languages;
   if (languages) {
     for (const l of languages) {
-      if (l.conflictCount) return true;
+      if (l.conflictCount) {
+        conflicts.push(l.id);
+      }
     }
   }
 
-  return false;
+  return conflicts;
+}
+
+async function promptConflicts(
+  params: PushParams
+): Promise<'KEEP' | 'OVERRIDE'> {
+  const projectId =
+    params.projectId === -1
+      ? await projectIdOfPak(params.apiUrl, params.apiKey)
+      : params.projectId;
+
+  const resolveUrl = new URL(`/projects/${projectId}/import`, params.apiUrl)
+    .href;
+
+  if (params.forceMode === 'NO') {
+    error(
+      `There are conflicts in the import. You can resolve them and complete the import here: ${resolveUrl}.`
+    );
+    process.exit(1);
+  }
+
+  if (params.forceMode) {
+    return params.forceMode;
+  }
+
+  if (!process.stdout.isTTY) {
+    error(
+      `There are conflicts in the import. Please specify a --force-mode, or resolve them in your browser at ${resolveUrl}.`
+    );
+    process.exit(1);
+  }
+
+  warn('There are conflicts in the import. What do you want to do?');
+  const resp = await askString(
+    'Type "KEEP" to preserve the version on the server, "OVERRIDE" to use the version from the import, and nothing to abort: '
+  );
+  if (resp !== 'KEEP' && resp !== 'OVERRIDE') {
+    error(
+      `Aborting. You can resolve the conflicts and complete the import here: ${resolveUrl}`
+    );
+    process.exit(1);
+  }
+
+  return resp;
 }
 
 async function prepareImport(client: ImportClient, files: File[]) {
   return loading('Deleting import...', client.deleteImportIfExists()).then(() =>
     loading('Uploading files...', client.addFiles({ files: files }))
   );
+}
+
+async function resolveConflicts(
+  client: ImportClient,
+  locales: number[],
+  method: 'KEEP' | 'OVERRIDE'
+) {
+  for (const locale of locales) {
+    if (method === 'KEEP') {
+      await client.conflictsKeepExistingAll(locale);
+    } else {
+      await client.conflictsOverrideAll(locale);
+    }
+  }
 }
 
 async function applyImport(client: ImportClient) {
@@ -94,11 +156,13 @@ async function pushHandler(path: string, params: PushParams) {
   }
 
   const result = await prepareImport(client, files);
-  if (params.forceMode === 'NO' && hasConflicts(result)) {
-    error(
-      "There are conflicts. Resolve them in the browser or set --force-mode option to 'KEEP' or 'OVERRIDE'."
+  const conflicts = getConflictingLanguages(result);
+  if (conflicts.length) {
+    const resolveMethod = await promptConflicts(params);
+    await loading(
+      'Resolving conflicts...',
+      resolveConflicts(client, conflicts, resolveMethod)
     );
-    return;
   }
 
   await applyImport(client);
@@ -115,10 +179,9 @@ export default new Command()
   .addOption(
     new Option(
       '-f, --force-mode <mode>',
-      'What should we do with possible conflicts?'
+      'What should we do with possible conflicts? If unspecified, the user will be prompted interactively, or the command will fail when in non-interactive.'
     )
       .choices(['OVERRIDE', 'KEEP', 'NO'])
-      .default('NO')
       .argParser((v) => v.toUpperCase())
   )
   .action(pushHandler);
