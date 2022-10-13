@@ -1,7 +1,7 @@
-import type { BodyOf, QueryOf, ResponseOf } from './schema.utils';
+import type { BodyOf, QueryOf, ResponseOf } from './internal/schema.utils';
 
 import FormData from 'form-data';
-import Client from './client';
+import Client from './internal/client';
 import { HttpError } from './errors';
 
 export type File = { name: string; data: string | Buffer | Blob };
@@ -19,15 +19,29 @@ export default class ImportClient extends Client {
     for (const file of req.files)
       body.append('files', file.data, { filename: file.name });
 
-    return this.request({
+    return this.requestJson({
       method: 'POST',
       path: `${this.projectUrl}/import`,
       body: body,
     });
   }
 
+  async conflictsOverrideAll(languageId: number): Promise<void> {
+    await this.requestVoid({
+      method: 'PUT',
+      path: `${this.projectUrl}/import/result/languages/${languageId}/resolve-all/set-override`,
+    });
+  }
+
+  async conflictsKeepExistingAll(languageId: number): Promise<void> {
+    await this.requestVoid({
+      method: 'PUT',
+      path: `${this.projectUrl}/import/result/languages/${languageId}/resolve-all/set-keep-existing`,
+    });
+  }
+
   async applyImport(req?: ApplyImportRequest): Promise<void> {
-    await this.request({
+    await this.requestVoid({
       method: 'PUT',
       path: `${this.projectUrl}/import/apply`,
       query: { forceMode: req?.forceMode },
@@ -35,7 +49,7 @@ export default class ImportClient extends Client {
   }
 
   async deleteImport(): Promise<void> {
-    await this.request({
+    await this.requestVoid({
       method: 'DELETE',
       path: `${this.projectUrl}/import`,
     });
