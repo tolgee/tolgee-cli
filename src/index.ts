@@ -1,68 +1,74 @@
-import {Command} from 'commander'
-import {ImportCommand} from "./commands/importCommand";
-import './fetch-polyfill'
-import {ExtractCommand} from "./commands/extractCommand";
+#!/usr/bin/env node
 
-const program = new Command();
+import { Command } from 'commander';
 
-program
-  .name("Tolgee-cli: Tolgee Command Line Interface")
-  .description("Tools to work with Tolgee more powerfully")
-  .option("-ak, --apiKey <apiKey>")
-  .option("-au, --apiUrl <apiUrl>", 'The url of Tolgee API', "https://app.tolgee.io")
-  .option('-d, --debug', "Prints debug info")
+import Client from './client';
+import { HttpError } from './client/errors';
+import { setDebug, error } from './utils/logger';
+import { VERSION } from './utils/constants';
 
-program.command("import")
-  .description("Imports data from tolgee platform")
-  .option("-i, --input <inputPath>", 'Directory or single file to import', '.')
-  .option("-f, --forceMode <OVERRIDE | KEEP | NO>", 'What should we do with possible conflicts?', 'NO')
-  .action(async (options) => {
-    await new ImportCommand({
-      apiUrl: options.apiUrl,
-      apiKey: options.apiKey,
-      inputPath: options.input,
-      forceMode: options.forceMode
-    }).execute()
-  })
+import PushCommand from './commands/push';
+import PullCommand from './commands/pull';
+import ExtractCommand from './commands/extract';
 
-const extract = program.command("extract")
-  .description("Extracts keys from source")
-  .option("-i, --input <input>", 'Pattern to match find files in', './**')
-  .option("-c, --custom-extractor <customExtractor>", 'JS file with custom extractor', undefined)
-  .option("-p, --preset <preset>", 'The preset to use', 'react')
+function preHandler(prog: Command, cmd: Command) {
+  const opts = cmd.opts();
+  // Validate --project-id and --api-key if necessary
+  if ('apiKey' in opts) {
+    if (opts.project === -1 && !opts.apiKey.startsWith('tgpak_')) {
+      error('Project ID is required when not using a Project API Key.');
+      process.exit(1);
+    }
 
+    const client = new Client({
+      apiUrl: opts.apiUrl,
+      apiKey: opts.apiKey,
+      projectId: opts.projectId,
+    });
 
-extract.command("print")
-  .description("Prints the extracted data")
-  .action(async (options) => {
-    await new ExtractCommand({
-      input: extract.opts().input,
-      customExtractor: extract.opts().customExtractor,
-      preset: extract.opts().preset,
-      apiKey: program.opts().apiKey,
-      apiUrl: program.opts().apiUrl
-    }).print()
-  })
+    cmd.setOptionValue('client', client);
+  }
 
-extract.command("compare")
-  .action(async (...args) => {
-    await new ExtractCommand({
-      input: extract.opts().input,
-      customExtractor: extract.opts().customExtractor,
-      preset: extract.opts().preset,
-      apiKey: program.opts().apiKey,
-      apiUrl: program.opts().apiUrl,
-    }).compare()
-  })
+  // Apply verbosity
+  setDebug(prog.opts().verbose);
+}
 
+const program = new Command('tolgee-cli')
+  .version(VERSION)
+  .description('Command Line Interface to interact with the Tolgee Platform')
+  .option('-v, --verbose', 'Enable verbose logging.')
+  .hook('preAction', preHandler);
 
-export const debug = (msg: string) => {
-  if (program.opts().debug) {
-    console.log(msg)
+// Register commands
+program.addCommand(PushCommand);
+program.addCommand(PullCommand);
+program.addCommand(ExtractCommand);
+
+// Run & handle potential uncaught failure
+async function run() {
+  try {
+    await program.parseAsync();
+  } catch (e: any) {
+    if (e instanceof HttpError) {
+      if (e.response.status === 503) {
+        error(
+          'The Tolgee server is temporarily unavailable. Please try again later.'
+        );
+        process.exit(1);
+      }
+
+      if (e.response.status >= 500) {
+        error(
+          'The Tolgee server reported an unexpected server error. Please try again later.'
+        );
+        process.exit(1);
+      }
+    }
+
+    error(`Uncaught Error: ${e.message}`);
+    console.log(e);
+    process.exit(1);
   }
 }
 
-program.parse();
-
-
-process.stdout.write("\n\n")
+run();
