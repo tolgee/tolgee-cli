@@ -24,7 +24,7 @@ export type QueryOf<
   P extends Path,
   M extends MethodsOf<P>
 > = paths[P][M] extends { parameters: { query: Record<string, any> } }
-  ? paths[P][M]['parameters']['query']
+  ? Omit<paths[P][M]['parameters']['query'], 'ak'>
   : void;
 
 export type BodyOf<

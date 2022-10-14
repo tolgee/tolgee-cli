@@ -1,24 +1,23 @@
 import type { Response } from 'undici';
 import type { Blob } from 'buffer';
+import type { components } from './schema.generated';
 
-import { join } from 'path';
-import { readFile } from 'fs/promises';
 import { fetch } from 'undici';
-
 import FormData from 'form-data';
+
 import { HttpError } from '../errors';
 import { debug } from '../../utils/logger';
+import { USER_AGENT } from '../../utils/constants';
 
-type ClientParams =
+export type RequesterParams =
   | { apiUrl: string | URL; apiKey: `tgpat_${string}`; projectId: number }
   | { apiUrl: string | URL; apiKey: string; projectId?: number };
-
-type Primitive = string | boolean | number;
 
 // I'd love to strictly type the path & stuff...
 // But it's a pain to do so with the generated schema unless request code is written in a super specific way.
 // Considering this is internal, it's not that big of a deal. ¯\_(ツ)_/¯
-type RequestData = {
+type Primitive = string | boolean | number;
+export type RequestData = {
   method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
   path: string;
   body?: any;
@@ -26,38 +25,28 @@ type RequestData = {
   headers?: Record<string, string>;
 };
 
-let version = '0.0.0';
-const packageJson = join(__dirname, '..', '..', '..', 'package.json');
-readFile(packageJson, 'utf8').then(
-  (pkg) => (version = JSON.parse(pkg).version)
-);
+export type PaginatedView<T> = {
+  data: T;
+  page: components['schemas']['PageMetadata'];
 
-export async function request(
-  url: URL,
-  method: string,
-  headers: Record<string, string>,
-  body?: string | Buffer
-) {
-  debug(`[HTTP] Requesting: ${method} ${url.href}`);
+  hasNext: () => boolean;
+  next: () => Promise<PaginatedView<T> | null>;
 
-  headers[
-    'user-agent'
-  ] = `Tolgee-CLI/${version} (+https://github.com/tolgee/tolgee-cli)`;
-  const res = await fetch(url, {
-    method: method,
-    headers: headers,
-    body: body,
-  });
+  hasPrevious: () => boolean;
+  previous: () => Promise<PaginatedView<T> | null>;
+};
 
-  debug(`[HTTP] ${method} ${url.href} -> ${res.status} ${res.statusText}`);
-  if (!res.ok) throw new HttpError(res);
-  return res;
-}
+// Helper API type
+type PagedView = {
+  _embedded: any;
+  _links: Record<string, { href: string }>;
+  page: components['schemas']['PageMetadata'];
+};
 
-export default abstract class Client {
-  constructor(private params: ClientParams) {}
+export default class Requester {
+  constructor(private params: RequesterParams) {}
 
-  protected get projectUrl() {
+  get projectUrl() {
     return 'projectId' in this.params && this.params.projectId !== -1
       ? `/v2/projects/${this.params.projectId}`
       : '/v2/projects';
@@ -69,7 +58,7 @@ export default abstract class Client {
    * @param req Request data
    * @returns The response
    */
-  protected async request(req: RequestData): Promise<Response> {
+  async request(req: RequestData): Promise<Response> {
     const url = new URL(req.path, this.params.apiUrl);
 
     if (req.query) {
@@ -91,6 +80,7 @@ export default abstract class Client {
 
     const headers: Record<string, string> = {
       ...(req.headers || {}),
+      'user-agent': USER_AGENT,
       'x-api-key': this.params.apiKey,
     };
 
@@ -107,7 +97,19 @@ export default abstract class Client {
       }
     }
 
-    return request(url, req.method, headers, body);
+    debug(`[HTTP] Requesting: ${req.method} ${url.href}`);
+
+    const res = await fetch(url, {
+      method: req.method,
+      headers: headers,
+      body: body,
+    });
+
+    debug(
+      `[HTTP] ${req.method} ${url.href} -> ${res.status} ${res.statusText}`
+    );
+    if (!res.ok) throw new HttpError(res);
+    return res;
   }
 
   /**
@@ -116,7 +118,7 @@ export default abstract class Client {
    * @param req Request data
    * @returns The response data
    */
-  protected async requestJson<T = unknown>(req: RequestData): Promise<T> {
+  async requestJson<T = unknown>(req: RequestData): Promise<T> {
     return <Promise<T>>this.request(req).then((r) => r.json());
   }
 
@@ -126,7 +128,7 @@ export default abstract class Client {
    * @param req Request data
    * @returns The response blob
    */
-  protected async requestBlob(req: RequestData): Promise<Blob> {
+  async requestBlob(req: RequestData): Promise<Blob> {
     return this.request(req).then((r) => r.blob());
   }
 
@@ -136,10 +138,52 @@ export default abstract class Client {
    * @see https://github.com/nodejs/undici#garbage-collection
    * @param req Request data
    */
-  protected async requestVoid(req: RequestData): Promise<void> {
+  async requestVoid(req: RequestData): Promise<void> {
     const res = await this.request(req);
     if (res.body) {
       for await (const _chunk of res.body);
     }
+  }
+
+  /**
+   * Performs an HTTP request to the API to a resource which is paginated.
+   * The returned result is a view with helpers to get next (or previous) data.
+   *
+   * @param req Request data
+   */
+  async requestPaginatedResource<T = unknown>(
+    req: RequestData
+  ): Promise<PaginatedView<T>> {
+    const res = await this.requestJson<PagedView>(req);
+
+    const _this = this;
+    const view: PaginatedView<T> = {
+      data: res._embedded,
+      page: res.page,
+      hasNext() {
+        return !!res._links.next?.href;
+      },
+      hasPrevious() {
+        return !!res._links.prev?.href;
+      },
+      async next() {
+        if (!this.hasNext()) return null;
+        return _this.requestPaginatedResource({
+          ...req,
+          path: res._links.next.href,
+          query: undefined,
+        });
+      },
+      async previous() {
+        if (!this.hasPrevious()) return null;
+        return _this.requestPaginatedResource({
+          ...req,
+          path: res._links.prev.href,
+          query: undefined,
+        });
+      },
+    };
+
+    return view;
   }
 }

@@ -1,13 +1,12 @@
 import type { File, AddFileResponse } from '../client/import';
+import type Client from '../client';
 
 import { join } from 'path';
 import { readdir, readFile, stat } from 'fs/promises';
 import { Command, Option } from 'commander';
 
 import { API_URL_OPT, API_KEY_OPT, PROJECT_ID_OPT } from '../options';
-import ImportClient from '../client/import';
 import { HttpError } from '../client/errors';
-import { projectIdOfPak } from '../client/utils';
 
 import { askString } from '../utils/ask';
 import { loading, success, warn, error } from '../utils/logger';
@@ -16,6 +15,8 @@ type PushParams = {
   apiUrl: URL;
   apiKey: string;
   projectId: number;
+  client: Client;
+
   forceMode: 'KEEP' | 'OVERRIDE' | 'NO';
 };
 
@@ -54,7 +55,7 @@ async function promptConflicts(
 ): Promise<'KEEP' | 'OVERRIDE'> {
   const projectId =
     params.projectId === -1
-      ? await projectIdOfPak(params.apiUrl, params.apiKey)
+      ? await params.client.getApiKeyInformation().then((i) => i.projectId)
       : params.projectId;
 
   const resolveUrl = new URL(`/projects/${projectId}/import`, params.apiUrl)
@@ -92,29 +93,32 @@ async function promptConflicts(
   return resp;
 }
 
-async function prepareImport(client: ImportClient, files: File[]) {
-  return loading('Deleting import...', client.deleteImportIfExists()).then(() =>
-    loading('Uploading files...', client.addFiles({ files: files }))
+async function prepareImport(client: Client, files: File[]) {
+  return loading(
+    'Deleting import...',
+    client.import.deleteImportIfExists()
+  ).then(() =>
+    loading('Uploading files...', client.import.addFiles({ files: files }))
   );
 }
 
 async function resolveConflicts(
-  client: ImportClient,
+  client: Client,
   locales: number[],
   method: 'KEEP' | 'OVERRIDE'
 ) {
   for (const locale of locales) {
     if (method === 'KEEP') {
-      await client.conflictsKeepExistingAll(locale);
+      await client.import.conflictsKeepExistingAll(locale);
     } else {
-      await client.conflictsOverrideAll(locale);
+      await client.import.conflictsOverrideAll(locale);
     }
   }
 }
 
-async function applyImport(client: ImportClient) {
+async function applyImport(client: Client) {
   try {
-    await loading('Applying changes...', client.applyImport());
+    await loading('Applying changes...', client.import.applyImport());
   } catch (e) {
     if (e instanceof HttpError && e.response.status === 400) {
       error(
@@ -143,29 +147,23 @@ async function pushHandler(path: string, params: PushParams) {
     throw e;
   }
 
-  const client = new ImportClient({
-    apiUrl: params.apiUrl,
-    apiKey: params.apiKey,
-    projectId: params.projectId,
-  });
-
   const files = await loading('Reading files...', readDirectory(path));
   if (files.length === 0) {
     error('Nothing to import.');
     return;
   }
 
-  const result = await prepareImport(client, files);
+  const result = await prepareImport(params.client, files);
   const conflicts = getConflictingLanguages(result);
   if (conflicts.length) {
     const resolveMethod = await promptConflicts(params);
     await loading(
       'Resolving conflicts...',
-      resolveConflicts(client, conflicts, resolveMethod)
+      resolveConflicts(params.client, conflicts, resolveMethod)
     );
   }
 
-  await applyImport(client);
+  await applyImport(params.client);
   success('Done!');
 }
 

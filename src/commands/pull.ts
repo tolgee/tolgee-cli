@@ -1,22 +1,31 @@
 import type { Blob } from 'buffer';
-import type { Entry } from 'yauzl';
+import { ZipFile, Options } from 'yauzl';
+import type Client from '../client';
 
 import { join, resolve } from 'path';
 import { createWriteStream } from 'fs';
 import { stat, rm, mkdir } from 'fs/promises';
-import { fromBuffer as zipFromBuffer } from 'yauzl';
+import { fromBuffer as zipFromBufferCb } from 'yauzl';
 import { Command, Option } from 'commander';
 
 import { API_URL_OPT, API_KEY_OPT, PROJECT_ID_OPT } from '../options';
-import ExportClient from '../client/export';
-
+import { unzip } from '../utils/zip';
 import { askBoolean } from '../utils/ask';
 import { loading, success, warn, error } from '../utils/logger';
+
+import { promisify } from 'util';
+// Cast is required as TypeScript fails to properly type it
+const zipFromBuffer = promisify(zipFromBufferCb) as (
+  b: Buffer,
+  opts?: Options
+) => Promise<ZipFile>;
 
 type PullParams = {
   apiUrl: URL;
   apiKey: string;
   projectId: number;
+  client: Client;
+
   format: 'JSON' | 'XLIFF';
   languages?: string[];
   states?: Array<'UNTRANSLATED' | 'TRANSLATED' | 'REVIEWED'>;
@@ -57,17 +66,10 @@ async function validatePath(path: string, overwrite?: boolean) {
 }
 
 async function fetchZipBlob(params: PullParams): Promise<Blob> {
-  const client = new ExportClient({
-    apiUrl: params.apiUrl,
-    apiKey: params.apiKey,
-    projectId: params.projectId,
-  });
-
-  return client.export({
+  return params.client.export.export({
     format: params.format,
     languages: params.languages,
     filterState: params.states,
-    zip: true,
 
     // these below as marked as required in the API types ¯\_(ツ)_/¯
     splitByScope: false,
@@ -78,44 +80,14 @@ async function fetchZipBlob(params: PullParams): Promise<Blob> {
 
 async function extractZip(zipBlob: Blob, path: string) {
   const zipAb = await zipBlob.arrayBuffer();
-  return new Promise<void>((resolve, reject) => {
-    const opts = {
-      strictFileNames: true,
-      decodeStrings: true,
-      lazyEntries: true,
-    };
+  const opts = {
+    strictFileNames: true,
+    decodeStrings: true,
+    lazyEntries: true,
+  };
 
-    zipFromBuffer(Buffer.from(zipAb), opts, (err, zip) => {
-      if (err) return reject(err);
-      zip.on('error', reject);
-
-      zip.readEntry();
-      zip.on('entry', (entry: Entry) => {
-        // Security note: yauzl *does* sanitize the string and protects from path traversal.
-        const entryPath = join(path, entry.fileName);
-
-        if (entry.fileName.endsWith('/')) {
-          // Entry is a directory
-          // This branch shouldn't be necessary as the archive doesn't contain directories.
-          // Handling is done to ensure future-proofing
-          mkdir(entryPath).then(() => zip.readEntry());
-          return;
-        }
-
-        zip.openReadStream(entry, (err, stream) => {
-          if (err) return reject(err);
-          const writeStream = createWriteStream(entryPath);
-          stream.pipe(writeStream);
-
-          // Once we're done, read the next entry
-          stream.on('end', () => zip.readEntry());
-        });
-      });
-
-      // Done reading!
-      zip.on('end', () => resolve());
-    });
-  });
+  const zip = await zipFromBuffer(Buffer.from(zipAb), opts);
+  await unzip(zip, path);
 }
 
 async function pullHandler(path: string, params: PullParams) {

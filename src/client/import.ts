@@ -1,7 +1,7 @@
 import type { BodyOf, QueryOf, ResponseOf } from './internal/schema.utils';
 
 import FormData from 'form-data';
-import Client from './internal/client';
+import Requester from './internal/requester';
 import { HttpError } from './errors';
 
 export type File = { name: string; data: string | Buffer | Blob };
@@ -13,45 +13,47 @@ export type AddFileResponse = ResponseOf<'/v2/projects/import', 'post'>[200];
 
 export type ApplyImportRequest = QueryOf<'/v2/projects/import/apply', 'put'>;
 
-export default class ImportClient extends Client {
+export default class ImportClient {
+  constructor(private requester: Requester) {}
+
   async addFiles(req: AddFileRequest): Promise<AddFileResponse> {
     const body = new FormData();
     for (const file of req.files)
       body.append('files', file.data, { filename: file.name });
 
-    return this.requestJson({
+    return this.requester.requestJson({
       method: 'POST',
-      path: `${this.projectUrl}/import`,
+      path: `${this.requester.projectUrl}/import`,
       body: body,
     });
   }
 
   async conflictsOverrideAll(languageId: number): Promise<void> {
-    await this.requestVoid({
+    await this.requester.requestVoid({
       method: 'PUT',
-      path: `${this.projectUrl}/import/result/languages/${languageId}/resolve-all/set-override`,
+      path: `${this.requester.projectUrl}/import/result/languages/${languageId}/resolve-all/set-override`,
     });
   }
 
   async conflictsKeepExistingAll(languageId: number): Promise<void> {
-    await this.requestVoid({
+    await this.requester.requestVoid({
       method: 'PUT',
-      path: `${this.projectUrl}/import/result/languages/${languageId}/resolve-all/set-keep-existing`,
+      path: `${this.requester.projectUrl}/import/result/languages/${languageId}/resolve-all/set-keep-existing`,
     });
   }
 
   async applyImport(req?: ApplyImportRequest): Promise<void> {
-    await this.requestVoid({
+    await this.requester.requestVoid({
       method: 'PUT',
-      path: `${this.projectUrl}/import/apply`,
+      path: `${this.requester.projectUrl}/import/apply`,
       query: { forceMode: req?.forceMode },
     });
   }
 
   async deleteImport(): Promise<void> {
-    await this.requestVoid({
+    await this.requester.requestVoid({
       method: 'DELETE',
-      path: `${this.projectUrl}/import`,
+      path: `${this.requester.projectUrl}/import`,
     });
   }
 
