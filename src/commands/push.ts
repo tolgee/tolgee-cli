@@ -11,7 +11,7 @@ import { HttpError } from '../client/errors';
 import { askString } from '../utils/ask';
 import { loading, success, warn, error } from '../utils/logger';
 
-type PushParams = {
+type PushOptions = {
   apiUrl: URL;
   apiKey: string;
   projectId: number;
@@ -51,7 +51,7 @@ function getConflictingLanguages(result: AddFileResponse) {
 }
 
 async function promptConflicts(
-  params: PushParams
+  params: PushOptions
 ): Promise<'KEEP' | 'OVERRIDE'> {
   const projectId =
     params.projectId === -1
@@ -131,7 +131,9 @@ async function applyImport(client: Client) {
   }
 }
 
-async function pushHandler(path: string, params: PushParams) {
+async function pushHandler(this: Command, path: string) {
+  const opts: PushOptions = this.optsWithGlobals();
+
   try {
     const stats = await stat(path);
     if (!stats.isDirectory()) {
@@ -153,17 +155,17 @@ async function pushHandler(path: string, params: PushParams) {
     return;
   }
 
-  const result = await prepareImport(params.client, files);
+  const result = await prepareImport(opts.client, files);
   const conflicts = getConflictingLanguages(result);
   if (conflicts.length) {
-    const resolveMethod = await promptConflicts(params);
+    const resolveMethod = await promptConflicts(opts);
     await loading(
       'Resolving conflicts...',
-      resolveConflicts(params.client, conflicts, resolveMethod)
+      resolveConflicts(opts.client, conflicts, resolveMethod)
     );
   }
 
-  await applyImport(params.client);
+  await applyImport(opts.client);
   success('Done!');
 }
 

@@ -4,11 +4,12 @@ import FormData from 'form-data';
 import Requester from './internal/requester';
 import { HttpError } from './errors';
 
+type ImportRequest = BodyOf<'/v2/projects/import', 'post'>;
+
 export type File = { name: string; data: string | Buffer | Blob };
-export type AddFileRequest = Omit<
-  BodyOf<'/v2/projects/import', 'post'>,
-  'files'
-> & { files: Array<File> };
+export type AddFileRequest = Omit<ImportRequest, 'files'> & {
+  files: Array<File>;
+};
 export type AddFileResponse = ResponseOf<'/v2/projects/import', 'post'>[200];
 
 export type ApplyImportRequest = QueryOf<'/v2/projects/import/apply', 'put'>;

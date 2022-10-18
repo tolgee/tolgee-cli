@@ -2,8 +2,7 @@ import type { Blob } from 'buffer';
 import { ZipFile, Options } from 'yauzl';
 import type Client from '../client';
 
-import { join, resolve } from 'path';
-import { createWriteStream } from 'fs';
+import { resolve } from 'path';
 import { stat, rm, mkdir } from 'fs/promises';
 import { fromBuffer as zipFromBufferCb } from 'yauzl';
 import { Command, Option } from 'commander';
@@ -14,13 +13,12 @@ import { askBoolean } from '../utils/ask';
 import { loading, success, warn, error } from '../utils/logger';
 
 import { promisify } from 'util';
-// Cast is required as TypeScript fails to properly type it
-const zipFromBuffer = promisify(zipFromBufferCb) as (
-  b: Buffer,
-  opts?: Options
-) => Promise<ZipFile>;
 
-type PullParams = {
+// Cast is required as TypeScript fails to properly type it
+type ZipParser = (b: Buffer, opts?: Options) => Promise<ZipFile>;
+const zipFromBuffer = promisify(zipFromBufferCb) as ZipParser;
+
+type PullOptions = {
   apiUrl: URL;
   apiKey: string;
   projectId: number;
@@ -65,7 +63,7 @@ async function validatePath(path: string, overwrite?: boolean) {
   }
 }
 
-async function fetchZipBlob(params: PullParams): Promise<Blob> {
+async function fetchZipBlob(params: PullOptions): Promise<Blob> {
   return params.client.export.export({
     format: params.format,
     languages: params.languages,
@@ -90,13 +88,15 @@ async function extractZip(zipBlob: Blob, path: string) {
   await unzip(zip, path);
 }
 
-async function pullHandler(path: string, params: PullParams) {
-  await validatePath(path, params.overwrite);
+async function pullHandler(this: Command, path: string) {
+  const opts: PullOptions = this.optsWithGlobals();
+
+  await validatePath(path, opts.overwrite);
   await mkdir(path, { recursive: true });
 
   const zipBlob = await loading(
     'Fetching strings from Tolgee...',
-    fetchZipBlob(params)
+    fetchZipBlob(opts)
   );
 
   await loading('Extracting strings...', extractZip(zipBlob, path));

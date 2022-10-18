@@ -8,6 +8,14 @@ import ExportClient from './export';
 
 type ApiKeyInfo = components['schemas']['ApiKeyWithLanguagesModel'];
 
+type _UserAccount = components['schemas']['UserAccountModel'];
+type UserAccount = Omit<_UserAccount, 'deleted'> & {
+  mfaEnabled: boolean;
+  accountType: 'LOCAL' | 'LDAP' | 'THIRD_PARTY';
+  deletable: boolean;
+  needsSuperJwtToken: boolean;
+};
+
 export default class RestClient {
   private requester: Requester;
   readonly languages: LanguagesClient;
@@ -25,6 +33,23 @@ export default class RestClient {
   async getApiKeyInformation(): Promise<ApiKeyInfo> {
     return this.requester.requestJson({
       path: '/v2/api-keys/current',
+      method: 'GET',
+    });
+  }
+
+  static getApiKeyInformation(api: URL, key: string): Promise<ApiKeyInfo> {
+    return new Requester({ apiUrl: api, apiKey: key }).requestJson({
+      path: '/v2/api-keys/current',
+      method: 'GET',
+    });
+  }
+
+  static getPersonalAccessTokenUser(
+    api: URL,
+    key: string
+  ): Promise<UserAccount> {
+    return new Requester({ apiUrl: api, apiKey: key }).requestJson({
+      path: '/v2/user',
       method: 'GET',
     });
   }
