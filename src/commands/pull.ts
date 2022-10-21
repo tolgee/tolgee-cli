@@ -7,7 +7,6 @@ import { stat, rm, mkdir } from 'fs/promises';
 import { fromBuffer as zipFromBufferCb } from 'yauzl';
 import { Command, Option } from 'commander';
 
-import { API_URL_OPT, API_KEY_OPT, PROJECT_ID_OPT } from '../options';
 import { unzip } from '../utils/zip';
 import { askBoolean } from '../utils/ask';
 import { loading, success, warn, error } from '../utils/logger';
@@ -63,11 +62,11 @@ async function validatePath(path: string, overwrite?: boolean) {
   }
 }
 
-async function fetchZipBlob(params: PullOptions): Promise<Blob> {
-  return params.client.export.export({
-    format: params.format,
-    languages: params.languages,
-    filterState: params.states,
+async function fetchZipBlob(opts: PullOptions): Promise<Blob> {
+  return opts.client.export.export({
+    format: opts.format,
+    languages: opts.languages,
+    filterState: opts.states,
 
     // these below as marked as required in the API types ¯\_(ツ)_/¯
     splitByScope: false,
@@ -111,9 +110,6 @@ export default new Command()
     '<path>',
     'Destination path where translation files will be stored in.'
   )
-  .addOption(API_URL_OPT)
-  .addOption(API_KEY_OPT)
-  .addOption(PROJECT_ID_OPT)
   .addOption(
     new Option('-f, --format <format>', 'Format of the exported files.')
       .choices(['JSON', 'XLIFF'])

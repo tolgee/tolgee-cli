@@ -5,7 +5,6 @@ import { join } from 'path';
 import { readdir, readFile, stat } from 'fs/promises';
 import { Command, Option } from 'commander';
 
-import { API_URL_OPT, API_KEY_OPT, PROJECT_ID_OPT } from '../options';
 import { HttpError } from '../client/errors';
 
 import { askString } from '../utils/ask';
@@ -51,25 +50,20 @@ function getConflictingLanguages(result: AddFileResponse) {
 }
 
 async function promptConflicts(
-  params: PushOptions
+  opts: PushOptions
 ): Promise<'KEEP' | 'OVERRIDE'> {
-  const projectId =
-    params.projectId === -1
-      ? await params.client.getApiKeyInformation().then((i) => i.projectId)
-      : params.projectId;
+  const projectId = opts.client.getProjectId();
+  const resolveUrl = new URL(`/projects/${projectId}/import`, opts.apiUrl).href;
 
-  const resolveUrl = new URL(`/projects/${projectId}/import`, params.apiUrl)
-    .href;
-
-  if (params.forceMode === 'NO') {
+  if (opts.forceMode === 'NO') {
     error(
       `There are conflicts in the import. You can resolve them and complete the import here: ${resolveUrl}.`
     );
     process.exit(1);
   }
 
-  if (params.forceMode) {
-    return params.forceMode;
+  if (opts.forceMode) {
+    return opts.forceMode;
   }
 
   if (!process.stdout.isTTY) {
@@ -173,9 +167,6 @@ export default new Command()
   .name('push')
   .description('Pushes translations to Tolgee')
   .argument('<path>', 'Path to the files to push to Tolgee')
-  .addOption(API_URL_OPT)
-  .addOption(API_KEY_OPT)
-  .addOption(PROJECT_ID_OPT)
   .addOption(
     new Option(
       '-f, --force-mode <mode>',

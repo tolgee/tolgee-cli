@@ -4,7 +4,7 @@
   "type": "commonjs",
   "description": "A tool to interact with the Tolgee Platform through CLI",
   "bin": {
-    "tolgee-cli": "./dist/index.js"
+    "tolgee": "./dist/index.js"
   },
   "scripts": {
     "build": "tsc",
@@ -15,6 +15,7 @@
   "author": "Jan Cizmar",
   "license": "MIT",
   "dependencies": {
+    "base32-decode": "^1.0.0",
     "commander": "^9.4.0",
     "cosmiconfig": "^7.0.1",
     "form-data": "^4.0.0",

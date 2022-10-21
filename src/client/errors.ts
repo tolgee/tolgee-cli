@@ -1,7 +1,11 @@
-import type { Response } from 'undici';
+import type { Request, Response } from 'undici';
 
 export class HttpError extends Error {
-  constructor(public response: Response, options?: ErrorOptions) {
+  constructor(
+    public request: Request,
+    public response: Response,
+    options?: ErrorOptions
+  ) {
     super(response.statusText, options);
   }
 }

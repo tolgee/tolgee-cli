@@ -2,7 +2,6 @@ import type Client from '../client';
 import { Command, Option } from 'commander';
 
 import extractKeys from '../extractor';
-import { API_URL_OPT, API_KEY_OPT, PROJECT_ID_OPT } from '../options';
 
 type BaseExtractOptions = {
   preset: 'react';
@@ -99,10 +98,6 @@ const extractPrint = new Command('print')
   .action(printHandler);
 
 const extractCompare = new Command('compare')
-  .addOption(API_URL_OPT)
-  .addOption(API_KEY_OPT)
-  .addOption(PROJECT_ID_OPT)
-  .option('-c, --custom-extractor <js file>', 'JS file with custom extractor')
   .argument('<pattern>', 'File pattern to include')
   .action(compareHandler);
 

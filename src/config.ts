@@ -1,15 +1,24 @@
+import type { ApiKeyInfo } from './client';
+
 import { join } from 'path';
 import { mkdir, readFile, writeFile } from 'fs/promises';
 import { cosmiconfig, defaultLoaders } from 'cosmiconfig';
 
-import { getConfigPath } from './utils/path';
+import { CONFIG_PATH } from './utils/constants';
 
-type TolgeeConfig = {
+type Store = {
+  [scope: string]: {
+    user?: string;
+    // keys cannot be numeric values in JSON
+    projects?: Record<string, string>;
+  };
+};
+
+export type TolgeeConfig = {
   apiUrl?: URL;
   projectId?: number;
 };
 
-const CONFIG_PATH = join(getConfigPath(), 'tolgee');
 const API_TOKENS_FILE = join(CONFIG_PATH, 'authentication.json');
 
 const explorer = cosmiconfig('tolgee', {
@@ -28,7 +37,7 @@ async function ensureConfigPath() {
   }
 }
 
-async function loadStore() {
+async function loadStore(): Promise<Store> {
   try {
     await ensureConfigPath();
     const storeData = await readFile(API_TOKENS_FILE, 'utf8');
@@ -40,6 +49,14 @@ async function loadStore() {
   }
 
   return {};
+}
+
+async function saveStore(store: Store): Promise<void> {
+  const blob = JSON.stringify(store);
+  await writeFile(API_TOKENS_FILE, blob, {
+    mode: 0o600,
+    encoding: 'utf8',
+  });
 }
 
 function parseConfig(rc: any): TolgeeConfig {
@@ -70,29 +87,56 @@ export async function loadTolgeeRc(): Promise<TolgeeConfig | null> {
   return parseConfig(res.config);
 }
 
-export async function loadAuthToken(url: URL): Promise<string | null> {
+export async function getApiKey(
+  url: URL,
+  projectId: number
+): Promise<string | null> {
   const store = await loadStore();
-  return store[url.href] || null;
+  if (!store[url.hostname]) return null;
+
+  const scopedStore = store[url.href];
+  if (scopedStore.user) return scopedStore.user;
+
+  if (projectId <= 0) return null;
+
+  const pak = scopedStore.projects?.[projectId.toString(10)];
+  return pak || null;
 }
 
-export async function storeAuthToken(api: URL, token: string | null) {
+export async function saveApiKey(api: URL, token: ApiKeyInfo) {
   const store = await loadStore();
 
-  if (token) {
-    store[api.href] = token;
-  } else {
-    delete store[api.href];
+  if (token.type === 'PAT') {
+    return saveStore({
+      ...store,
+      [api.hostname]: {
+        ...(store[api.hostname] || {}),
+        user: token.key,
+      },
+    });
   }
 
-  await writeFile(API_TOKENS_FILE, JSON.stringify(store), {
-    mode: 0o600,
-    encoding: 'utf8',
+  const projectId = token.project.id.toString(10);
+  return saveStore({
+    ...store,
+    [api.hostname]: {
+      ...(store[api.hostname] || {}),
+      projects: {
+        ...(store[api.hostname]?.projects || {}),
+        [projectId]: token.key,
+      },
+    },
+  });
+}
+
+export async function removeApiKeys(api: URL) {
+  const store = await loadStore();
+  return saveStore({
+    ...store,
+    [api.hostname]: {},
   });
 }
 
 export async function clearAuthStore() {
-  await writeFile(API_TOKENS_FILE, '{}', {
-    mode: 0o600,
-    encoding: 'utf8',
-  });
+  return saveStore({});
 }
