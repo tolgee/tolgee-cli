@@ -4,10 +4,10 @@
   "type": "commonjs",
   "description": "A tool to interact with the Tolgee Platform through CLI",
   "bin": {
-    "tolgee-cli": "./dist/index.js"
+    "tolgee": "./dist/index.js"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "rimraf dist && tsc",
     "prettier": "prettier --write ./src",
     "run-dev": "npm run build && node --enable-source-maps ./dist/index.js",
     "schema": "openapi-typescript https://app.tolgee.io/v3/api-docs/V2%20Accessible%20with%20API%20key%20V2 --output src/client/internal/schema.generated.ts"
@@ -15,7 +15,9 @@
   "author": "Jan Cizmar",
   "license": "MIT",
   "dependencies": {
+    "base32-decode": "^1.0.0",
     "commander": "^9.4.0",
+    "cosmiconfig": "^7.0.1",
     "form-data": "^4.0.0",
     "glob": "^8.0.3",
     "undici": "^5.10.0",
@@ -27,6 +29,7 @@
     "@types/yauzl": "^2.10.0",
     "openapi-typescript": "^5.4.1",
     "prettier": "^2.7.1",
+    "rimraf": "^3.0.2",
     "typescript": "^4.8.3"
   }
 }

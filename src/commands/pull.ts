@@ -2,25 +2,22 @@ import type { Blob } from 'buffer';
 import { ZipFile, Options } from 'yauzl';
 import type Client from '../client';
 
-import { join, resolve } from 'path';
-import { createWriteStream } from 'fs';
+import { resolve } from 'path';
 import { stat, rm, mkdir } from 'fs/promises';
 import { fromBuffer as zipFromBufferCb } from 'yauzl';
 import { Command, Option } from 'commander';
 
-import { API_URL_OPT, API_KEY_OPT, PROJECT_ID_OPT } from '../options';
 import { unzip } from '../utils/zip';
 import { askBoolean } from '../utils/ask';
 import { loading, success, warn, error } from '../utils/logger';
 
 import { promisify } from 'util';
-// Cast is required as TypeScript fails to properly type it
-const zipFromBuffer = promisify(zipFromBufferCb) as (
-  b: Buffer,
-  opts?: Options
-) => Promise<ZipFile>;
 
-type PullParams = {
+// Cast is required as TypeScript fails to properly type it
+type ZipParser = (b: Buffer, opts?: Options) => Promise<ZipFile>;
+const zipFromBuffer = promisify(zipFromBufferCb) as ZipParser;
+
+type PullOptions = {
   apiUrl: URL;
   apiKey: string;
   projectId: number;
@@ -65,11 +62,11 @@ async function validatePath(path: string, overwrite?: boolean) {
   }
 }
 
-async function fetchZipBlob(params: PullParams): Promise<Blob> {
-  return params.client.export.export({
-    format: params.format,
-    languages: params.languages,
-    filterState: params.states,
+async function fetchZipBlob(opts: PullOptions): Promise<Blob> {
+  return opts.client.export.export({
+    format: opts.format,
+    languages: opts.languages,
+    filterState: opts.states,
 
     // these below as marked as required in the API types ¯\_(ツ)_/¯
     splitByScope: false,
@@ -90,13 +87,15 @@ async function extractZip(zipBlob: Blob, path: string) {
   await unzip(zip, path);
 }
 
-async function pullHandler(path: string, params: PullParams) {
-  await validatePath(path, params.overwrite);
+async function pullHandler(this: Command, path: string) {
+  const opts: PullOptions = this.optsWithGlobals();
+
+  await validatePath(path, opts.overwrite);
   await mkdir(path, { recursive: true });
 
   const zipBlob = await loading(
     'Fetching strings from Tolgee...',
-    fetchZipBlob(params)
+    fetchZipBlob(opts)
   );
 
   await loading('Extracting strings...', extractZip(zipBlob, path));
@@ -111,9 +110,6 @@ export default new Command()
     '<path>',
     'Destination path where translation files will be stored in.'
   )
-  .addOption(API_URL_OPT)
-  .addOption(API_KEY_OPT)
-  .addOption(PROJECT_ID_OPT)
   .addOption(
     new Option('-f, --format <format>', 'Format of the exported files.')
       .choices(['JSON', 'XLIFF'])

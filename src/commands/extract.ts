@@ -1,21 +1,16 @@
 import type Client from '../client';
-import { readFile } from 'fs/promises';
 import { Command, Option } from 'commander';
 
 import extractKeys from '../extractor';
-import { API_URL_OPT, API_KEY_OPT, PROJECT_ID_OPT } from '../options';
 
-import { debug } from '../utils/logger';
-import { KEY_REGEX } from '../utils/constants';
-
-type BaseExtractParams = {
+type BaseExtractOptions = {
   preset: 'react';
   customExtractor?: string;
 };
 
-type ExtractPrintParams = BaseExtractParams;
+type ExtractPrintOptions = BaseExtractOptions;
 
-type ExtractCompareParams = BaseExtractParams & {
+type ExtractCompareOptions = BaseExtractOptions & {
   apiUrl: URL;
   apiKey: string;
   projectId: number;
@@ -27,13 +22,6 @@ export type PossibleKey = {
   line: number;
   position: number;
 };
-
-async function printHandler(filesPattern: string, params: ExtractPrintParams) {
-  const keys = await extractKeys(filesPattern, params);
-
-  for (const key of keys.keys) console.log(key);
-  console.log(`Found: ${keys.keys.length} keys.`);
-}
 
 async function fetchAllKeys(client: Client) {
   const languages = await client.languages.getLanguages({ size: 1 });
@@ -50,13 +38,20 @@ async function fetchAllKeys(client: Client) {
   return Object.keys(exported);
 }
 
-async function compareHandler(
-  filesPattern: string,
-  params: ExtractCompareParams
-) {
+async function printHandler(this: Command, filesPattern: string) {
+  const opts: ExtractPrintOptions = this.optsWithGlobals();
+  const keys = await extractKeys(filesPattern, opts);
+
+  for (const key of keys.keys) console.log(key);
+  console.log(`Found: ${keys.keys.length} keys.`);
+}
+
+async function compareHandler(this: Command, filesPattern: string) {
+  const opts: ExtractCompareOptions = this.optsWithGlobals();
+
   // todo: migrate to a better endpoint combo once it exists
-  const platformKeys = await fetchAllKeys(params.client);
-  const keys = await extractKeys(filesPattern, params);
+  const platformKeys = await fetchAllKeys(opts.client);
+  const keys = await extractKeys(filesPattern, opts);
 
   const localKeysNotInPlatform = [...keys.keys];
   platformKeys.forEach((platformKey) => {
@@ -97,32 +92,21 @@ async function compareHandler(
   );
 }
 
-const presetOpt = new Option('-p, --preset <preset>', 'The preset to use')
-  .choices(['react'])
-  .default('react');
-
 const extractPrint = new Command('print')
   .description('Prints extracted data to the console')
-  .addOption(presetOpt)
-  .option('-c, --custom-extractor <js file>', 'JS file with custom extractor')
   .argument('<pattern>', 'File pattern to include')
   .action(printHandler);
 
 const extractCompare = new Command('compare')
-  .addOption(API_URL_OPT)
-  .addOption(API_KEY_OPT)
-  .addOption(PROJECT_ID_OPT)
-  .addOption(presetOpt)
-  .option('-c, --custom-extractor <js file>', 'JS file with custom extractor')
   .argument('<pattern>', 'File pattern to include')
   .action(compareHandler);
 
 export default new Command('extract')
+  .option('-c, --custom-extractor <js file>', 'JS file with custom extractor')
+  .addOption(
+    new Option('-p, --preset <preset>', 'The preset to use')
+      .choices(['react'])
+      .default('react')
+  )
   .addCommand(extractPrint)
   .addCommand(extractCompare);
-
-export type {
-  Extractor,
-  ExtractorFunction,
-  ExtractorRegExp,
-} from '../extractor';

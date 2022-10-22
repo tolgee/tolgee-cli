@@ -50,7 +50,7 @@ export interface paths {
   '/v2/projects/translations/{translationId}/comments/{commentId}': {
     get: operations['get_4'];
     put: operations['update_1'];
-    delete: operations['delete_5'];
+    delete: operations['delete_6'];
   };
   '/v2/projects/translations/{translationId}/dismiss-auto-translated-state': {
     put: operations['dismissAutoTranslatedState_1'];
@@ -78,7 +78,7 @@ export interface paths {
   };
   '/v2/projects/keys': {
     post: operations['create_3'];
-    delete: operations['delete_3'];
+    delete: operations['delete_4'];
   };
   '/v2/projects/import': {
     /** Prepares provided files to import. */
@@ -160,13 +160,13 @@ export interface paths {
     delete: operations['removeTag_1'];
   };
   '/v2/projects/keys/{ids}': {
-    delete: operations['delete_1'];
+    delete: operations['delete_2'];
   };
   '/v2/projects/keys/{keyId}/screenshots/{ids}': {
     delete: operations['deleteScreenshots'];
   };
   '/v2/image-upload/{ids}': {
-    delete: operations['delete_8'];
+    delete: operations['delete_9'];
   };
 }
 
@@ -354,6 +354,7 @@ export interface components {
       avatar?: components['schemas']['Avatar'];
       /** @enum {string} */
       globalServerRole: 'USER' | 'ADMIN';
+      deleted: boolean;
     };
     TranslationCommentDto: {
       text: string;
@@ -665,6 +666,7 @@ export interface components {
       username?: string;
       name?: string;
       avatar?: components['schemas']['Avatar'];
+      deleted: boolean;
     };
     ProjectActivityModel: {
       /** Format: int64 */
@@ -777,6 +779,7 @@ export interface components {
       username: string;
       name?: string;
       avatar?: components['schemas']['Avatar'];
+      deleted: boolean;
     };
     TranslationHistoryModel: {
       /** @description Modified fields */
@@ -912,14 +915,14 @@ export interface components {
       id: number;
       userFullName?: string;
       projectName: string;
-      scopes: string[];
-      /** Format: int64 */
-      projectId: number;
       /** Format: int64 */
       expiresAt?: number;
-      username?: string;
+      /** Format: int64 */
+      projectId: number;
+      scopes: string[];
       /** Format: int64 */
       lastUsedAt?: number;
+      username?: string;
       description: string;
     };
     DeleteKeysDto: {
@@ -1423,7 +1426,7 @@ export interface operations {
       };
     };
   };
-  delete_5: {
+  delete_6: {
     parameters: {
       path: {
         commentId: number;
@@ -1826,7 +1829,7 @@ export interface operations {
       };
     };
   };
-  delete_3: {
+  delete_4: {
     parameters: {
       query: {
         /** API key provided via query parameter. Will be deprecated in the future. */
@@ -2969,7 +2972,7 @@ export interface operations {
       };
     };
   };
-  delete_1: {
+  delete_2: {
     parameters: {
       path: {
         ids: number[];
@@ -3031,7 +3034,7 @@ export interface operations {
       };
     };
   };
-  delete_8: {
+  delete_9: {
     parameters: {
       path: {
         ids: number[];

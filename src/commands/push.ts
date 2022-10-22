@@ -5,13 +5,12 @@ import { join } from 'path';
 import { readdir, readFile, stat } from 'fs/promises';
 import { Command, Option } from 'commander';
 
-import { API_URL_OPT, API_KEY_OPT, PROJECT_ID_OPT } from '../options';
 import { HttpError } from '../client/errors';
 
 import { askString } from '../utils/ask';
 import { loading, success, warn, error } from '../utils/logger';
 
-type PushParams = {
+type PushOptions = {
   apiUrl: URL;
   apiKey: string;
   projectId: number;
@@ -51,25 +50,20 @@ function getConflictingLanguages(result: AddFileResponse) {
 }
 
 async function promptConflicts(
-  params: PushParams
+  opts: PushOptions
 ): Promise<'KEEP' | 'OVERRIDE'> {
-  const projectId =
-    params.projectId === -1
-      ? await params.client.getApiKeyInformation().then((i) => i.projectId)
-      : params.projectId;
+  const projectId = opts.client.getProjectId();
+  const resolveUrl = new URL(`/projects/${projectId}/import`, opts.apiUrl).href;
 
-  const resolveUrl = new URL(`/projects/${projectId}/import`, params.apiUrl)
-    .href;
-
-  if (params.forceMode === 'NO') {
+  if (opts.forceMode === 'NO') {
     error(
       `There are conflicts in the import. You can resolve them and complete the import here: ${resolveUrl}.`
     );
     process.exit(1);
   }
 
-  if (params.forceMode) {
-    return params.forceMode;
+  if (opts.forceMode) {
+    return opts.forceMode;
   }
 
   if (!process.stdout.isTTY) {
@@ -131,7 +125,9 @@ async function applyImport(client: Client) {
   }
 }
 
-async function pushHandler(path: string, params: PushParams) {
+async function pushHandler(this: Command, path: string) {
+  const opts: PushOptions = this.optsWithGlobals();
+
   try {
     const stats = await stat(path);
     if (!stats.isDirectory()) {
@@ -153,17 +149,17 @@ async function pushHandler(path: string, params: PushParams) {
     return;
   }
 
-  const result = await prepareImport(params.client, files);
+  const result = await prepareImport(opts.client, files);
   const conflicts = getConflictingLanguages(result);
   if (conflicts.length) {
-    const resolveMethod = await promptConflicts(params);
+    const resolveMethod = await promptConflicts(opts);
     await loading(
       'Resolving conflicts...',
-      resolveConflicts(params.client, conflicts, resolveMethod)
+      resolveConflicts(opts.client, conflicts, resolveMethod)
     );
   }
 
-  await applyImport(params.client);
+  await applyImport(opts.client);
   success('Done!');
 }
 
@@ -171,9 +167,6 @@ export default new Command()
   .name('push')
   .description('Pushes translations to Tolgee')
   .argument('<path>', 'Path to the files to push to Tolgee')
-  .addOption(API_URL_OPT)
-  .addOption(API_KEY_OPT)
-  .addOption(PROJECT_ID_OPT)
   .addOption(
     new Option(
       '-f, --force-mode <mode>',

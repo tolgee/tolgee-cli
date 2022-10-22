@@ -1,4 +1,4 @@
-import type { Response } from 'undici';
+import { Request, Response } from 'undici';
 import type { Blob } from 'buffer';
 import type { components } from './schema.generated';
 
@@ -97,19 +97,20 @@ export default class Requester {
       }
     }
 
-    debug(`[HTTP] Requesting: ${req.method} ${url.href}`);
-
-    const res = await fetch(url, {
+    const request = new Request(url, {
       method: req.method,
       headers: headers,
       body: body,
     });
 
+    debug(`[HTTP] Requesting: ${request.method} ${request.url}`);
+    const response = await fetch(request);
+
     debug(
-      `[HTTP] ${req.method} ${url.href} -> ${res.status} ${res.statusText}`
+      `[HTTP] ${request.method} ${request.url} -> ${response.status} ${response.statusText}`
     );
-    if (!res.ok) throw new HttpError(res);
-    return res;
+    if (!response.ok) throw new HttpError(request, response);
+    return response;
   }
 
   /**
