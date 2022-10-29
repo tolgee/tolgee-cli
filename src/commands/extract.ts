@@ -1,11 +1,10 @@
 import type Client from '../client';
-import { Command, Option } from 'commander';
+import { Command } from 'commander';
 
 import extractKeys from '../extractor';
 
 type BaseExtractOptions = {
-  preset: 'react';
-  customExtractor?: string;
+  extractor: string;
 };
 
 type ExtractPrintOptions = BaseExtractOptions;
@@ -102,11 +101,9 @@ const extractCompare = new Command('compare')
   .action(compareHandler);
 
 export default new Command('extract')
-  .option('-c, --custom-extractor <js file>', 'JS file with custom extractor')
-  .addOption(
-    new Option('-p, --preset <preset>', 'The preset to use')
-      .choices(['react'])
-      .default('react')
+  .requiredOption(
+    '-e, --extractor <extractor>',
+    'The extractor to use. Either a builtin identifier, or a path to a JS file.'
   )
   .addCommand(extractPrint)
   .addCommand(extractCompare);

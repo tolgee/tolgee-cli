@@ -1,12 +1,13 @@
-import type { ExtractorRegExp } from './regexp';
-
-import { join } from 'path';
+import { join, extname } from 'path';
+import { existsSync } from 'fs';
 import { readFile } from 'fs/promises';
 import { glob as globCb } from 'glob';
 
-import { regexpExtractorRunner, validateRegExpExtractor } from './regexp';
+import { callWorker } from './worker';
+
 import { debug } from '../utils/logger';
 import { KEY_REGEX } from '../utils/constants';
+import { loadModule } from '../utils/moduleLoader';
 
 import { promisify } from 'util';
 const glob = promisify(globCb);
@@ -22,35 +23,47 @@ export type PossibleKey = {
   position: number;
 };
 
-type ExtractRunner = (fileContents: string) => string[];
+export type Extractor = (fileContents: string) => string[];
 
-export type { ExtractorRegExp };
-export type ExtractorFunction = { extractor: ExtractRunner };
-export type Extractor = ExtractorRegExp | ExtractorFunction;
-
-function prepareExtractor(params: ExtractorParams): ExtractRunner {
-  const extractorPath = params.customExtractor
-    ? params.customExtractor
-    : join(__dirname, 'presets', `${params.preset}.js`);
-
-  const extractor = require(extractorPath);
-
-  if (!extractor || typeof extractor !== 'object' || Array.isArray(extractor))
-    throw new TypeError(
-      'Invalid extractor provided: The provided extractor is not an object!'
+function resolveExtractor(extractor: string): string {
+  if (!existsSync(extractor)) {
+    // During dev, we deal with .ts files because of ts-node
+    const preset = join(
+      __dirname,
+      'presets',
+      `${extractor}${extname(__filename)}`
     );
+    if (!existsSync(preset)) {
+      throw new Error(`Cannot find specified extractor: ${extractor}`);
+    }
 
-  if ('extraction' in extractor) {
-    validateRegExpExtractor(extractor);
-    return regexpExtractorRunner.bind(null, extractor);
+    return preset;
   }
 
-  if (typeof extractor.extractor !== 'function')
-    throw new TypeError(
-      'Invalid functional extractor provided: `extractor` is not a function!'
-    );
+  return extractor;
+}
 
-  return extractor.extractor;
+export async function loadExtractor(extractor: string): Promise<Extractor> {
+  if (!existsSync(extractor)) {
+    // During dev, we deal with .ts files because of ts-node
+    const preset = join(
+      __dirname,
+      'presets',
+      `${extractor}${extname(__filename)}`
+    );
+    if (!existsSync(preset)) {
+      throw new Error(`Cannot find specified extractor: ${extractor}`);
+    }
+
+    extractor = preset;
+  }
+
+  const mdl = await loadModule(extractor);
+  if (typeof mdl.default !== 'function') {
+    throw new TypeError('Invalid extractor: export is not a function');
+  }
+
+  return mdl.default;
 }
 
 function findPossibleKeys(content: string) {
@@ -69,11 +82,43 @@ function findPossibleKeys(content: string) {
   return res;
 }
 
-export default async function extractKeys(
-  filesPattern: string,
-  params: ExtractorParams
+export async function extractKeysFromCode(extractor: string, code: string) {
+  return callWorker({
+    extractor: resolveExtractor(extractor),
+    code: code,
+  });
+}
+
+export async function extractKeysFromFile(extractor: string, file: string) {
+  return callWorker({
+    extractor: resolveExtractor(extractor),
+    file: file,
+  });
+}
+
+export async function extractKeysOfFiles(
+  extractor: string,
+  filesPattern: string
 ) {
-  const extractor = prepareExtractor(params);
+  const files = await glob(filesPattern, { nodir: true });
+  const result = new Map<string, string[]>();
+
+  // Done as a map to allow pseudoconcurrent execution
+  await Promise.all(
+    files.map(async (file) => {
+      const keys = await extractKeysFromFile(extractor, file);
+      result.set(file, keys);
+    })
+  );
+
+  return result;
+}
+
+export default async function extractKeysOf(
+  filesPattern: string,
+  params: { extractor: string }
+) {
+  const extractor = await loadExtractor(params.extractor);
 
   const files = await glob(filesPattern, { nodir: true });
   const possibleKeys: Map<string, PossibleKey[]> = new Map();
