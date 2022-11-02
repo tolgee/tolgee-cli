@@ -1,15 +1,13 @@
 import type { Deferred } from '../utils/deferred';
 
 import { extname } from 'path';
-import { Worker, isMainThread, parentPort, workerData } from 'worker_threads';
+import { Worker, isMainThread, parentPort } from 'worker_threads';
 import { readFile } from 'fs/promises';
 
 import { loadModule } from '../utils/moduleLoader';
 import { createDeferred } from '../utils/deferred';
 
-export type FileParams = { extractor: string; file: string };
-export type CodeParams = { extractor: string; code: string };
-export type WorkerParams = FileParams | CodeParams;
+export type WorkerParams = { extractor: string; file: string };
 
 const IS_TS_NODE = extname(__filename) === '.ts';
 
@@ -28,8 +26,7 @@ async function handleJob(args: WorkerParams) {
     await loadExtractor(args.extractor);
   }
 
-  const code = 'file' in args ? await readFile(args.file, 'utf8') : args.code;
-
+  const code = await readFile(args.file, 'utf8');
   return extractor(code);
 }
 

@@ -12,11 +12,6 @@ import { loadModule } from '../utils/moduleLoader';
 import { promisify } from 'util';
 const glob = promisify(globCb);
 
-export type ExtractorParams = {
-  preset: 'react';
-  customExtractor?: string;
-};
-
 export type PossibleKey = {
   fileName: string;
   line: number;
@@ -80,13 +75,6 @@ function findPossibleKeys(content: string) {
   }
 
   return res;
-}
-
-export async function extractKeysFromCode(extractor: string, code: string) {
-  return callWorker({
-    extractor: resolveExtractor(extractor),
-    code: code,
-  });
 }
 
 export async function extractKeysFromFile(extractor: string, file: string) {
