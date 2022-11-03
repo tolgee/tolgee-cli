@@ -30,14 +30,14 @@ export default createMachine<MachineCtx>(
     states: {
       idle: {
         on: {
-          'variable.other.object.tsx': [
+          'variable.other.object.ts': [
             // React.createElement (step 1)
             {
               target: 'react_call1',
               cond: (_ctx, evt) => evt.token === 'React',
             },
           ],
-          'entity.name.function.tsx': [
+          'entity.name.function.ts': [
             // useTranslate call
             {
               target: 'hook_call',
@@ -62,15 +62,18 @@ export default createMachine<MachineCtx>(
         // React.createElement (step 2)
         on: {
           '*': 'idle',
-          'punctuation.accessor.tsx': 'react_call2',
+          'meta.function-call.ts': undefined,
+          'punctuation.accessor.ts': 'react_call2',
         },
       },
       react_call2: {
         // React.createElement (step 3)
         on: {
           '*': 'idle',
-          'support.function.dom.tsx': {
+          'meta.function-call.ts': undefined,
+          'support.function.dom.ts': {
             target: 'create_element',
+            cond: (_ctx, evt) => evt.token === 'createElement',
             actions: assign({ createElement: (_ctx, _evt) => true }),
           },
         },
@@ -126,8 +129,12 @@ export default createMachine<MachineCtx>(
       create_element: {
         on: {
           '*': 'idle',
-          'meta.brace.round.tsx': undefined,
-          'variable.other.constant.tsx': [
+
+          // Void & punctuation
+          'meta.brace.round.ts': undefined,
+
+          // Component
+          'variable.other.constant.ts': [
             {
               target: 'create_element_props',
               cond: (_ctx, evt) => evt.token === 'T',
@@ -137,8 +144,8 @@ export default createMachine<MachineCtx>(
       },
       create_element_props: {
         on: {
-          'constant.language.null.tsx': 'create_element_children',
-          'punctuation.definition.block.tsx': {
+          'constant.language.null.ts': 'create_element_children',
+          'punctuation.definition.block.ts': {
             target: 'params',
             actions: [
               assign({ createElement: (_ctx, _evt) => true }),
@@ -154,11 +161,18 @@ export default createMachine<MachineCtx>(
             target: 'idle',
             actions: 'pushKey',
           },
-          'punctuation.separator.comma.tsx': undefined,
-          'punctuation.definition.string.begin.tsx':
+
+          // Void & punctuation
+          'meta.objectliteral.ts': undefined,
+          'punctuation.separator.comma.ts': undefined,
+
+          // String
+          'punctuation.definition.string.begin.ts':
             'create_element_children_string',
-          'punctuation.definition.string.template.begin.tsx':
+          'punctuation.definition.string.template.begin.ts':
             'create_element_children_string',
+
+          // JSX child
           'meta.jsx.children.tsx': [
             {
               target: 'idle',
@@ -192,9 +206,9 @@ export default createMachine<MachineCtx>(
       // Process useTranslate call
       hook_call: {
         on: {
-          'punctuation.definition.string.begin.tsx': 'hook_set_ns',
-          'punctuation.definition.string.template.begin.tsx': 'hook_set_ns',
-          'meta.brace.round.tsx': {
+          'punctuation.definition.string.begin.ts': 'hook_set_ns',
+          'punctuation.definition.string.template.begin.ts': 'hook_set_ns',
+          'meta.brace.round.ts': {
             target: 'idle',
             cond: (_ctx, evt) => evt.token === ')',
             actions: 'pushHook',
@@ -213,13 +227,13 @@ export default createMachine<MachineCtx>(
       // Process t call
       t_call: {
         on: {
-          'punctuation.definition.string.begin.tsx': {
+          'punctuation.definition.string.begin.ts': {
             target: 't_set_key',
           },
-          'punctuation.definition.string.template.begin.tsx': {
+          'punctuation.definition.string.template.begin.ts': {
             target: 't_set_key',
           },
-          'meta.brace.round.tsx': {
+          'meta.brace.round.ts': {
             target: 'idle',
             cond: (_ctx, evt) => evt.token === ')',
           },
@@ -235,19 +249,19 @@ export default createMachine<MachineCtx>(
       },
       t_params: {
         on: {
-          'meta.brace.round.tsx': {
+          'meta.brace.round.ts': {
             target: 'idle',
             actions: 'pushKey',
             cond: (_ctx, evt) => evt.token === ')',
           },
-          'punctuation.separator.comma.tsx': {
+          'punctuation.separator.comma.ts': {
             target: 'params',
           },
         },
       },
     },
     on: {
-      'punctuation.definition.block.tsx': [
+      'punctuation.definition.block.ts': [
         {
           cond: (_ctx, evt) => evt.token === '{',
           actions: 'incrementDepth',

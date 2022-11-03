@@ -15,14 +15,20 @@ export type Token = {
 };
 
 const enum Grammar {
+  TYPESCRIPT = 'source.ts',
   TYPESCRIPT_TSX = 'source.tsx',
 }
 
 const GrammarFiles: Record<Grammar, string> = {
+  [Grammar.TYPESCRIPT]: join(
+    __dirname,
+    'textmate',
+    'TypeScript.tmLanguage'
+  ),
   [Grammar.TYPESCRIPT_TSX]: join(
     __dirname,
     'textmate',
-    'TypeScriptReact.plist'
+    'TypeScriptReact.tmLanguage'
   ),
 };
 
@@ -53,8 +59,9 @@ async function loadGrammar(scope: Grammar) {
 function extnameToGrammar(extname: string) {
   switch (extname) {
     case '.js':
-    case '.jsx':
     case '.ts':
+      return Grammar.TYPESCRIPT;
+    case '.jsx':
     case '.tsx':
       return Grammar.TYPESCRIPT_TSX;
   }
@@ -69,13 +76,14 @@ function* tokenize(code: string, grammar: IGrammar) {
     for (let i = 0; i < res.tokens.length; i++) {
       const token = res.tokens[i];
 
-      // Opinionated take: if a token is whitespace, chances are we don't care about it.
+      // Opinionated take: if a token is scope-less, chances are we don't care about it.
       // Ditching it allows us to reduce complexity from the state machine's POV.
+      if (token.scopes.length === 1) continue
+
       const codeToken = code.slice(
         linePtr + token.startIndex,
         linePtr + token.endIndex
       );
-      if (!codeToken.trim()) continue;
 
       yield <Token>{
         type: token.scopes[token.scopes.length - 1],

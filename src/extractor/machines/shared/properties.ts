@@ -27,15 +27,15 @@ export default createMachine<PropertiesContext>(
       idle: {
         on: {
           // JS/TS
-          'meta.brace.square.tsx': {
+          'meta.brace.square.ts': {
             target: 'complex_key',
             cond: 'isOpenSquare',
           },
-          'meta.object-literal.key.tsx': {
+          'meta.object-literal.key.ts': {
             actions: 'storePropertyType',
             cond: 'isRootLevel',
           },
-          'punctuation.separator.key-value.tsx': {
+          'punctuation.separator.key-value.ts': {
             target: 'value',
             cond: 'isRootLevel',
           },
@@ -44,17 +44,22 @@ export default createMachine<PropertiesContext>(
           'entity.other.attribute-name.tsx': {
             actions: 'storePropertyType',
           },
-          'keyword.operator.assignment.tsx': {
+          'keyword.operator.assignment.ts': {
             target: 'value',
           },
         },
       },
       complex_key: {
         on: {
-          '*': 'idle',
-          'punctuation.definition.string.begin.tsx': 'complex_key_string',
-          'punctuation.definition.string.template.begin.tsx':
-            'complex_key_string',
+          // On string
+          'punctuation.definition.string.begin.ts': 'complex_key_string',
+          'punctuation.definition.string.template.begin.ts': 'complex_key_string',
+
+          // Key end
+          'meta.brace.square.ts': {
+            target: 'idle',
+            cond: 'isCloseSquare'
+          }
         },
       },
       complex_key_string: {
@@ -67,18 +72,15 @@ export default createMachine<PropertiesContext>(
       },
       value: {
         on: {
-          '*': 'idle',
-
-          // Ignore expression wrap
-          'punctuation.section.embedded.begin.tsx': undefined,
-
           // Extract strings
-          'punctuation.definition.string.begin.tsx': 'value_string',
-          'punctuation.definition.string.template.begin.tsx': 'value_string',
+          'punctuation.definition.string.begin.ts': 'value_string',
+          'punctuation.definition.string.template.begin.ts': 'value_string',
 
-          // Replay the event to let depth update itself if necessary
-          'punctuation.definition.block.tsx': {
+          // Value end
+          'punctuation.separator.comma.ts': 'idle',
+          'punctuation.definition.block.ts': {
             target: 'idle',
+            // Replay the event to let depth update itself if necessary
             actions: send((_ctx, evt) => evt),
           },
         },
@@ -102,7 +104,7 @@ export default createMachine<PropertiesContext>(
       },
     },
     on: {
-      'punctuation.definition.block.tsx': [
+      'punctuation.definition.block.ts': [
         {
           actions: 'incrementDepth',
           cond: 'isOpenCurly',
@@ -125,6 +127,7 @@ export default createMachine<PropertiesContext>(
       isCloseCurly: (_ctx, evt) => evt.token === '}',
       isFinalCloseCurly: (ctx, evt) => evt.token === '}' && ctx.depth === 1,
       isOpenSquare: (_ctx, evt) => evt.token === '[',
+      isCloseSquare: (_ctx, evt) => evt.token === ']',
       isRootLevel: (ctx) => ctx.depth === 1,
     },
     actions: {

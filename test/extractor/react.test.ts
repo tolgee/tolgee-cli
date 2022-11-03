@@ -1,7 +1,9 @@
 import extractKeys from '../../src/extractor/presets/react';
 
-describe('React.createElement', () => {
-  it('should extract keys specified as properties', async () => {
+describe.each([ 'js', 'ts', 'jsx', 'tsx' ])('React.createElement (.%s)', (ext) => {
+  const FILE_NAME = `test.${ext}`
+
+  it('extracts keys specified as properties', async () => {
     const expected = [
       { keyName: 'key1' },
       { keyName: 'key2' },
@@ -18,11 +20,11 @@ describe('React.createElement', () => {
       React.createElement(T, { keyName: 'key5', someProp: 'a' }, 'not key6')
     `;
 
-    const extracted = await extractKeys(code, 'test.js');
+    const extracted = await extractKeys(code, FILE_NAME);
     expect(extracted).toEqual(expected);
   });
 
-  it('should extract keys specified as children', async () => {
+  it('extracts keys specified as children', async () => {
     const expected = [
       { keyName: 'key1' },
       { keyName: 'key2' },
@@ -39,7 +41,7 @@ describe('React.createElement', () => {
       React.createElement(T, {}, 'key5', React.createElement('hr'))
     `;
 
-    const extracted = await extractKeys(code, 'test.js');
+    const extracted = await extractKeys(code, FILE_NAME);
     expect(extracted).toEqual(expected);
   });
 
@@ -50,7 +52,7 @@ describe('React.createElement', () => {
       React.createElement(T, { keyName: 'key1' }, "default value")
     `;
 
-    const extracted = await extractKeys(code, 'test.js');
+    const extracted = await extractKeys(code, FILE_NAME);
     expect(extracted).toEqual(expected);
   });
 
@@ -61,7 +63,7 @@ describe('React.createElement', () => {
       React.createElement(T, { keyName: 'key1' }, "default value")
     `;
 
-    const extracted = await extractKeys(code, 'test.js');
+    const extracted = await extractKeys(code, FILE_NAME);
     expect(extracted).toEqual(expected);
   });
 
@@ -72,7 +74,7 @@ describe('React.createElement', () => {
       React.createElement(T, { keyName: 'key1', defaultValue: 'default value' }, "ignored stuff")
     `;
 
-    const extracted = await extractKeys(code, 'test.js');
+    const extracted = await extractKeys(code, FILE_NAME);
     expect(extracted).toEqual(expected);
   });
 
@@ -83,11 +85,11 @@ describe('React.createElement', () => {
       React.createElement(T, { keyName: 'key1', ns: 'ns1' })
     `;
 
-    const extracted = await extractKeys(code, 'test.js');
+    const extracted = await extractKeys(code, FILE_NAME);
     expect(extracted).toEqual(expected);
   });
 
-  it('should not be confused by nested objects in properties', async () => {
+  it('is not be confused by nested objects in properties', async () => {
     const expected = [
       { keyName: 'key1' },
       { keyName: 'key2' },
@@ -102,11 +104,11 @@ describe('React.createElement', () => {
       React.createElement(T, { someProp: { keyName: 'not key4' }, keyName: 'key4' })
     `;
 
-    const extracted = await extractKeys(code, 'test.js');
+    const extracted = await extractKeys(code, FILE_NAME);
     expect(extracted).toEqual(expected);
   });
 
-  it('should handle multiline use of createElement', async () => {
+  it('handles multiline use of createElement', async () => {
     const expected = [
       { keyName: 'key1' },
       { keyName: 'key2' },
@@ -146,12 +148,55 @@ describe('React.createElement', () => {
       }, 'key6')
     `;
 
-    const extracted = await extractKeys(code, 'test.js');
+    const extracted = await extractKeys(code, FILE_NAME);
+    expect(extracted).toEqual(expected);
+  });
+
+  it('handles weird/lack of spacing in declarations', async () => {
+    const expected = [
+      { keyName: 'key1' },
+      { keyName: 'key2' },
+    ];
+
+    const code = `
+      React         .    createElement     (    T,     {     keyName: 'key1' })
+      React.createElement(T,{keyName:'key2'})
+    `;
+
+    const extracted = await extractKeys(code, FILE_NAME);
+    expect(extracted).toEqual(expected);
+  });
+
+  it.skip('consumes all children provided and combine them', async () => {
+    const expected = [
+      { keyName: 'key1', defaultValue: 'this is the default value' },
+    ];
+
+    const code = `
+      React.createElement(T, { keyName: 'key1' }, 'this is', ' the default value')
+    `;
+
+    const extracted = await extractKeys(code, FILE_NAME);
+    expect(extracted).toEqual(expected);
+  });
+
+  it('ignores dynamic values', async () => {
+    const expected = [
+      { keyName: 'key1' },
+    ];
+
+    const code = `
+      React.createElement(T, { keyName:'key1' }, someValue)
+    `;
+
+    const extracted = await extractKeys(code, FILE_NAME);
     expect(extracted).toEqual(expected);
   });
 });
 
-describe('useTranslate', () => {
+describe.each([ 'js', 'ts', 'jsx', 'tsx' ])('useTranslate (.%s)', (ext) => {
+  const FILE_NAME = `test.${ext}`
+
   it('extracts from the t call', async () => {
     const expected = [{ keyName: 'key1' }];
 
@@ -162,7 +207,7 @@ describe('useTranslate', () => {
       }
     `;
 
-    const extracted = await extractKeys(code, 'test.js');
+    const extracted = await extractKeys(code, FILE_NAME);
     expect(extracted).toEqual(expected);
   });
 
@@ -176,7 +221,7 @@ describe('useTranslate', () => {
       }
     `;
 
-    const extracted = await extractKeys(code, 'test.js');
+    const extracted = await extractKeys(code, FILE_NAME);
     expect(extracted).toEqual(expected);
   });
 
@@ -190,7 +235,7 @@ describe('useTranslate', () => {
       }
     `;
 
-    const extracted = await extractKeys(code, 'test.js');
+    const extracted = await extractKeys(code, FILE_NAME);
     expect(extracted).toEqual(expected);
   });
 
@@ -204,7 +249,7 @@ describe('useTranslate', () => {
       }
     `;
 
-    const extracted = await extractKeys(code, 'test.js');
+    const extracted = await extractKeys(code, FILE_NAME);
     expect(extracted).toEqual(expected);
   });
 
@@ -218,7 +263,7 @@ describe('useTranslate', () => {
       }
     `;
 
-    const extracted = await extractKeys(code, 'test.js');
+    const extracted = await extractKeys(code, FILE_NAME);
     expect(extracted).toEqual(expected);
   });
 
@@ -232,7 +277,7 @@ describe('useTranslate', () => {
       }
     `;
 
-    const extracted = await extractKeys(code, 'test.js');
+    const extracted = await extractKeys(code, FILE_NAME);
     expect(extracted).toEqual(expected);
   });
 
@@ -245,7 +290,7 @@ describe('useTranslate', () => {
       }
     `;
 
-    const extracted = await extractKeys(code, 'test.js');
+    const extracted = await extractKeys(code, FILE_NAME);
     expect(extracted).toEqual(expected);
   });
 
@@ -262,7 +307,7 @@ describe('useTranslate', () => {
       }
     `;
 
-    const extracted = await extractKeys(code, 'test.js');
+    const extracted = await extractKeys(code, FILE_NAME);
     expect(extracted).toEqual(expected);
   });
 
@@ -278,7 +323,7 @@ describe('useTranslate', () => {
       }
     `;
 
-    const extracted = await extractKeys(code, 'test.js');
+    const extracted = await extractKeys(code, FILE_NAME);
     expect(extracted).toEqual(expected);
   });
 
@@ -303,7 +348,7 @@ describe('useTranslate', () => {
       }
     `;
 
-    const extracted = await extractKeys(code, 'test.js');
+    const extracted = await extractKeys(code, FILE_NAME);
     expect(extracted).toEqual(expected);
   });
 
@@ -322,42 +367,44 @@ describe('useTranslate', () => {
       }
     `;
 
-    const extracted = await extractKeys(code, 'test.js');
+    const extracted = await extractKeys(code, FILE_NAME);
     expect(extracted).toEqual(expected);
   });
 });
 
-describe('<T>', () => {
-  it('should extract keys specified as properties', async () => {
+describe.each([ 'jsx', 'tsx' ])('<T> (.%s)', (ext) => {
+  const FILE_NAME = `test.${ext}`
+
+  it('extracts keys specified as properties', async () => {
     const expected = [{ keyName: 'key1' }];
 
     const code = `
       <T keyName='key1'/>
     `;
 
-    const extracted = await extractKeys(code, 'test.jsx');
+    const extracted = await extractKeys(code, FILE_NAME);
     expect(extracted).toEqual(expected);
   });
 
-  it('should extract keys specified as properties with curly braces', async () => {
+  it('extracts keys specified as properties with curly braces', async () => {
     const expected = [{ keyName: 'key1' }];
 
     const code = `
       <T keyName={'key1'}/>
     `;
 
-    const extracted = await extractKeys(code, 'test.jsx');
+    const extracted = await extractKeys(code, FILE_NAME);
     expect(extracted).toEqual(expected);
   });
 
-  it('should extract keys specified as children', async () => {
+  it('extracts keys specified as children', async () => {
     const expected = [{ keyName: 'key1' }];
 
     const code = `
       <T>key1</T>
     `;
 
-    const extracted = await extractKeys(code, 'test.jsx');
+    const extracted = await extractKeys(code, FILE_NAME);
     expect(extracted).toEqual(expected);
   });
 
@@ -368,7 +415,7 @@ describe('<T>', () => {
       <T keyName='key1'>default value1</T>
     `;
 
-    const extracted = await extractKeys(code, 'test.jsx');
+    const extracted = await extractKeys(code, FILE_NAME);
     expect(extracted).toEqual(expected);
   });
 
@@ -379,7 +426,7 @@ describe('<T>', () => {
       <T keyName='key1' defaultValue='default value1'/>
     `;
 
-    const extracted = await extractKeys(code, 'test.jsx');
+    const extracted = await extractKeys(code, FILE_NAME);
     expect(extracted).toEqual(expected);
   });
 
@@ -390,7 +437,7 @@ describe('<T>', () => {
       <T keyName='key1' defaultValue='default value1'>unused</T>
     `;
 
-    const extracted = await extractKeys(code, 'test.jsx');
+    const extracted = await extractKeys(code, FILE_NAME);
     expect(extracted).toEqual(expected);
   });
 
@@ -401,7 +448,7 @@ describe('<T>', () => {
       <T keyName='key1' ns='ns1'/>
     `;
 
-    const extracted = await extractKeys(code, 'test.jsx');
+    const extracted = await extractKeys(code, FILE_NAME);
     expect(extracted).toEqual(expected);
   });
 
@@ -414,7 +461,7 @@ describe('<T>', () => {
       </div>
     `;
 
-    const extracted = await extractKeys(code, 'test.jsx');
+    const extracted = await extractKeys(code, FILE_NAME);
     expect(extracted).toEqual(expected);
   });
 
@@ -447,24 +494,33 @@ describe('<T>', () => {
       </T>
     `;
 
-    const extracted = await extractKeys(code, 'test.jsx');
+    const extracted = await extractKeys(code, FILE_NAME);
     expect(extracted).toEqual(expected);
   });
 
-  // todo: not really important, but a good QOL thing to have.
-  it.failing(
-    'should unroll static JSX compound expressions that only contain a string',
-    async () => {
-      const expected = [
-        { keyName: 'key1', defaultValue: 'children with spaces' },
-      ];
+  it.skip('extracts inner JSX tags as basic XML tags', async () => {
+    const expected = [
+      { keyName: 'key1', defaultValue: 'This has <b>important</b> text!' },
+    ];
 
-      const code = `
+    const code = `
+      <T keyName='key1'>This has <b>important</b> text!</T>
+    `;
+
+    const extracted = await extractKeys(code, FILE_NAME);
+    expect(extracted).toEqual(expected);
+  });
+
+  it.skip('unrolls static JSX compound expressions that only contain a string', async () => {
+    const expected = [
+      { keyName: 'key1', defaultValue: 'children with spaces' },
+    ];
+
+    const code = `
       <T keyName='key1'>children{' '}with{' '}spaces</T>
     `;
 
-      const extracted = await extractKeys(code, 'test.jsx');
-      expect(extracted).toEqual(expected);
-    }
-  );
+    const extracted = await extractKeys(code, FILE_NAME);
+    expect(extracted).toEqual(expected);
+  });
 });
