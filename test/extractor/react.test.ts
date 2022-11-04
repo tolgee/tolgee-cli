@@ -167,19 +167,6 @@ describe.each([ 'js', 'ts', 'jsx', 'tsx' ])('React.createElement (.%s)', (ext) =
     expect(extracted).toEqual(expected);
   });
 
-  it.skip('consumes all children provided and combine them', async () => {
-    const expected = [
-      { keyName: 'key1', defaultValue: 'this is the default value' },
-    ];
-
-    const code = `
-      React.createElement(T, { keyName: 'key1' }, 'this is', ' the default value')
-    `;
-
-    const extracted = await extractKeys(code, FILE_NAME);
-    expect(extracted).toEqual(expected);
-  });
-
   it('ignores dynamic values', async () => {
     const expected = [
       { keyName: 'key1' },
@@ -370,6 +357,20 @@ describe.each([ 'js', 'ts', 'jsx', 'tsx' ])('useTranslate (.%s)', (ext) => {
     const extracted = await extractKeys(code, FILE_NAME);
     expect(extracted).toEqual(expected);
   });
+
+  it('handles weird spacings', async () => {
+    const expected = [{ keyName: 'key1', namespace: 'namespace' }];
+
+    const code = `
+      function Test () {
+        const { t } = useTranslate         (   'namespace')
+        t     (      'key1')
+      }
+    `;
+
+    const extracted = await extractKeys(code, FILE_NAME);
+    expect(extracted).toEqual(expected);
+  });
 });
 
 describe.each([ 'jsx', 'tsx' ])('<T> (.%s)', (ext) => {
@@ -409,10 +410,14 @@ describe.each([ 'jsx', 'tsx' ])('<T> (.%s)', (ext) => {
   });
 
   it('extracts the default value from children', async () => {
-    const expected = [{ keyName: 'key1', defaultValue: 'default value1' }];
+    const expected = [
+      { keyName: 'key1', defaultValue: 'default value1' },
+      { keyName: 'key2', defaultValue: 'default value2' },
+    ];
 
     const code = `
       <T keyName='key1'>default value1</T>
+      <T keyName='key2'>{'default value2'}</T>
     `;
 
     const extracted = await extractKeys(code, FILE_NAME);
@@ -465,7 +470,7 @@ describe.each([ 'jsx', 'tsx' ])('<T> (.%s)', (ext) => {
     expect(extracted).toEqual(expected);
   });
 
-  it('handle multiline use', async () => {
+  it('handles multiline use', async () => {
     const expected = [
       { keyName: 'key1', namespace: 'ns1', defaultValue: 'default value1' },
       { keyName: 'key2', namespace: 'ns2', defaultValue: 'default value2' },
@@ -498,20 +503,7 @@ describe.each([ 'jsx', 'tsx' ])('<T> (.%s)', (ext) => {
     expect(extracted).toEqual(expected);
   });
 
-  it.skip('extracts inner JSX tags as basic XML tags', async () => {
-    const expected = [
-      { keyName: 'key1', defaultValue: 'This has <b>important</b> text!' },
-    ];
-
-    const code = `
-      <T keyName='key1'>This has <b>important</b> text!</T>
-    `;
-
-    const extracted = await extractKeys(code, FILE_NAME);
-    expect(extracted).toEqual(expected);
-  });
-
-  it.skip('unrolls static JSX compound expressions that only contain a string', async () => {
+  it('unrolls static JSX compound expressions that only contain a string', async () => {
     const expected = [
       { keyName: 'key1', defaultValue: 'children with spaces' },
     ];

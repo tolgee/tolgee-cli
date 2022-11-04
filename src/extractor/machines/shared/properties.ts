@@ -100,6 +100,7 @@ export default createMachine<PropertiesContext>(
           keyName: ctx.keyName,
           defaultValue: ctx.defaultValue,
           namespace: ctx.namespace,
+          lastEvent: evt,
         }),
       },
     },

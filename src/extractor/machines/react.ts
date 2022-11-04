@@ -5,8 +5,7 @@ type HookVisibility = { depth: number; namespace?: string };
 type Key = { keyName: string; defaultValue?: string; namespace?: string };
 type MachineCtx = {
   blockDepth: number;
-  createElement: boolean;
-  isImmediateJsxClose: boolean;
+  children: string;
 
   key: Key;
   hooks: HookVisibility[];
@@ -16,262 +15,329 @@ type MachineCtx = {
 export default createMachine<MachineCtx>(
   {
     predictableActionArguments: true,
-    id: 'code',
-    initial: 'idle',
+    id: 'reactExtractor',
+    type: 'parallel',
     context: {
       blockDepth: 0,
-      createElement: false,
-      isImmediateJsxClose: false,
+      children: '',
 
       key: { keyName: '' },
       hooks: [],
       keys: [],
     },
     states: {
-      idle: {
+      useTranslate: {
+        initial: 'idle',
+        states: {
+          idle: {
+            on: {
+              'entity.name.function.ts': {
+                target: 'func',
+                cond: (_ctx, evt) => evt.token === 'useTranslate',
+              },
+            }
+          },
+          func: {
+            on: {
+              '*': 'idle',
+              'meta.block.ts': undefined,
+              'meta.var.expr.ts': undefined,
+              'meta.brace.round.ts': {
+                target: 'call',
+                cond: (_ctx, evt) => evt.token === '(',
+              },
+            }
+          },
+          call: {
+            on: {
+              'punctuation.definition.string.begin.ts': 'namespace',
+              'punctuation.definition.string.template.begin.ts': 'namespace',
+              'meta.brace.round.ts': {
+                target: 'idle',
+                cond: (_ctx, evt) => evt.token === ')',
+                actions: 'pushHook',
+              },
+            },
+          },
+          namespace: {
+            on: {
+              '*': {
+                target: 'idle',
+                actions: 'pushNamespacedHook',
+              },
+            },
+          }
+        },
         on: {
-          'variable.other.object.ts': [
-            // React.createElement (step 1)
+          'punctuation.definition.block.ts': [
             {
-              target: 'react_call1',
-              cond: (_ctx, evt) => evt.token === 'React',
+              cond: (_ctx, evt) => evt.token === '{',
+              actions: 'incrementDepth',
+            },
+            {
+              cond: (_ctx, evt) => evt.token === '}',
+              actions: 'decrementDepth',
             },
           ],
-          'entity.name.function.ts': [
-            // useTranslate call
-            {
-              target: 'hook_call',
-              cond: (_ctx, evt) => evt.token === 'useTranslate',
-            },
-
-            // t call
-            {
-              target: 't_call',
-              cond: (ctx, evt) => !!ctx.hooks.length && evt.token === 't',
-            },
-          ],
-          // T JSX component
-          'punctuation.definition.tag.begin.tsx': {
-            target: 'jsx_element',
-            cond: (_ctx, evt) => evt.token === '<',
-          },
-        },
+        }
       },
 
-      react_call1: {
-        // React.createElement (step 2)
-        on: {
-          '*': 'idle',
-          'meta.function-call.ts': undefined,
-          'punctuation.accessor.ts': 'react_call2',
-        },
-      },
-      react_call2: {
-        // React.createElement (step 3)
-        on: {
-          '*': 'idle',
-          'meta.function-call.ts': undefined,
-          'support.function.dom.ts': {
-            target: 'create_element',
-            cond: (_ctx, evt) => evt.token === 'createElement',
-            actions: assign({ createElement: (_ctx, _evt) => true }),
+      createElement: {
+        initial: 'idle',
+        states: {
+          idle: {
+            on: {
+              'variable.other.object.ts': {
+                target: 'func1',
+                cond: (_ctx, evt) => evt.token === 'React'
+              }
+            }
           },
-        },
-      },
-      jsx_element: {
-        on: {
-          '*': 'idle',
-          'support.class.component.tsx': {
-            target: 'params',
-            actions: assign({ createElement: (_ctx, _evt) => true }),
-            cond: (_ctx, evt) => evt.token === 'T',
+          func1: {
+            on: {
+              '*': 'idle',
+              'meta.function-call.ts': undefined,
+              'punctuation.accessor.ts': {
+                target: 'func2',
+                cond: (_ctx, evt) => evt.token === '.'
+              }
+            }
           },
-        },
-      },
-
-      // Extract params
-      params: {
-        invoke: {
-          id: 'propertiesMachine',
-          src: propertiesMachine,
-          onDone: [
-            {
-              target: 'create_element_children',
-              actions: [
-                'consumeParameters',
-                assign({ createElement: (_ctx, _evt) => false }),
+          func2: {
+            on: {
+              '*': 'idle',
+              'meta.function-call.ts': undefined,
+              'support.function.dom.ts': {
+                target: 'func3',
+                cond: (_ctx, evt) => evt.token === 'createElement'
+              }
+            }
+          },
+          func3: {
+            on: {
+              '*': 'idle',
+              'meta.function-call.ts': undefined,
+              'meta.brace.round.ts': {
+                target: 'call',
+                cond: (_ctx, evt) => evt.token === '(',
+              },
+            }
+          },
+          call: {
+            on: {
+              '*': 'idle',
+              'variable.other.constant.ts': {
+                target: 'props',
+                cond: (_ctx, evt) => evt.token === 'T',
+              }
+            }
+          },
+          props: {
+            on: {
+              'constant.language.null.ts': 'children',
+              'punctuation.definition.block.ts': {
+                target: 'props_object',
+                // Replay event for child machine
+                actions: send((_ctx, evt) => evt),
+                cond: (_ctx, evt) => evt.token === '{',
+              },
+            }
+          },
+          props_object: {
+            invoke: {
+              id: 'propertiesMachine',
+              src: propertiesMachine,
+              onDone: [
+                {
+                  target: 'children',
+                  actions: 'consumeParameters',
+                  cond: (ctx, evt) =>
+                    (!ctx.key.keyName && !evt.data.keyName)
+                      || (!ctx.key.defaultValue && !evt.data.defaultValue),
+                },
+                {
+                  target: 'idle',
+                  actions: ['consumeParameters', 'pushKey'],
+                },
               ],
-              cond: (ctx, evt) =>
-                ctx.createElement &&
-                !ctx.isImmediateJsxClose &&
-                ((!ctx.key.keyName && !evt.data.keyName) ||
-                  (!ctx.key.defaultValue && !evt.data.defaultValue)),
             },
-            {
-              target: 'idle',
-              actions: ['consumeParameters', 'pushKey'],
+            on: {
+              '*': {
+                actions: forwardTo('propertiesMachine')
+              },
             },
-          ],
-        },
-        on: {
-          '*': {
-            actions: [
-              forwardTo('propertiesMachine'),
-              assign({
-                isImmediateJsxClose: (_ctx, evt) => evt.token === '/>',
-              }),
-            ],
           },
-        },
-      },
+          children: {
+            on: {
+              '*': [
+                {
+                  target: 'idle',
+                  actions: 'pushKey',
+                  cond: (ctx) => !!ctx.key.keyName
+                },
+                {
+                  target: 'idle',
+                },
+              ],
 
-      // Process React.createElement
-      create_element: {
-        on: {
-          '*': 'idle',
+              // Void & punctuation
+              'meta.objectliteral.ts': undefined,
+              'punctuation.separator.comma.ts': undefined,
 
-          // Void & punctuation
-          'meta.brace.round.ts': undefined,
-
-          // Component
-          'variable.other.constant.ts': [
-            {
-              target: 'create_element_props',
-              cond: (_ctx, evt) => evt.token === 'T',
+              // String
+              'punctuation.definition.string.begin.ts': 'children_string',
+              'punctuation.definition.string.template.begin.ts': 'children_string',
             },
-          ],
-        },
-      },
-      create_element_props: {
-        on: {
-          'constant.language.null.ts': 'create_element_children',
-          'punctuation.definition.block.ts': {
-            target: 'params',
-            actions: [
-              assign({ createElement: (_ctx, _evt) => true }),
-              send((_ctx, evt) => evt), // Replay event for child machine
-            ],
-            cond: (_ctx, evt) => evt.token === '{',
           },
-        },
-      },
-      create_element_children: {
-        on: {
-          '*': {
-            target: 'idle',
-            actions: 'pushKey',
-          },
-
-          // Void & punctuation
-          'meta.objectliteral.ts': undefined,
-          'punctuation.separator.comma.ts': undefined,
-
-          // String
-          'punctuation.definition.string.begin.ts':
-            'create_element_children_string',
-          'punctuation.definition.string.template.begin.ts':
-            'create_element_children_string',
-
-          // JSX child
-          'meta.jsx.children.tsx': [
-            {
-              target: 'idle',
-              actions: ['storeKeyName', 'pushKey'],
-              cond: (ctx) => !ctx.key.keyName,
+          children_string: {
+            on: {
+              '*': [
+                {
+                  target: 'idle',
+                  actions: ['storeKeyName', 'pushKey'],
+                  cond: (ctx) => !ctx.key.keyName,
+                },
+                {
+                  target: 'idle',
+                  actions: ['storeKeyDefault', 'pushKey'],
+                  cond: (ctx) => !!ctx.key.keyName,
+                },
+              ],
             },
-            {
-              actions: 'appendKeyDefault',
-              cond: (ctx) => !!ctx.key.keyName,
-            },
-          ],
-        },
+          }
+        }
       },
-      create_element_children_string: {
-        on: {
-          '*': [
-            {
-              target: 'idle',
-              actions: ['storeKeyName', 'pushKey'],
-              cond: (ctx) => !ctx.key.keyName,
+      jsx: {
+        initial: 'idle',
+        states: {
+          idle: {
+            on: {
+              'punctuation.definition.tag.begin.tsx': {
+                target: 'tag',
+                cond: (_ctx, evt) => evt.token === '<',
+              },
+            }
+          },
+          tag: {
+            on: {
+              '*': 'idle',
+              'meta.tag.ts': undefined,
+              'support.class.component.tsx': {
+                target: 'props',
+                cond: (_ctx, evt) => evt.token === 'T',
+              },
             },
-            {
-              target: 'idle',
-              actions: ['storeKeyDefault', 'pushKey'],
-              cond: (ctx) => !!ctx.key.keyName,
+          },
+          props: {
+            invoke: {
+              id: 'propertiesMachine',
+              src: propertiesMachine,
+              onDone: [
+                {
+                  target: 'children',
+                  actions: 'consumeParameters',
+                  cond: (ctx, evt) =>
+                    evt.data.lastEvent.token !== '/>'
+                      && (
+                        (!ctx.key.keyName && !evt.data.keyName)
+                          || (!ctx.key.defaultValue && !evt.data.defaultValue)
+                      ),
+                },
+                {
+                  target: 'idle',
+                  actions: ['consumeParameters', 'pushKey'],
+                }
+              ],
             },
-          ],
-        },
-      },
+            on: {
+              '*': {
+                actions: forwardTo('propertiesMachine'),
+              },
+            },
+          },
+          children: {
+            on: {
+              'punctuation.definition.tag.begin.tsx': {
+                target: 'idle',
+                actions: [ 'consumeChildren', 'pushKey' ],
+              },
 
-      // Process useTranslate call
-      hook_call: {
-        on: {
-          'punctuation.definition.string.begin.ts': 'hook_set_ns',
-          'punctuation.definition.string.template.begin.ts': 'hook_set_ns',
-          'meta.brace.round.ts': {
-            target: 'idle',
-            cond: (_ctx, evt) => evt.token === ')',
-            actions: 'pushHook',
-          },
-        },
+              'meta.jsx.children.tsx': {
+                actions: 'appendChildren',
+              },
+              'string.quoted.single.ts': {
+                actions: 'appendChildren',
+              },
+              'string.quoted.double.ts': {
+                actions: 'appendChildren',
+              },
+              'string.template.ts': {
+                actions: 'appendChildren',
+              },
+            }
+          }
+        }
       },
-      hook_set_ns: {
-        on: {
-          '*': {
-            target: 'idle',
-            actions: 'pushNamespacedHook',
+      t: {
+        initial: 'idle',
+        states: {
+          idle: {
+            on: {
+              'entity.name.function.ts': {
+                target: 'func',
+                cond: (ctx, evt) => !!ctx.hooks.length && evt.token === 't',
+              },
+            }
           },
-        },
+          func: {
+            on: {
+              '*': 'idle',
+              'meta.block.ts': undefined,
+              'meta.var.expr.ts': undefined,
+              'meta.brace.round.ts': {
+                target: 'call',
+                cond: (_ctx, evt) => evt.token === '(',
+              },
+            }
+          },
+          call: {
+            on: {
+              'punctuation.definition.string.begin.ts': 'key',
+              'punctuation.definition.string.template.begin.ts': 'key',
+              'punctuation.separator.comma.ts': 'params',
+              'meta.brace.round.ts': {
+                target: 'idle',
+                cond: (_ctx, evt) => evt.token === ')',
+                actions: 'pushKey',
+              },
+            }
+          },
+          key: {
+            on: {
+              '*': {
+                target: 'call',
+                actions: ['storeKeyName', 'storeKeyCurrentNamespace'],
+              },
+            },
+          },
+          params: {
+            invoke: {
+              id: 'propertiesMachine',
+              src: propertiesMachine,
+              onDone: {
+                target: 'idle',
+                actions: ['consumeParameters', 'pushKey'],
+              },
+            },
+            on: {
+              '*': {
+                actions: forwardTo('propertiesMachine'),
+              },
+            },
+          },
+        }
       },
-
-      // Process t call
-      t_call: {
-        on: {
-          'punctuation.definition.string.begin.ts': {
-            target: 't_set_key',
-          },
-          'punctuation.definition.string.template.begin.ts': {
-            target: 't_set_key',
-          },
-          'meta.brace.round.ts': {
-            target: 'idle',
-            cond: (_ctx, evt) => evt.token === ')',
-          },
-        },
-      },
-      t_set_key: {
-        on: {
-          '*': {
-            target: 't_params',
-            actions: ['storeKeyName', 'storeKeyCurrentNamespace'],
-          },
-        },
-      },
-      t_params: {
-        on: {
-          'meta.brace.round.ts': {
-            target: 'idle',
-            actions: 'pushKey',
-            cond: (_ctx, evt) => evt.token === ')',
-          },
-          'punctuation.separator.comma.ts': {
-            target: 'params',
-          },
-        },
-      },
-    },
-    on: {
-      'punctuation.definition.block.ts': [
-        {
-          cond: (_ctx, evt) => evt.token === '{',
-          actions: 'incrementDepth',
-        },
-        {
-          cond: (_ctx, evt) => evt.token === '}',
-          actions: 'decrementDepth',
-        },
-      ],
-    },
+    }
   },
   {
     actions: {
@@ -300,17 +366,24 @@ export default createMachine<MachineCtx>(
           namespace: evt.data.namespace ?? ctx.key.namespace,
         }),
       }),
+
+      appendChildren: assign({
+        children: (ctx, evt) => (ctx.children ?? '') + evt.token,
+      }),
+      consumeChildren: assign({
+        key: (ctx, _evt) => ({
+          ...ctx.key,
+          keyName: ctx.key.keyName ? ctx.key.keyName : ctx.children,
+          defaultValue: !ctx.key.keyName ? ctx.key.defaultValue : ctx.children,
+        }),
+        children: (_ctx, _evt) => '',
+      }),
+
       storeKeyName: assign({
         key: (ctx, evt) => ({ ...ctx.key, keyName: evt.token }),
       }),
       storeKeyDefault: assign({
         key: (ctx, evt) => ({ ...ctx.key, defaultValue: evt.token }),
-      }),
-      appendKeyDefault: assign({
-        key: (ctx, evt) => ({
-          ...ctx.key,
-          defaultValue: (ctx.key.defaultValue ?? '') + evt.token,
-        }),
       }),
       storeKeyCurrentNamespace: assign({
         key: (ctx, _evt) => ({
@@ -334,4 +407,4 @@ export default createMachine<MachineCtx>(
       }),
     },
   }
-);
+)
