@@ -5,7 +5,7 @@ import { interpret } from 'xstate';
 const machine = interpret(propertiesMachine);
 
 describe('Plain JavaScript', () => {
-  describe.each([ 'js', 'ts' ])('JavaScript (.%s)', (ext) => {
+  describe.each([ 'js', 'ts', 'jsx', 'tsx' ])('JavaScript (.%s)', (ext) => {
     beforeEach(() => machine.start());
     afterEach(() => machine.stop());
     const FILE_NAME = `test.${ext}`
@@ -102,32 +102,14 @@ describe('Plain JavaScript', () => {
     });
   })
 
-  describe('TypeScript', () => {
+  describe.each([ 'ts', 'tsx', ])('TypeScript (.%s)', (ext) => {
     beforeEach(() => machine.start());
     afterEach(() => machine.stop());
-    const FILE_NAME = 'test.ts'
+    const FILE_NAME = `test.${ext}`
 
     it('gracefully ignores "as" cast', async () => {
       const tokens = await tokenizer(
         'const a = { keyName: "key1" as any, test: 22 }',
-        FILE_NAME
-      );
-      for (const token of tokens) {
-        if (!machine.getSnapshot().done) {
-          machine.send(token);
-        }
-      }
-
-      const snapshot = machine.getSnapshot();
-      expect(snapshot.done).toBe(true);
-      expect(snapshot.context.keyName).toBe('key1');
-      expect(snapshot.context.defaultValue).toBeNull();
-      expect(snapshot.context.namespace).toBeNull();
-    });
-
-    it('gracefully ignores prefix cast', async () => {
-      const tokens = await tokenizer(
-        'const a = { keyName: <any> "key1", test: 22 }',
         FILE_NAME
       );
       for (const token of tokens) {
@@ -161,9 +143,56 @@ describe('Plain JavaScript', () => {
       expect(snapshot.context.namespace).toBeNull();
     });
 
-    it('gracefully ignores prefix cast in complex keys', async () => {
+    if (ext !== 'tsx') {
+      // Test does not apply to TSX; <xxx> is interpreted as a component
+      it('gracefully ignores prefix cast', async () => {
+        const tokens = await tokenizer(
+          'const a = { keyName: <any> "key1", test: 22 }',
+          FILE_NAME
+        );
+        for (const token of tokens) {
+          if (!machine.getSnapshot().done) {
+            machine.send(token);
+          }
+        }
+
+        const snapshot = machine.getSnapshot();
+        expect(snapshot.done).toBe(true);
+        expect(snapshot.context.keyName).toBe('key1');
+        expect(snapshot.context.defaultValue).toBeNull();
+        expect(snapshot.context.namespace).toBeNull();
+      });
+
+      it('gracefully ignores prefix cast in complex keys', async () => {
+        const tokens = await tokenizer(
+          'const a = { [<SomeEnum> "keyName"]: "key1", test: 22 }',
+          FILE_NAME
+        );
+        for (const token of tokens) {
+          if (!machine.getSnapshot().done) {
+            machine.send(token);
+          }
+        }
+
+        const snapshot = machine.getSnapshot();
+        expect(snapshot.done).toBe(true);
+        expect(snapshot.context.keyName).toBe('key1');
+        expect(snapshot.context.defaultValue).toBeNull();
+        expect(snapshot.context.namespace).toBeNull();
+      });
+    }
+  });
+})
+
+describe('JSX', () => {
+  describe.each([ 'jsx', 'tsx' ])('Plain JSX (.%s)', (ext) => {
+    beforeEach(() => machine.start());
+    afterEach(() => machine.stop());
+    const FILE_NAME = `test.${ext}`
+
+    it('extracts from plain JavaScript objects', async () => {
       const tokens = await tokenizer(
-        'const a = { [<SomeEnum> "keyName"]: "key1", test: 22 }',
+        'const a = { keyName: "key1", test: 22 }',
         FILE_NAME
       );
       for (const token of tokens) {
@@ -178,14 +207,6 @@ describe('Plain JavaScript', () => {
       expect(snapshot.context.defaultValue).toBeNull();
       expect(snapshot.context.namespace).toBeNull();
     });
-  });
-})
-
-describe('JSX', () => {
-  describe.each([ 'jsx', 'tsx' ])('Plain JSX (.%s)', (ext) => {
-    beforeEach(() => machine.start());
-    afterEach(() => machine.stop());
-    const FILE_NAME = `test.${ext}`
 
     it('extracts simple JSX props', async () => {
       const tokens = await tokenizer('<T keyName="key1"/>', FILE_NAME);

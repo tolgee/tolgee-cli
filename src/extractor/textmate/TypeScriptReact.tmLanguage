@@ -1,6 +1,6 @@
 <!--
   This TextMate grammar has been modified from the original one.
-  `.tsx` tokens have been transformed into `.ts` to simplify use within the tolgee-cli project.
+  '.tsx' tokens have been transformed into '.ts' to simplify use within the tolgee-cli project.
 
   You may find the original TextMate definition here:
   https://github.com/microsoft/TypeScript-TmLanguage/blob/master/TypeScriptReact.tmLanguage
