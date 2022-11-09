@@ -5,10 +5,10 @@ import { interpret } from 'xstate';
 const machine = interpret(propertiesMachine);
 
 describe('Plain JavaScript', () => {
-  describe.each([ 'js', 'ts', 'jsx', 'tsx' ])('JavaScript (.%s)', (ext) => {
+  describe.each(['js', 'ts', 'jsx', 'tsx'])('JavaScript (.%s)', (ext) => {
     beforeEach(() => machine.start());
     afterEach(() => machine.stop());
-    const FILE_NAME = `test.${ext}`
+    const FILE_NAME = `test.${ext}`;
 
     it('extracts information from basic objects', async () => {
       const tokens = await tokenizer(
@@ -118,12 +118,12 @@ describe('Plain JavaScript', () => {
       expect(snapshot.context.defaultValue).toBe('def value1');
       expect(snapshot.context.namespace).toBeNull();
     });
-  })
+  });
 
-  describe.each([ 'ts', 'tsx', ])('TypeScript (.%s)', (ext) => {
+  describe.each(['ts', 'tsx'])('TypeScript (.%s)', (ext) => {
     beforeEach(() => machine.start());
     afterEach(() => machine.stop());
-    const FILE_NAME = `test.${ext}`
+    const FILE_NAME = `test.${ext}`;
 
     it('gracefully ignores "as" cast', async () => {
       const tokens = await tokenizer(
@@ -200,13 +200,13 @@ describe('Plain JavaScript', () => {
       });
     }
   });
-})
+});
 
 describe('JSX', () => {
-  describe.each([ 'jsx', 'tsx' ])('Plain JSX (.%s)', (ext) => {
+  describe.each(['jsx', 'tsx'])('Plain JSX (.%s)', (ext) => {
     beforeEach(() => machine.start());
     afterEach(() => machine.stop());
-    const FILE_NAME = `test.${ext}`
+    const FILE_NAME = `test.${ext}`;
 
     it('extracts from plain JavaScript objects', async () => {
       const tokens = await tokenizer(

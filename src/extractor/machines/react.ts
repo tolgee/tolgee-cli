@@ -35,7 +35,7 @@ export default createMachine<MachineCtx>(
                 target: 'func',
                 cond: (_ctx, evt) => evt.token === 'useTranslate',
               },
-            }
+            },
           },
           func: {
             on: {
@@ -46,7 +46,7 @@ export default createMachine<MachineCtx>(
                 target: 'call',
                 cond: (_ctx, evt) => evt.token === '(',
               },
-            }
+            },
           },
           call: {
             on: {
@@ -66,7 +66,7 @@ export default createMachine<MachineCtx>(
                 actions: 'pushNamespacedHook',
               },
             },
-          }
+          },
         },
         on: {
           'punctuation.definition.block.ts': [
@@ -79,7 +79,7 @@ export default createMachine<MachineCtx>(
               actions: 'decrementDepth',
             },
           ],
-        }
+        },
       },
 
       createElement: {
@@ -89,9 +89,9 @@ export default createMachine<MachineCtx>(
             on: {
               'variable.other.object.ts': {
                 target: 'func1',
-                cond: (_ctx, evt) => evt.token === 'React'
-              }
-            }
+                cond: (_ctx, evt) => evt.token === 'React',
+              },
+            },
           },
           func1: {
             on: {
@@ -99,9 +99,9 @@ export default createMachine<MachineCtx>(
               'meta.function-call.ts': undefined,
               'punctuation.accessor.ts': {
                 target: 'func2',
-                cond: (_ctx, evt) => evt.token === '.'
-              }
-            }
+                cond: (_ctx, evt) => evt.token === '.',
+              },
+            },
           },
           func2: {
             on: {
@@ -109,9 +109,9 @@ export default createMachine<MachineCtx>(
               'meta.function-call.ts': undefined,
               'support.function.dom.ts': {
                 target: 'func3',
-                cond: (_ctx, evt) => evt.token === 'createElement'
-              }
-            }
+                cond: (_ctx, evt) => evt.token === 'createElement',
+              },
+            },
           },
           func3: {
             on: {
@@ -121,7 +121,7 @@ export default createMachine<MachineCtx>(
                 target: 'call',
                 cond: (_ctx, evt) => evt.token === '(',
               },
-            }
+            },
           },
           call: {
             on: {
@@ -129,8 +129,8 @@ export default createMachine<MachineCtx>(
               'variable.other.constant.ts': {
                 target: 'props',
                 cond: (_ctx, evt) => evt.token === 'T',
-              }
-            }
+              },
+            },
           },
           props: {
             on: {
@@ -141,7 +141,7 @@ export default createMachine<MachineCtx>(
                 actions: send((_ctx, evt) => evt),
                 cond: (_ctx, evt) => evt.token === '{',
               },
-            }
+            },
           },
           props_object: {
             invoke: {
@@ -152,8 +152,8 @@ export default createMachine<MachineCtx>(
                   target: 'children',
                   actions: 'consumeParameters',
                   cond: (ctx, evt) =>
-                    (!ctx.key.keyName && !evt.data.keyName)
-                      || (!ctx.key.defaultValue && !evt.data.defaultValue),
+                    (!ctx.key.keyName && !evt.data.keyName) ||
+                    (!ctx.key.defaultValue && !evt.data.defaultValue),
                 },
                 {
                   target: 'idle',
@@ -163,7 +163,7 @@ export default createMachine<MachineCtx>(
             },
             on: {
               '*': {
-                actions: forwardTo('propertiesMachine')
+                actions: forwardTo('propertiesMachine'),
               },
             },
           },
@@ -173,7 +173,7 @@ export default createMachine<MachineCtx>(
                 {
                   target: 'idle',
                   actions: 'pushKey',
-                  cond: (ctx) => !!ctx.key.keyName
+                  cond: (ctx) => !!ctx.key.keyName,
                 },
                 {
                   target: 'idle',
@@ -186,7 +186,8 @@ export default createMachine<MachineCtx>(
 
               // String
               'punctuation.definition.string.begin.ts': 'children_string',
-              'punctuation.definition.string.template.begin.ts': 'children_string',
+              'punctuation.definition.string.template.begin.ts':
+                'children_string',
             },
           },
           children_string: {
@@ -204,8 +205,8 @@ export default createMachine<MachineCtx>(
                 },
               ],
             },
-          }
-        }
+          },
+        },
       },
       jsx: {
         initial: 'idle',
@@ -216,7 +217,7 @@ export default createMachine<MachineCtx>(
                 target: 'tag',
                 cond: (_ctx, evt) => evt.token === '<',
               },
-            }
+            },
           },
           tag: {
             on: {
@@ -237,16 +238,14 @@ export default createMachine<MachineCtx>(
                   target: 'children',
                   actions: 'consumeParameters',
                   cond: (ctx, evt) =>
-                    evt.data.lastEvent.token !== '/>'
-                      && (
-                        (!ctx.key.keyName && !evt.data.keyName)
-                          || (!ctx.key.defaultValue && !evt.data.defaultValue)
-                      ),
+                    evt.data.lastEvent.token !== '/>' &&
+                    ((!ctx.key.keyName && !evt.data.keyName) ||
+                      (!ctx.key.defaultValue && !evt.data.defaultValue)),
                 },
                 {
                   target: 'idle',
                   actions: ['consumeParameters', 'pushKey'],
-                }
+                },
               ],
             },
             on: {
@@ -259,7 +258,7 @@ export default createMachine<MachineCtx>(
             on: {
               'punctuation.definition.tag.begin.tsx': {
                 target: 'idle',
-                actions: [ 'consumeChildren', 'pushKey' ],
+                actions: ['consumeChildren', 'pushKey'],
               },
 
               'meta.jsx.children.tsx': {
@@ -274,9 +273,9 @@ export default createMachine<MachineCtx>(
               'string.template.ts': {
                 actions: 'appendChildren',
               },
-            }
-          }
-        }
+            },
+          },
+        },
       },
       t: {
         initial: 'idle',
@@ -287,7 +286,7 @@ export default createMachine<MachineCtx>(
                 target: 'func',
                 cond: (ctx, evt) => !!ctx.hooks.length && evt.token === 't',
               },
-            }
+            },
           },
           func: {
             on: {
@@ -298,7 +297,7 @@ export default createMachine<MachineCtx>(
                 target: 'call',
                 cond: (_ctx, evt) => evt.token === '(',
               },
-            }
+            },
           },
           call: {
             on: {
@@ -315,7 +314,7 @@ export default createMachine<MachineCtx>(
                 cond: (_ctx, evt) => evt.token === ')',
                 actions: 'pushKey',
               },
-            }
+            },
           },
           param_string: {
             on: {
@@ -323,13 +322,13 @@ export default createMachine<MachineCtx>(
                 {
                   target: 'call',
                   actions: ['storeKeyName', 'storeKeyCurrentNamespace'],
-                  cond: (ctx) => !ctx.key.keyName
+                  cond: (ctx) => !ctx.key.keyName,
                 },
                 {
                   target: 'call',
                   actions: ['storeKeyDefault', 'storeKeyCurrentNamespace'],
-                  cond: (ctx) => !!ctx.key.keyName
-                }
+                  cond: (ctx) => !!ctx.key.keyName,
+                },
               ],
             },
           },
@@ -348,9 +347,9 @@ export default createMachine<MachineCtx>(
               },
             },
           },
-        }
+        },
       },
-    }
+    },
   },
   {
     actions: {
@@ -422,4 +421,4 @@ export default createMachine<MachineCtx>(
       }),
     },
   }
-)
+);

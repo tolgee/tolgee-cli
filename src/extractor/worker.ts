@@ -66,9 +66,15 @@ function getWorker(): Worker {
       const deferred = queries.get(m.id);
       queries.delete(m.id);
 
-      if (!deferred) return;
-      if ('data' in m) deferred.resolve(m.data);
-      if ('err' in m) deferred.reject(m.err);
+      if (!deferred) {
+        return;
+      }
+
+      if ('data' in m) {
+        deferred.resolve(m.data);
+      } else {
+        deferred.reject(m.err);
+      }
     });
 
     // Let the process exit even if the worker is alive

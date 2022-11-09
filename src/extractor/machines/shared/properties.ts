@@ -53,13 +53,14 @@ export default createMachine<PropertiesContext>(
         on: {
           // On string
           'punctuation.definition.string.begin.ts': 'complex_key_string',
-          'punctuation.definition.string.template.begin.ts': 'complex_key_string',
+          'punctuation.definition.string.template.begin.ts':
+            'complex_key_string',
 
           // Key end
           'meta.brace.square.ts': {
             target: 'idle',
-            cond: 'isCloseSquare'
-          }
+            cond: 'isCloseSquare',
+          },
         },
       },
       complex_key_string: {
@@ -137,7 +138,9 @@ export default createMachine<PropertiesContext>(
       }),
       storePropertyValue: assign({
         keyName: (ctx, evt) =>
-          ctx.property === 'key' || ctx.property === 'keyName' ? evt.token : ctx.keyName,
+          ctx.property === 'key' || ctx.property === 'keyName'
+            ? evt.token
+            : ctx.keyName,
         defaultValue: (ctx, evt) =>
           ctx.property === 'defaultValue' ? evt.token : ctx.defaultValue,
         namespace: (ctx, evt) =>

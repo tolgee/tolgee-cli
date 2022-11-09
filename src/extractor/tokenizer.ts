@@ -19,17 +19,10 @@ const enum Grammar {
   TYPESCRIPT_TSX = 'source.tsx',
 }
 
+const GRAMMAR_PATH = join(__dirname, 'textmate');
 const GrammarFiles: Record<Grammar, string> = {
-  [Grammar.TYPESCRIPT]: join(
-    __dirname,
-    'textmate',
-    'TypeScript.tmLanguage'
-  ),
-  [Grammar.TYPESCRIPT_TSX]: join(
-    __dirname,
-    'textmate',
-    'TypeScriptReact.tmLanguage'
-  ),
+  [Grammar.TYPESCRIPT]: join(GRAMMAR_PATH, 'TypeScript.tmLanguage'),
+  [Grammar.TYPESCRIPT_TSX]: join(GRAMMAR_PATH, 'TypeScriptReact.tmLanguage'),
 };
 
 let oniguruma: Promise<IOnigLib>;
@@ -78,20 +71,20 @@ function* tokenize(code: string, grammar: IGrammar) {
 
       // Opinionated take: if a token is scope-less, chances are we don't care about it.
       // Ditching it allows us to reduce complexity from the state machine's POV.
-      if (token.scopes.length === 1) continue
+      if (token.scopes.length !== 1) {
+        const codeToken = code.slice(
+          linePtr + token.startIndex,
+          linePtr + token.endIndex
+        );
 
-      const codeToken = code.slice(
-        linePtr + token.startIndex,
-        linePtr + token.endIndex
-      );
-
-      yield <Token>{
-        type: token.scopes[token.scopes.length - 1],
-        token: codeToken,
-        startIndex: linePtr + token.startIndex,
-        endIndex: linePtr + token.endIndex,
-        scopes: token.scopes,
-      };
+        yield <Token>{
+          type: token.scopes[token.scopes.length - 1],
+          token: codeToken,
+          startIndex: linePtr + token.startIndex,
+          endIndex: linePtr + token.endIndex,
+          scopes: token.scopes,
+        };
+      }
     }
 
     linePtr += line.length + 1;
