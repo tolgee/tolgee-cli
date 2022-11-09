@@ -12,6 +12,24 @@ describe('Plain JavaScript', () => {
 
     it('extracts information from basic objects', async () => {
       const tokens = await tokenizer(
+        'const a = { key: "key1", defaultValue: \'default value\', ns: `ns1` test: 22 }',
+        FILE_NAME
+      );
+      for (const token of tokens) {
+        if (!machine.getSnapshot().done) {
+          machine.send(token);
+        }
+      }
+
+      const snapshot = machine.getSnapshot();
+      expect(snapshot.done).toBe(true);
+      expect(snapshot.context.keyName).toBe('key1');
+      expect(snapshot.context.defaultValue).toBe('default value');
+      expect(snapshot.context.namespace).toBe('ns1');
+    });
+
+    it('extracts key when using keyName', async () => {
+      const tokens = await tokenizer(
         'const a = { keyName: "key1", test: 22 }',
         FILE_NAME
       );
@@ -30,7 +48,7 @@ describe('Plain JavaScript', () => {
 
     it('does not extract information from nested objects', async () => {
       const tokens = await tokenizer(
-        'const a = { keyName: "key1", test: { defaultValue: "def value1" } }',
+        'const a = { key: "key1", test: { defaultValue: "def value1" } }',
         FILE_NAME
       );
       for (const token of tokens) {
@@ -50,7 +68,7 @@ describe('Plain JavaScript', () => {
       'ignores non-string values (%s)',
       async (value) => {
         const tokens = await tokenizer(
-          `const a = { keyName: ${value}, test: 22 }`,
+          `const a = { key: ${value}, test: 22 }`,
           FILE_NAME
         );
         for (const token of tokens) {
@@ -67,7 +85,7 @@ describe('Plain JavaScript', () => {
 
     it('ignores declaration shorthands', async () => {
       const tokens = await tokenizer(
-        'const a = { keyName, test: "something" }',
+        'const a = { key, test: "something" }',
         FILE_NAME
       );
       for (const token of tokens) {
@@ -85,7 +103,7 @@ describe('Plain JavaScript', () => {
 
     it('extracts static keys written as an expression', async () => {
       const tokens = await tokenizer(
-        'const a = { ["keyName"]: "key1", [`defaultValue`]: "def value1" }',
+        'const a = { ["key"]: "key1", [`defaultValue`]: "def value1" }',
         FILE_NAME
       );
       for (const token of tokens) {
@@ -109,7 +127,7 @@ describe('Plain JavaScript', () => {
 
     it('gracefully ignores "as" cast', async () => {
       const tokens = await tokenizer(
-        'const a = { keyName: "key1" as any, test: 22 }',
+        'const a = { key: "key1" as any, test: 22 }',
         FILE_NAME
       );
       for (const token of tokens) {
@@ -127,7 +145,7 @@ describe('Plain JavaScript', () => {
 
     it('gracefully ignores "as" cast in complex keys', async () => {
       const tokens = await tokenizer(
-        'const a = { ["keyName" as SomeEnum]: "key1", test: 22 }',
+        'const a = { ["key" as SomeEnum]: "key1", test: 22 }',
         FILE_NAME
       );
       for (const token of tokens) {
@@ -147,7 +165,7 @@ describe('Plain JavaScript', () => {
       // Test does not apply to TSX; <xxx> is interpreted as a component
       it('gracefully ignores prefix cast', async () => {
         const tokens = await tokenizer(
-          'const a = { keyName: <any> "key1", test: 22 }',
+          'const a = { key: <any> "key1", test: 22 }',
           FILE_NAME
         );
         for (const token of tokens) {
@@ -165,7 +183,7 @@ describe('Plain JavaScript', () => {
 
       it('gracefully ignores prefix cast in complex keys', async () => {
         const tokens = await tokenizer(
-          'const a = { [<SomeEnum> "keyName"]: "key1", test: 22 }',
+          'const a = { [<SomeEnum> "key"]: "key1", test: 22 }',
           FILE_NAME
         );
         for (const token of tokens) {
@@ -192,7 +210,7 @@ describe('JSX', () => {
 
     it('extracts from plain JavaScript objects', async () => {
       const tokens = await tokenizer(
-        'const a = { keyName: "key1", test: 22 }',
+        'const a = { key: "key1", test: 22 }',
         FILE_NAME
       );
       for (const token of tokens) {

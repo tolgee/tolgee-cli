@@ -184,13 +184,70 @@ describe.each([ 'js', 'ts', 'jsx', 'tsx' ])('React.createElement (.%s)', (ext) =
 describe.each([ 'js', 'ts', 'jsx', 'tsx' ])('useTranslate (.%s)', (ext) => {
   const FILE_NAME = `test.${ext}`
 
-  it('extracts from the t call', async () => {
+  it('extracts from the t call with signature t(string))', async () => {
     const expected = [{ keyName: 'key1' }];
 
     const code = `
       function Test () {
         const { t } = useTranslate()
         t('key1')
+      }
+    `;
+
+    const extracted = await extractKeys(code, FILE_NAME);
+    expect(extracted).toEqual(expected);
+  });
+
+  it('extracts from the t call with signature t(string, string)', async () => {
+    const expected = [{ keyName: 'key1', defaultValue: 'default value' }];
+
+    const code = `
+      function Test () {
+        const { t } = useTranslate()
+        t('key1', 'default value')
+      }
+    `;
+
+    const extracted = await extractKeys(code, FILE_NAME);
+    expect(extracted).toEqual(expected);
+  });
+
+  it('extracts from the t call with signature t(string, string, opts)', async () => {
+    const expected = [{ keyName: 'key1', defaultValue: 'default value', namespace: 'ns' }];
+
+    const code = `
+      function Test () {
+        const { t } = useTranslate()
+        t('key1', 'default value', { ns: 'ns', defaultValue: 'ignored' })
+      }
+    `;
+
+    const extracted = await extractKeys(code, FILE_NAME);
+    expect(extracted).toEqual(expected);
+  });
+
+  it('extracts from the t call with signature t(string, opts)', async () => {
+    const expected = [{ keyName: 'key1', defaultValue: 'default value', namespace: 'ns' }];
+
+    const code = `
+      function Test () {
+        const { t } = useTranslate()
+        t('key1', { defaultValue: 'default value', ns: 'ns' })
+      }
+    `;
+
+    const extracted = await extractKeys(code, FILE_NAME);
+    expect(extracted).toEqual(expected);
+  });
+
+
+  it('extracts from the t call with signature t(opts)', async () => {
+    const expected = [{ keyName: 'key1', defaultValue: 'default value', namespace: 'ns' }];
+
+    const code = `
+      function Test () {
+        const { t } = useTranslate()
+        t({ key: 'key1', defaultValue: 'default value', ns: 'ns' })
       }
     `;
 

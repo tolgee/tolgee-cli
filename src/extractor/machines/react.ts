@@ -302,9 +302,14 @@ export default createMachine<MachineCtx>(
           },
           call: {
             on: {
-              'punctuation.definition.string.begin.ts': 'key',
-              'punctuation.definition.string.template.begin.ts': 'key',
-              'punctuation.separator.comma.ts': 'params',
+              'punctuation.definition.string.begin.ts': 'param_string',
+              'punctuation.definition.string.template.begin.ts': 'param_string',
+              'punctuation.definition.block.ts': {
+                target: 'param_object',
+                // Replay event for child machine
+                actions: send((_ctx, evt) => evt),
+                cond: (_ctx, evt) => evt.token === '{',
+              },
               'meta.brace.round.ts': {
                 target: 'idle',
                 cond: (_ctx, evt) => evt.token === ')',
@@ -312,15 +317,23 @@ export default createMachine<MachineCtx>(
               },
             }
           },
-          key: {
+          param_string: {
             on: {
-              '*': {
-                target: 'call',
-                actions: ['storeKeyName', 'storeKeyCurrentNamespace'],
-              },
+              '*': [
+                {
+                  target: 'call',
+                  actions: ['storeKeyName', 'storeKeyCurrentNamespace'],
+                  cond: (ctx) => !ctx.key.keyName
+                },
+                {
+                  target: 'call',
+                  actions: ['storeKeyDefault', 'storeKeyCurrentNamespace'],
+                  cond: (ctx) => !!ctx.key.keyName
+                }
+              ],
             },
           },
-          params: {
+          param_object: {
             invoke: {
               id: 'propertiesMachine',
               src: propertiesMachine,
@@ -361,8 +374,10 @@ export default createMachine<MachineCtx>(
 
       consumeParameters: assign({
         key: (ctx, evt) => ({
-          keyName: evt.data.keyName ?? ctx.key.keyName,
-          defaultValue: evt.data.defaultValue ?? ctx.key.defaultValue,
+          // We don't want the key and default value to be overridable
+          // But we DO want the namespace to be overridable
+          keyName: ctx.key.keyName || evt.data.keyName,
+          defaultValue: ctx.key.defaultValue || evt.data.defaultValue,
           namespace: evt.data.namespace ?? ctx.key.namespace,
         }),
       }),

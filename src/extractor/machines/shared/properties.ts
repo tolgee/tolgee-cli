@@ -137,7 +137,7 @@ export default createMachine<PropertiesContext>(
       }),
       storePropertyValue: assign({
         keyName: (ctx, evt) =>
-          ctx.property === 'keyName' ? evt.token : ctx.keyName,
+          ctx.property === 'key' || ctx.property === 'keyName' ? evt.token : ctx.keyName,
         defaultValue: (ctx, evt) =>
           ctx.property === 'defaultValue' ? evt.token : ctx.defaultValue,
         namespace: (ctx, evt) =>
