@@ -274,6 +274,25 @@ describe('JSX', () => {
       expect(snapshot.context.namespace).toBeNull();
     });
 
+    it('is undisturbed by objects within properties', async () => {
+      const tokens = await tokenizer(
+        '<T properties={{ a: "b" }} keyName={"key1"}/>',
+        FILE_NAME
+      );
+      for (const token of tokens) {
+        console.log(token)
+        if (!machine.getSnapshot().done) {
+          machine.send(token);
+        }
+      }
+
+      const snapshot = machine.getSnapshot();
+      expect(snapshot.done).toBe(true);
+      expect(snapshot.context.keyName).toBe('key1');
+      expect(snapshot.context.defaultValue).toBeNull();
+      expect(snapshot.context.namespace).toBeNull();
+    });
+
     it('reaches completion if there are no properties', async () => {
       const tokens = await tokenizer('<T></T>', FILE_NAME);
       for (const token of tokens) {
@@ -299,6 +318,7 @@ describe('JSX', () => {
     });
   });
 
+  
   // There is nothing to test for TSX specifically;
   // Leaving this so the person who'll stumble across a TSX quirk can laugh at me via `git blame` (and write tests :p)
   // describe('TSX', () => {})

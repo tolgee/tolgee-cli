@@ -530,6 +530,17 @@ describe.each(['jsx', 'tsx'])('<T> (.%s)', (ext) => {
     expect(extracted).toEqual(expected);
   });
 
+  it('is undisturbed by objects in properties', async () => {
+    const expected = [{ keyName: 'key1', defaultValue: 'value' }];
+
+    const code = `
+      <T properties={{ a: 'b' }} keyName='key1'>value</T>
+    `;
+
+    const extracted = await extractKeys(code, FILE_NAME);
+    expect(extracted).toEqual(expected);
+  });
+
   it('handles multiline use', async () => {
     const expected = [
       { keyName: 'key1', namespace: 'ns1', defaultValue: 'default value1' },

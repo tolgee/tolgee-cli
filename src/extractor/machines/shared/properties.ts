@@ -125,8 +125,8 @@ export default createMachine<PropertiesContext>(
   },
   {
     guards: {
-      isOpenCurly: (_ctx, evt) => evt.token === '{',
-      isCloseCurly: (_ctx, evt) => evt.token === '}',
+      isOpenCurly: (_ctx, evt) => evt.token === '{' && !evt.scopes.includes('meta.embedded.expression.tsx'),
+      isCloseCurly: (_ctx, evt) => evt.token === '}' && !evt.scopes.includes('meta.embedded.expression.tsx'),
       isFinalCloseCurly: (ctx, evt) => evt.token === '}' && ctx.depth === 1,
       isOpenSquare: (_ctx, evt) => evt.token === '[',
       isCloseSquare: (_ctx, evt) => evt.token === ']',

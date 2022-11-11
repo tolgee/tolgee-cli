@@ -1,6 +1,7 @@
 import type { Deferred } from '../utils/deferred';
 
-import { extname } from 'path';
+import { cpus } from 'os';
+import { resolve, extname } from 'path';
 import { Worker, isMainThread, parentPort } from 'worker_threads';
 import { readFile } from 'fs/promises';
 
@@ -10,6 +11,7 @@ import { createDeferred } from '../utils/deferred';
 export type WorkerParams = { extractor: string; file: string };
 
 const IS_TS_NODE = extname(__filename) === '.ts';
+const MAX_THREADS = cpus().length
 
 // --- Worker functions
 
@@ -26,15 +28,16 @@ async function handleJob(args: WorkerParams) {
     await loadExtractor(args.extractor);
   }
 
-  const code = await readFile(args.file, 'utf8');
-  return extractor(code);
+  const file = resolve(args.file)
+  const code = await readFile(file, 'utf8');
+  return extractor(code, file);
 }
 
 async function workerInit() {
   parentPort!.on('message', (msg) => {
-    handleJob(msg.data)
-      .then((res) => parentPort!.postMessage({ id: msg.id, data: res }))
-      .catch((e) => parentPort!.postMessage({ id: msg.id, err: e }));
+    handleJob(msg)
+      .then((res) => parentPort!.postMessage({ data: res }))
+      .catch((e) => parentPort!.postMessage({ err: e }));
   });
 }
 
@@ -42,60 +45,57 @@ if (!isMainThread) workerInit();
 
 // --- Main thread functions
 
-let queryId = 0;
-let worker: Worker | null;
-const queries: Map<number, Deferred<string[]>> = new Map();
+const workers = new Set<Worker>()
+const jobQueue: Array<[ WorkerParams, Deferred ]> = []
 
-function clearWorker() {
-  worker = null;
-  for (const deferred of queries.values()) {
-    deferred.reject('aborted');
-  }
-  queries.clear();
-}
+function createWorker () {
+  const worker = new Worker(__filename, {
+    // ts-node workaround
+    execArgv: IS_TS_NODE ? ['--require', 'ts-node/register'] : undefined,
+  });
 
-function getWorker(): Worker {
-  if (!worker) {
-    worker = new Worker(__filename, {
-      // ts-node workaround
-      execArgv: IS_TS_NODE ? ['--require', 'ts-node/register'] : undefined,
-    });
+  let timeout: NodeJS.Timeout
+  let currentDeferred: Deferred
 
-    worker.once('exit', clearWorker);
-    worker.on('message', (m) => {
-      const deferred = queries.get(m.id);
-      queries.delete(m.id);
+  function workOrDie () {
+    const job = jobQueue.shift()
+    if (!job) {
+      worker.terminate()
+      return
+    }
 
-      if (!deferred) {
-        return;
-      }
-
-      if ('data' in m) {
-        deferred.resolve(m.data);
-      } else {
-        deferred.reject(m.err);
-      }
-    });
-
-    // Let the process exit even if the worker is alive
-    worker.unref();
+    worker.postMessage(job[0])
+    currentDeferred = job[1]
+    timeout = setTimeout(() => {
+      worker.terminate()
+      currentDeferred.reject(new Error('aborted'))
+    }, 10e3)
   }
 
-  return worker;
+  worker.on('message', (msg) => {
+    if ('data' in msg) {
+      currentDeferred.resolve(msg.data)
+    } else {
+      currentDeferred.reject(msg.err)
+    }
+
+    clearTimeout(timeout)
+    workOrDie()
+  })
+
+  workOrDie()
+  return worker
 }
 
 export async function callWorker(params: WorkerParams) {
-  const worker = getWorker();
-  const deferred = createDeferred<string[]>();
-  const id = queryId++;
+  const deferred = createDeferred()
+  jobQueue.push([ params, deferred ])
 
-  // Send request to the worker
-  queries.set(id, deferred);
-  worker.postMessage({ id: id, data: params });
-
-  // Timeout
-  const timer = setTimeout(() => worker.terminate(), 10e3);
-  deferred.promise.finally(() => clearTimeout(timer));
+  if (workers.size < MAX_THREADS) {
+    const worker = createWorker()
+    worker.once('exit', () => workers.delete(worker))
+    workers.add(worker)
+  }
 
   return deferred.promise;
 }

@@ -12,6 +12,8 @@ import { loadModule } from '../utils/moduleLoader';
 import { promisify } from 'util';
 const glob = promisify(globCb);
 
+export type Key = { keyName: string; defaultValue?: string; namespace?: string };
+
 export type PossibleKey = {
   fileName: string;
   line: number;
@@ -77,7 +79,7 @@ function findPossibleKeys(content: string) {
   return res;
 }
 
-export async function extractKeysFromFile(extractor: string, file: string) {
+export async function extractKeysFromFile(file: string, extractor: string) {
   return callWorker({
     extractor: resolveExtractor(extractor),
     file: file,
@@ -85,16 +87,16 @@ export async function extractKeysFromFile(extractor: string, file: string) {
 }
 
 export async function extractKeysOfFiles(
+  filesPattern: string,
   extractor: string,
-  filesPattern: string
 ) {
   const files = await glob(filesPattern, { nodir: true });
-  const result = new Map<string, string[]>();
+  const result = new Map<string, Key[]>();
 
   // Done as a map to allow pseudoconcurrent execution
   await Promise.all(
     files.map(async (file) => {
-      const keys = await extractKeysFromFile(extractor, file);
+      const keys = await extractKeysFromFile(file, extractor);
       result.set(file, keys);
     })
   );

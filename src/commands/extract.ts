@@ -1,7 +1,7 @@
 import type Client from '../client';
 import { Command } from 'commander';
 
-import extractKeys from '../extractor';
+import extractKeys, { extractKeysOfFiles } from '../extractor';
 
 type BaseExtractOptions = {
   extractor: string;
@@ -39,10 +39,26 @@ async function fetchAllKeys(client: Client) {
 
 async function printHandler(this: Command, filesPattern: string) {
   const opts: ExtractPrintOptions = this.optsWithGlobals();
-  const keys = await extractKeys(filesPattern, opts);
+  const extracted = await extractKeysOfFiles(filesPattern, opts.extractor);
 
-  for (const key of keys.keys) console.log(key);
-  console.log(`Found: ${keys.keys.length} keys.`);
+  const keySet = new Set()
+  // console.log(extracted)
+  for (const [ file, keys ] of extracted) {
+    if (keys.length) {
+      console.log(file)
+      for (const key of keys) {
+        keySet.add(key)
+        console.log('\t%s', key.keyName)
+        if (key.defaultValue) console.log('\t\t%s', key.defaultValue)
+      }
+      console.log()
+    }
+  }
+
+  console.log('Total unique keys: %d', keySet.size)
+
+  // for (const key of keys.keys) console.log(key);
+  // console.log(`Found: ${keys.keys.length} keys.`);
 }
 
 async function compareHandler(this: Command, filesPattern: string) {

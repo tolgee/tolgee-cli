@@ -19,7 +19,7 @@ const enum Grammar {
   TYPESCRIPT_TSX = 'source.tsx',
 }
 
-const GRAMMAR_PATH = join(__dirname, 'textmate');
+const GRAMMAR_PATH = join(__dirname, '..', '..', 'textmate');
 const GrammarFiles: Record<Grammar, string> = {
   [Grammar.TYPESCRIPT]: join(GRAMMAR_PATH, 'TypeScript.tmLanguage'),
   [Grammar.TYPESCRIPT_TSX]: join(GRAMMAR_PATH, 'TypeScriptReact.tmLanguage'),

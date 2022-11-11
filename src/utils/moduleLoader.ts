@@ -1,30 +1,49 @@
-import vm from 'vm';
-import { readFile } from 'fs/promises';
+import { extname } from 'path'
+import type { Service } from 'ts-node'
 
-async function importTypeScript(module: string) {
-  const ts = await import('typescript');
-  const rawScript = await readFile(module, 'utf8');
-  const transpiled = ts.transpileModule(rawScript, {
-    compilerOptions: { module: ts.ModuleKind.CommonJS },
-  }).outputText;
+let tsService: Service
 
-  const vmExports = { __esModule: false };
-  const vmMdl = { exports: vmExports };
+function realImport(file: string) {
+  return eval('import(file)')
+}
 
-  const vmCtx = {
-    ...globalThis,
-    console: console,
-    module: vmMdl,
-    exports: vmExports,
-  };
+async function registerTsNode () {
+  if (!tsService) {
+    try {
+      const tsNode = require('ts-node')
+      tsService = tsNode.register({ compilerOptions: { module: 'CommonJS' } })
+    } catch (e: any) {
+      if (e.code === 'ERR_MODULE_NOT_FOUND') {
+        throw new Error('ts-node is required to load TypeScript files.')
+      }
+      throw e
+    }
+  }
+}
 
-  vm.runInNewContext(transpiled, vmCtx, { filename: module });
+async function importTypeScript(file: string) {
+  if (extname(__filename) === '.ts') {
+    return require(file)
+  }
 
-  return vmMdl.exports.__esModule ? vmMdl.exports : { default: vmMdl.exports };
+  await registerTsNode()
+
+  tsService.enabled(true)
+  const mdl = await realImport(file)
+  tsService.enabled(false)
+
+  return mdl
 }
 
 export async function loadModule(module: string) {
-  return module.endsWith('.ts')
-    ? importTypeScript(module)
-    : eval('import(module)'); // eval'd to prevent conversion to `require` by TypeScript
+  if (module.endsWith('.ts')) {
+    return importTypeScript(module)
+  }
+
+  const mdl = await realImport(module);
+  if (mdl.default?.default) {
+    return mdl.default
+  }
+
+  return mdl
 }

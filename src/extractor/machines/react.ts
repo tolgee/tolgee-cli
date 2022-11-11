@@ -1,4 +1,4 @@
-import { createMachine, assign, send, forwardTo } from 'xstate';
+import { createMachine, assign, forwardTo } from 'xstate';
 import propertiesMachine from './shared/properties';
 
 type HookVisibility = { depth: number; namespace?: string };
@@ -137,8 +137,6 @@ export default createMachine<MachineCtx>(
               'constant.language.null.ts': 'children',
               'punctuation.definition.block.ts': {
                 target: 'props_object',
-                // Replay event for child machine
-                actions: send((_ctx, evt) => evt),
                 cond: (_ctx, evt) => evt.token === '{',
               },
             },
@@ -147,6 +145,9 @@ export default createMachine<MachineCtx>(
             invoke: {
               id: 'propertiesMachine',
               src: propertiesMachine,
+              data: {
+                depth: 1,
+              },
               onDone: [
                 {
                   target: 'children',
@@ -305,8 +306,6 @@ export default createMachine<MachineCtx>(
               'punctuation.definition.string.template.begin.ts': 'param_string',
               'punctuation.definition.block.ts': {
                 target: 'param_object',
-                // Replay event for child machine
-                actions: send((_ctx, evt) => evt),
                 cond: (_ctx, evt) => evt.token === '{',
               },
               'meta.brace.round.ts': {
@@ -336,6 +335,9 @@ export default createMachine<MachineCtx>(
             invoke: {
               id: 'propertiesMachine',
               src: propertiesMachine,
+              data: {
+                depth: 1,
+              },
               onDone: {
                 target: 'idle',
                 actions: ['consumeParameters', 'pushKey'],
@@ -409,14 +411,17 @@ export default createMachine<MachineCtx>(
       }),
 
       pushKey: assign({
-        keys: (ctx, _evt) => [
-          ...ctx.keys,
-          {
-            keyName: ctx.key.keyName!.trim(),
-            namespace: ctx.key.namespace?.trim(),
-            defaultValue: ctx.key.defaultValue?.trim().replace(/\s+/g, ' '),
-          },
-        ],
+        keys: (ctx, _evt) => {
+          if (!ctx.key.keyName) return ctx.keys
+          return [
+            ...ctx.keys,
+            {
+              keyName: ctx.key.keyName.trim(),
+              namespace: ctx.key.namespace?.trim(),
+              defaultValue: ctx.key.defaultValue?.trim().replace(/\s+/g, ' '),
+            },
+          ]
+        },
         key: (_ctx, _evt) => ({ keyName: '' }),
       }),
     },
