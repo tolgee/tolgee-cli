@@ -64,43 +64,6 @@ describe('Plain JavaScript', () => {
       expect(snapshot.context.namespace).toBeNull();
     });
 
-    it.each(['22', 'true', '{ test: true }', '[ 1, 2, 3 ]'])(
-      'ignores non-string values (%s)',
-      async (value) => {
-        const tokens = await tokenizer(
-          `const a = { key: ${value}, test: 22 }`,
-          FILE_NAME
-        );
-        for (const token of tokens) {
-          machine.send(token);
-        }
-
-        const snapshot = machine.getSnapshot();
-        expect(snapshot.done).toBe(true);
-        expect(snapshot.context.keyName).toBeNull();
-        expect(snapshot.context.defaultValue).toBeNull();
-        expect(snapshot.context.namespace).toBeNull();
-      }
-    );
-
-    it('ignores declaration shorthands', async () => {
-      const tokens = await tokenizer(
-        'const a = { key, test: "something" }',
-        FILE_NAME
-      );
-      for (const token of tokens) {
-        if (!machine.getSnapshot().done) {
-          machine.send(token);
-        }
-      }
-
-      const snapshot = machine.getSnapshot();
-      expect(snapshot.done).toBe(true);
-      expect(snapshot.context.keyName).toBeNull();
-      expect(snapshot.context.defaultValue).toBeNull();
-      expect(snapshot.context.namespace).toBeNull();
-    });
-
     it('extracts static keys written as an expression', async () => {
       const tokens = await tokenizer(
         'const a = { ["key"]: "key1", [`defaultValue`]: "def value1" }',
@@ -118,6 +81,80 @@ describe('Plain JavaScript', () => {
       expect(snapshot.context.defaultValue).toBe('def value1');
       expect(snapshot.context.namespace).toBeNull();
     });
+
+    describe('dynamic data', () => {
+      it('marks templates with ${} chunks as dynamic', async () => {
+        const tokens = await tokenizer(
+          'const a = { key: `dynamic-${i}`, test: "something" }',
+          FILE_NAME
+        );
+        for (const token of tokens) {
+          if (!machine.getSnapshot().done) {
+            machine.send(token);
+          }
+        }
+
+        const snapshot = machine.getSnapshot();
+        expect(snapshot.done).toBe(true);
+        expect(snapshot.context.keyName).toBe(false);
+        expect(snapshot.context.defaultValue).toBeNull();
+        expect(snapshot.context.namespace).toBeNull();
+      });
+
+      it('marks strings with concatenations as dynamic', async () => {
+        const tokens = await tokenizer(
+          'const a = { key: "dynamic-" + i, test: "something" }',
+          FILE_NAME
+        );
+        for (const token of tokens) {
+          if (!machine.getSnapshot().done) {
+            machine.send(token);
+          }
+        }
+
+        const snapshot = machine.getSnapshot();
+        expect(snapshot.done).toBe(true);
+        expect(snapshot.context.keyName).toBe(false);
+        expect(snapshot.context.defaultValue).toBeNull();
+        expect(snapshot.context.namespace).toBeNull();
+      });
+
+      it('marks plain variables as dynamic', async () => {
+        const tokens = await tokenizer(
+          'const a = { key: key, test: "something" }',
+          FILE_NAME
+        );
+        for (const token of tokens) {
+          if (!machine.getSnapshot().done) {
+            machine.send(token);
+          }
+        }
+
+        const snapshot = machine.getSnapshot();
+        expect(snapshot.done).toBe(true);
+        expect(snapshot.context.keyName).toBe(false);
+        expect(snapshot.context.defaultValue).toBeNull();
+        expect(snapshot.context.namespace).toBeNull();
+      });
+
+      it('marks declaration shorthand as dynamic', async () => {
+        const tokens = await tokenizer(
+          'const a = { key, v: keyName, test: "something", ns }',
+          FILE_NAME
+        );
+        for (const token of tokens) {
+          if (!machine.getSnapshot().done) {
+            machine.send(token);
+          }
+        }
+
+        const snapshot = machine.getSnapshot();
+        expect(snapshot.done).toBe(true);
+        expect(snapshot.context.keyName).toBe(false);
+        expect(snapshot.context.defaultValue).toBeNull();
+        expect(snapshot.context.namespace).toBe(false);
+      });
+    })
   });
 
   describe.each(['ts', 'tsx'])('TypeScript (.%s)', (ext) => {
@@ -256,31 +293,12 @@ describe('JSX', () => {
       expect(snapshot.context.namespace).toBeNull();
     });
 
-    it('ignores boolean shorthands', async () => {
-      const tokens = await tokenizer(
-        '<T keyName someValue={"key1"}/>',
-        FILE_NAME
-      );
-      for (const token of tokens) {
-        if (!machine.getSnapshot().done) {
-          machine.send(token);
-        }
-      }
-
-      const snapshot = machine.getSnapshot();
-      expect(snapshot.done).toBe(true);
-      expect(snapshot.context.keyName).toBeNull();
-      expect(snapshot.context.defaultValue).toBeNull();
-      expect(snapshot.context.namespace).toBeNull();
-    });
-
     it('is undisturbed by objects within properties', async () => {
       const tokens = await tokenizer(
         '<T properties={{ a: "b" }} keyName={"key1"}/>',
         FILE_NAME
       );
       for (const token of tokens) {
-        console.log(token)
         if (!machine.getSnapshot().done) {
           machine.send(token);
         }
@@ -316,9 +334,82 @@ describe('JSX', () => {
       const snapshot = machine.getSnapshot();
       expect(snapshot.done).toBe(true);
     });
+
+    describe('dynamic data', () => {
+      it('marks templates with ${} chunks as dynamic', async () => {
+        const tokens = await tokenizer(
+          '<T keyName={`dynamic-${i}`}/>',
+          FILE_NAME
+        );
+        for (const token of tokens) {
+          if (!machine.getSnapshot().done) {
+            machine.send(token);
+          }
+        }
+
+        const snapshot = machine.getSnapshot();
+        expect(snapshot.done).toBe(true);
+        expect(snapshot.context.keyName).toBe(false);
+        expect(snapshot.context.defaultValue).toBeNull();
+        expect(snapshot.context.namespace).toBeNull();
+      });
+
+      it('marks strings with concatenations as dynamic', async () => {
+        const tokens = await tokenizer(
+          '<T ns="heh" keyName={"dynamic-" + i}/>',
+          FILE_NAME
+        );
+        for (const token of tokens) {
+          if (!machine.getSnapshot().done) {
+            machine.send(token);
+          }
+        }
+
+        const snapshot = machine.getSnapshot();
+        expect(snapshot.done).toBe(true);
+        expect(snapshot.context.keyName).toBe(false);
+        expect(snapshot.context.defaultValue).toBeNull();
+        expect(snapshot.context.namespace).toBe('heh');
+      });
+
+      it('marks plain variables as dynamic', async () => {
+        const tokens = await tokenizer(
+          '<T keyName={key}/>',
+          FILE_NAME
+        );
+        for (const token of tokens) {
+          if (!machine.getSnapshot().done) {
+            machine.send(token);
+          }
+        }
+
+        const snapshot = machine.getSnapshot();
+        expect(snapshot.done).toBe(true);
+        expect(snapshot.context.keyName).toBe(false);
+        expect(snapshot.context.defaultValue).toBeNull();
+        expect(snapshot.context.namespace).toBeNull();
+      });
+
+      it('marks declaration shorthand as dynamic', async () => {
+        const tokens = await tokenizer(
+          '<T keyName someValue={"key1"} ns/>',
+          FILE_NAME
+        );
+        for (const token of tokens) {
+          if (!machine.getSnapshot().done) {
+            machine.send(token);
+          }
+        }
+
+        const snapshot = machine.getSnapshot();
+        expect(snapshot.done).toBe(true);
+        expect(snapshot.context.keyName).toBe(false);
+        expect(snapshot.context.defaultValue).toBeNull();
+        expect(snapshot.context.namespace).toBe(false);
+      });
+    })
   });
 
-  
   // There is nothing to test for TSX specifically;
   // Leaving this so the person who'll stumble across a TSX quirk can laugh at me via `git blame` (and write tests :p)
   // describe('TSX', () => {})

@@ -1,7 +1,7 @@
 import { writeFile } from 'fs/promises'
 import { Grammars, Licenses, Transformers } from './grammars.mjs'
 
-const TARGET_PATH = new URL('../src/extractor/textmate/', import.meta.url)
+const TARGET_PATH = new URL('../textmate/', import.meta.url)
 
 const downloaded = {}
 

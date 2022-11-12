@@ -12,5 +12,8 @@ export default async function (code: string, fileName: string) {
   }
 
   const snapshot = machine.getSnapshot();
-  return snapshot.context.keys;
+  return {
+    warnings: snapshot.context.warnings,
+    keys: snapshot.context.keys,
+  };
 }

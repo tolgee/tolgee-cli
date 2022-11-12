@@ -43,13 +43,23 @@ async function printHandler(this: Command, filesPattern: string) {
 
   const keySet = new Set()
   // console.log(extracted)
-  for (const [ file, keys ] of extracted) {
-    if (keys.length) {
+  for (const [ file, { keys, warnings } ] of extracted) {
+    if (keys.length || warnings.length) {
       console.log(file)
+    }
+
+    if (keys.length) {
       for (const key of keys) {
         keySet.add(key)
         console.log('\t%s', key.keyName)
         if (key.defaultValue) console.log('\t\t%s', key.defaultValue)
+      }
+      console.log()
+    }
+
+    if (warnings.length) {
+      for (const warning of warnings) {
+        console.log('\tline %d: %s', warning.line, warning.warning)
       }
       console.log()
     }

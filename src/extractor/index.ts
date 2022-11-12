@@ -13,6 +13,7 @@ import { promisify } from 'util';
 const glob = promisify(globCb);
 
 export type Key = { keyName: string; defaultValue?: string; namespace?: string };
+export type Warning = { warning: string, line: number };
 
 export type PossibleKey = {
   fileName: string;
@@ -91,7 +92,7 @@ export async function extractKeysOfFiles(
   extractor: string,
 ) {
   const files = await glob(filesPattern, { nodir: true });
-  const result = new Map<string, Key[]>();
+  const result = new Map<string, { keys: Key[], warnings: Warning[] }>();
 
   // Done as a map to allow pseudoconcurrent execution
   await Promise.all(

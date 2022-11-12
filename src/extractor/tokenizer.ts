@@ -63,12 +63,12 @@ function extnameToGrammar(extname: string) {
 function* tokenize(code: string, grammar: IGrammar) {
   let stack = INITIAL;
   let linePtr = 0;
-  for (const line of code.split('\n')) {
+  const lines = code.split('\n')
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i]
     const res = grammar.tokenizeLine(line, stack);
 
-    for (let i = 0; i < res.tokens.length; i++) {
-      const token = res.tokens[i];
-
+    for (const token of res.tokens) {
       // Opinionated take: if a token is scope-less, chances are we don't care about it.
       // Ditching it allows us to reduce complexity from the state machine's POV.
       if (token.scopes.length !== 1) {
@@ -80,6 +80,7 @@ function* tokenize(code: string, grammar: IGrammar) {
         yield <Token>{
           type: token.scopes[token.scopes.length - 1],
           token: codeToken,
+          line: i + 1,
           startIndex: linePtr + token.startIndex,
           endIndex: linePtr + token.endIndex,
           scopes: token.scopes,
