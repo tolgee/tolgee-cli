@@ -88,6 +88,15 @@ function* tokenize(code: string, grammar: IGrammar) {
       }
     }
 
+    yield <Token>{
+      type: 'newline',
+      token: '\n',
+      line: i + 1,
+      startIndex: linePtr + line.length,
+      endIndex: linePtr + line.length + 1,
+      scopes: [],
+    };
+
     linePtr += line.length + 1;
     stack = res.ruleStack;
   }

@@ -22,6 +22,7 @@
     "cosmiconfig": "^7.0.1",
     "form-data": "^4.0.0",
     "glob": "^8.0.3",
+    "json5": "^2.2.1",
     "undici": "^5.10.0",
     "vscode-oniguruma": "^1.6.2",
     "vscode-textmate": "^7.0.3",

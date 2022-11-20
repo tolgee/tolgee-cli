@@ -1,7 +1,8 @@
 import type { Key, Warning } from '../index.js'
 
-import { createMachine, assign, forwardTo } from 'xstate';
+import { createMachine, assign, send, forwardTo } from 'xstate';
 import propertiesMachine from './shared/properties';
+import commentsService from './shared/comments';
 
 type HookVisibility = { depth: number; namespace?: string | false };
 
@@ -14,6 +15,7 @@ type MachineCtx = {
 
   key: KeyWithDynamicNs;
   hooks: HookVisibility[];
+  ignore: null | { type: 'key' | 'ignore', line: number };
 
   keys: Key[];
   warnings: Warning[];
@@ -31,11 +33,46 @@ export default createMachine<MachineCtx>(
 
       key: { keyName: '' },
       hooks: [],
+      ignore: null,
 
       keys: [],
       warnings: [],
     },
     states: {
+      comments: {
+        invoke: {
+          id: 'comments',
+          src: () => commentsService
+        },
+        on: {
+          // Service messages
+          MAGIC_COMMENT: [
+            {
+              actions: 'ignoreNextLine',
+              cond: (_ctx, evt) => evt.kind === 'ignore',
+            },
+            {
+              actions: 'pushImmediateKey',
+              cond: (_ctx, evt) => evt.kind === 'key',
+            }
+          ],
+          WARNING: {
+            actions: 'pushWarning',
+          },
+
+          // Code messages
+          'comment.line.double-slash.ts': {
+            actions: send((_ctx, evt) => ({ type: 'COMMENT', data: evt.token, line: evt.line }), { to: 'comments' })
+          },
+          'comment.block.ts': {
+            actions: send((_ctx, evt) => ({ type: 'COMMENT', data: evt.token, line: evt.line }), { to: 'comments' })
+          },
+          'newline': {
+            actions: 'warnUnusedIgnore',
+            cond: (ctx, evt) => ctx.ignore?.type === 'ignore' && ctx.ignore.line === evt.line
+          }
+        }
+      },
       useTranslate: {
         initial: 'idle',
         states: {
@@ -51,12 +88,20 @@ export default createMachine<MachineCtx>(
           func: {
             on: {
               '*': 'idle',
+              'newline': undefined,
               'meta.block.ts': undefined,
               'meta.var.expr.ts': undefined,
-              'meta.brace.round.ts': {
-                target: 'call',
-                cond: (_ctx, evt) => evt.token === '(',
-              },
+              'meta.brace.round.ts': [
+                {
+                  target: 'idle',
+                  actions: 'consumeIgnoredLine',
+                  cond: (ctx, evt) => ctx.ignore?.line === ctx.line && ctx.ignore.type === 'ignore' && evt.token === '(',
+                },
+                {
+                  target: 'call',
+                  cond: (_ctx, evt) => evt.token === '(',
+                }
+              ],
             },
           },
           call: {
@@ -126,6 +171,7 @@ export default createMachine<MachineCtx>(
           func1: {
             on: {
               '*': 'idle',
+              'newline': undefined,
               'meta.function-call.ts': undefined,
               'punctuation.accessor.ts': {
                 target: 'func2',
@@ -136,6 +182,7 @@ export default createMachine<MachineCtx>(
           func2: {
             on: {
               '*': 'idle',
+              'newline': undefined,
               'meta.function-call.ts': undefined,
               'support.function.dom.ts': {
                 target: 'func3',
@@ -146,6 +193,7 @@ export default createMachine<MachineCtx>(
           func3: {
             on: {
               '*': 'idle',
+              'newline': undefined,
               'meta.function-call.ts': undefined,
               'meta.brace.round.ts': {
                 target: 'call',
@@ -156,10 +204,18 @@ export default createMachine<MachineCtx>(
           call: {
             on: {
               '*': 'idle',
-              'variable.other.constant.ts': {
-                target: 'props',
-                cond: (_ctx, evt) => evt.token === 'T',
-              },
+              'newline': undefined,
+              'variable.other.constant.ts': [
+                {
+                  target: 'idle',
+                  actions: 'consumeIgnoredLine',
+                  cond: (ctx, evt) => ctx.ignore?.line === ctx.line && evt.token === 'T',
+                },
+                {
+                  target: 'props',
+                  cond: (_ctx, evt) => evt.token === 'T',
+                },
+              ]
             },
           },
           props: {
@@ -222,6 +278,7 @@ export default createMachine<MachineCtx>(
               },
 
               // Void & punctuation
+              'newline': undefined,
               'meta.objectliteral.ts': undefined,
               'punctuation.separator.comma.ts': undefined,
 
@@ -284,11 +341,19 @@ export default createMachine<MachineCtx>(
           tag: {
             on: {
               '*': 'idle',
+              'newline': undefined,
               'meta.tag.ts': undefined,
-              'support.class.component.tsx': {
-                target: 'props',
-                cond: (_ctx, evt) => evt.token === 'T',
-              },
+              'support.class.component.tsx': [
+                {
+                  target: 'idle',
+                  actions: 'consumeIgnoredLine',
+                  cond: (ctx, evt) => ctx.ignore?.line === ctx.line && evt.token === 'T',
+                },
+                {
+                  target: 'props',
+                  cond: (_ctx, evt) => evt.token === 'T',
+                }
+              ],
             },
           },
           props: {
@@ -372,12 +437,20 @@ export default createMachine<MachineCtx>(
           func: {
             on: {
               '*': 'idle',
+              'newline': undefined,
               'meta.block.ts': undefined,
               'meta.var.expr.ts': undefined,
-              'meta.brace.round.ts': {
-                target: 'call',
-                cond: (_ctx, evt) => evt.token === '(',
-              },
+              'meta.brace.round.ts': [
+                {
+                  target: 'idle',
+                  actions: 'consumeIgnoredLine',
+                  cond: (ctx, evt) => ctx.ignore?.line === ctx.line && evt.token === '(',
+                },
+                {
+                  target: 'call',
+                  cond: (_ctx, evt) => evt.token === '(',
+                },
+              ],
             },
           },
           call: {
@@ -509,6 +582,19 @@ export default createMachine<MachineCtx>(
         line: (_ctx, evt) => evt.line,
       }),
 
+      ignoreNextLine: assign({
+        ignore: (_ctx, evt) => ({ type: 'ignore', line: evt.line + 1 }),
+      }),
+      consumeIgnoredLine: assign({
+        ignore: (_ctx, _evt) => null,
+      }),
+      warnUnusedIgnore: assign({
+        warnings: (ctx, evt) => [
+          ...ctx.warnings,
+          { warning: 'W_UNUSED_IGNORE', line: evt.line - 1 }
+        ]
+      }),
+
       pushHook: assign({
         hooks: (ctx) => [...ctx.hooks, { depth: ctx.blockDepth }],
       }),
@@ -635,6 +721,19 @@ export default createMachine<MachineCtx>(
         },
         key: (_ctx, _evt) => ({ keyName: '' }),
       }),
+      pushImmediateKey: assign({
+        ignore: (_ctx, evt) => ({ type: 'key', line: evt.line + 1 }),
+        keys: (ctx, evt) => [
+          ...ctx.keys,
+          { keyName: evt.keyName, namespace: evt.namespace, defaultValue: evt.defaultValue },
+        ],
+      }),
+      pushWarning: assign({
+        warnings: (ctx, evt) => [
+          ...ctx.warnings,
+          { warning: evt.kind, line: evt.line }
+        ]
+      })
     },
   }
 );
