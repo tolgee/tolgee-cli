@@ -21,6 +21,8 @@ type MachineCtx = {
   warnings: Warning[];
 };
 
+const VOID_KEY = { keyName: '', line: -1 }
+
 export default createMachine<MachineCtx>(
   {
     predictableActionArguments: true,
@@ -31,7 +33,7 @@ export default createMachine<MachineCtx>(
       children: '',
       line: 0,
 
-      key: { keyName: '' },
+      key: VOID_KEY,
       hooks: [],
       ignore: null,
 
@@ -622,6 +624,7 @@ export default createMachine<MachineCtx>(
           keyName: ctx.key.keyName || evt.data.keyName,
           defaultValue: ctx.key.defaultValue || evt.data.defaultValue || undefined,
           namespace: evt.data.namespace ?? ctx.key.namespace,
+          line: ctx.line,
         }),
         warnings: (ctx, evt) => {
           if (evt.data.defaultValue !== false) return ctx.warnings
@@ -641,7 +644,7 @@ export default createMachine<MachineCtx>(
             line: ctx.line,
           }
         ],
-        key: (_ctx, _evt) => ({ keyName: '' }),
+        key: (_ctx, _evt) => VOID_KEY,
       }),
 
       appendChildren: assign({
@@ -676,7 +679,7 @@ export default createMachine<MachineCtx>(
           ...ctx.warnings,
           { warning: 'W_DYNAMIC_KEY', line: ctx.line }
         ],
-        key: (_ctx, _evt) => ({ keyName: '' }),
+        key: (_ctx, _evt) => VOID_KEY,
       }),
       dynamicKeyDefault: assign({
         key: (ctx, _evt) => ({ ...ctx.key, defaultValue: undefined }),
@@ -688,7 +691,7 @@ export default createMachine<MachineCtx>(
       dynamicChildren: assign({
         key: (ctx, _evt) => ctx.key.keyName
           ? { ...ctx.key, defaultValue: undefined }
-          : { keyName: '' },
+          : VOID_KEY,
         warnings: (ctx, _evt) => [
           ...ctx.warnings,
           {
@@ -716,16 +719,17 @@ export default createMachine<MachineCtx>(
               keyName: ctx.key.keyName.trim(),
               namespace: ctx.key.namespace?.trim(),
               defaultValue: ctx.key.defaultValue?.trim().replace(/\s+/g, ' '),
+              line: ctx.line,
             },
           ]
         },
-        key: (_ctx, _evt) => ({ keyName: '' }),
+        key: (_ctx, _evt) => ({ keyName: '', line: 0, }),
       }),
       pushImmediateKey: assign({
         ignore: (_ctx, evt) => ({ type: 'key', line: evt.line + 1 }),
         keys: (ctx, evt) => [
           ...ctx.keys,
-          { keyName: evt.keyName, namespace: evt.namespace, defaultValue: evt.defaultValue },
+          { keyName: evt.keyName, namespace: evt.namespace, defaultValue: evt.defaultValue, line: evt.line },
         ],
       }),
       pushWarning: assign({

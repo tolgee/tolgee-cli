@@ -7,11 +7,11 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])(
 
     it('extracts keys specified as properties', async () => {
       const expected = [
-        { keyName: 'key1' },
-        { keyName: 'key2' },
-        { keyName: 'key3' },
-        { keyName: 'key4' },
-        { keyName: 'key5', defaultValue: 'not key6' },
+        { keyName: 'key1', line: 2 },
+        { keyName: 'key2', line: 3 },
+        { keyName: 'key3', line: 4 },
+        { keyName: 'key4', line: 5 },
+        { keyName: 'key5', defaultValue: 'not key6', line: 6 },
       ];
 
       const code = `
@@ -29,11 +29,11 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])(
 
     it('extracts keys specified as children', async () => {
       const expected = [
-        { keyName: 'key1' },
-        { keyName: 'key2' },
-        { keyName: 'key3' },
-        { keyName: 'key4' },
-        { keyName: 'key5' },
+        { keyName: 'key1', line: 2 },
+        { keyName: 'key2', line: 3 },
+        { keyName: 'key3', line: 4 },
+        { keyName: 'key4', line: 5 },
+        { keyName: 'key5', line: 6 },
       ];
 
       const code = `
@@ -50,7 +50,7 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])(
     });
 
     it('extracts the default value from children', async () => {
-      const expected = [{ keyName: 'key1', defaultValue: 'default value' }];
+      const expected = [{ keyName: 'key1', defaultValue: 'default value', line: 2 }];
 
       const code = `
         React.createElement(T, { keyName: 'key1' }, "default value")
@@ -62,7 +62,7 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])(
     });
 
     it('extracts the default value from props', async () => {
-      const expected = [{ keyName: 'key1', defaultValue: 'default value' }];
+      const expected = [{ keyName: 'key1', defaultValue: 'default value', line: 2 }];
 
       const code = `
         React.createElement(T, { keyName: 'key1' }, "default value")
@@ -74,7 +74,7 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])(
     });
 
     it('does not extract default value from children if a defaultValue prop is set', async () => {
-      const expected = [{ keyName: 'key1', defaultValue: 'default value' }];
+      const expected = [{ keyName: 'key1', defaultValue: 'default value', line: 2 }];
 
       const code = `
         React.createElement(T, { keyName: 'key1', defaultValue: 'default value' }, "ignored stuff")
@@ -86,7 +86,9 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])(
     });
 
     it('extracts the namespace from props', async () => {
-      const expected = [{ keyName: 'key1', namespace: 'ns1' }];
+      const expected = [
+        { keyName: 'key1', namespace: 'ns1', line: 2 }
+      ];
 
       const code = `
         React.createElement(T, { keyName: 'key1', ns: 'ns1' })
@@ -99,10 +101,10 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])(
 
     it('is not be confused by nested objects in properties', async () => {
       const expected = [
-        { keyName: 'key1' },
-        { keyName: 'key2' },
-        { keyName: 'key3' },
-        { keyName: 'key4' },
+        { keyName: 'key1', line: 2 },
+        { keyName: 'key2', line: 3 },
+        { keyName: 'key3', line: 4 },
+        { keyName: 'key4', line: 5 },
       ];
 
       const code = `
@@ -119,12 +121,12 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])(
 
     it('handles multiline use of createElement', async () => {
       const expected = [
-        { keyName: 'key1' },
-        { keyName: 'key2' },
-        { keyName: 'key3' },
-        { keyName: 'key4' },
-        { keyName: 'key5' },
-        { keyName: 'key6' },
+        { keyName: 'key1', line: 2 },
+        { keyName: 'key2', line: 6 },
+        { keyName: 'key3', line: 9 },
+        { keyName: 'key4', line: 15 },
+        { keyName: 'key5', line: 21 },
+        { keyName: 'key6', line: 26 },
       ];
 
       const code = `
@@ -163,7 +165,10 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])(
     });
 
     it('handles weird/lack of spacing in declarations', async () => {
-      const expected = [{ keyName: 'key1' }, { keyName: 'key2' }];
+      const expected = [
+        { keyName: 'key1', line: 2 },
+        { keyName: 'key2', line: 3 },
+      ];
 
       const code = `
         React         .    createElement     (    T,     {     keyName: 'key1' })
@@ -224,9 +229,9 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])(
         ];
 
         const expectedKeys = [
-          { keyName: 'key1', defaultValue: undefined },
-          { keyName: 'key2', defaultValue: undefined },
-          { keyName: 'key3', defaultValue: undefined },
+          { keyName: 'key1', defaultValue: undefined, line: 2 },
+          { keyName: 'key2', defaultValue: undefined, line: 3 },
+          { keyName: 'key3', defaultValue: undefined, line: 4 },
         ];
 
         const code = `
@@ -247,7 +252,7 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])('useTranslate (.%s)', (ext) => {
   const FILE_NAME = `test.${ext}`;
 
   it('extracts from the t call with signature t(string))', async () => {
-    const expected = [{ keyName: 'key1' }];
+    const expected = [{ keyName: 'key1', line: 4 }];
 
     const code = `
       function Test () {
@@ -262,7 +267,7 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])('useTranslate (.%s)', (ext) => {
   });
 
   it('extracts from the t call with signature t(string, string)', async () => {
-    const expected = [{ keyName: 'key1', defaultValue: 'default value' }];
+    const expected = [{ keyName: 'key1', defaultValue: 'default value', line: 4 }];
 
     const code = `
       function Test () {
@@ -278,7 +283,7 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])('useTranslate (.%s)', (ext) => {
 
   it('extracts from the t call with signature t(string, string, opts)', async () => {
     const expected = [
-      { keyName: 'key1', defaultValue: 'default value', namespace: 'ns' },
+      { keyName: 'key1', defaultValue: 'default value', namespace: 'ns', line: 4 },
     ];
 
     const code = `
@@ -295,7 +300,7 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])('useTranslate (.%s)', (ext) => {
 
   it('extracts from the t call with signature t(string, opts)', async () => {
     const expected = [
-      { keyName: 'key1', defaultValue: 'default value', namespace: 'ns' },
+      { keyName: 'key1', defaultValue: 'default value', namespace: 'ns', line: 4 },
     ];
 
     const code = `
@@ -312,7 +317,7 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])('useTranslate (.%s)', (ext) => {
 
   it('extracts from the t call with signature t(opts)', async () => {
     const expected = [
-      { keyName: 'key1', defaultValue: 'default value', namespace: 'ns' },
+      { keyName: 'key1', defaultValue: 'default value', namespace: 'ns', line: 4 },
     ];
 
     const code = `
@@ -328,7 +333,7 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])('useTranslate (.%s)', (ext) => {
   });
 
   it('extracts the default value from parameters', async () => {
-    const expected = [{ keyName: 'key1', defaultValue: 'default value' }];
+    const expected = [{ keyName: 'key1', defaultValue: 'default value', line: 4 }];
 
     const code = `
       function Test () {
@@ -343,7 +348,7 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])('useTranslate (.%s)', (ext) => {
   });
 
   it('extracts the namespace from parameters', async () => {
-    const expected = [{ keyName: 'key1', namespace: 'ns1' }];
+    const expected = [{ keyName: 'key1', namespace: 'ns1', line: 4 }];
 
     const code = `
       function Test () {
@@ -358,7 +363,7 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])('useTranslate (.%s)', (ext) => {
   });
 
   it('keeps track of the namespace specified in useTranslate', async () => {
-    const expected = [{ keyName: 'key1', namespace: 'namespace' }];
+    const expected = [{ keyName: 'key1', namespace: 'namespace', line: 4 }];
 
     const code = `
       function Test () {
@@ -373,7 +378,7 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])('useTranslate (.%s)', (ext) => {
   });
 
   it('keeps track of the namespace specified in useTranslate (array)', async () => {
-    const expected = [{ keyName: 'key1', namespace: 'namespace1' }];
+    const expected = [{ keyName: 'key1', namespace: 'namespace1', line: 4 }];
 
     const code = `
       function Test () {
@@ -388,7 +393,7 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])('useTranslate (.%s)', (ext) => {
   });
 
   it('overrides the specified namespace if one is passed as parameter', async () => {
-    const expected = [{ keyName: 'key1', namespace: 'ns1' }];
+    const expected = [{ keyName: 'key1', namespace: 'ns1', line: 4 }];
 
     const code = `
       function Test () {
@@ -403,8 +408,6 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])('useTranslate (.%s)', (ext) => {
   });
 
   it('does not extract if there was no useTranslate call', async () => {
-    const expected: any[] = [];
-
     const code = `
       function Test () {
         t('key1')
@@ -413,12 +416,10 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])('useTranslate (.%s)', (ext) => {
 
     const extracted = await extractKeys(code, FILE_NAME);
     expect(extracted.warnings).toEqual([]);
-    expect(extracted.keys).toEqual(expected);
+    expect(extracted.keys).toEqual([]);
   });
 
   it('does not extract if the useTranslate call was in an unrelated block', async () => {
-    const expected: any[] = [];
-
     const code = `
       function Meow () {
         const { t } = useTranslate()
@@ -431,12 +432,10 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])('useTranslate (.%s)', (ext) => {
 
     const extracted = await extractKeys(code, FILE_NAME);
     expect(extracted.warnings).toEqual([]);
-    expect(extracted.keys).toEqual(expected);
+    expect(extracted.keys).toEqual([]);
   });
 
   it('does not extract if the useTranslate call was in a deeper block', async () => {
-    const expected: any[] = [];
-
     const code = `
       function Test () {
         function Meow () {
@@ -448,14 +447,14 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])('useTranslate (.%s)', (ext) => {
 
     const extracted = await extractKeys(code, FILE_NAME);
     expect(extracted.warnings).toEqual([]);
-    expect(extracted.keys).toEqual(expected);
+    expect(extracted.keys).toEqual([]);
   });
 
   it('keeps track of the right namespace when multiple useTranslates are in use', async () => {
     const expected = [
-      { keyName: 'key1', namespace: 'ns-test' },
-      { keyName: 'key2', namespace: 'ns-meow' },
-      { keyName: 'key3', namespace: 'ns-test' },
+      { keyName: 'key1', namespace: 'ns-test', line: 4 },
+      { keyName: 'key2', namespace: 'ns-meow', line: 8 },
+      { keyName: 'key3', namespace: 'ns-test', line: 11 },
     ];
 
     const code = `
@@ -478,7 +477,7 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])('useTranslate (.%s)', (ext) => {
   });
 
   it('handles multi-line use', async () => {
-    const expected = [{ keyName: 'key1', namespace: 'namespace' }];
+    const expected = [{ keyName: 'key1', namespace: 'namespace', line: 7 }];
 
     const code = `
       function Test () {
@@ -498,7 +497,7 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])('useTranslate (.%s)', (ext) => {
   });
 
   it('handles weird spacings', async () => {
-    const expected = [{ keyName: 'key1', namespace: 'namespace' }];
+    const expected = [{ keyName: 'key1', namespace: 'namespace', line: 4 }];
 
     const code = `
       function Test () {
@@ -596,7 +595,7 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])('useTranslate (.%s)', (ext) => {
       ];
 
       const expectedKeys = [
-        { keyName: 'key2', namespace: 'static-ns' },
+        { keyName: 'key2', namespace: 'static-ns', line: 5 },
       ];
 
       const code = `
@@ -620,9 +619,9 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])('useTranslate (.%s)', (ext) => {
       ];
 
       const expectedKeys = [
-        { keyName: 'key1', defaultValue: undefined },
-        { keyName: 'key2', defaultValue: undefined },
-        { keyName: 'key3', defaultValue: undefined },
+        { keyName: 'key1', defaultValue: undefined, line: 4 },
+        { keyName: 'key2', defaultValue: undefined, line: 5 },
+        { keyName: 'key3', defaultValue: undefined, line: 6 },
       ];
 
       const code = `
@@ -645,7 +644,7 @@ describe.each(['jsx', 'tsx'])('<T> (.%s)', (ext) => {
   const FILE_NAME = `test.${ext}`;
 
   it('extracts keys specified as properties', async () => {
-    const expected = [{ keyName: 'key1' }];
+    const expected = [{ keyName: 'key1', line: 2 }];
 
     const code = `
       <T keyName='key1'/>
@@ -657,7 +656,7 @@ describe.each(['jsx', 'tsx'])('<T> (.%s)', (ext) => {
   });
 
   it('extracts keys specified as properties with curly braces', async () => {
-    const expected = [{ keyName: 'key1' }];
+    const expected = [{ keyName: 'key1', line: 2 }];
 
     const code = `
       <T keyName={'key1'}/>
@@ -669,7 +668,7 @@ describe.each(['jsx', 'tsx'])('<T> (.%s)', (ext) => {
   });
 
   it('extracts keys specified as children', async () => {
-    const expected = [{ keyName: 'key1' }];
+    const expected = [{ keyName: 'key1', line: 2 }];
 
     const code = `
       <T>key1</T>
@@ -682,8 +681,8 @@ describe.each(['jsx', 'tsx'])('<T> (.%s)', (ext) => {
 
   it('extracts the default value from children', async () => {
     const expected = [
-      { keyName: 'key1', defaultValue: 'default value1' },
-      { keyName: 'key2', defaultValue: 'default value2' },
+      { keyName: 'key1', defaultValue: 'default value1', line: 2 },
+      { keyName: 'key2', defaultValue: 'default value2', line: 3 },
     ];
 
     const code = `
@@ -697,7 +696,7 @@ describe.each(['jsx', 'tsx'])('<T> (.%s)', (ext) => {
   });
 
   it('extracts the default value from props', async () => {
-    const expected = [{ keyName: 'key1', defaultValue: 'default value1' }];
+    const expected = [{ keyName: 'key1', defaultValue: 'default value1', line: 2 }];
 
     const code = `
       <T keyName='key1' defaultValue='default value1'/>
@@ -709,7 +708,7 @@ describe.each(['jsx', 'tsx'])('<T> (.%s)', (ext) => {
   });
 
   it('does not extract default value from children if a defaultValue prop is set', async () => {
-    const expected = [{ keyName: 'key1', defaultValue: 'default value1' }];
+    const expected = [{ keyName: 'key1', defaultValue: 'default value1', line: 2 }];
 
     const code = `
       <T keyName='key1' defaultValue='default value1'>unused</T>
@@ -721,7 +720,7 @@ describe.each(['jsx', 'tsx'])('<T> (.%s)', (ext) => {
   });
 
   it('extracts the namespace from props', async () => {
-    const expected = [{ keyName: 'key1', namespace: 'ns1' }];
+    const expected = [{ keyName: 'key1', namespace: 'ns1', line: 2 }];
 
     const code = `
       <T keyName='key1' ns='ns1'/>
@@ -733,7 +732,7 @@ describe.each(['jsx', 'tsx'])('<T> (.%s)', (ext) => {
   });
 
   it('does not extract from unrelated components', async () => {
-    const expected = [{ keyName: 'key1' }];
+    const expected = [{ keyName: 'key1', line: 3 }];
 
     const code = `
       <div keyName='not key1'>
@@ -747,7 +746,7 @@ describe.each(['jsx', 'tsx'])('<T> (.%s)', (ext) => {
   });
 
   it('is undisturbed by objects in properties', async () => {
-    const expected = [{ keyName: 'key1', defaultValue: 'value' }];
+    const expected = [{ keyName: 'key1', defaultValue: 'value', line: 2 }];
 
     const code = `
       <T properties={{ a: 'b' }} keyName='key1'>value</T>
@@ -760,13 +759,14 @@ describe.each(['jsx', 'tsx'])('<T> (.%s)', (ext) => {
 
   it('handles multiline use', async () => {
     const expected = [
-      { keyName: 'key1', namespace: 'ns1', defaultValue: 'default value1' },
-      { keyName: 'key2', namespace: 'ns2', defaultValue: 'default value2' },
+      { keyName: 'key1', namespace: 'ns1', defaultValue: 'default value1', line: 2 },
+      { keyName: 'key2', namespace: 'ns2', defaultValue: 'default value2', line: 8 },
       {
         keyName: 'key3',
         namespace: 'ns3',
         defaultValue:
           'sometimes, you really have to deal with a lot of whitespaces...',
+        line: 12,
       },
     ];
 
@@ -794,7 +794,7 @@ describe.each(['jsx', 'tsx'])('<T> (.%s)', (ext) => {
 
   it('unrolls static JSX compound expressions that only contain a string', async () => {
     const expected = [
-      { keyName: 'key1', defaultValue: 'children with spaces' },
+      { keyName: 'key1', defaultValue: 'children with spaces', line: 2 },
     ];
 
     const code = `
@@ -866,12 +866,12 @@ describe.each(['jsx', 'tsx'])('<T> (.%s)', (ext) => {
       ];
 
       const expectedKeys = [
-        { keyName: 'key1', defaultValue: undefined },
-        { keyName: 'key2', defaultValue: undefined },
-        { keyName: 'key3', defaultValue: undefined },
-        { keyName: 'key4', defaultValue: undefined },
-        { keyName: 'key5', defaultValue: undefined },
-        { keyName: 'key6', defaultValue: undefined },
+        { keyName: 'key1', defaultValue: undefined, line: 2 },
+        { keyName: 'key2', defaultValue: undefined, line: 3 },
+        { keyName: 'key3', defaultValue: undefined, line: 4 },
+        { keyName: 'key4', defaultValue: undefined, line: 5 },
+        { keyName: 'key5', defaultValue: undefined, line: 6 },
+        { keyName: 'key6', defaultValue: undefined, line: 7 },
       ];
 
       const code = `
@@ -1045,8 +1045,8 @@ describe('magic comments', () => {
   describe('@tolgee-key', () => {
     it.each([ 'js', 'ts', 'jsx', 'tsx' ])('extracts keys specified as comments', async (ext) => {
       const expected = [
-        { keyName: 'key1' },
-        { keyName: 'key2', namespace: 'ns', defaultValue: 'test value' },
+        { keyName: 'key1', line: 2 },
+        { keyName: 'key2', namespace: 'ns', defaultValue: 'test value', line: 3 },
       ]
 
       const code = `
@@ -1060,8 +1060,8 @@ describe('magic comments', () => {
 
     it('overrides data from code', async () => {
       const expected = [
-        { keyName: 'key-override-1' },
-        { keyName: 'key-override-2', namespace: undefined },
+        { keyName: 'key-override-1', line: 2 },
+        { keyName: 'key-override-2', namespace: undefined, line: 8 },
       ]
 
       const code = `
@@ -1083,7 +1083,7 @@ describe('magic comments', () => {
 
     it('overrides data from code (JSX-specific)', async () => {
       const expected = [
-        { keyName: 'key-override-1', defaultValue: undefined },
+        { keyName: 'key-override-1', defaultValue: undefined, line: 5 },
       ]
 
       const code = `
@@ -1104,7 +1104,7 @@ describe('magic comments', () => {
 
     it('doesn\'t extract json5 if escaped', async () => {
       const expected = [
-        { keyName: '{key}' },
+        { keyName: '{key}', line: 2 },
       ]
 
       const code = `
