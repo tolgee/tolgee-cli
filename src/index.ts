@@ -18,7 +18,7 @@ import PushCommand from './commands/push';
 import PullCommand from './commands/pull';
 import ExtractCommand from './commands/extract';
 
-const NO_KEY_COMMANDS = ['login', 'logout'];
+const NO_KEY_COMMANDS = ['login', 'logout', 'extract'];
 
 async function validateApiKey(cmd: Command) {
   const opts = cmd.optsWithGlobals();

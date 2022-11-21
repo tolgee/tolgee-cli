@@ -1,130 +1,11 @@
-import type Client from '../client';
 import { Command } from 'commander';
 
-import extractKeys, { extractKeysOfFiles } from '../extractor';
+import extractPrint from './extract/print'
+import extractCheck from './extract/check'
 
-type BaseExtractOptions = {
+export type BaseExtractOptions = {
   extractor: string;
 };
-
-type ExtractPrintOptions = BaseExtractOptions;
-
-type ExtractCompareOptions = BaseExtractOptions & {
-  apiUrl: URL;
-  apiKey: string;
-  projectId: number;
-  client: Client;
-};
-
-export type PossibleKey = {
-  fileName: string;
-  line: number;
-  position: number;
-};
-
-async function fetchAllKeys(client: Client) {
-  const languages = await client.languages.getLanguages({ size: 1 });
-  const lang = languages.data?.languages?.[0]?.tag!;
-
-  const exported = await client.export.exportSingle({
-    format: 'JSON',
-    languages: [lang],
-    splitByScope: false,
-    splitByScopeDelimiter: '',
-    splitByScopeDepth: 0,
-  });
-
-  return Object.keys(exported);
-}
-
-async function printHandler(this: Command, filesPattern: string) {
-  const opts: ExtractPrintOptions = this.optsWithGlobals();
-  const extracted = await extractKeysOfFiles(filesPattern, opts.extractor);
-
-  const keySet = new Set()
-  // console.log(extracted)
-  for (const [ file, { keys, warnings } ] of extracted) {
-    if (keys.length || warnings.length) {
-      console.log(file)
-    }
-
-    if (keys.length) {
-      for (const key of keys) {
-        keySet.add(key)
-        console.log('\t%s', key.keyName)
-        if (key.defaultValue) console.log('\t\t%s', key.defaultValue)
-      }
-      console.log()
-    }
-
-    if (warnings.length) {
-      for (const warning of warnings) {
-        console.log('\tline %d: %s', warning.line, warning.warning)
-      }
-      console.log()
-    }
-  }
-
-  console.log('Total unique keys: %d', keySet.size)
-
-  // for (const key of keys.keys) console.log(key);
-  // console.log(`Found: ${keys.keys.length} keys.`);
-}
-
-async function compareHandler(this: Command, filesPattern: string) {
-  const opts: ExtractCompareOptions = this.optsWithGlobals();
-
-  // todo: migrate to a better endpoint combo once it exists
-  const platformKeys = await fetchAllKeys(opts.client);
-  const keys = await extractKeys(filesPattern, opts);
-
-  const localKeysNotInPlatform = [...keys.keys];
-  platformKeys.forEach((platformKey) => {
-    const idx = localKeysNotInPlatform.indexOf(platformKey);
-    if (idx > -1) {
-      localKeysNotInPlatform.splice(idx, 1);
-    }
-  });
-
-  const unusedPlatformKeys = [...platformKeys];
-  keys.keys.forEach((localKey) => {
-    const idx = unusedPlatformKeys.indexOf(localKey);
-    if (idx > -1) {
-      unusedPlatformKeys.splice(idx, 1);
-    }
-  });
-
-  const unusedPlatformKeysWithPossibleKeys: Record<string, PossibleKey[]> = {};
-  unusedPlatformKeys.forEach((key) => {
-    unusedPlatformKeysWithPossibleKeys[key] = keys.possibleKeys.get(key) || [];
-  });
-
-  console.log('\nThese local keys were not found in platform:\n');
-  localKeysNotInPlatform.forEach((key) => {
-    console.log(key);
-  });
-
-  console.log('\nThese keys from platform were not found locally:\n');
-  Object.entries(unusedPlatformKeysWithPossibleKeys).forEach(
-    ([key, occurrences]) => {
-      console.log(key);
-      occurrences.forEach((occurrence) => {
-        console.log(
-          `    ${occurrence.fileName}:${occurrence.line}:${occurrence.position}`
-        );
-      });
-    }
-  );
-}
-
-const extractPrint = new Command('print')
-  .description('Prints extracted data to the console')
-  .argument('<pattern>', 'File pattern to include')
-  .action(printHandler);
-
-const extractCompare = new Command('compare')
-  .argument('<pattern>', 'File pattern to include')
-  .action(compareHandler);
 
 export default new Command('extract')
   .requiredOption(
@@ -132,4 +13,4 @@ export default new Command('extract')
     'The extractor to use. Either a builtin identifier, or a path to a JS (or TS) file.'
   )
   .addCommand(extractPrint)
-  .addCommand(extractCompare);
+  .addCommand(extractCheck);
