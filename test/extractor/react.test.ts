@@ -611,25 +611,39 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])('useTranslate (.%s)', (ext) => {
       expect(extracted.keys).toEqual(expectedKeys);
     });
 
-    it('emits warning for dynamic default values, but extracts keys', async () => {
+    it('emits warning for dynamic parameters', async () => {
       const expectedWarnings = [
-        { warning: 'W_DYNAMIC_DEFAULT_VALUE', line: 4 },
-        { warning: 'W_DYNAMIC_DEFAULT_VALUE', line: 5 },
-        { warning: 'W_DYNAMIC_DEFAULT_VALUE', line: 6 },
-      ];
-
-      const expectedKeys = [
-        { keyName: 'key1', defaultValue: undefined, line: 4 },
-        { keyName: 'key2', defaultValue: undefined, line: 5 },
-        { keyName: 'key3', defaultValue: undefined, line: 6 },
+        { warning: 'W_DYNAMIC_OPTIONS', line: 4 },
       ];
 
       const code = `
         function Test3 () {
           const { t } = useTranslate()
           t('key1', someValue)
-          t('key2', 'dynamic-' + i)
-          t('key3', \`dynamic-\${i}\`)
+        }
+      `;
+
+      const extracted = await extractKeys(code, FILE_NAME);
+      expect(extracted.warnings).toEqual(expectedWarnings);
+      expect(extracted.keys).toEqual([]);
+    });
+
+    it('emits warning for dynamic default values, but extracts keys', async () => {
+      const expectedWarnings = [
+        { warning: 'W_DYNAMIC_DEFAULT_VALUE', line: 4 },
+        { warning: 'W_DYNAMIC_DEFAULT_VALUE', line: 5 },
+      ];
+
+      const expectedKeys = [
+        { keyName: 'key1', defaultValue: undefined, line: 4 },
+        { keyName: 'key2', defaultValue: undefined, line: 5 },
+      ];
+
+      const code = `
+        function Test3 () {
+          const { t } = useTranslate()
+          t('key1', 'dynamic-' + i)
+          t('key2', \`dynamic-\${i}\`)
         }
       `;
 

@@ -461,8 +461,8 @@ export default createMachine<MachineCtx>(
               'punctuation.definition.string.template.begin.ts': 'param_string',
               'variable.other.readwrite.ts': [
                 {
-                  target: 'param_end_warn',
-                  actions: 'dynamicKeyDefault',
+                  target: 'idle',
+                  actions: 'dynamicOptions',
                   cond: (ctx) => !!ctx.key.keyName,
                 },
                 {
@@ -686,6 +686,13 @@ export default createMachine<MachineCtx>(
         warnings: (ctx, _evt) => [
           ...ctx.warnings,
           { warning: 'W_DYNAMIC_DEFAULT_VALUE', line: ctx.line }
+        ]
+      }),
+      dynamicOptions: assign({
+        key: (ctx, _evt) => VOID_KEY,
+        warnings: (ctx, _evt) => [
+          ...ctx.warnings,
+          { warning: 'W_DYNAMIC_OPTIONS', line: ctx.line }
         ]
       }),
       dynamicChildren: assign({
