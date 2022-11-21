@@ -11,7 +11,7 @@ import { createDeferred } from '../utils/deferred';
 export type WorkerParams = { extractor: string; file: string };
 
 const IS_TS_NODE = extname(__filename) === '.ts';
-const MAX_THREADS = cpus().length
+const MAX_THREADS = cpus().length;
 
 // --- Worker functions
 
@@ -28,7 +28,7 @@ async function handleJob(args: WorkerParams) {
     await loadExtractor(args.extractor);
   }
 
-  const file = resolve(args.file)
+  const file = resolve(args.file);
   const code = await readFile(file, 'utf8');
   return extractor(code, file);
 }
@@ -45,56 +45,56 @@ if (!isMainThread) workerInit();
 
 // --- Main thread functions
 
-const workers = new Set<Worker>()
-const jobQueue: Array<[ WorkerParams, Deferred ]> = []
+const workers = new Set<Worker>();
+const jobQueue: Array<[WorkerParams, Deferred]> = [];
 
-function createWorker () {
+function createWorker() {
   const worker = new Worker(__filename, {
     // ts-node workaround
     execArgv: IS_TS_NODE ? ['--require', 'ts-node/register'] : undefined,
   });
 
-  let timeout: NodeJS.Timeout
-  let currentDeferred: Deferred
+  let timeout: NodeJS.Timeout;
+  let currentDeferred: Deferred;
 
-  function workOrDie () {
-    const job = jobQueue.shift()
+  function workOrDie() {
+    const job = jobQueue.shift();
     if (!job) {
-      worker.terminate()
-      return
+      worker.terminate();
+      return;
     }
 
-    worker.postMessage(job[0])
-    currentDeferred = job[1]
+    worker.postMessage(job[0]);
+    currentDeferred = job[1];
     timeout = setTimeout(() => {
-      worker.terminate()
-      currentDeferred.reject(new Error('aborted'))
-    }, 10e3)
+      worker.terminate();
+      currentDeferred.reject(new Error('aborted'));
+    }, 10e3);
   }
 
   worker.on('message', (msg) => {
     if ('data' in msg) {
-      currentDeferred.resolve(msg.data)
+      currentDeferred.resolve(msg.data);
     } else {
-      currentDeferred.reject(msg.err)
+      currentDeferred.reject(msg.err);
     }
 
-    clearTimeout(timeout)
-    workOrDie()
-  })
+    clearTimeout(timeout);
+    workOrDie();
+  });
 
-  workOrDie()
-  return worker
+  workOrDie();
+  return worker;
 }
 
 export async function callWorker(params: WorkerParams) {
-  const deferred = createDeferred()
-  jobQueue.push([ params, deferred ])
+  const deferred = createDeferred();
+  jobQueue.push([params, deferred]);
 
   if (workers.size < MAX_THREADS) {
-    const worker = createWorker()
-    worker.once('exit', () => workers.delete(worker))
-    workers.add(worker)
+    const worker = createWorker();
+    worker.once('exit', () => workers.delete(worker));
+    workers.add(worker);
   }
 
   return deferred.promise;

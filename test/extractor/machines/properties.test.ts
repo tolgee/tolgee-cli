@@ -154,7 +154,7 @@ describe('Plain JavaScript', () => {
         expect(snapshot.context.defaultValue).toBeNull();
         expect(snapshot.context.namespace).toBe(false);
       });
-    })
+    });
   });
 
   describe.each(['ts', 'tsx'])('TypeScript (.%s)', (ext) => {
@@ -373,10 +373,7 @@ describe('JSX', () => {
       });
 
       it('marks plain variables as dynamic', async () => {
-        const tokens = await tokenizer(
-          '<T keyName={key}/>',
-          FILE_NAME
-        );
+        const tokens = await tokenizer('<T keyName={key}/>', FILE_NAME);
         for (const token of tokens) {
           if (!machine.getSnapshot().done) {
             machine.send(token);
@@ -407,7 +404,7 @@ describe('JSX', () => {
         expect(snapshot.context.defaultValue).toBeNull();
         expect(snapshot.context.namespace).toBe(false);
       });
-    })
+    });
   });
 
   // There is nothing to test for TSX specifically;

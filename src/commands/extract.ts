@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 
-import extractPrint from './extract/print'
-import extractCheck from './extract/check'
+import extractPrint from './extract/print';
+import extractCheck from './extract/check';
 
 export type BaseExtractOptions = {
   extractor: string;

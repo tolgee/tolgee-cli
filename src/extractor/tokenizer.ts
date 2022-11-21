@@ -63,9 +63,9 @@ function extnameToGrammar(extname: string) {
 function* tokenize(code: string, grammar: IGrammar) {
   let stack = INITIAL;
   let linePtr = 0;
-  const lines = code.split('\n')
+  const lines = code.split('\n');
   for (let i = 0; i < lines.length; i++) {
-    const line = lines[i]
+    const line = lines[i];
     const res = grammar.tokenizeLine(line, stack);
 
     for (const token of res.tokens) {

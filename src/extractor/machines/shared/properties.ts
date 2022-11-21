@@ -43,12 +43,13 @@ export default createMachine<PropertiesContext>(
           },
           'variable.other.readwrite.ts': {
             actions: 'markImmediatePropertyAsDynamic',
-            cond: (_ctx, evt) => [ 'key', 'keyName', 'ns', 'defaultValue' ].includes(evt.token)
+            cond: (_ctx, evt) =>
+              ['key', 'keyName', 'ns', 'defaultValue'].includes(evt.token),
           },
 
           // JSX/TSX
           'entity.other.attribute-name.tsx': {
-            actions: [ 'markPropertyAsDynamic', 'storePropertyType' ],
+            actions: ['markPropertyAsDynamic', 'storePropertyType'],
           },
           'keyword.operator.assignment.ts': {
             target: 'value',
@@ -87,7 +88,11 @@ export default createMachine<PropertiesContext>(
           // Variable
           'variable.other.readwrite.ts': {
             target: 'idle',
-            actions: [ 'unmarkAsStatic', 'markPropertyAsDynamic', 'clearPropertyType' ]
+            actions: [
+              'unmarkAsStatic',
+              'markPropertyAsDynamic',
+              'clearPropertyType',
+            ],
           },
 
           // JSX Expression
@@ -98,12 +103,21 @@ export default createMachine<PropertiesContext>(
           // Value end
           'punctuation.separator.comma.ts': {
             target: 'idle',
-            actions: [ 'unmarkAsStatic', 'markPropertyAsDynamic', 'clearPropertyType' ]
+            actions: [
+              'unmarkAsStatic',
+              'markPropertyAsDynamic',
+              'clearPropertyType',
+            ],
           },
           'punctuation.definition.block.ts': {
             target: 'idle',
             // Replay the event to let depth update itself if necessary
-            actions: [ 'unmarkAsStatic', 'markPropertyAsDynamic', 'clearPropertyType', send((_ctx, evt) => evt) ],
+            actions: [
+              'unmarkAsStatic',
+              'markPropertyAsDynamic',
+              'clearPropertyType',
+              send((_ctx, evt) => evt),
+            ],
           },
         },
       },
@@ -112,13 +126,17 @@ export default createMachine<PropertiesContext>(
           '*': [
             {
               target: 'idle',
-              actions: [ 'storePropertyValue', 'clearPropertyType', 'unmarkAsStatic' ],
-              cond: (ctx) => ctx.static
+              actions: [
+                'storePropertyValue',
+                'clearPropertyType',
+                'unmarkAsStatic',
+              ],
+              cond: (ctx) => ctx.static,
             },
             {
               target: 'string_end',
-              actions: 'storePropertyValue'
-            }
+              actions: 'storePropertyValue',
+            },
           ],
         },
       },
@@ -131,19 +149,19 @@ export default createMachine<PropertiesContext>(
           },
           'punctuation.definition.template-expression.begin.ts': {
             target: 'idle',
-            actions: [ 'markPropertyAsDynamic', 'clearPropertyType' ]
+            actions: ['markPropertyAsDynamic', 'clearPropertyType'],
           },
           'keyword.operator.arithmetic.ts': {
             target: 'idle',
-            actions: [ 'markPropertyAsDynamic', 'clearPropertyType' ]
+            actions: ['markPropertyAsDynamic', 'clearPropertyType'],
           },
 
           // JSX
           'punctuation.section.embedded.end.tsx': {
             target: 'idle',
             actions: 'clearPropertyType',
-          }
-        }
+          },
+        },
       },
       end: {
         type: 'final',
@@ -172,14 +190,18 @@ export default createMachine<PropertiesContext>(
       ],
       'punctuation.definition.tag.end.tsx': {
         target: 'end',
-        actions: 'markPropertyAsDynamic'
-      }
+        actions: 'markPropertyAsDynamic',
+      },
     },
   },
   {
     guards: {
-      isOpenCurly: (_ctx, evt) => evt.token === '{' && !evt.scopes.includes('meta.embedded.expression.tsx'),
-      isCloseCurly: (_ctx, evt) => evt.token === '}' && !evt.scopes.includes('meta.embedded.expression.tsx'),
+      isOpenCurly: (_ctx, evt) =>
+        evt.token === '{' &&
+        !evt.scopes.includes('meta.embedded.expression.tsx'),
+      isCloseCurly: (_ctx, evt) =>
+        evt.token === '}' &&
+        !evt.scopes.includes('meta.embedded.expression.tsx'),
       isFinalCloseCurly: (ctx, evt) => evt.token === '}' && ctx.depth === 1,
       isOpenSquare: (_ctx, evt) => evt.token === '[',
       isCloseSquare: (_ctx, evt) => evt.token === ']',
@@ -215,13 +237,10 @@ export default createMachine<PropertiesContext>(
       }),
       markImmediatePropertyAsDynamic: assign({
         keyName: (ctx, evt) =>
-          evt.token === 'key' || evt.token === 'keyName'
-            ? false
-            : ctx.keyName,
+          evt.token === 'key' || evt.token === 'keyName' ? false : ctx.keyName,
         defaultValue: (ctx, evt) =>
           evt.token === 'defaultValue' ? false : ctx.defaultValue,
-        namespace: (ctx, evt) =>
-          evt.token === 'ns' ? false : ctx.namespace,
+        namespace: (ctx, evt) => (evt.token === 'ns' ? false : ctx.namespace),
       }),
 
       incrementDepth: assign({
