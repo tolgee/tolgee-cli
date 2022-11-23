@@ -66,10 +66,10 @@ function validateProjectId(cmd: Command) {
   }
 }
 
-function topLevelName (command: Command): string {
+function topLevelName(command: Command): string {
   return command.parent && command.parent.parent
     ? topLevelName(command.parent)
-    : command.name()
+    : command.name();
 }
 
 async function preHandler(prog: Command, cmd: Command) {
