@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 
 import { Command } from 'commander';
-import { loadTolgeeRc, getApiKey } from './config';
+
+import { getApiKey } from './config/credentials';
+import loadTolgeeRc from './config/tolgeerc';
 
 import RestClient from './client';
 import { HttpError } from './client/errors';

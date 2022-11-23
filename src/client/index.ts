@@ -24,6 +24,7 @@ export type ApiKeyInfoPat = {
   type: 'PAT';
   key: string;
   username: string;
+  expires: number;
 };
 
 export type ApiKeyInfoPak = {
@@ -31,6 +32,7 @@ export type ApiKeyInfoPak = {
   key: string;
   username: string;
   project: { id: number; name: string };
+  expires: number;
 };
 
 export type ApiKeyInfo = ApiKeyInfoPat | ApiKeyInfoPak;
@@ -108,6 +110,7 @@ export default class RestClient {
           id: info.projectId,
           name: info.projectName,
         },
+        expires: info.expiresAt ?? 0,
       };
     }
 
@@ -118,6 +121,7 @@ export default class RestClient {
       type: 'PAT',
       key: key,
       username: username,
+      expires: 0,
     };
   }
 }

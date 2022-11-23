@@ -32,6 +32,7 @@ async function initializeOniguruma() {
   const wasmBlobPath = require
     .resolve('vscode-oniguruma')
     .replace('main.js', 'onig.wasm');
+
   const wasmBlob = await readFile(wasmBlobPath);
   await loadWASM(wasmBlob);
 

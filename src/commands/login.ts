@@ -3,7 +3,11 @@ import { Command } from 'commander';
 import RestClient from '../client';
 
 import { HttpError } from '../client/errors';
-import { saveApiKey, removeApiKeys, clearAuthStore } from '../config';
+import {
+  saveApiKey,
+  removeApiKeys,
+  clearAuthStore,
+} from '../config/credentials';
 import { success, error } from '../utils/logger';
 
 type Options = {
