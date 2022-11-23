@@ -1,20 +1,19 @@
-import type { ExtractorRegExp } from '../regexp';
+import { interpret } from 'xstate';
+import reactExtractorMachine from '../machines/react';
+import tokenizer from '../tokenizer';
 
-module.exports = <ExtractorRegExp>{
-  references: {
-    hook: /\s([a-zA-Z0-9_]+)\s?=\s??useTranslate\(\)/g,
-  },
-  extraction: [
-    // React component (JSX)
-    '<\\s*T [^>]*?keyName={?["\'`]%string%["\'`]}?',
-    '<\\s*T[^>]*?>%string%</T>}?',
+export default async function (code: string, fileName: string) {
+  const tokens = await tokenizer(code, fileName);
+  const machine = interpret(reactExtractorMachine);
 
-    // React component (Plain React.createElement)
-    // fixme: nested objects would cancel the `[^}]*?` segment
-    'React\\.createElement\\(\\s*T,\\s*{[^}]*?keyName:\\s*["\'`]%string%["\'`]',
+  machine.start();
+  for (const token of tokens) {
+    machine.send(token);
+  }
 
-    // Hook usage
-    '[^A-Za-z0-9_]$hook$\\(["\'`]%string%["\'`],?',
-    '[^A-Za-z0-9_]$hook$\\({(?:\\n|.*?)*?key:\\s*[\'`"]%string%[\'`"]',
-  ],
-};
+  const snapshot = machine.getSnapshot();
+  return {
+    warnings: snapshot.context.warnings,
+    keys: snapshot.context.keys,
+  };
+}

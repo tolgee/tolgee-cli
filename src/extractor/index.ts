@@ -1,108 +1,85 @@
-import type { ExtractorRegExp } from './regexp';
-
-import { join } from 'path';
-import { readFile } from 'fs/promises';
+import { join, extname } from 'path';
+import { existsSync } from 'fs';
 import { glob as globCb } from 'glob';
 
-import { regexpExtractorRunner, validateRegExpExtractor } from './regexp';
-import { debug } from '../utils/logger';
-import { KEY_REGEX } from '../utils/constants';
+import { callWorker } from './worker';
+import { loadModule } from '../utils/moduleLoader';
 
 import { promisify } from 'util';
 const glob = promisify(globCb);
 
-export type ExtractorParams = {
-  preset: 'react';
-  customExtractor?: string;
-};
-
-export type PossibleKey = {
-  fileName: string;
+export type Key = {
+  keyName: string;
+  defaultValue?: string;
+  namespace?: string;
   line: number;
-  position: number;
 };
+export type Warning = { warning: string; line: number };
 
-type ExtractRunner = (fileContents: string) => string[];
+export type Extractor = (fileContents: string, fileName: string) => string[];
 
-export type { ExtractorRegExp };
-export type ExtractorFunction = { extractor: ExtractRunner };
-export type Extractor = ExtractorRegExp | ExtractorFunction;
-
-function prepareExtractor(params: ExtractorParams): ExtractRunner {
-  const extractorPath = params.customExtractor
-    ? params.customExtractor
-    : join(__dirname, 'presets', `${params.preset}.js`);
-
-  const extractor = require(extractorPath);
-
-  if (!extractor || typeof extractor !== 'object' || Array.isArray(extractor))
-    throw new TypeError(
-      'Invalid extractor provided: The provided extractor is not an object!'
+function resolveExtractor(extractor: string): string {
+  if (!existsSync(extractor)) {
+    // During dev, we deal with .ts files because of ts-node
+    const preset = join(
+      __dirname,
+      'presets',
+      `${extractor}${extname(__filename)}`
     );
-
-  if ('extraction' in extractor) {
-    validateRegExpExtractor(extractor);
-    return regexpExtractorRunner.bind(null, extractor);
-  }
-
-  if (typeof extractor.extractor !== 'function')
-    throw new TypeError(
-      'Invalid functional extractor provided: `extractor` is not a function!'
-    );
-
-  return extractor.extractor;
-}
-
-function findPossibleKeys(content: string) {
-  const res = [];
-
-  const lines = content.split(/\r?\n/);
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-    for (const match of line.matchAll(new RegExp(KEY_REGEX, 'g'))) {
-      const string = match[0].trim();
-      if (string)
-        res.push({ string: string, line: i + 1, position: match.index! });
+    if (!existsSync(preset)) {
+      throw new Error(`Cannot find specified extractor: ${extractor}`);
     }
+
+    return preset;
   }
 
-  return res;
+  return extractor;
 }
 
-export default async function extractKeys(
+export async function loadExtractor(extractor: string): Promise<Extractor> {
+  if (!existsSync(extractor)) {
+    // During dev, we deal with .ts files because of ts-node
+    const preset = join(
+      __dirname,
+      'presets',
+      `${extractor}${extname(__filename)}`
+    );
+    if (!existsSync(preset)) {
+      throw new Error(`Cannot find specified extractor: ${extractor}`);
+    }
+
+    extractor = preset;
+  }
+
+  const mdl = await loadModule(extractor);
+  if (typeof mdl.default !== 'function') {
+    throw new TypeError('Invalid extractor: export is not a function');
+  }
+
+  return mdl.default;
+}
+
+export async function extractKeysFromFile(file: string, extractor: string) {
+  return callWorker({
+    extractor: resolveExtractor(extractor),
+    file: file,
+  });
+}
+
+export async function extractKeysOfFiles(
   filesPattern: string,
-  params: ExtractorParams
+  extractor: string
 ) {
-  const extractor = prepareExtractor(params);
-
   const files = await glob(filesPattern, { nodir: true });
-  const possibleKeys: Map<string, PossibleKey[]> = new Map();
-  const discoveredKeys = new Set<string>();
+  const result = new Map<string, { keys: Key[]; warnings: Warning[] }>();
 
-  for (const file of files) {
-    debug(`Extracting keys in file: ${file}`);
-    const content = await readFile(file, 'utf8');
+  // Done as a map to allow concurrent execution
+  await Promise.all(
+    files.map(async (file) => {
+      const keys = await extractKeysFromFile(file, extractor);
+      result.set(file, keys);
+    })
+  );
 
-    debug(`\tExtracting key-like strings`);
-    for (const possibleKey of findPossibleKeys(content)) {
-      if (!possibleKeys.has(possibleKey.string))
-        possibleKeys.set(possibleKey.string, []);
-
-      possibleKeys.get(possibleKey.string)!.push({
-        fileName: file,
-        line: possibleKey.line,
-        position: possibleKey.position,
-      });
-    }
-
-    debug(`\tLooking for key usage`);
-    for (const key of extractor(content)) {
-      discoveredKeys.add(key);
-    }
-  }
-
-  return {
-    keys: [...discoveredKeys],
-    possibleKeys: possibleKeys,
-  };
+  return result;
 }

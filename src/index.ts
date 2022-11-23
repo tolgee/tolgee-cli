@@ -18,7 +18,7 @@ import PushCommand from './commands/push';
 import PullCommand from './commands/pull';
 import ExtractCommand from './commands/extract';
 
-const NO_KEY_COMMANDS = ['login', 'logout'];
+const NO_KEY_COMMANDS = ['login', 'logout', 'extract'];
 
 async function validateApiKey(cmd: Command) {
   const opts = cmd.optsWithGlobals();
@@ -66,8 +66,14 @@ function validateProjectId(cmd: Command) {
   }
 }
 
+function topLevelName (command: Command): string {
+  return command.parent && command.parent.parent
+    ? topLevelName(command.parent)
+    : command.name()
+}
+
 async function preHandler(prog: Command, cmd: Command) {
-  if (!NO_KEY_COMMANDS.includes(cmd.name())) {
+  if (!NO_KEY_COMMANDS.includes(topLevelName(cmd))) {
     await validateApiKey(cmd);
     await validateProjectId(cmd);
 
