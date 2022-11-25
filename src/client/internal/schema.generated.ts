@@ -4,177 +4,440 @@
  */
 
 export interface paths {
-  '/v2/projects/keys/{keyId}/tags': {
-    put: operations['tagKey_1'];
+  '/v2/user': {
+    get: operations['getInfo'];
+    put: operations['updateUser'];
+    post: operations['updateUserOld'];
+    delete: operations['delete'];
   };
-  '/v2/projects/keys/{id}/complex-update': {
-    put: operations['complexEdit_1'];
+  '/v2/user/password': {
+    put: operations['updateUserPassword'];
   };
-  '/v2/projects/keys/{id}': {
-    put: operations['edit_1'];
+  '/v2/user/mfa/totp': {
+    put: operations['enableMfa'];
+    delete: operations['disableMfa'];
   };
-  '/v2/projects/import/result/languages/{languageId}/translations/{translationId}/resolve/set-override': {
+  '/v2/user/mfa/recovery': {
+    put: operations['regenerateRecoveryCodes'];
+  };
+  '/v2/user/avatar': {
+    put: operations['uploadAvatar'];
+    delete: operations['removeAvatar'];
+  };
+  '/v2/user-preferences/set-preferred-organization/{organizationId}': {
+    put: operations['setPreferredOrganization'];
+  };
+  '/v2/user-preferences/set-language/{languageTag}': {
+    put: operations['setLanguage'];
+  };
+  '/v2/projects/{projectId}': {
+    get: operations['get_2'];
+    put: operations['editProject'];
+    delete: operations['deleteProject'];
+  };
+  '/v2/projects/{projectId}/users/{userId}/set-permissions/{permissionType}': {
+    put: operations['setUsersPermissions'];
+  };
+  '/v2/projects/{projectId}/users/{userId}/revoke-access': {
+    put: operations['revokePermission'];
+  };
+  '/v2/projects/{projectId}/machine-translation-service-settings': {
+    get: operations['getMachineTranslationSettings'];
+    put: operations['setMachineTranslationSettings'];
+  };
+  '/v2/projects/{projectId}/keys/{keyId}/tags': {
+    put: operations['tagKey'];
+  };
+  '/v2/projects/{projectId}/keys/{id}/complex-update': {
+    put: operations['complexEdit'];
+  };
+  '/v2/projects/{projectId}/keys/{id}': {
+    put: operations['edit'];
+  };
+  '/v2/projects/{projectId}/invite': {
+    put: operations['inviteUser'];
+  };
+  '/v2/projects/{projectId}/auto-translation-settings': {
+    get: operations['getAutoTranslationSettings'];
+    put: operations['setAutoTranslationSettings'];
+  };
+  '/v2/projects/{projectId}/import/result/languages/{languageId}/translations/{translationId}/resolve/set-override': {
     /** Resolves translation conflict. The old translation will be overridden. */
-    put: operations['resolveTranslationSetOverride_1'];
+    put: operations['resolveTranslationSetOverride'];
   };
-  '/v2/projects/import/result/languages/{languageId}/translations/{translationId}/resolve/set-keep-existing': {
+  '/v2/projects/{projectId}/import/result/languages/{languageId}/translations/{translationId}/resolve/set-keep-existing': {
     /** Resolves translation conflict. The old translation will be kept. */
-    put: operations['resolveTranslationSetKeepExisting_1'];
+    put: operations['resolveTranslationSetKeepExisting'];
   };
-  '/v2/projects/import/result/languages/{languageId}/resolve-all/set-override': {
+  '/v2/projects/{projectId}/import/result/languages/{languageId}/resolve-all/set-override': {
     /** Resolves all translation conflicts for provided language. The old translations will be overridden. */
-    put: operations['resolveTranslationSetOverride_3'];
+    put: operations['resolveTranslationSetOverride_2'];
   };
-  '/v2/projects/import/result/languages/{languageId}/resolve-all/set-keep-existing': {
+  '/v2/projects/{projectId}/import/result/languages/{languageId}/resolve-all/set-keep-existing': {
     /** Resolves all translation conflicts for provided language. The old translations will be kept. */
-    put: operations['resolveTranslationSetKeepExisting_3'];
+    put: operations['resolveTranslationSetKeepExisting_2'];
   };
-  '/v2/projects/import/result/languages/{importLanguageId}/select-existing/{existingLanguageId}': {
+  '/v2/projects/{projectId}/import/result/languages/{importLanguageId}/select-existing/{existingLanguageId}': {
     /** Sets existing language to pair with language to import. Data will be imported to selected existing language when applied. */
-    put: operations['selectExistingLanguage_1'];
+    put: operations['selectExistingLanguage'];
   };
-  '/v2/projects/import/result/languages/{importLanguageId}/reset-existing': {
+  '/v2/projects/{projectId}/import/result/languages/{importLanguageId}/reset-existing': {
     /** Resets existing language paired with language to import. */
-    put: operations['resetExistingLanguage_1'];
+    put: operations['resetExistingLanguage'];
   };
-  '/v2/projects/import/apply': {
+  '/v2/projects/{projectId}/import/apply': {
     /** Imports the data prepared in previous step */
-    put: operations['applyImport_1'];
+    put: operations['applyImport'];
   };
-  '/v2/projects/translations/{translationId}/set-state/{state}': {
-    put: operations['setTranslationState_1'];
+  '/v2/projects/{projectId}/translations/{translationId}/set-state/{state}': {
+    put: operations['setTranslationState'];
   };
-  '/v2/projects/translations/{translationId}/comments/{commentId}/set-state/{state}': {
-    put: operations['setState_1'];
+  '/v2/projects/{projectId}/translations/{translationId}/comments/{commentId}/set-state/{state}': {
+    put: operations['setState'];
   };
-  '/v2/projects/translations/{translationId}/comments/{commentId}': {
-    get: operations['get_4'];
-    put: operations['update_1'];
-    delete: operations['delete_6'];
+  '/v2/projects/{projectId}/translations/{translationId}/comments/{commentId}': {
+    get: operations['get_3'];
+    put: operations['update'];
+    delete: operations['delete_5'];
   };
-  '/v2/projects/translations/{translationId}/dismiss-auto-translated-state': {
-    put: operations['dismissAutoTranslatedState_1'];
+  '/v2/projects/{projectId}/translations/{translationId}/dismiss-auto-translated-state': {
+    put: operations['dismissAutoTranslatedState'];
   };
-  '/v2/projects/translations': {
-    get: operations['getTranslations_1'];
-    put: operations['setTranslations_1'];
-    post: operations['createOrUpdateTranslations_1'];
+  '/v2/projects/{projectId}/translations': {
+    get: operations['getTranslations'];
+    put: operations['setTranslations'];
+    post: operations['createOrUpdateTranslations'];
   };
-  '/v2/projects/languages/{languageId}': {
-    put: operations['editLanguage_1'];
-    delete: operations['deleteLanguage_3'];
+  '/v2/projects/{projectId}/transfer-to-organization/{organizationId}': {
+    put: operations['transferProjectToOrganization'];
   };
-  '/v2/projects/keys/{keyId}/auto-translate': {
+  '/v2/projects/{projectId}/leave': {
+    put: operations['leaveProject'];
+  };
+  '/v2/projects/{projectId}/languages/{languageId}': {
+    get: operations['get_5'];
+    put: operations['editLanguage'];
+    delete: operations['deleteLanguage_2'];
+  };
+  '/v2/projects/{projectId}/keys/{keyId}/auto-translate': {
     /**
      * Uses enabled auto-translation methods.
      * You need to set at least one of useMachineTranslation or useTranslationMemory to true.
      *
      * This will replace the the existing translation with the result obtained from specified source!
      */
-    put: operations['autoTranslate_1'];
+    put: operations['autoTranslate'];
   };
-  '/v2/projects/keys/create': {
-    post: operations['create_2'];
+  '/v2/projects/{projectId}/avatar': {
+    put: operations['uploadAvatar_1'];
+    delete: operations['removeAvatar_1'];
   };
-  '/v2/projects/keys': {
-    post: operations['create_3'];
-    delete: operations['delete_4'];
+  '/v2/pats/{id}': {
+    get: operations['get_7'];
+    put: operations['update_2'];
+    delete: operations['delete_7'];
   };
-  '/v2/projects/import': {
+  '/v2/pats/{id}/regenerate': {
+    put: operations['regenerate'];
+  };
+  '/v2/organizations/{organizationId}/users/{userId}/set-role': {
+    put: operations['setUserRole'];
+  };
+  '/v2/organizations/{id}/leave': {
+    put: operations['leaveOrganization'];
+  };
+  '/v2/organizations/{id}/invite': {
+    put: operations['inviteUser_1'];
+  };
+  '/v2/organizations/{id}/avatar': {
+    put: operations['uploadAvatar_2'];
+    delete: operations['removeAvatar_2'];
+  };
+  '/v2/organizations/{id}': {
+    get: operations['get_9'];
+    put: operations['update_3'];
+    delete: operations['delete_8'];
+  };
+  '/v2/api-keys/{apiKeyId}': {
+    put: operations['update_4'];
+    delete: operations['delete_10'];
+  };
+  '/v2/api-keys/{apiKeyId}/regenerate': {
+    put: operations['regenerate_1'];
+  };
+  '/v2/administration/users/{userId}/set-role/{role}': {
+    put: operations['setRole'];
+  };
+  '/v2/user/generate-super-token': {
+    post: operations['getSuperToken'];
+  };
+  '/v2/slug/generate-project': {
+    post: operations['generateProjectSlug'];
+  };
+  '/v2/slug/generate-organization': {
+    post: operations['generateOrganizationSlug'];
+  };
+  '/v2/projects': {
+    get: operations['getAll'];
+    post: operations['createProject'];
+  };
+  '/v2/projects/{projectId}/keys/create': {
+    post: operations['create'];
+  };
+  '/v2/projects/{projectId}/keys': {
+    post: operations['create_1'];
+    delete: operations['delete_3'];
+  };
+  '/v2/projects/{projectId}/import/with-streaming-response': {
+    /** Prepares provided files to import, streams operation progress */
+    post: operations['addFilesStreaming'];
+  };
+  '/v2/projects/{projectId}/import': {
     /** Prepares provided files to import. */
-    post: operations['addFiles_1'];
+    post: operations['addFiles'];
     /** Deletes prepared import data. */
-    delete: operations['cancelImport_1'];
+    delete: operations['cancelImport'];
   };
-  '/v2/projects/export': {
-    get: operations['export_1'];
-    post: operations['exportPost_1'];
+  '/v2/projects/{projectId}/export': {
+    get: operations['export'];
+    post: operations['exportPost'];
   };
-  '/v2/projects/translations/{translationId}/comments': {
-    get: operations['getAll_4'];
-    post: operations['create_5'];
+  '/v2/projects/{projectId}/translations/{translationId}/comments': {
+    get: operations['getAll_3'];
+    post: operations['create_4'];
   };
-  '/v2/projects/translations/create-comment': {
-    post: operations['create_7'];
+  '/v2/projects/{projectId}/translations/create-comment': {
+    post: operations['create_6'];
   };
-  '/v2/projects/suggest/translation-memory': {
-    post: operations['suggestTranslationMemory_1'];
+  '/v2/projects/{projectId}/suggest/translation-memory': {
+    post: operations['suggestTranslationMemory'];
   };
-  '/v2/projects/suggest/machine-translations': {
-    post: operations['suggestMachineTranslations_1'];
+  '/v2/projects/{projectId}/suggest/machine-translations': {
+    post: operations['suggestMachineTranslations'];
   };
-  '/v2/projects/languages': {
-    get: operations['getAll_6'];
-    post: operations['createLanguage_1'];
+  '/v2/projects/{projectId}/languages': {
+    get: operations['getAll_5'];
+    post: operations['createLanguage'];
   };
-  '/v2/projects/keys/{keyId}/screenshots': {
-    get: operations['getKeyScreenshots'];
-    post: operations['uploadScreenshot'];
+  '/v2/projects/{projectId}/keys/{keyId}/screenshots': {
+    get: operations['getKeyScreenshots_1'];
+    post: operations['uploadScreenshot_1'];
+  };
+  '/v2/pats': {
+    get: operations['getAll_7'];
+    post: operations['create_8'];
+  };
+  '/v2/organizations': {
+    get: operations['getAll_8'];
+    post: operations['create_9'];
   };
   '/v2/image-upload': {
     post: operations['upload'];
   };
-  '/v2/projects/tags': {
-    get: operations['getAll_2'];
+  '/v2/api-keys': {
+    get: operations['allByUser'];
+    post: operations['create_10'];
   };
-  '/v2/projects/stats/daily-activity': {
-    get: operations['getProjectDailyActivity_1'];
+  '/v2/user/single-owned-organizations': {
+    get: operations['getAllSingleOwnedOrganizations'];
   };
-  '/v2/projects/stats': {
-    get: operations['getProjectStats_1'];
+  '/v2/user-preferences': {
+    get: operations['get'];
   };
-  '/v2/projects/activity': {
-    get: operations['getActivity_1'];
+  '/v2/slug/validate-project/{slug}': {
+    get: operations['validateProjectSlug'];
   };
-  '/v2/projects/import/result/languages/{languageId}/translations': {
+  '/v2/slug/validate-organization/{slug}': {
+    get: operations['validateOrganizationSlug'];
+  };
+  '/v2/public/initial-data': {
+    /** Returns initial data always required by frontend */
+    get: operations['get_1'];
+  };
+  '/v2/projects/{projectId}/users': {
+    get: operations['getAllUsers'];
+  };
+  '/v2/projects/{projectId}/tags': {
+    get: operations['getAll_1'];
+  };
+  '/v2/projects/{projectId}/machine-translation-credit-balance': {
+    get: operations['getProjectCredits'];
+  };
+  '/v2/projects/{projectId}/activity': {
+    get: operations['getActivity'];
+  };
+  '/v2/projects/{projectId}/import/result/languages/{languageId}/translations': {
     /** Returns translations prepared to import. */
-    get: operations['getImportTranslations_1'];
+    get: operations['getImportTranslations'];
   };
-  '/v2/projects/import/result/languages/{languageId}': {
+  '/v2/projects/{projectId}/import/result/languages/{languageId}': {
     /** Returns language prepared to import. */
-    get: operations['getImportLanguage_1'];
+    get: operations['getImportLanguage'];
     /** Deletes language prepared to import. */
-    delete: operations['deleteLanguage_1'];
+    delete: operations['deleteLanguage'];
   };
-  '/v2/projects/import/result/files/{importFileId}/issues': {
+  '/v2/projects/{projectId}/import/result/files/{importFileId}/issues': {
     /** Returns issues for uploaded file. */
-    get: operations['getImportFileIssues_1'];
+    get: operations['getImportFileIssues'];
   };
-  '/v2/projects/import/result': {
+  '/v2/projects/{projectId}/import/result': {
     /** Returns the result of preparation. */
-    get: operations['getImportResult_1'];
+    get: operations['getImportResult'];
   };
-  '/v2/projects/translations/{translationId}/history': {
-    get: operations['getTranslationHistory_1'];
+  '/v2/projects/{projectId}/translations/{translationId}/history': {
+    get: operations['getTranslationHistory'];
   };
-  '/v2/projects/translations/{languages}': {
-    get: operations['getAllTranslations_1'];
+  '/v2/projects/{projectId}/translations/{languages}': {
+    get: operations['getAllTranslations'];
   };
-  '/v2/projects/translations/select-all': {
-    get: operations['getSelectAllKeyIds_1'];
+  '/v2/projects/{projectId}/translations/select-all': {
+    get: operations['getSelectAllKeyIds'];
   };
-  '/v2/api-keys/current': {
+  '/v2/projects/{projectId}/transfer-options': {
+    get: operations['getTransferOptions'];
+  };
+  '/v2/projects/{projectId}/stats/daily-activity': {
+    get: operations['getProjectDailyActivity'];
+  };
+  '/v2/projects/{projectId}/stats': {
+    get: operations['getProjectStats'];
+  };
+  '/v2/projects/{projectId}/invitations': {
+    get: operations['getProjectInvitations'];
+  };
+  '/v2/projects/{projectId}/api-keys': {
+    get: operations['allByProject'];
+  };
+  '/v2/projects/with-stats': {
+    get: operations['getAllWithStatistics'];
+  };
+  '/v2/preferred-organization': {
+    get: operations['getPreferred'];
+  };
+  '/v2/pats/current': {
     get: operations['getCurrent'];
   };
-  '/v2/projects/keys/{keyId}/tags/{tagId}': {
-    delete: operations['removeTag_1'];
+  '/v2/organizations/{slug}/projects-with-stats': {
+    get: operations['getAllWithStatistics_1'];
   };
-  '/v2/projects/keys/{ids}': {
-    delete: operations['delete_2'];
+  '/v2/organizations/{slug}/projects': {
+    get: operations['getAllProjects'];
   };
-  '/v2/projects/keys/{keyId}/screenshots/{ids}': {
-    delete: operations['deleteScreenshots'];
+  '/v2/organizations/{slug}': {
+    get: operations['get_8'];
+  };
+  '/v2/organizations/{organizationId}/machine-translation-credit-balance': {
+    get: operations['getOrganizationCredits'];
+  };
+  '/v2/organizations/{organizationId}/invitations': {
+    get: operations['getInvitations'];
+  };
+  '/v2/organizations/{organizationId}/usage': {
+    /** Returns current organization usage */
+    get: operations['getUsage'];
+  };
+  '/v2/organizations/{organizationId}/projects-with-stats': {
+    get: operations['getAllWithStatistics_2'];
+  };
+  '/v2/organizations/{id}/users': {
+    get: operations['getAllUsers_1'];
+  };
+  '/v2/organizations/{id}/projects': {
+    get: operations['getAllProjects_1'];
+  };
+  '/v2/invitations/{code}/accept': {
+    get: operations['acceptInvitation'];
+  };
+  '/v2/api-keys/{keyId}': {
+    get: operations['get_10'];
+  };
+  '/v2/api-keys/current': {
+    get: operations['getCurrent_1'];
+  };
+  '/v2/api-keys/availableScopes': {
+    get: operations['getScopes'];
+  };
+  '/v2/administration/users': {
+    get: operations['getUsers'];
+  };
+  '/v2/administration/users/{userId}/generate-token': {
+    get: operations['generateUserToken'];
+  };
+  '/v2/administration/organizations': {
+    get: operations['getOrganizations'];
+  };
+  '/v2/projects/{projectId}/keys/{keyId}/tags/{tagId}': {
+    delete: operations['removeTag'];
+  };
+  '/v2/projects/{projectId}/keys/{ids}': {
+    delete: operations['delete_1'];
+  };
+  '/v2/projects/{projectId}/keys/{keyId}/screenshots/{ids}': {
+    delete: operations['deleteScreenshots_1'];
+  };
+  '/v2/organizations/{organizationId}/users/{userId}': {
+    delete: operations['removeUser'];
+  };
+  '/v2/invitations/{invitationId}': {
+    delete: operations['deleteInvitation'];
   };
   '/v2/image-upload/{ids}': {
     delete: operations['delete_9'];
+  };
+  '/v2/administration/users/{userId}': {
+    delete: operations['deleteUser'];
   };
 }
 
 export interface components {
   schemas: {
+    UserUpdateRequestDto: {
+      name: string;
+      email: string;
+      currentPassword?: string;
+      /** @description Callback url for link sent in e-mail. This may be omitted, when server has set frontEndUrl in properties. */
+      callbackUrl?: string;
+    };
     Avatar: {
       large: string;
       thumbnail: string;
+    };
+    PrivateUserAccountModel: {
+      /** Format: int64 */
+      id: number;
+      username: string;
+      name?: string;
+      emailAwaitingVerification?: string;
+      mfaEnabled: boolean;
+      avatar?: components['schemas']['Avatar'];
+      /** @enum {string} */
+      accountType: 'LOCAL' | 'LDAP' | 'THIRD_PARTY';
+      /** @enum {string} */
+      globalServerRole: 'USER' | 'ADMIN';
+      deletable: boolean;
+      needsSuperJwtToken: boolean;
+    };
+    UserUpdatePasswordRequestDto: {
+      currentPassword: string;
+      password: string;
+    };
+    JwtAuthenticationResponse: {
+      accessToken?: string;
+      tokenType?: string;
+    };
+    UserTotpEnableRequestDto: {
+      totpKey: string;
+      otp: string;
+      password: string;
+    };
+    UserMfaRecoveryRequestDto: {
+      password: string;
+    };
+    EditProjectDTO: {
+      name: string;
+      slug?: string;
+      /** Format: int64 */
+      baseLanguageId?: number;
     };
     LanguageModel: {
       /** Format: int64 */
@@ -204,6 +467,114 @@ export interface components {
        * @example false
        */
       base: boolean;
+    };
+    ProjectModel: {
+      /** Format: int64 */
+      id: number;
+      name: string;
+      description?: string;
+      slug?: string;
+      avatar?: components['schemas']['Avatar'];
+      organizationOwner?: components['schemas']['SimpleOrganizationModel'];
+      baseLanguage?: components['schemas']['LanguageModel'];
+      /**
+       * @deprecated
+       * @description Use organizationOwner field
+       */
+      organizationOwnerName?: string;
+      /**
+       * @deprecated
+       * @description Use organizationOwner field
+       */
+      organizationOwnerSlug?: string;
+      /**
+       * @deprecated
+       * @description Use organizationOwner field
+       * @enum {string}
+       */
+      organizationOwnerBasePermissions?:
+        | 'VIEW'
+        | 'TRANSLATE'
+        | 'EDIT'
+        | 'MANAGE';
+      /** @enum {string} */
+      organizationRole?: 'MEMBER' | 'OWNER';
+      /**
+       * @description Current user's direct permission
+       * @example MANAGE
+       * @enum {string}
+       */
+      directPermissions?: 'VIEW' | 'TRANSLATE' | 'EDIT' | 'MANAGE';
+      computedPermissions: components['schemas']['UserPermissionModel'];
+    };
+    SimpleOrganizationModel: {
+      /** Format: int64 */
+      id: number;
+      /** @example Beautiful organization */
+      name: string;
+      /** @example btforg */
+      slug: string;
+      /** @example This is a beautiful organization full of beautiful and clever people */
+      description?: string;
+      /** @enum {string} */
+      basePermissions: 'VIEW' | 'TRANSLATE' | 'EDIT' | 'MANAGE';
+      avatar?: components['schemas']['Avatar'];
+    };
+    UserPermissionModel: {
+      /**
+       * @description List of languages current user has TRANSLATE permission to. If null, all languages edition is permitted.
+       * @example [
+       *   200001,
+       *   200004
+       * ]
+       */
+      permittedLanguageIds?: number[];
+      /**
+       * @description The type of permission.
+       * @example EDIT
+       * @enum {string}
+       */
+      type?: 'VIEW' | 'TRANSLATE' | 'EDIT' | 'MANAGE';
+    };
+    MachineTranslationLanguagePropsDto: {
+      /**
+       * Format: int64
+       * @description The language to apply those rules. If null, then this settings are default.
+       */
+      targetLanguageId?: number;
+      /**
+       * @description This service will be used for automated translation
+       * @enum {string}
+       */
+      primaryService?: 'GOOGLE' | 'AWS' | 'DEEPL' | 'AZURE';
+      /** @description List of enabled services */
+      enabledServices: ('GOOGLE' | 'AWS' | 'DEEPL' | 'AZURE')[];
+    };
+    SetMachineTranslationSettingsDto: {
+      settings: components['schemas']['MachineTranslationLanguagePropsDto'][];
+    };
+    CollectionModelLanguageConfigItemModel: {
+      _embedded?: {
+        languageConfigs?: components['schemas']['LanguageConfigItemModel'][];
+      };
+    };
+    LanguageConfigItemModel: {
+      /**
+       * Format: int64
+       * @description When null, its a default configuration applied to not configured languages
+       */
+      targetLanguageId?: number;
+      /** @description When null, its a default configuration applied to not configured languages */
+      targetLanguageTag?: string;
+      /** @description When null, its a default configuration applied to not configured languages */
+      targetLanguageName?: string;
+      /**
+       * @description Service used for automated translating
+       * @enum {string}
+       */
+      primaryService?: 'GOOGLE' | 'AWS' | 'DEEPL' | 'AZURE';
+      /** @description Services to be used for suggesting */
+      enabledServices: ('GOOGLE' | 'AWS' | 'DEEPL' | 'AZURE')[];
     };
     TagKeyDto: {
       name: string;
@@ -319,6 +690,38 @@ export interface components {
        */
       name: string;
     };
+    ProjectInviteUserDto: {
+      /** @enum {string} */
+      type: 'VIEW' | 'TRANSLATE' | 'EDIT' | 'MANAGE';
+      /**
+       * @description IDs of languages to allow user to translate to with TRANSLATE permission.
+       *
+       * Only applicable when type is TRANSLATE, otherwise 400 - Bad Request is returned.
+       */
+      languages?: number[];
+      /** @description Email to send invitation to */
+      email?: string;
+      /** @description Name of invited user */
+      name?: string;
+    };
+    ProjectInvitationModel: {
+      /** Format: int64 */
+      id: number;
+      code: string;
+      /** @enum {string} */
+      type: 'VIEW' | 'TRANSLATE' | 'EDIT' | 'MANAGE';
+      permittedLanguageIds?: number[];
+      /** Format: date-time */
+      createdAt: string;
+      invitedUserName?: string;
+      invitedUserEmail?: string;
+    };
+    AutoTranslationSettingsDto: {
+      /** @description If true, new keys will be automatically translated using translation memory when 100% match is found */
+      usingTranslationMemory: boolean;
+      /** @description If true, new keys will be automatically translated using primary machine translation service.When "usingTranslationMemory" is enabled, it tries to translate it with translation memory first. */
+      usingMachineTranslation: boolean;
+    };
     TranslationCommentModel: {
       /**
        * Format: int64
@@ -433,6 +836,192 @@ export interface components {
        * @example 🇨🇿
        */
       flagEmoji?: string;
+    };
+    UpdatePatDto: {
+      /** @description New description of the PAT */
+      description: string;
+    };
+    PatModel: {
+      /** Format: int64 */
+      id: number;
+      description: string;
+      /** Format: int64 */
+      expiresAt?: number;
+      /** Format: int64 */
+      createdAt: number;
+      /** Format: int64 */
+      updatedAt: number;
+      /** Format: int64 */
+      lastUsedAt?: number;
+    };
+    RegeneratePatDto: {
+      /**
+       * Format: int64
+       * @description Expiration date in epoch format (milliseconds). When null key never expires.
+       * @example 1661172869000
+       */
+      expiresAt?: number;
+    };
+    RevealedPatModel: {
+      token: string;
+      /** Format: int64 */
+      createdAt: number;
+      /** Format: int64 */
+      updatedAt: number;
+      /** Format: int64 */
+      expiresAt?: number;
+      /** Format: int64 */
+      lastUsedAt?: number;
+      description: string;
+      /** Format: int64 */
+      id: number;
+    };
+    SetOrganizationRoleDto: {
+      /** @enum {string} */
+      roleType: 'MEMBER' | 'OWNER';
+    };
+    OrganizationInviteUserDto: {
+      /** @enum {string} */
+      roleType: 'MEMBER' | 'OWNER';
+      /** @description Name of invited user */
+      name?: string;
+      /** @description Email to send invitation to */
+      email?: string;
+    };
+    OrganizationInvitationModel: {
+      /** Format: int64 */
+      id: number;
+      code: string;
+      /** @enum {string} */
+      type: 'MEMBER' | 'OWNER';
+      /** Format: date-time */
+      createdAt: string;
+      invitedUserName?: string;
+      invitedUserEmail?: string;
+    };
+    OrganizationModel: {
+      /** Format: int64 */
+      id: number;
+      /** @example Beautiful organization */
+      name: string;
+      /** @example btforg */
+      slug: string;
+      /** @example This is a beautiful organization full of beautiful and clever people */
+      description?: string;
+      /** @enum {string} */
+      basePermissions: 'VIEW' | 'TRANSLATE' | 'EDIT' | 'MANAGE';
+      /**
+       * @description The role of currently authorized user.
+       *
+       * Can be null when user has direct access to one of the projects owned by the organization.
+       * @enum {string}
+       */
+      currentUserRole?: 'MEMBER' | 'OWNER';
+      avatar?: components['schemas']['Avatar'];
+    };
+    OrganizationDto: {
+      /** @example Beautiful organization */
+      name: string;
+      /** @example This is a beautiful organization full of beautiful and clever people */
+      description?: string;
+      /** @example btforg */
+      slug?: string;
+      /** @enum {string} */
+      basePermissions: 'VIEW' | 'TRANSLATE' | 'EDIT' | 'MANAGE';
+    };
+    V2EditApiKeyDto: {
+      scopes: string[];
+      description?: string;
+    };
+    ApiKeyModel: {
+      /**
+       * Format: int64
+       * @description ID of the API key
+       */
+      id: number;
+      /** @description Description */
+      description: string;
+      /** @description Username of user owner */
+      username?: string;
+      /** @description Full name of user owner */
+      userFullName?: string;
+      /**
+       * Format: int64
+       * @description Api key's project ID
+       */
+      projectId: number;
+      /** @description Api key's project name */
+      projectName: string;
+      /**
+       * Format: int64
+       * @description Timestamp of API key expiraion
+       */
+      expiresAt?: number;
+      /**
+       * Format: int64
+       * @description Timestamp of API key last usage
+       */
+      lastUsedAt?: number;
+      /**
+       * @description Api key's permission scopes
+       * @example [
+       *   "screenshots.upload",
+       *   "screenshots.delete",
+       *   "translations.edit",
+       *   "screenshots.view",
+       *   "translations.view",
+       *   "keys.edit"
+       * ]
+       */
+      scopes: string[];
+    };
+    RegenerateApiKeyDto: {
+      /**
+       * Format: int64
+       * @description Expiration date in epoch format (milliseconds). When null key never expires.
+       * @example 1661172869000
+       */
+      expiresAt?: number;
+    };
+    RevealedApiKeyModel: {
+      /** @description Resulting user's api key */
+      key: string;
+      username?: string;
+      /** Format: int64 */
+      expiresAt?: number;
+      /** Format: int64 */
+      projectId: number;
+      scopes: string[];
+      /** Format: int64 */
+      lastUsedAt?: number;
+      projectName: string;
+      userFullName?: string;
+      description: string;
+      /** Format: int64 */
+      id: number;
+    };
+    SuperTokenRequest: {
+      /** @description Has to be provided when TOTP enabled */
+      otp?: string;
+      /** @description Has to be provided when TOTP not enabled */
+      password?: string;
+    };
+    GenerateSlugDto: {
+      name: string;
+      oldSlug?: string;
+    };
+    CreateProjectDTO: {
+      name: string;
+      languages: components['schemas']['LanguageDto'][];
+      /** @description Slug of your project used in url e.g. "/v2/projects/what-a-project". If not provided, it will be generated */
+      slug?: string;
+      /**
+       * Format: int64
+       * @description Organization to create the project in
+       */
+      organizationId: number;
+      /** @description Tag of one of created languages, to select it as base language. If not provided, first language will be selected as base. */
+      baseLanguageTag?: string;
     };
     CreateKeyDto: {
       /** @description Name of the key */
@@ -566,6 +1155,16 @@ export interface components {
        */
       translationExtraCreditsBalanceAfter: number;
     };
+    CreatePatDto: {
+      /** @description Description of the PAT */
+      description: string;
+      /**
+       * Format: int64
+       * @description Expiration date in epoch format (milliseconds). When null, token never expires.
+       * @example 1661172869000
+       */
+      expiresAt?: number;
+    };
     UploadedImageModel: {
       /** Format: int64 */
       id: number;
@@ -575,56 +1174,122 @@ export interface components {
       /** Format: date-time */
       createdAt: string;
     };
+    CreateApiKeyDto: {
+      /** Format: int64 */
+      projectId: number;
+      scopes: string[];
+      /** @description Description of the project API key */
+      description?: string;
+      /**
+       * Format: int64
+       * @description Expiration date in epoch format (milliseconds). When null key never expires.
+       * @example 1661172869000
+       */
+      expiresAt?: number;
+    };
+    CollectionModelSimpleOrganizationModel: {
+      _embedded?: {
+        organizations?: components['schemas']['SimpleOrganizationModel'][];
+      };
+    };
+    UserPreferencesModel: {
+      language?: string;
+      /** Format: int64 */
+      preferredOrganizationId?: number;
+    };
+    AuthMethodsDTO: {
+      github: components['schemas']['OAuthPublicConfigDTO'];
+      google: components['schemas']['OAuthPublicConfigDTO'];
+      oauth2: components['schemas']['OAuthPublicExtendsConfigDTO'];
+    };
+    InitialDataModel: {
+      serverConfiguration: components['schemas']['PublicConfigurationDTO'];
+      userInfo?: components['schemas']['PrivateUserAccountModel'];
+      preferredOrganization?: components['schemas']['OrganizationModel'];
+      languageTag?: string;
+    };
+    MtServiceDTO: {
+      enabled: boolean;
+      defaultEnabledForProject: boolean;
+    };
+    MtServicesDTO: {
+      /** @enum {string} */
+      defaultPrimaryService?: 'GOOGLE' | 'AWS' | 'DEEPL' | 'AZURE';
+      services: { [key: string]: components['schemas']['MtServiceDTO'] };
+    };
+    OAuthPublicConfigDTO: {
+      clientId?: string;
+      enabled: boolean;
+    };
+    OAuthPublicExtendsConfigDTO: {
+      clientId?: string;
+      authorizationUrl?: string;
+      scopes?: string[];
+      enabled: boolean;
+    };
+    PublicBillingConfigurationDTO: {
+      enabled: boolean;
+    };
+    PublicConfigurationDTO: {
+      machineTranslationServices: components['schemas']['MtServicesDTO'];
+      billing: components['schemas']['PublicBillingConfigurationDTO'];
+      authentication: boolean;
+      authMethods?: components['schemas']['AuthMethodsDTO'];
+      passwordResettable: boolean;
+      allowRegistrations: boolean;
+      screenshotsUrl: string;
+      /** Format: int32 */
+      maxUploadFileSize: number;
+      clientSentryDsn?: string;
+      needsEmailVerification: boolean;
+      userCanCreateOrganizations: boolean;
+      appName: string;
+      version: string;
+      showVersion: boolean;
+      /** Format: int64 */
+      maxTranslationTextLength: number;
+      recaptchaSiteKey?: string;
+      openReplayApiKey?: string;
+      chatwootToken?: string;
+    };
+    PagedModelProjectModel: {
+      _embedded?: {
+        projects?: components['schemas']['ProjectModel'][];
+      };
+      page?: components['schemas']['PageMetadata'];
+    };
+    PagedModelUserAccountInProjectModel: {
+      _embedded?: {
+        users?: components['schemas']['UserAccountInProjectModel'][];
+      };
+      page?: components['schemas']['PageMetadata'];
+    };
+    UserAccountInProjectModel: {
+      /** Format: int64 */
+      id: number;
+      username: string;
+      name?: string;
+      /** @enum {string} */
+      organizationRole?: 'MEMBER' | 'OWNER';
+      /** @enum {string} */
+      organizationBasePermissions?: 'VIEW' | 'TRANSLATE' | 'EDIT' | 'MANAGE';
+      /** @enum {string} */
+      directPermissions?: 'VIEW' | 'TRANSLATE' | 'EDIT' | 'MANAGE';
+      computedPermissions: components['schemas']['UserPermissionModel'];
+    };
     PagedModelTagModel: {
       _embedded?: {
         tags?: components['schemas']['TagModel'][];
       };
       page?: components['schemas']['PageMetadata'];
     };
-    LanguageStatsModel: {
+    CreditBalanceModel: {
       /** Format: int64 */
-      languageId?: number;
-      languageTag?: string;
-      languageName?: string;
-      languageOriginalName?: string;
-      languageFlagEmoji?: string;
+      creditBalance: number;
       /** Format: int64 */
-      translatedKeyCount: number;
+      bucketSize: number;
       /** Format: int64 */
-      translatedWordCount: number;
-      /** Format: double */
-      translatedPercentage: number;
-      /** Format: int64 */
-      reviewedKeyCount: number;
-      /** Format: int64 */
-      reviewedWordCount: number;
-      /** Format: double */
-      reviewedPercentage: number;
-      /** Format: int64 */
-      untranslatedKeyCount: number;
-      /** Format: int64 */
-      untranslatedWordCount: number;
-      /** Format: double */
-      untranslatedPercentage: number;
-    };
-    ProjectStatsModel: {
-      /** Format: int64 */
-      projectId: number;
-      /** Format: int32 */
-      languageCount: number;
-      /** Format: int64 */
-      keyCount: number;
-      /** Format: int64 */
-      baseWordsCount: number;
-      /** Format: double */
-      translatedPercentage: number;
-      /** Format: double */
-      reviewedPercentage: number;
-      /** Format: int64 */
-      membersCount: number;
-      /** Format: int64 */
-      tagCount: number;
-      languageStats: components['schemas']['LanguageStatsModel'][];
+      extraCreditBalance: number;
     };
     EntityDescriptionWithRelations: {
       entityClass: string;
@@ -727,6 +1392,7 @@ export interface components {
       page?: components['schemas']['PageMetadata'];
     };
     EntityModelImportFileIssueView: {
+      params: components['schemas']['ImportFileIssueParamView'][];
       /** Format: int64 */
       id: number;
       /** @enum {string} */
@@ -740,7 +1406,6 @@ export interface components {
         | 'ID_ATTRIBUTE_NOT_PROVIDED'
         | 'TARGET_NOT_PROVIDED'
         | 'TRANSLATION_TOO_LONG';
-      params: components['schemas']['ImportFileIssueParamView'][];
     };
     ImportFileIssueParamView: {
       value?: string;
@@ -893,16 +1558,234 @@ export interface components {
       /** @description Was translation memory used to translate this? */
       fromTranslationMemory: boolean;
     };
+    CollectionModelProjectTransferOptionModel: {
+      _embedded?: {
+        transferOptions?: components['schemas']['ProjectTransferOptionModel'][];
+      };
+    };
+    ProjectTransferOptionModel: {
+      name: string;
+      slug: string;
+      /** Format: int64 */
+      id: number;
+    };
+    LanguageStatsModel: {
+      /** Format: int64 */
+      languageId?: number;
+      languageTag?: string;
+      languageName?: string;
+      languageOriginalName?: string;
+      languageFlagEmoji?: string;
+      /** Format: int64 */
+      translatedKeyCount: number;
+      /** Format: int64 */
+      translatedWordCount: number;
+      /** Format: double */
+      translatedPercentage: number;
+      /** Format: int64 */
+      reviewedKeyCount: number;
+      /** Format: int64 */
+      reviewedWordCount: number;
+      /** Format: double */
+      reviewedPercentage: number;
+      /** Format: int64 */
+      untranslatedKeyCount: number;
+      /** Format: int64 */
+      untranslatedWordCount: number;
+      /** Format: double */
+      untranslatedPercentage: number;
+    };
+    ProjectStatsModel: {
+      /** Format: int64 */
+      projectId: number;
+      /** Format: int32 */
+      languageCount: number;
+      /** Format: int64 */
+      keyCount: number;
+      /** Format: int64 */
+      baseWordsCount: number;
+      /** Format: double */
+      translatedPercentage: number;
+      /** Format: double */
+      reviewedPercentage: number;
+      /** Format: int64 */
+      membersCount: number;
+      /** Format: int64 */
+      tagCount: number;
+      languageStats: components['schemas']['LanguageStatsModel'][];
+    };
     PagedModelLanguageModel: {
       _embedded?: {
         languages?: components['schemas']['LanguageModel'][];
       };
       page?: components['schemas']['PageMetadata'];
     };
+    CollectionModelProjectInvitationModel: {
+      _embedded?: {
+        invitations?: components['schemas']['ProjectInvitationModel'][];
+      };
+    };
+    Pageable: {
+      /** Format: int32 */
+      page?: number;
+      /** Format: int32 */
+      size?: number;
+      sort?: string[];
+    };
+    PagedModelApiKeyModel: {
+      _embedded?: {
+        apiKeys?: components['schemas']['ApiKeyModel'][];
+      };
+      page?: components['schemas']['PageMetadata'];
+    };
+    PagedModelProjectWithStatsModel: {
+      _embedded?: {
+        projects?: components['schemas']['ProjectWithStatsModel'][];
+      };
+      page?: components['schemas']['PageMetadata'];
+    };
+    ProjectStatistics: {
+      /** Format: int64 */
+      projectId: number;
+      /** Format: int64 */
+      keyCount: number;
+      /** Format: int64 */
+      languageCount: number;
+      translationStatePercentages: { [key: string]: number };
+    };
+    ProjectWithStatsModel: {
+      /** Format: int64 */
+      id: number;
+      name: string;
+      description?: string;
+      slug?: string;
+      avatar?: components['schemas']['Avatar'];
+      organizationOwner?: components['schemas']['SimpleOrganizationModel'];
+      baseLanguage?: components['schemas']['LanguageModel'];
+      /**
+       * @deprecated
+       * @description Use organizationOwner field
+       */
+      organizationOwnerName?: string;
+      /**
+       * @deprecated
+       * @description Use organizationOwner field
+       */
+      organizationOwnerSlug?: string;
+      /**
+       * @deprecated
+       * @description Use organizationOwner field
+       * @enum {string}
+       */
+      organizationOwnerBasePermissions?:
+        | 'VIEW'
+        | 'TRANSLATE'
+        | 'EDIT'
+        | 'MANAGE';
+      /** @enum {string} */
+      organizationRole?: 'MEMBER' | 'OWNER';
+      /**
+       * @description Current user's direct permission
+       * @example MANAGE
+       * @enum {string}
+       */
+      directPermissions?: 'VIEW' | 'TRANSLATE' | 'EDIT' | 'MANAGE';
+      computedPermissions: components['schemas']['UserPermissionModel'];
+      stats: components['schemas']['ProjectStatistics'];
+      languages: components['schemas']['LanguageModel'][];
+    };
     CollectionModelScreenshotModel: {
       _embedded?: {
         screenshots?: components['schemas']['ScreenshotModel'][];
       };
+    };
+    PagedModelPatModel: {
+      _embedded?: {
+        pats?: components['schemas']['PatModel'][];
+      };
+      page?: components['schemas']['PageMetadata'];
+    };
+    PatWithUserModel: {
+      user: components['schemas']['SimpleUserAccountModel'];
+      /** Format: int64 */
+      createdAt: number;
+      /** Format: int64 */
+      updatedAt: number;
+      /** Format: int64 */
+      expiresAt?: number;
+      /** Format: int64 */
+      lastUsedAt?: number;
+      description: string;
+      /** Format: int64 */
+      id: number;
+    };
+    CollectionModelOrganizationInvitationModel: {
+      _embedded?: {
+        organizationInvitations?: components['schemas']['OrganizationInvitationModel'][];
+      };
+    };
+    UsageModel: {
+      /** Format: int64 */
+      organizationId: number;
+      /**
+       * Format: int64
+       * @description Current balance of standard credits. Standard credits are refilled every month.
+       */
+      creditBalance: number;
+      /**
+       * Format: int64
+       * @description How many credits are included in your current plan.
+       */
+      includedMtCredits: number;
+      /**
+       * Format: int64
+       * @description Date when credits were refilled. (In epoch format.)
+       */
+      creditBalanceRefilledAt: number;
+      /**
+       * Format: int64
+       * @description Date when credits will be refilled. (In epoch format.)
+       */
+      creditBalanceNextRefillAt: number;
+      /**
+       * Format: int64
+       * @description Extra credits, which are neither refilled nor reset every month. These credits are used when there are no standard credits.
+       */
+      extraCreditBalance: number;
+      /**
+       * Format: int64
+       * @description How many translations can be stored within your organization.
+       */
+      translationLimit: number;
+      /**
+       * Format: int64
+       * @description How many translations are currently stored within your organization.
+       */
+      currentTranslations: number;
+    };
+    PagedModelUserAccountWithOrganizationRoleModel: {
+      _embedded?: {
+        usersInOrganization?: components['schemas']['UserAccountWithOrganizationRoleModel'][];
+      };
+      page?: components['schemas']['PageMetadata'];
+    };
+    UserAccountWithOrganizationRoleModel: {
+      /** Format: int64 */
+      id: number;
+      name: string;
+      username: string;
+      /** @enum {string} */
+      organizationRole: 'MEMBER' | 'OWNER';
+    };
+    OrganizationRequestParamsDto: {
+      filterCurrentUserOwner: boolean;
+      search?: string;
+    };
+    PagedModelOrganizationModel: {
+      _embedded?: {
+        organizations?: components['schemas']['OrganizationModel'][];
+      };
+      page?: components['schemas']['PageMetadata'];
     };
     ApiKeyWithLanguagesModel: {
       /**
@@ -911,10 +1794,7 @@ export interface components {
        * If null, all languages are permitted.
        */
       permittedLanguageIds?: number[];
-      /** Format: int64 */
-      id: number;
-      userFullName?: string;
-      projectName: string;
+      username?: string;
       /** Format: int64 */
       expiresAt?: number;
       /** Format: int64 */
@@ -922,8 +1802,20 @@ export interface components {
       scopes: string[];
       /** Format: int64 */
       lastUsedAt?: number;
-      username?: string;
+      projectName: string;
+      userFullName?: string;
       description: string;
+      /** Format: int64 */
+      id: number;
+    };
+    PagedModelUserAccountModel: {
+      _embedded?: {
+        users?: components['schemas']['UserAccountModel'][];
+      };
+      page?: components['schemas']['PageMetadata'];
+    };
+    UserTotpDisableRequestDto: {
+      password: string;
     };
     DeleteKeysDto: {
       /** @description IDs of keys to delete */
@@ -933,18 +1825,504 @@ export interface components {
 }
 
 export interface operations {
-  tagKey_1: {
+  getInfo: {
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['PrivateUserAccountModel'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  updateUser: {
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['PrivateUserAccountModel'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UserUpdateRequestDto'];
+      };
+    };
+  };
+  updateUserOld: {
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['PrivateUserAccountModel'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UserUpdateRequestDto'];
+      };
+    };
+  };
+  delete: {
+    responses: {
+      /** OK */
+      200: unknown;
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  updateUserPassword: {
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['JwtAuthenticationResponse'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UserUpdatePasswordRequestDto'];
+      };
+    };
+  };
+  enableMfa: {
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['JwtAuthenticationResponse'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UserTotpEnableRequestDto'];
+      };
+    };
+  };
+  disableMfa: {
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['JwtAuthenticationResponse'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UserTotpDisableRequestDto'];
+      };
+    };
+  };
+  regenerateRecoveryCodes: {
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': string[];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UserMfaRecoveryRequestDto'];
+      };
+    };
+  };
+  uploadAvatar: {
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['PrivateUserAccountModel'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        'multipart/form-data': {
+          /** Format: binary */
+          avatar: string;
+        };
+      };
+    };
+  };
+  removeAvatar: {
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['PrivateUserAccountModel'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  setPreferredOrganization: {
+    parameters: {
+      path: {
+        organizationId: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: unknown;
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  setLanguage: {
+    parameters: {
+      path: {
+        languageTag: string;
+      };
+    };
+    responses: {
+      /** OK */
+      200: unknown;
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  get_2: {
+    parameters: {
+      path: {
+        projectId: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['ProjectModel'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  editProject: {
+    parameters: {
+      path: {
+        projectId: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['ProjectModel'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['EditProjectDTO'];
+      };
+    };
+  };
+  deleteProject: {
+    parameters: {
+      path: {
+        projectId: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: unknown;
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  setUsersPermissions: {
+    parameters: {
+      path: {
+        projectId: number;
+        userId: number;
+        permissionType: 'VIEW' | 'TRANSLATE' | 'EDIT' | 'MANAGE';
+      };
+      query: {
+        languages?: number[];
+      };
+    };
+    responses: {
+      /** OK */
+      200: unknown;
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  revokePermission: {
+    parameters: {
+      path: {
+        projectId: number;
+        userId: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: unknown;
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  getMachineTranslationSettings: {
+    parameters: {
+      path: {
+        projectId: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['CollectionModelLanguageConfigItemModel'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  setMachineTranslationSettings: {
+    parameters: {
+      path: {
+        projectId: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['CollectionModelLanguageConfigItemModel'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SetMachineTranslationSettingsDto'];
+      };
+    };
+  };
+  tagKey: {
     parameters: {
       path: {
         keyId: number;
-      };
-      query: {
-        /** API key provided via query parameter. Will be deprecated in the future. */
-        ak?: string;
-      };
-      header: {
-        /** API key provided via header. Safer since headers are not stored in server logs. */
-        'X-API-Key'?: string;
+        projectId: number;
       };
     };
     responses: {
@@ -973,18 +2351,11 @@ export interface operations {
       };
     };
   };
-  complexEdit_1: {
+  complexEdit: {
     parameters: {
       path: {
         id: number;
-      };
-      query: {
-        /** API key provided via query parameter. Will be deprecated in the future. */
-        ak?: string;
-      };
-      header: {
-        /** API key provided via header. Safer since headers are not stored in server logs. */
-        'X-API-Key'?: string;
+        projectId: number;
       };
     };
     responses: {
@@ -1013,18 +2384,11 @@ export interface operations {
       };
     };
   };
-  edit_1: {
+  edit: {
     parameters: {
       path: {
         id: number;
-      };
-      query: {
-        /** API key provided via query parameter. Will be deprecated in the future. */
-        ak?: string;
-      };
-      header: {
-        /** API key provided via header. Safer since headers are not stored in server logs. */
-        'X-API-Key'?: string;
+        projectId: number;
       };
     };
     responses: {
@@ -1053,20 +2417,104 @@ export interface operations {
       };
     };
   };
+  inviteUser: {
+    parameters: {
+      path: {
+        projectId: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['ProjectInvitationModel'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ProjectInviteUserDto'];
+      };
+    };
+  };
+  getAutoTranslationSettings: {
+    parameters: {
+      path: {
+        projectId: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['AutoTranslationSettingsDto'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  setAutoTranslationSettings: {
+    parameters: {
+      path: {
+        projectId: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['AutoTranslationSettingsDto'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['AutoTranslationSettingsDto'];
+      };
+    };
+  };
   /** Resolves translation conflict. The old translation will be overridden. */
-  resolveTranslationSetOverride_1: {
+  resolveTranslationSetOverride: {
     parameters: {
       path: {
         languageId: number;
         translationId: number;
-      };
-      query: {
-        /** API key provided via query parameter. Will be deprecated in the future. */
-        ak?: string;
-      };
-      header: {
-        /** API key provided via header. Safer since headers are not stored in server logs. */
-        'X-API-Key'?: string;
+        projectId: number;
       };
     };
     responses: {
@@ -1087,19 +2535,12 @@ export interface operations {
     };
   };
   /** Resolves translation conflict. The old translation will be kept. */
-  resolveTranslationSetKeepExisting_1: {
+  resolveTranslationSetKeepExisting: {
     parameters: {
       path: {
         languageId: number;
         translationId: number;
-      };
-      query: {
-        /** API key provided via query parameter. Will be deprecated in the future. */
-        ak?: string;
-      };
-      header: {
-        /** API key provided via header. Safer since headers are not stored in server logs. */
-        'X-API-Key'?: string;
+        projectId: number;
       };
     };
     responses: {
@@ -1120,18 +2561,11 @@ export interface operations {
     };
   };
   /** Resolves all translation conflicts for provided language. The old translations will be overridden. */
-  resolveTranslationSetOverride_3: {
+  resolveTranslationSetOverride_2: {
     parameters: {
       path: {
         languageId: number;
-      };
-      query: {
-        /** API key provided via query parameter. Will be deprecated in the future. */
-        ak?: string;
-      };
-      header: {
-        /** API key provided via header. Safer since headers are not stored in server logs. */
-        'X-API-Key'?: string;
+        projectId: number;
       };
     };
     responses: {
@@ -1152,18 +2586,11 @@ export interface operations {
     };
   };
   /** Resolves all translation conflicts for provided language. The old translations will be kept. */
-  resolveTranslationSetKeepExisting_3: {
+  resolveTranslationSetKeepExisting_2: {
     parameters: {
       path: {
         languageId: number;
-      };
-      query: {
-        /** API key provided via query parameter. Will be deprecated in the future. */
-        ak?: string;
-      };
-      header: {
-        /** API key provided via header. Safer since headers are not stored in server logs. */
-        'X-API-Key'?: string;
+        projectId: number;
       };
     };
     responses: {
@@ -1184,19 +2611,12 @@ export interface operations {
     };
   };
   /** Sets existing language to pair with language to import. Data will be imported to selected existing language when applied. */
-  selectExistingLanguage_1: {
+  selectExistingLanguage: {
     parameters: {
       path: {
         importLanguageId: number;
         existingLanguageId: number;
-      };
-      query: {
-        /** API key provided via query parameter. Will be deprecated in the future. */
-        ak?: string;
-      };
-      header: {
-        /** API key provided via header. Safer since headers are not stored in server logs. */
-        'X-API-Key'?: string;
+        projectId: number;
       };
     };
     responses: {
@@ -1217,18 +2637,11 @@ export interface operations {
     };
   };
   /** Resets existing language paired with language to import. */
-  resetExistingLanguage_1: {
+  resetExistingLanguage: {
     parameters: {
       path: {
         importLanguageId: number;
-      };
-      query: {
-        /** API key provided via query parameter. Will be deprecated in the future. */
-        ak?: string;
-      };
-      header: {
-        /** API key provided via header. Safer since headers are not stored in server logs. */
-        'X-API-Key'?: string;
+        projectId: number;
       };
     };
     responses: {
@@ -1249,16 +2662,13 @@ export interface operations {
     };
   };
   /** Imports the data prepared in previous step */
-  applyImport_1: {
+  applyImport: {
     parameters: {
       query: {
         forceMode?: 'OVERRIDE' | 'KEEP' | 'NO_FORCE';
-        /** API key provided via query parameter. Will be deprecated in the future. */
-        ak?: string;
       };
-      header: {
-        /** API key provided via header. Safer since headers are not stored in server logs. */
-        'X-API-Key'?: string;
+      path: {
+        projectId: number;
       };
     };
     responses: {
@@ -1278,19 +2688,12 @@ export interface operations {
       };
     };
   };
-  setTranslationState_1: {
+  setTranslationState: {
     parameters: {
       path: {
         translationId: number;
         state: 'UNTRANSLATED' | 'TRANSLATED' | 'REVIEWED';
-      };
-      query: {
-        /** API key provided via query parameter. Will be deprecated in the future. */
-        ak?: string;
-      };
-      header: {
-        /** API key provided via header. Safer since headers are not stored in server logs. */
-        'X-API-Key'?: string;
+        projectId: number;
       };
     };
     responses: {
@@ -1314,19 +2717,12 @@ export interface operations {
       };
     };
   };
-  setState_1: {
+  setState: {
     parameters: {
       path: {
         commentId: number;
         state: 'RESOLUTION_NOT_NEEDED' | 'NEEDS_RESOLUTION' | 'RESOLVED';
-      };
-      query: {
-        /** API key provided via query parameter. Will be deprecated in the future. */
-        ak?: string;
-      };
-      header: {
-        /** API key provided via header. Safer since headers are not stored in server logs. */
-        'X-API-Key'?: string;
+        projectId: number;
       };
     };
     responses: {
@@ -1350,19 +2746,12 @@ export interface operations {
       };
     };
   };
-  get_4: {
+  get_3: {
     parameters: {
       path: {
         translationId: number;
         commentId: number;
-      };
-      query: {
-        /** API key provided via query parameter. Will be deprecated in the future. */
-        ak?: string;
-      };
-      header: {
-        /** API key provided via header. Safer since headers are not stored in server logs. */
-        'X-API-Key'?: string;
+        projectId: number;
       };
     };
     responses: {
@@ -1386,18 +2775,11 @@ export interface operations {
       };
     };
   };
-  update_1: {
+  update: {
     parameters: {
       path: {
         commentId: number;
-      };
-      query: {
-        /** API key provided via query parameter. Will be deprecated in the future. */
-        ak?: string;
-      };
-      header: {
-        /** API key provided via header. Safer since headers are not stored in server logs. */
-        'X-API-Key'?: string;
+        projectId: number;
       };
     };
     responses: {
@@ -1426,18 +2808,11 @@ export interface operations {
       };
     };
   };
-  delete_6: {
+  delete_5: {
     parameters: {
       path: {
         commentId: number;
-      };
-      query: {
-        /** API key provided via query parameter. Will be deprecated in the future. */
-        ak?: string;
-      };
-      header: {
-        /** API key provided via header. Safer since headers are not stored in server logs. */
-        'X-API-Key'?: string;
+        projectId: number;
       };
     };
     responses: {
@@ -1457,18 +2832,11 @@ export interface operations {
       };
     };
   };
-  dismissAutoTranslatedState_1: {
+  dismissAutoTranslatedState: {
     parameters: {
       path: {
         translationId: number;
-      };
-      query: {
-        /** API key provided via query parameter. Will be deprecated in the future. */
-        ak?: string;
-      };
-      header: {
-        /** API key provided via header. Safer since headers are not stored in server logs. */
-        'X-API-Key'?: string;
+        projectId: number;
       };
     };
     responses: {
@@ -1492,7 +2860,7 @@ export interface operations {
       };
     };
   };
-  getTranslations_1: {
+  getTranslations: {
     parameters: {
       query: {
         /** Cursor to get next data */
@@ -1537,12 +2905,9 @@ export interface operations {
         size?: number;
         /** Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
         sort?: string[];
-        /** API key provided via query parameter. Will be deprecated in the future. */
-        ak?: string;
       };
-      header: {
-        /** API key provided via header. Safer since headers are not stored in server logs. */
-        'X-API-Key'?: string;
+      path: {
+        projectId: number;
       };
     };
     responses: {
@@ -1566,15 +2931,10 @@ export interface operations {
       };
     };
   };
-  setTranslations_1: {
+  setTranslations: {
     parameters: {
-      query: {
-        /** API key provided via query parameter. Will be deprecated in the future. */
-        ak?: string;
-      };
-      header: {
-        /** API key provided via header. Safer since headers are not stored in server logs. */
-        'X-API-Key'?: string;
+      path: {
+        projectId: number;
       };
     };
     responses: {
@@ -1603,15 +2963,10 @@ export interface operations {
       };
     };
   };
-  createOrUpdateTranslations_1: {
+  createOrUpdateTranslations: {
     parameters: {
-      query: {
-        /** API key provided via query parameter. Will be deprecated in the future. */
-        ak?: string;
-      };
-      header: {
-        /** API key provided via header. Safer since headers are not stored in server logs. */
-        'X-API-Key'?: string;
+      path: {
+        projectId: number;
       };
     };
     responses: {
@@ -1640,18 +2995,86 @@ export interface operations {
       };
     };
   };
-  editLanguage_1: {
+  transferProjectToOrganization: {
+    parameters: {
+      path: {
+        projectId: number;
+        organizationId: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: unknown;
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  leaveProject: {
+    parameters: {
+      path: {
+        projectId: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: unknown;
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  get_5: {
     parameters: {
       path: {
         languageId: number;
+        projectId: number;
       };
-      query: {
-        /** API key provided via query parameter. Will be deprecated in the future. */
-        ak?: string;
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['LanguageModel'];
+        };
       };
-      header: {
-        /** API key provided via header. Safer since headers are not stored in server logs. */
-        'X-API-Key'?: string;
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  editLanguage: {
+    parameters: {
+      path: {
+        languageId: number;
+        projectId: number;
       };
     };
     responses: {
@@ -1680,18 +3103,11 @@ export interface operations {
       };
     };
   };
-  deleteLanguage_3: {
+  deleteLanguage_2: {
     parameters: {
       path: {
         languageId: number;
-      };
-      query: {
-        /** API key provided via query parameter. Will be deprecated in the future. */
-        ak?: string;
-      };
-      header: {
-        /** API key provided via header. Safer since headers are not stored in server logs. */
-        'X-API-Key'?: string;
+        projectId: number;
       };
     };
     responses: {
@@ -1717,10 +3133,11 @@ export interface operations {
    *
    * This will replace the the existing translation with the result obtained from specified source!
    */
-  autoTranslate_1: {
+  autoTranslate: {
     parameters: {
       path: {
         keyId: number;
+        projectId: number;
       };
       query: {
         /**
@@ -1730,12 +3147,6 @@ export interface operations {
         languages?: string[];
         useMachineTranslation?: boolean;
         useTranslationMemory?: boolean;
-        /** API key provided via query parameter. Will be deprecated in the future. */
-        ak?: string;
-      };
-      header: {
-        /** API key provided via header. Safer since headers are not stored in server logs. */
-        'X-API-Key'?: string;
       };
     };
     responses: {
@@ -1755,15 +3166,666 @@ export interface operations {
       };
     };
   };
-  create_2: {
+  uploadAvatar_1: {
+    parameters: {
+      path: {
+        projectId: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['ProjectModel'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        'multipart/form-data': {
+          /** Format: binary */
+          avatar: string;
+        };
+      };
+    };
+  };
+  removeAvatar_1: {
+    parameters: {
+      path: {
+        projectId: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['ProjectModel'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  get_7: {
+    parameters: {
+      path: {
+        id: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['PatModel'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  update_2: {
+    parameters: {
+      path: {
+        id: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['PatModel'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdatePatDto'];
+      };
+    };
+  };
+  delete_7: {
+    parameters: {
+      path: {
+        id: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: unknown;
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  regenerate: {
+    parameters: {
+      path: {
+        id: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['RevealedPatModel'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RegeneratePatDto'];
+      };
+    };
+  };
+  setUserRole: {
+    parameters: {
+      path: {
+        organizationId: number;
+        userId: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: unknown;
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SetOrganizationRoleDto'];
+      };
+    };
+  };
+  leaveOrganization: {
+    parameters: {
+      path: {
+        id: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: unknown;
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  inviteUser_1: {
+    parameters: {
+      path: {
+        id: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['OrganizationInvitationModel'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['OrganizationInviteUserDto'];
+      };
+    };
+  };
+  uploadAvatar_2: {
+    parameters: {
+      path: {
+        id: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['OrganizationModel'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        'multipart/form-data': {
+          /** Format: binary */
+          avatar: string;
+        };
+      };
+    };
+  };
+  removeAvatar_2: {
+    parameters: {
+      path: {
+        id: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['OrganizationModel'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  get_9: {
+    parameters: {
+      path: {
+        id: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['OrganizationModel'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  update_3: {
+    parameters: {
+      path: {
+        id: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['OrganizationModel'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['OrganizationDto'];
+      };
+    };
+  };
+  delete_8: {
+    parameters: {
+      path: {
+        id: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: unknown;
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  update_4: {
+    parameters: {
+      path: {
+        apiKeyId: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['ApiKeyModel'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['V2EditApiKeyDto'];
+      };
+    };
+  };
+  delete_10: {
+    parameters: {
+      path: {
+        apiKeyId: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: unknown;
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  regenerate_1: {
+    parameters: {
+      path: {
+        apiKeyId: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['RevealedApiKeyModel'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RegenerateApiKeyDto'];
+      };
+    };
+  };
+  setRole: {
+    parameters: {
+      path: {
+        userId: number;
+        role: 'USER' | 'ADMIN';
+      };
+    };
+    responses: {
+      /** OK */
+      200: unknown;
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  getSuperToken: {
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['JwtAuthenticationResponse'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SuperTokenRequest'];
+      };
+    };
+  };
+  generateProjectSlug: {
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          'application/json': string;
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['GenerateSlugDto'];
+      };
+    };
+  };
+  generateOrganizationSlug: {
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          'application/json': string;
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['GenerateSlugDto'];
+      };
+    };
+  };
+  getAll: {
     parameters: {
       query: {
-        /** API key provided via query parameter. Will be deprecated in the future. */
-        ak?: string;
+        /** Zero-based page index (0..N) */
+        page?: number;
+        /** The size of the page to be returned */
+        size?: number;
+        /** Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+        sort?: string[];
+        search?: string;
       };
-      header: {
-        /** API key provided via header. Safer since headers are not stored in server logs. */
-        'X-API-Key'?: string;
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          'application/hal+json': components['schemas']['PagedModelProjectModel'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  createProject: {
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['ProjectModel'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateProjectDTO'];
+      };
+    };
+  };
+  create: {
+    parameters: {
+      path: {
+        projectId: number;
       };
     };
     responses: {
@@ -1792,15 +3854,10 @@ export interface operations {
       };
     };
   };
-  create_3: {
+  create_1: {
     parameters: {
-      query: {
-        /** API key provided via query parameter. Will be deprecated in the future. */
-        ak?: string;
-      };
-      header: {
-        /** API key provided via header. Safer since headers are not stored in server logs. */
-        'X-API-Key'?: string;
+      path: {
+        projectId: number;
       };
     };
     responses: {
@@ -1829,15 +3886,10 @@ export interface operations {
       };
     };
   };
-  delete_4: {
+  delete_3: {
     parameters: {
-      query: {
-        /** API key provided via query parameter. Will be deprecated in the future. */
-        ak?: string;
-      };
-      header: {
-        /** API key provided via header. Safer since headers are not stored in server logs. */
-        'X-API-Key'?: string;
+      path: {
+        projectId: number;
       };
     };
     responses: {
@@ -1862,16 +3914,46 @@ export interface operations {
       };
     };
   };
-  /** Prepares provided files to import. */
-  addFiles_1: {
+  /** Prepares provided files to import, streams operation progress */
+  addFilesStreaming: {
     parameters: {
-      query: {
-        /** API key provided via query parameter. Will be deprecated in the future. */
-        ak?: string;
+      path: {
+        projectId: number;
       };
-      header: {
-        /** API key provided via header. Safer since headers are not stored in server logs. */
-        'X-API-Key'?: string;
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['StreamingResponseBody'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        'multipart/form-data': {
+          files: string[];
+        };
+      };
+    };
+  };
+  /** Prepares provided files to import. */
+  addFiles: {
+    parameters: {
+      path: {
+        projectId: number;
       };
     };
     responses: {
@@ -1903,15 +3985,10 @@ export interface operations {
     };
   };
   /** Deletes prepared import data. */
-  cancelImport_1: {
+  cancelImport: {
     parameters: {
-      query: {
-        /** API key provided via query parameter. Will be deprecated in the future. */
-        ak?: string;
-      };
-      header: {
-        /** API key provided via header. Safer since headers are not stored in server logs. */
-        'X-API-Key'?: string;
+      path: {
+        projectId: number;
       };
     };
     responses: {
@@ -1931,7 +4008,7 @@ export interface operations {
       };
     };
   };
-  export_1: {
+  export: {
     parameters: {
       query: {
         /**
@@ -1974,12 +4051,9 @@ export interface operations {
          * This is possible only when single language is exported. Otherwise it returns "400 - Bad Request" response.
          */
         zip?: boolean;
-        /** API key provided via query parameter. Will be deprecated in the future. */
-        ak?: string;
       };
-      header: {
-        /** API key provided via header. Safer since headers are not stored in server logs. */
-        'X-API-Key'?: string;
+      path: {
+        projectId: number;
       };
     };
     responses: {
@@ -2003,15 +4077,10 @@ export interface operations {
       };
     };
   };
-  exportPost_1: {
+  exportPost: {
     parameters: {
-      query: {
-        /** API key provided via query parameter. Will be deprecated in the future. */
-        ak?: string;
-      };
-      header: {
-        /** API key provided via header. Safer since headers are not stored in server logs. */
-        'X-API-Key'?: string;
+      path: {
+        projectId: number;
       };
     };
     responses: {
@@ -2040,10 +4109,11 @@ export interface operations {
       };
     };
   };
-  getAll_4: {
+  getAll_3: {
     parameters: {
       path: {
         translationId: number;
+        projectId: number;
       };
       query: {
         /** Zero-based page index (0..N) */
@@ -2052,12 +4122,6 @@ export interface operations {
         size?: number;
         /** Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
         sort?: string[];
-        /** API key provided via query parameter. Will be deprecated in the future. */
-        ak?: string;
-      };
-      header: {
-        /** API key provided via header. Safer since headers are not stored in server logs. */
-        'X-API-Key'?: string;
       };
     };
     responses: {
@@ -2081,18 +4145,11 @@ export interface operations {
       };
     };
   };
-  create_5: {
+  create_4: {
     parameters: {
       path: {
         translationId: number;
-      };
-      query: {
-        /** API key provided via query parameter. Will be deprecated in the future. */
-        ak?: string;
-      };
-      header: {
-        /** API key provided via header. Safer since headers are not stored in server logs. */
-        'X-API-Key'?: string;
+        projectId: number;
       };
     };
     responses: {
@@ -2121,15 +4178,10 @@ export interface operations {
       };
     };
   };
-  create_7: {
+  create_6: {
     parameters: {
-      query: {
-        /** API key provided via query parameter. Will be deprecated in the future. */
-        ak?: string;
-      };
-      header: {
-        /** API key provided via header. Safer since headers are not stored in server logs. */
-        'X-API-Key'?: string;
+      path: {
+        projectId: number;
       };
     };
     responses: {
@@ -2158,7 +4210,7 @@ export interface operations {
       };
     };
   };
-  suggestTranslationMemory_1: {
+  suggestTranslationMemory: {
     parameters: {
       query: {
         /** Zero-based page index (0..N) */
@@ -2167,12 +4219,9 @@ export interface operations {
         size?: number;
         /** Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
         sort?: string[];
-        /** API key provided via query parameter. Will be deprecated in the future. */
-        ak?: string;
       };
-      header: {
-        /** API key provided via header. Safer since headers are not stored in server logs. */
-        'X-API-Key'?: string;
+      path: {
+        projectId: number;
       };
     };
     responses: {
@@ -2201,15 +4250,10 @@ export interface operations {
       };
     };
   };
-  suggestMachineTranslations_1: {
+  suggestMachineTranslations: {
     parameters: {
-      query: {
-        /** API key provided via query parameter. Will be deprecated in the future. */
-        ak?: string;
-      };
-      header: {
-        /** API key provided via header. Safer since headers are not stored in server logs. */
-        'X-API-Key'?: string;
+      path: {
+        projectId: number;
       };
     };
     responses: {
@@ -2238,8 +4282,11 @@ export interface operations {
       };
     };
   };
-  getAll_6: {
+  getAll_5: {
     parameters: {
+      path: {
+        projectId: number;
+      };
       query: {
         /** Zero-based page index (0..N) */
         page?: number;
@@ -2247,12 +4294,6 @@ export interface operations {
         size?: number;
         /** Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
         sort?: string[];
-        /** API key provided via query parameter. Will be deprecated in the future. */
-        ak?: string;
-      };
-      header: {
-        /** API key provided via header. Safer since headers are not stored in server logs. */
-        'X-API-Key'?: string;
       };
     };
     responses: {
@@ -2276,15 +4317,10 @@ export interface operations {
       };
     };
   };
-  createLanguage_1: {
+  createLanguage: {
     parameters: {
-      query: {
-        /** API key provided via query parameter. Will be deprecated in the future. */
-        ak?: string;
-      };
-      header: {
-        /** API key provided via header. Safer since headers are not stored in server logs. */
-        'X-API-Key'?: string;
+      path: {
+        projectId: number;
       };
     };
     responses: {
@@ -2313,18 +4349,11 @@ export interface operations {
       };
     };
   };
-  getKeyScreenshots: {
+  getKeyScreenshots_1: {
     parameters: {
       path: {
         keyId: number;
-      };
-      query: {
-        /** API key provided via query parameter. Will be deprecated in the future. */
-        ak?: string;
-      };
-      header: {
-        /** API key provided via header. Safer since headers are not stored in server logs. */
-        'X-API-Key'?: string;
+        projectId: number;
       };
     };
     responses: {
@@ -2348,18 +4377,11 @@ export interface operations {
       };
     };
   };
-  uploadScreenshot: {
+  uploadScreenshot_1: {
     parameters: {
       path: {
         keyId: number;
-      };
-      query: {
-        /** API key provided via query parameter. Will be deprecated in the future. */
-        ak?: string;
-      };
-      header: {
-        /** API key provided via header. Safer since headers are not stored in server logs. */
-        'X-API-Key'?: string;
+        projectId: number;
       };
     };
     responses: {
@@ -2391,17 +4413,127 @@ export interface operations {
       };
     };
   };
-  upload: {
+  getAll_7: {
     parameters: {
       query: {
-        /** API key provided via query parameter. Will be deprecated in the future. */
-        ak?: string;
-      };
-      header: {
-        /** API key provided via header. Safer since headers are not stored in server logs. */
-        'X-API-Key'?: string;
+        /** Zero-based page index (0..N) */
+        page?: number;
+        /** The size of the page to be returned */
+        size?: number;
+        /** Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+        sort?: string[];
       };
     };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['PagedModelPatModel'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  create_8: {
+    responses: {
+      /** Created */
+      201: {
+        content: {
+          '*/*': components['schemas']['RevealedPatModel'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreatePatDto'];
+      };
+    };
+  };
+  getAll_8: {
+    parameters: {
+      query: {
+        /** Zero-based page index (0..N) */
+        page?: number;
+        /** The size of the page to be returned */
+        size?: number;
+        /** Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+        sort?: string[];
+        params: components['schemas']['OrganizationRequestParamsDto'];
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          'application/hal+json': components['schemas']['PagedModelOrganizationModel'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  create_9: {
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['OrganizationModel'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['OrganizationDto'];
+      };
+    };
+  };
+  upload: {
+    parameters: {};
     responses: {
       /** Created */
       201: {
@@ -2431,7 +4563,219 @@ export interface operations {
       };
     };
   };
-  getAll_2: {
+  allByUser: {
+    parameters: {
+      query: {
+        pageable: components['schemas']['Pageable'];
+        filterProjectId?: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['PagedModelApiKeyModel'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  create_10: {
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['RevealedApiKeyModel'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateApiKeyDto'];
+      };
+    };
+  };
+  getAllSingleOwnedOrganizations: {
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['CollectionModelSimpleOrganizationModel'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  get: {
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['UserPreferencesModel'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  validateProjectSlug: {
+    parameters: {
+      path: {
+        slug: string;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': boolean;
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  validateOrganizationSlug: {
+    parameters: {
+      path: {
+        slug: string;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': boolean;
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  /** Returns initial data always required by frontend */
+  get_1: {
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['InitialDataModel'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  getAllUsers: {
+    parameters: {
+      path: {
+        projectId: number;
+      };
+      query: {
+        /** Zero-based page index (0..N) */
+        page?: number;
+        /** The size of the page to be returned */
+        size?: number;
+        /** Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+        sort?: string[];
+        search?: string;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['PagedModelUserAccountInProjectModel'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  getAll_1: {
     parameters: {
       query: {
         search?: string;
@@ -2441,12 +4785,9 @@ export interface operations {
         size?: number;
         /** Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
         sort?: string[];
-        /** API key provided via query parameter. Will be deprecated in the future. */
-        ak?: string;
       };
-      header: {
-        /** API key provided via header. Safer since headers are not stored in server logs. */
-        'X-API-Key'?: string;
+      path: {
+        projectId: number;
       };
     };
     responses: {
@@ -2470,22 +4811,17 @@ export interface operations {
       };
     };
   };
-  getProjectDailyActivity_1: {
+  getProjectCredits: {
     parameters: {
-      query: {
-        /** API key provided via query parameter. Will be deprecated in the future. */
-        ak?: string;
-      };
-      header: {
-        /** API key provided via header. Safer since headers are not stored in server logs. */
-        'X-API-Key'?: string;
+      path: {
+        projectId: number;
       };
     };
     responses: {
       /** OK */
       200: {
         content: {
-          'application/hal+json': { [key: string]: number };
+          '*/*': components['schemas']['CreditBalanceModel'];
         };
       };
       /** Bad Request */
@@ -2502,39 +4838,7 @@ export interface operations {
       };
     };
   };
-  getProjectStats_1: {
-    parameters: {
-      query: {
-        /** API key provided via query parameter. Will be deprecated in the future. */
-        ak?: string;
-      };
-      header: {
-        /** API key provided via header. Safer since headers are not stored in server logs. */
-        'X-API-Key'?: string;
-      };
-    };
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          'application/hal+json': components['schemas']['ProjectStatsModel'];
-        };
-      };
-      /** Bad Request */
-      400: {
-        content: {
-          '*/*': string;
-        };
-      };
-      /** Not Found */
-      404: {
-        content: {
-          '*/*': string;
-        };
-      };
-    };
-  };
-  getActivity_1: {
+  getActivity: {
     parameters: {
       query: {
         /** Zero-based page index (0..N) */
@@ -2543,12 +4847,9 @@ export interface operations {
         size?: number;
         /** Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
         sort?: string[];
-        /** API key provided via query parameter. Will be deprecated in the future. */
-        ak?: string;
       };
-      header: {
-        /** API key provided via header. Safer since headers are not stored in server logs. */
-        'X-API-Key'?: string;
+      path: {
+        projectId: number;
       };
     };
     responses: {
@@ -2573,9 +4874,10 @@ export interface operations {
     };
   };
   /** Returns translations prepared to import. */
-  getImportTranslations_1: {
+  getImportTranslations: {
     parameters: {
       path: {
+        projectId: number;
         languageId: number;
       };
       query: {
@@ -2588,12 +4890,6 @@ export interface operations {
         size?: number;
         /** Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
         sort?: string[];
-        /** API key provided via query parameter. Will be deprecated in the future. */
-        ak?: string;
-      };
-      header: {
-        /** API key provided via header. Safer since headers are not stored in server logs. */
-        'X-API-Key'?: string;
       };
     };
     responses: {
@@ -2618,18 +4914,11 @@ export interface operations {
     };
   };
   /** Returns language prepared to import. */
-  getImportLanguage_1: {
+  getImportLanguage: {
     parameters: {
       path: {
         languageId: number;
-      };
-      query: {
-        /** API key provided via query parameter. Will be deprecated in the future. */
-        ak?: string;
-      };
-      header: {
-        /** API key provided via header. Safer since headers are not stored in server logs. */
-        'X-API-Key'?: string;
+        projectId: number;
       };
     };
     responses: {
@@ -2654,18 +4943,11 @@ export interface operations {
     };
   };
   /** Deletes language prepared to import. */
-  deleteLanguage_1: {
+  deleteLanguage: {
     parameters: {
       path: {
         languageId: number;
-      };
-      query: {
-        /** API key provided via query parameter. Will be deprecated in the future. */
-        ak?: string;
-      };
-      header: {
-        /** API key provided via header. Safer since headers are not stored in server logs. */
-        'X-API-Key'?: string;
+        projectId: number;
       };
     };
     responses: {
@@ -2686,10 +4968,11 @@ export interface operations {
     };
   };
   /** Returns issues for uploaded file. */
-  getImportFileIssues_1: {
+  getImportFileIssues: {
     parameters: {
       path: {
         importFileId: number;
+        projectId: number;
       };
       query: {
         /** Zero-based page index (0..N) */
@@ -2698,12 +4981,6 @@ export interface operations {
         size?: number;
         /** Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
         sort?: string[];
-        /** API key provided via query parameter. Will be deprecated in the future. */
-        ak?: string;
-      };
-      header: {
-        /** API key provided via header. Safer since headers are not stored in server logs. */
-        'X-API-Key'?: string;
       };
     };
     responses: {
@@ -2728,7 +5005,7 @@ export interface operations {
     };
   };
   /** Returns the result of preparation. */
-  getImportResult_1: {
+  getImportResult: {
     parameters: {
       query: {
         /** Zero-based page index (0..N) */
@@ -2737,12 +5014,9 @@ export interface operations {
         size?: number;
         /** Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
         sort?: string[];
-        /** API key provided via query parameter. Will be deprecated in the future. */
-        ak?: string;
       };
-      header: {
-        /** API key provided via header. Safer since headers are not stored in server logs. */
-        'X-API-Key'?: string;
+      path: {
+        projectId: number;
       };
     };
     responses: {
@@ -2766,10 +5040,11 @@ export interface operations {
       };
     };
   };
-  getTranslationHistory_1: {
+  getTranslationHistory: {
     parameters: {
       path: {
         translationId: number;
+        projectId: number;
       };
       query: {
         /** Zero-based page index (0..N) */
@@ -2778,12 +5053,6 @@ export interface operations {
         size?: number;
         /** Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
         sort?: string[];
-        /** API key provided via query parameter. Will be deprecated in the future. */
-        ak?: string;
-      };
-      header: {
-        /** API key provided via header. Safer since headers are not stored in server logs. */
-        'X-API-Key'?: string;
       };
     };
     responses: {
@@ -2807,18 +5076,11 @@ export interface operations {
       };
     };
   };
-  getAllTranslations_1: {
+  getAllTranslations: {
     parameters: {
       path: {
         languages: string[];
-      };
-      query: {
-        /** API key provided via query parameter. Will be deprecated in the future. */
-        ak?: string;
-      };
-      header: {
-        /** API key provided via header. Safer since headers are not stored in server logs. */
-        'X-API-Key'?: string;
+        projectId: number;
       };
     };
     responses: {
@@ -2842,7 +5104,7 @@ export interface operations {
       };
     };
   };
-  getSelectAllKeyIds_1: {
+  getSelectAllKeyIds: {
     parameters: {
       query: {
         /**
@@ -2879,12 +5141,9 @@ export interface operations {
         filterHasNoScreenshot?: boolean;
         /** Selects only keys with provided tag */
         filterTag?: string[];
-        /** API key provided via query parameter. Will be deprecated in the future. */
-        ak?: string;
       };
-      header: {
-        /** API key provided via header. Safer since headers are not stored in server logs. */
-        'X-API-Key'?: string;
+      path: {
+        projectId: number;
       };
     };
     responses: {
@@ -2908,17 +5167,565 @@ export interface operations {
       };
     };
   };
-  getCurrent: {
+  getTransferOptions: {
     parameters: {
       query: {
-        /** API key provided via query parameter. Will be deprecated in the future. */
-        ak?: string;
+        search?: string;
       };
-      header: {
-        /** API key provided via header. Safer since headers are not stored in server logs. */
-        'X-API-Key'?: string;
+      path: {
+        projectId: number;
       };
     };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['CollectionModelProjectTransferOptionModel'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  getProjectDailyActivity: {
+    parameters: {
+      path: {
+        projectId: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          'application/hal+json': { [key: string]: number };
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  getProjectStats: {
+    parameters: {
+      path: {
+        projectId: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          'application/hal+json': components['schemas']['ProjectStatsModel'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  getProjectInvitations: {
+    parameters: {
+      path: {
+        projectId: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['CollectionModelProjectInvitationModel'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  allByProject: {
+    parameters: {
+      query: {
+        pageable: components['schemas']['Pageable'];
+      };
+      path: {
+        projectId: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['PagedModelApiKeyModel'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  getAllWithStatistics: {
+    parameters: {
+      query: {
+        /** Zero-based page index (0..N) */
+        page?: number;
+        /** The size of the page to be returned */
+        size?: number;
+        /** Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+        sort?: string[];
+        search?: string;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          'application/hal+json': components['schemas']['PagedModelProjectWithStatsModel'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  getPreferred: {
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['OrganizationModel'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  getCurrent: {
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['PatWithUserModel'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  getAllWithStatistics_1: {
+    parameters: {
+      query: {
+        /** Zero-based page index (0..N) */
+        page?: number;
+        /** The size of the page to be returned */
+        size?: number;
+        /** Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+        sort?: string[];
+        search?: string;
+      };
+      path: {
+        slug: string;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          'application/hal+json': components['schemas']['PagedModelProjectWithStatsModel'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  getAllProjects: {
+    parameters: {
+      path: {
+        slug: string;
+      };
+      query: {
+        /** Zero-based page index (0..N) */
+        page?: number;
+        /** The size of the page to be returned */
+        size?: number;
+        /** Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+        sort?: string[];
+        search?: string;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['PagedModelProjectModel'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  get_8: {
+    parameters: {
+      path: {
+        slug: string;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['OrganizationModel'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  getOrganizationCredits: {
+    parameters: {
+      path: {
+        organizationId: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['CreditBalanceModel'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  getInvitations: {
+    parameters: {
+      path: {
+        organizationId: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['CollectionModelOrganizationInvitationModel'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  /** Returns current organization usage */
+  getUsage: {
+    parameters: {
+      path: {
+        organizationId: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['UsageModel'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  getAllWithStatistics_2: {
+    parameters: {
+      query: {
+        /** Zero-based page index (0..N) */
+        page?: number;
+        /** The size of the page to be returned */
+        size?: number;
+        /** Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+        sort?: string[];
+        search?: string;
+      };
+      path: {
+        organizationId: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          'application/hal+json': components['schemas']['PagedModelProjectWithStatsModel'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  getAllUsers_1: {
+    parameters: {
+      path: {
+        id: number;
+      };
+      query: {
+        /** Zero-based page index (0..N) */
+        page?: number;
+        /** The size of the page to be returned */
+        size?: number;
+        /** Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+        sort?: string[];
+        search?: string;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['PagedModelUserAccountWithOrganizationRoleModel'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  getAllProjects_1: {
+    parameters: {
+      path: {
+        id: number;
+      };
+      query: {
+        /** Zero-based page index (0..N) */
+        page?: number;
+        /** The size of the page to be returned */
+        size?: number;
+        /** Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+        sort?: string[];
+        search?: string;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['PagedModelProjectModel'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  acceptInvitation: {
+    parameters: {
+      path: {
+        code: string;
+      };
+    };
+    responses: {
+      /** OK */
+      200: unknown;
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  get_10: {
+    parameters: {
+      path: {
+        keyId: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['ApiKeyModel'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  getCurrent_1: {
+    parameters: {};
     responses: {
       /** OK */
       200: {
@@ -2940,19 +5747,127 @@ export interface operations {
       };
     };
   };
-  removeTag_1: {
+  getScopes: {
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          'application/json': string;
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  getUsers: {
+    parameters: {
+      query: {
+        /** Zero-based page index (0..N) */
+        page?: number;
+        /** The size of the page to be returned */
+        size?: number;
+        /** Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+        sort?: string[];
+        search?: string;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['PagedModelUserAccountModel'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  generateUserToken: {
+    parameters: {
+      path: {
+        userId: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  getOrganizations: {
+    parameters: {
+      query: {
+        /** Zero-based page index (0..N) */
+        page?: number;
+        /** The size of the page to be returned */
+        size?: number;
+        /** Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+        sort?: string[];
+        search?: string;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['PagedModelOrganizationModel'];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  removeTag: {
     parameters: {
       path: {
         keyId: number;
         tagId: number;
-      };
-      query: {
-        /** API key provided via query parameter. Will be deprecated in the future. */
-        ak?: string;
-      };
-      header: {
-        /** API key provided via header. Safer since headers are not stored in server logs. */
-        'X-API-Key'?: string;
+        projectId: number;
       };
     };
     responses: {
@@ -2972,18 +5887,11 @@ export interface operations {
       };
     };
   };
-  delete_2: {
+  delete_1: {
     parameters: {
       path: {
         ids: number[];
-      };
-      query: {
-        /** API key provided via query parameter. Will be deprecated in the future. */
-        ak?: string;
-      };
-      header: {
-        /** API key provided via header. Safer since headers are not stored in server logs. */
-        'X-API-Key'?: string;
+        projectId: number;
       };
     };
     responses: {
@@ -3003,18 +5911,58 @@ export interface operations {
       };
     };
   };
-  deleteScreenshots: {
+  deleteScreenshots_1: {
     parameters: {
       path: {
         ids: number[];
+        projectId: number;
       };
-      query: {
-        /** API key provided via query parameter. Will be deprecated in the future. */
-        ak?: string;
+    };
+    responses: {
+      /** OK */
+      200: unknown;
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
       };
-      header: {
-        /** API key provided via header. Safer since headers are not stored in server logs. */
-        'X-API-Key'?: string;
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  removeUser: {
+    parameters: {
+      path: {
+        organizationId: number;
+        userId: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: unknown;
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  deleteInvitation: {
+    parameters: {
+      path: {
+        invitationId: number;
       };
     };
     responses: {
@@ -3039,13 +5987,28 @@ export interface operations {
       path: {
         ids: number[];
       };
-      query: {
-        /** API key provided via query parameter. Will be deprecated in the future. */
-        ak?: string;
+    };
+    responses: {
+      /** OK */
+      200: unknown;
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
       };
-      header: {
-        /** API key provided via header. Safer since headers are not stored in server logs. */
-        'X-API-Key'?: string;
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  deleteUser: {
+    parameters: {
+      path: {
+        userId: number;
       };
     };
     responses: {

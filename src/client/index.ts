@@ -12,13 +12,7 @@ import { API_KEY_PAK_PREFIX } from '../utils/constants';
 
 type ProjectApiKeyInfo = components['schemas']['ApiKeyWithLanguagesModel'];
 
-type _UserAccount = components['schemas']['UserAccountModel'];
-type UserAccount = Omit<_UserAccount, 'deleted'> & {
-  mfaEnabled: boolean;
-  accountType: 'LOCAL' | 'LDAP' | 'THIRD_PARTY';
-  deletable: boolean;
-  needsSuperJwtToken: boolean;
-};
+type PatWithUser = components['schemas']['PatWithUserModel'];
 
 export type ApiKeyInfoPat = {
   type: 'PAT';
@@ -84,12 +78,12 @@ export default class RestClient {
     });
   }
 
-  static getPersonalAccessTokenUser(
+  static getPersonalAccessTokenInformation(
     api: URL,
     key: string
-  ): Promise<UserAccount> {
+  ): Promise<PatWithUser> {
     return new Requester({ apiUrl: api, apiKey: key }).requestJson({
-      path: '/v2/user',
+      path: '/v2/pats/current',
       method: 'GET',
     });
   }
@@ -114,14 +108,14 @@ export default class RestClient {
       };
     }
 
-    const info = await RestClient.getPersonalAccessTokenUser(api, key);
-    const username = info.name || info.username;
+    const info = await RestClient.getPersonalAccessTokenInformation(api, key);
+    const username = info.user.name || info.user.username;
 
     return {
       type: 'PAT',
       key: key,
       username: username,
-      expires: 0,
+      expires: info.expiresAt ?? 0,
     };
   }
 }

@@ -12,7 +12,7 @@
     "lint": "prettier --check ./src ./test ./scripts jest.config.ts",
     "prettier": "prettier --write ./src ./test ./scripts jest.config.ts",
     "run-dev": "ts-node ./src/index.ts",
-    "schema": "openapi-typescript https://app.tolgee.io/v3/api-docs/V2%20Accessible%20with%20API%20key%20V2 --output src/client/internal/schema.generated.ts"
+    "schema": "openapi-typescript https://app.tolgee.io/v3/api-docs/All%20Internal%20-%20for%20Tolgee%20Web%20application --output src/client/internal/schema.generated.ts"
   },
   "author": "Jan Cizmar",
   "license": "MIT",

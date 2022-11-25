@@ -3,9 +3,12 @@ import type { PaginatedView } from './internal/requester';
 
 import Requester from './internal/requester';
 
-export type GetLanguagesRequest = QueryOf<'/v2/projects/languages', 'get'>;
+export type GetLanguagesRequest = QueryOf<
+  '/v2/projects/{projectId}/languages',
+  'get'
+>;
 export type GetLanguagesResponse = ResponseOf<
-  '/v2/projects/languages',
+  '/v2/projects/{projectId}/languages',
   'get'
 >[200]['_embedded'];
 
