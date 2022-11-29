@@ -3,7 +3,6 @@ import { existsSync } from 'fs';
 import { glob as globCb } from 'glob';
 
 import { callWorker } from './worker';
-import { loadModule } from '../utils/moduleLoader';
 
 import { promisify } from 'util';
 const glob = promisify(globCb);
@@ -14,6 +13,7 @@ export type Key = {
   namespace?: string;
   line: number;
 };
+
 export type Warning = { warning: string; line: number };
 
 export type Extractor = (fileContents: string, fileName: string) => string[];
@@ -26,6 +26,7 @@ function resolveExtractor(extractor: string): string {
       'presets',
       `${extractor}${extname(__filename)}`
     );
+
     if (!existsSync(preset)) {
       throw new Error(`Cannot find specified extractor: ${extractor}`);
     }
@@ -34,29 +35,6 @@ function resolveExtractor(extractor: string): string {
   }
 
   return extractor;
-}
-
-export async function loadExtractor(extractor: string): Promise<Extractor> {
-  if (!existsSync(extractor)) {
-    // During dev, we deal with .ts files because of ts-node
-    const preset = join(
-      __dirname,
-      'presets',
-      `${extractor}${extname(__filename)}`
-    );
-    if (!existsSync(preset)) {
-      throw new Error(`Cannot find specified extractor: ${extractor}`);
-    }
-
-    extractor = preset;
-  }
-
-  const mdl = await loadModule(extractor);
-  if (typeof mdl.default !== 'function') {
-    throw new TypeError('Invalid extractor: export is not a function');
-  }
-
-  return mdl.default;
 }
 
 export async function extractKeysFromFile(file: string, extractor: string) {

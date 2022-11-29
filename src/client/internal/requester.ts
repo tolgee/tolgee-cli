@@ -47,9 +47,7 @@ export default class Requester {
   constructor(private params: RequesterParams) {}
 
   get projectUrl() {
-    return 'projectId' in this.params && this.params.projectId !== -1
-      ? `/v2/projects/${this.params.projectId}`
-      : '/v2/projects';
+    return `/v2/projects/${this.params.projectId}`;
   }
 
   /**

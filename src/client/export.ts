@@ -3,7 +3,10 @@ import type { BodyOf } from './internal/schema.utils';
 
 import Requester from './internal/requester';
 
-export type ExportRequest = Omit<BodyOf<'/v2/projects/export', 'post'>, 'zip'>;
+export type ExportRequest = Omit<
+  BodyOf<'/v2/projects/{projectId}/export', 'post'>,
+  'zip'
+>;
 
 type SingleExportRequest = Omit<ExportRequest, 'languages'> & {
   languages: [string];
