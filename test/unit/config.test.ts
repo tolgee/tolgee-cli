@@ -1,9 +1,10 @@
 import { tmpdir } from 'os';
 import { join } from 'path';
 import { rm, readFile } from 'fs/promises';
-import { saveApiKey, getApiKey } from '../src/config/credentials';
-import loadTolgeeRc from '../src/config/tolgeerc';
+import { saveApiKey, getApiKey } from '../../src/config/credentials';
+import loadTolgeeRc from '../../src/config/tolgeerc';
 
+const FIXTURES_PATH = join(__dirname, '..', '__fixtures__');
 const AUTH_FILE = join(tmpdir(), 'auth.json');
 const TG_1 = new URL('https://app.tolgee.io');
 const TG_2 = new URL('https://meow.local');
@@ -57,7 +58,7 @@ const PAK_3 = <const>{
 describe('credentials', () => {
   beforeAll(async () => {
     // Override auth store file
-    await import('../src/config/credentials').then((m: any) => {
+    await import('../../src/config/credentials').then((m: any) => {
       m.API_TOKENS_FILE = AUTH_FILE;
     });
   });
@@ -159,14 +160,14 @@ describe('.tolgeerc', () => {
   });
 
   it('loads nothing', async () => {
-    cwd.mockReturnValueOnce(join(__dirname, '__fixtures__', 'emptyFolder'));
+    cwd.mockReturnValueOnce(join(FIXTURES_PATH, 'emptyFolder'));
 
     const cfg = await loadTolgeeRc();
     expect(cfg).toBeNull();
   });
 
   it('loads valid tolgeerc', async () => {
-    cwd.mockReturnValueOnce(join(__dirname, '__fixtures__', 'validTolgeeRc'));
+    cwd.mockReturnValueOnce(join(FIXTURES_PATH, 'validTolgeeRc'));
 
     const cfg = await loadTolgeeRc();
     expect(cfg).toEqual({
@@ -179,21 +180,21 @@ describe('.tolgeerc', () => {
 
   it('rejects invalid API url', async () => {
     cwd.mockReturnValueOnce(
-      join(__dirname, '__fixtures__', 'invalidTolgeeRcApi')
+      join(FIXTURES_PATH, 'invalidTolgeeRcApi')
     );
     expect(loadTolgeeRc()).rejects.toThrow('apiUrl');
   });
 
   it('rejects invalid project ID', async () => {
     cwd.mockReturnValueOnce(
-      join(__dirname, '__fixtures__', 'invalidTolgeeRcProject')
+      join(FIXTURES_PATH, 'invalidTolgeeRcProject')
     );
     expect(loadTolgeeRc()).rejects.toThrow('projectId');
   });
 
   it('rejects invalid SDK', async () => {
     cwd.mockReturnValueOnce(
-      join(__dirname, '__fixtures__', 'invalidTolgeeRcSdk')
+      join(FIXTURES_PATH, 'invalidTolgeeRcSdk')
     );
     expect(loadTolgeeRc()).rejects.toThrow('sdk');
   });

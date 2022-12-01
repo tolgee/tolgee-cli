@@ -8,9 +8,18 @@
   },
   "scripts": {
     "build": "rimraf dist && tsc",
+    "pretest": "npm run tolgee:start",
+    "posttest": "npm run tolgee:stop",
     "test": "jest",
-    "lint": "prettier --check ./src ./test ./scripts jest.config.ts",
-    "prettier": "prettier --write ./src ./test ./scripts jest.config.ts",
+    "test:unit": "jest -c jest.unit.config.ts",
+    "pretest:e2e": "npm run tolgee:start",
+    "posttest:e2e": "npm run tolgee:stop",
+    "test:e2e": "jest -c jest.e2e.config.ts",
+    "test:e2e-run": "jest -c jest.e2e.config.ts",
+    "tolgee:start": "node scripts/startDocker.mjs",
+    "tolgee:stop": "docker stop tolgee_cli_e2e",
+    "lint": "prettier --check ./src ./test ./scripts jest.config.ts jest.*.config.ts",
+    "prettier": "prettier --write ./src ./test ./scripts jest.config.ts jest.*.config.ts",
     "run-dev": "ts-node ./src/index.ts",
     "schema": "openapi-typescript https://app.tolgee.io/v3/api-docs/All%20Internal%20-%20for%20Tolgee%20Web%20application --output src/client/internal/schema.generated.ts"
   },
@@ -30,6 +39,7 @@
     "yauzl": "^2.10.0"
   },
   "devDependencies": {
+    "@jest/types": "^29.3.1",
     "@types/glob": "^8.0.0",
     "@types/jest": "^29.2.0",
     "@types/node": "^18.7.18",

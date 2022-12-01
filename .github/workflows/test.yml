@@ -12,10 +12,10 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actionsx/prettier@v2
         with:
-          args: --check ./src ./test ./scripts jest.config.ts
+          args: --check ./src ./test ./scripts jest.config.ts jest.*.config.ts
 
-  test:
-    name: Tests
+  test-unit:
+    name: Unit Tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -29,5 +29,29 @@ jobs:
           key: cache-node-modules-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
       - name: Install dependencies
         run: npm ci
+
       - name: Run Jest
-        run: npm test
+        run: npm run test:unit
+
+  test-e2e:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: cache-node-modules-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Start Tolgee Container
+        run: npm run tolgee:start
+      - name: Run Jest
+        run: npm run test:e2e
+      - name: Stop Tolgee Container
+        run: npm run tolgee:stop
