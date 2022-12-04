@@ -3,7 +3,7 @@ import { relative } from 'path';
 import { Command } from 'commander';
 
 import { extractKeysOfFiles } from '../../extractor';
-import { WarningMessages, emitGitHubWarning } from '../../utils/warnings';
+import { WarningMessages, emitGitHubWarning } from '../../extractor/warnings';
 
 type ExtractLintOptions = BaseExtractOptions;
 

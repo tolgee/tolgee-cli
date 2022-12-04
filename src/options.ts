@@ -1,5 +1,21 @@
 import { Option, InvalidArgumentError } from 'commander';
-import { DEFAULT_API_URL } from './utils/constants';
+import { DEFAULT_API_URL } from './constants';
+
+function parseProjectId(v: string) {
+  const val = Number(v);
+  if (isNaN(val) || val < 1) {
+    throw new InvalidArgumentError('Not a valid project ID.');
+  }
+  return val;
+}
+
+function parseUrlArgument(v: string) {
+  try {
+    return new URL(v);
+  } catch {
+    throw new InvalidArgumentError('Malformed URL.');
+  }
+}
 
 export const API_KEY_OPT = new Option(
   '-ak, --api-key <key>',
@@ -11,23 +27,11 @@ export const PROJECT_ID_OPT = new Option(
   'Project ID. Only required when using a Personal Access Token.'
 )
   .default(-1)
-  .argParser((v) => {
-    const val = Number(v);
-    if (isNaN(val) || val < 1) {
-      throw new InvalidArgumentError('Not a valid project ID.');
-    }
-    return val;
-  });
+  .argParser(parseProjectId);
 
 export const API_URL_OPT = new Option(
   '-au, --api-url <url>',
   'The url of Tolgee API.'
 )
   .default(DEFAULT_API_URL)
-  .argParser((v) => {
-    try {
-      return new URL(v);
-    } catch (e) {
-      throw new InvalidArgumentError('Malformed URL.');
-    }
-  });
+  .argParser(parseUrlArgument);

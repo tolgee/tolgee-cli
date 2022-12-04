@@ -1,6 +1,6 @@
 import { join } from 'path';
 import { readFileSync } from 'fs';
-import getConfigPath from './configPath';
+import getConfigPath from './utils/configPath';
 
 const packageJson = join(__dirname, '..', '..', 'package.json');
 const pkg = readFileSync(packageJson, 'utf8');

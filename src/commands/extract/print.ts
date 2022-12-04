@@ -3,7 +3,7 @@ import { relative } from 'path';
 import { Command } from 'commander';
 
 import { extractKeysOfFiles } from '../../extractor';
-import { WarningMessages } from '../../utils/warnings';
+import { WarningMessages } from '../../extractor/warnings';
 
 type ExtractPrintOptions = BaseExtractOptions;
 

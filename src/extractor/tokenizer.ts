@@ -53,7 +53,11 @@ async function loadGrammar(scope: Grammar) {
 function extnameToGrammar(extname: string) {
   switch (extname) {
     case '.js':
+    case '.mjs':
+    case '.cjs':
     case '.ts':
+    case '.mts':
+    case '.cts':
       return Grammar.TYPESCRIPT;
     case '.jsx':
     case '.tsx':

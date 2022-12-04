@@ -4,7 +4,5 @@ export default <JestConfigWithTsJest>{
   preset: 'ts-jest',
   testEnvironment: 'node',
   displayName: 'Unit',
-  testMatch: [
-    '<rootDir>/test/unit/**/*.(spec|test).[jt]s?(x)'
-  ],
+  testMatch: ['<rootDir>/test/unit/**/*.(spec|test).[jt]s?(x)'],
 };

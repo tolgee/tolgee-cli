@@ -3,12 +3,21 @@ const SYMBOLS = ['      🐁', '    🐁  ', '  🐁    ', '🐁      '];
 let debugEnabled = false;
 
 /**
- * Enables or disables debugging messages
+ * Enables or disables debugging messages.
  *
- * @param enabled Whether debugging messages should be logged
+ * @param enabled Whether debugging messages should be logged.
  */
 export function setDebug(enabled: boolean) {
   debugEnabled = enabled;
+}
+
+/**
+ * Gets the current status of debug logging.
+ *
+ * @returns Whether debugging is enabled.
+ */
+export function isDebugEnabled(): boolean {
+  return debugEnabled;
 }
 
 /**

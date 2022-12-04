@@ -7,7 +7,7 @@ import FormData from 'form-data';
 
 import { HttpError } from '../errors';
 import { debug } from '../../utils/logger';
-import { USER_AGENT } from '../../utils/constants';
+import { USER_AGENT } from '../../constants';
 
 export type RequesterParams =
   | { apiUrl: string | URL; apiKey: `tgpat_${string}`; projectId: number }

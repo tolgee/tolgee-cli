@@ -2,25 +2,28 @@
 
 import { Command } from 'commander';
 
-import { getApiKey } from './config/credentials';
+import { getApiKey, savePak, savePat } from './config/credentials';
 import loadTolgeeRc from './config/tolgeerc';
 
 import RestClient from './client';
 import { HttpError } from './client/errors';
-import { setDebug, debug, info, error } from './utils/logger';
-import {
-  API_KEY_PAK_PREFIX,
-  API_KEY_PAT_PREFIX,
-  VERSION,
-} from './utils/constants';
+import { setDebug, isDebugEnabled, debug, info, error } from './utils/logger';
 
 import { API_KEY_OPT, API_URL_OPT, PROJECT_ID_OPT } from './options';
+import { API_KEY_PAK_PREFIX, API_KEY_PAT_PREFIX, VERSION } from './constants';
+
 import { Login, Logout } from './commands/login';
 import PushCommand from './commands/push';
 import PullCommand from './commands/pull';
 import ExtractCommand from './commands/extract';
 
 const NO_KEY_COMMANDS = ['login', 'logout', 'extract'];
+
+function topLevelName(command: Command): string {
+  return command.parent && command.parent.parent
+    ? topLevelName(command.parent)
+    : command.name();
+}
 
 async function validateApiKey(cmd: Command) {
   const opts = cmd.optsWithGlobals();
@@ -38,6 +41,13 @@ async function validateApiKey(cmd: Command) {
     }
 
     cmd.setOptionValue('apiKey', key);
+    program.setOptionValue('_removeApiKeyFromStore', () => {
+      if (key.startsWith(API_KEY_PAT_PREFIX)) {
+        savePat(opts.apiUrl);
+      } else {
+        savePak(opts.apiUrl, opts.projectId);
+      }
+    });
   }
 }
 
@@ -65,13 +75,9 @@ function validateProjectId(cmd: Command) {
       );
       process.exit(1);
     }
-  }
-}
 
-function topLevelName(command: Command): string {
-  return command.parent && command.parent.parent
-    ? topLevelName(command.parent)
-    : command.name();
+    cmd.setOptionValue('projectId', projectId);
+  }
 }
 
 async function preHandler(prog: Command, cmd: Command) {
@@ -112,60 +118,52 @@ program.addCommand(PushCommand);
 program.addCommand(PullCommand);
 program.addCommand(ExtractCommand);
 
+async function loadConfig () {
+  const tgConfig = await loadTolgeeRc();
+  if (tgConfig) {
+    for (const [key, value] of Object.entries(tgConfig)) {
+      program.setOptionValue(key, value);
+    }
+  }
+}
+
+async function handleHttpError(e: HttpError) {
+  error('An error occurred while requesting the API.');
+  error(`${e.request.method} ${e.request.url}`);
+  error(e.getErrorText());
+
+  // Remove token from store if necessary
+  if (e.response.status === 401) {
+    const removeFn = program.getOptionValue('_removeApiKeyFromStore');
+    if (removeFn) {
+      info('Removing the API key from the authentication store.');
+      removeFn();
+    }
+  }
+
+  // Print server output for server errors
+  if (
+    e.response.status >= 500 &&
+    e.response.status !== 503 &&
+    isDebugEnabled()
+  ) {
+    // We cannot parse the response as JSON and pull error codes here: by nature 5xx class errors can happen for
+    // a lot of reasons (e.g. upstream issues, server issues, catastrophic failure) which means the output is
+    // completely unpredictable. While some errors are formatted by the Tolgee server, reality is there's a huge
+    // chance the 5xx error hasn't been raised by Tolgee's error handler.
+    const res = await e.response.text();
+    debug(`Server response:\n\n---\n${res}\n---`);
+  }
+}
+
 async function run() {
   try {
-    // Load configuration
-    const tgConfig = await loadTolgeeRc();
-    if (tgConfig) {
-      for (const [key, value] of Object.entries(tgConfig)) {
-        program.setOptionValue(key, value);
-      }
-    }
-
-    // Run & handle potential uncaught failure
+    await loadConfig();
     await program.parseAsync();
   } catch (e: any) {
     if (e instanceof HttpError) {
-      error(
-        `An error occurred while requesting ${e.request.method} ${e.request.url}.`
-      );
-
-      // Service Unavailable
-      if (e.response.status === 503) {
-        error('API is temporarily unavailable. Please try again later.');
-        process.exit(1);
-      }
-
-      // Unauthorized
-      if (e.response.status === 401) {
-        error(
-          "Couldn't authenticate with the API. Make sure your key is valid, hasn't expired, or hasn't been revoked."
-        );
-        process.exit(1);
-      }
-
-      // Forbidden
-      if (e.response.status === 403) {
-        error('You are not allowed to perform this operation.');
-        process.exit(1);
-      }
-
-      // Server error
-      if (e.response.status >= 500) {
-        error(
-          `The Tolgee server reported an unexpected server error (HTTP ${e.response.status} ${e.response.statusText}). Please try again later.`
-        );
-
-        // We cannot parse the response as JSON and pull error codes here: by nature 5xx class errors can happen for
-        // a lot of reasons (e.g. upstream issues, server issues, catastrophic failure) which means the output is
-        // completely unpredictable. While some errors are formatted by the Tolgee server, reality is there's a huge
-        // chance the 5xx error hasn't been raised by Tolgee's error handler.
-        const res = await e.response.text();
-        const formatted = ' > ' + res.split('\n').join('\n > '); // Prefix with " > "
-        debug(`Server response:\n${formatted}`);
-
-        process.exit(1);
-      }
+      await handleHttpError(e)
+      process.exit(1);
     }
 
     // If the error is uncaught, huge chance that either:
@@ -182,10 +180,3 @@ async function run() {
 }
 
 run();
-
-// Augment Command type
-declare module 'commander' {
-  interface Command {
-    options: Option[];
-  }
-}
