@@ -35,7 +35,13 @@ async function lintHandler(this: Command, filesPattern: string) {
 
   if (warningCount !== 0) {
     console.log();
-    console.log('Total: %d warning%s in %d file%d', warningCount, warningCount !== 1 ? 's' : '', filesCount, filesCount !== 1 ? 's' : '');
+    console.log(
+      'Total: %d warning%s in %d file%d',
+      warningCount,
+      warningCount !== 1 ? 's' : '',
+      filesCount,
+      filesCount !== 1 ? 's' : ''
+    );
     process.exit(1);
   }
 

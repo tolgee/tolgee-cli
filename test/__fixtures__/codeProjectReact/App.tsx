@@ -22,9 +22,7 @@ export default function App() {
             defaultValue="Here's your lucky quote!"
           />
         </h2>
-        <p>
-          BTW I USE ARCH
-        </p>
+        <p>BTW I USE ARCH</p>
       </section>
     </main>
   );

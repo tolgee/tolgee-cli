@@ -16,7 +16,12 @@ async function printHandler(this: Command, filesPattern: string) {
   for (const [file, { keys, warnings }] of extracted) {
     if (keys.length) {
       const relFile = relative(process.cwd(), file);
-      console.log('%d key%s found in %s:', keys.length, keys.length !== 1 ? 's' : '', relFile);
+      console.log(
+        '%d key%s found in %s:',
+        keys.length,
+        keys.length !== 1 ? 's' : '',
+        relFile
+      );
       for (const key of keys) {
         keySet.add(key);
         console.log('\tline %d: %s', key.line, key.keyName);
