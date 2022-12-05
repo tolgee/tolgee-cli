@@ -2,7 +2,6 @@ import { relative } from 'path';
 
 export type WarningMessage = { name: string; description: string };
 
-// Note: @ are followed by a zero-width-space to ensure they do not cause mentions on GitHub.
 export const WarningMessages: Record<string, WarningMessage> = {
   W_DYNAMIC_KEY: {
     name: 'Dynamic key',

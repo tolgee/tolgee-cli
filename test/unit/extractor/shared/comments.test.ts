@@ -1,4 +1,4 @@
-import commentsService from '../../../src/extractor/machines/shared/comments';
+import commentsService from '../../../../src/extractor/machines/shared/comments';
 
 let callback: jest.Mock;
 let send: Function;

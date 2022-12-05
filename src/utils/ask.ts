@@ -23,8 +23,11 @@ export async function askBoolean(
 
   const str = await askString(`${question} ${yn}`);
   const strRes = str[0]?.toLowerCase();
-  if (strRes === 'y') res = true;
-  else if (strRes === 'n') res = false;
+  if (strRes === 'y') {
+    res = true;
+  } else if (strRes === 'n') {
+    res = false;
+  }
 
   return res;
 }

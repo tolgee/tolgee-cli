@@ -1,4 +1,4 @@
-import extractKeys from '../../src/extractor/presets/react';
+import extractKeys from '../../../src/extractor/presets/react';
 
 describe.each(['js', 'ts', 'jsx', 'tsx'])(
   'React.createElement (.%s)',

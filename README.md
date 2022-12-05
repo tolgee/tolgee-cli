@@ -36,5 +36,9 @@ The following parameters are supported:
   - `apiUrl` (string): URL of the Tolgee server. Only needed if you're using a self-hosted installation.
   - `projectId` (number): The ID of the project within Tolgee.
 
+## Contributing
+Contributions are welcome! Check out [HACKING.md](HACKING.md) for some information about the project internals and
+information about the workflow.
+
 ----
 🧀

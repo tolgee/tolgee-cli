@@ -1,0 +1,10 @@
+{
+  "keyboard": "Clavier",
+  "mouse": "Souris",
+  "controller": "Manette",
+  "remote": "Télécommande",
+  "screen": "Écran",
+  "desk": "Bureau",
+  "wired": "Filaire",
+  "wireless": "Sans-fil"
+}

@@ -1,5 +1,5 @@
-import tokenizer from '../../../src/extractor/tokenizer';
-import propertiesMachine from '../../../src/extractor/machines/shared/properties';
+import tokenizer from '../../../../src/extractor/tokenizer';
+import propertiesMachine from '../../../../src/extractor/machines/shared/properties';
 import { interpret } from 'xstate';
 
 const machine = interpret(propertiesMachine);

@@ -8,7 +8,7 @@ import LanguagesClient from './languages';
 import ImportClient from './import';
 import ExportClient from './export';
 
-import { API_KEY_PAK_PREFIX } from '../utils/constants';
+import { API_KEY_PAK_PREFIX } from '../constants';
 
 type ProjectApiKeyInfo = components['schemas']['ApiKeyWithLanguagesModel'];
 
@@ -53,9 +53,7 @@ export default class RestClient {
   }
 
   getProjectId() {
-    return !this.params.projectId || this.params.projectId === -1
-      ? RestClient.projectIdFromKey(this.params.apiKey)
-      : this.params.projectId;
+    return this.params.projectId;
   }
 
   static projectIdFromKey(key: string) {

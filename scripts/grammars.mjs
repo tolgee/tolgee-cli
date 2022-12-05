@@ -1,3 +1,7 @@
+// ---
+// See HACKING.md for more details about what's in this file
+// ---
+
 export const Grammars = {
   TypeScript:
     'https://raw.githubusercontent.com/microsoft/TypeScript-TmLanguage/master/TypeScript.tmLanguage',

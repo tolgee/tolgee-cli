@@ -1,3 +1,7 @@
+// ---
+// Downloads TextMate grammars (& licenses) specified in grammars.mjs
+// ---
+
 import { writeFile } from 'fs/promises';
 import { Grammars, Licenses, Transformers } from './grammars.mjs';
 
