@@ -47,7 +47,10 @@ export function spawn(
   );
 }
 
-function runProcess(cliProcess: ChildProcessWithoutNullStreams) {
+function runProcess(
+  cliProcess: ChildProcessWithoutNullStreams,
+  timeoutTime: number
+) {
   return new Promise<RunResult>((resolve, reject) => {
     let stdout = '';
     let stderr = '';
@@ -63,7 +66,7 @@ function runProcess(cliProcess: ChildProcessWithoutNullStreams) {
       killed = true;
       cliProcess.kill(9);
       reject(new Error('timeout'));
-    }, 10e3);
+    }, timeoutTime);
 
     cliProcess.on('exit', (code) => {
       if (killed) return;
@@ -76,15 +79,20 @@ function runProcess(cliProcess: ChildProcessWithoutNullStreams) {
 export async function runWithStdin(
   args: string[],
   stdin: string,
-  env?: Record<string, string>
+  env?: Record<string, string>,
+  timeout: number = 10e3
 ) {
   const cliProcess = spawn(args, true, env);
   cliProcess.stdin.write(`${stdin}\n`);
   cliProcess.stdin.end(); // Otherwise, stdin will remain open and process will never exit
-  return runProcess(cliProcess);
+  return runProcess(cliProcess, timeout);
 }
 
-export async function run(args: string[], env?: Record<string, string>) {
+export async function run(
+  args: string[],
+  env?: Record<string, string>,
+  timeout: number = 10e3
+) {
   const cliProcess = spawn(args, false, env);
-  return runProcess(cliProcess);
+  return runProcess(cliProcess, timeout);
 }
