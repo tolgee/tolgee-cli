@@ -40,10 +40,16 @@ export function spawn(
   stdin?: boolean,
   env?: Record<string, string>
 ) {
+  const userEnv = env ?? {}
   return spawnProcess(
     process.argv0,
     [...(stdin ? BASE_ARGS_WITH_TTY : BASE_ARGS), ...args],
-    { env: env ?? {} }
+    {
+      env: {
+        ...userEnv,
+        PATH: process.env.PATH!
+      }
+    }
   );
 }
 
