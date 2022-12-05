@@ -43,7 +43,7 @@ export function spawn(
   return spawnProcess(
     process.argv0,
     [...(stdin ? BASE_ARGS_WITH_TTY : BASE_ARGS), ...args],
-    { env: env }
+    { env: env ?? {} }
   );
 }
 
