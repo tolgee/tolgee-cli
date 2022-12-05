@@ -63,7 +63,7 @@ function runProcess(cliProcess: ChildProcessWithoutNullStreams) {
       killed = true;
       cliProcess.kill(9);
       reject(new Error('timeout'));
-    }, 5e3);
+    }, 10e3);
 
     cliProcess.on('exit', (code) => {
       if (killed) return;
