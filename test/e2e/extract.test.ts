@@ -1,10 +1,7 @@
-import { randomUUID } from 'crypto';
 import { join } from 'path';
 import { readFile } from 'fs/promises';
 
 import { run } from './utils/run';
-
-const RUN_UUID = randomUUID();
 
 const FIXTURES_PATH = join(__dirname, '..', '__fixtures__');
 const CODE_PROJECT = join(FIXTURES_PATH, 'codeProjectReact');
