@@ -16,7 +16,7 @@ async function printHandler(this: Command, filesPattern: string) {
   for (const [file, { keys, warnings }] of extracted) {
     if (keys.length) {
       const relFile = relative(process.cwd(), file);
-      console.log('%d keys found in %s:', keys.length, relFile);
+      console.log('%d key%s found in %s:', keys.length, keys.length !== 1 ? 's' : '', relFile);
       for (const key of keys) {
         keySet.add(key);
         console.log('\tline %d: %s', key.line, key.keyName);
@@ -32,8 +32,9 @@ async function printHandler(this: Command, filesPattern: string) {
     if (warnings.length) {
       warningCount += warnings.length;
       console.log(
-        '%d warnings were emitted during extraction:',
-        warnings.length
+        '%d warning%s were emitted during extraction:',
+        warnings.length,
+        warnings.length !== 1 ? 's' : ''
       );
       for (const warning of warnings) {
         if (warning.warning in WarningMessages) {

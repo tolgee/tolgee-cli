@@ -1,0 +1,10 @@
+{
+  "keyboard": "Keyboard",
+  "mouse": "Mouse",
+  "controller": "Controller",
+  "remote": "Remote",
+  "screen": "Screen",
+  "desk": "Desk",
+  "wired": "Wired",
+  "wireless": "Wireless"
+}

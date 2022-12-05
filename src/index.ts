@@ -60,10 +60,12 @@ function validateProjectId(cmd: Command) {
     process.exit(1);
   }
 
-  if (opts.projectId !== -1 && opts.apiKey.startsWith(API_KEY_PAK_PREFIX)) {
+  if (opts.apiKey.startsWith(API_KEY_PAK_PREFIX)) {
     // Parse the key to ensure we can access the specified Project ID
     const projectId = RestClient.projectIdFromKey(opts.apiKey);
-    if (opts.projectId !== projectId) {
+    program.setOptionValue('projectId', projectId);
+
+    if (opts.projectId !== -1 && opts.projectId !== projectId) {
       error(
         'The specified API key cannot be used to perform operations on the specified project.'
       );
@@ -75,8 +77,6 @@ function validateProjectId(cmd: Command) {
       );
       process.exit(1);
     }
-
-    cmd.setOptionValue('projectId', projectId);
   }
 }
 
@@ -118,7 +118,7 @@ program.addCommand(PushCommand);
 program.addCommand(PullCommand);
 program.addCommand(ExtractCommand);
 
-async function loadConfig () {
+async function loadConfig() {
   const tgConfig = await loadTolgeeRc();
   if (tgConfig) {
     for (const [key, value] of Object.entries(tgConfig)) {
@@ -162,7 +162,7 @@ async function run() {
     await program.parseAsync();
   } catch (e: any) {
     if (e instanceof HttpError) {
-      await handleHttpError(e)
+      await handleHttpError(e);
       process.exit(1);
     }
 
