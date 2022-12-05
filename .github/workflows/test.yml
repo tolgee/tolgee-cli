@@ -49,9 +49,5 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Start Tolgee Container
-        run: npm run tolgee:start
       - name: Run Jest
         run: npm run test:e2e
-      - name: Stop Tolgee Container
-        run: npm run tolgee:stop
