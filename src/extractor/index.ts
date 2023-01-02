@@ -51,7 +51,6 @@ export async function extractKeysOfFiles(
   const files = await glob(filesPattern, { nodir: true });
   const result = new Map<string, { keys: Key[]; warnings: Warning[] }>();
 
-  // Done as a map to allow concurrent execution
   for (const file of files) {
     const keys = await extractKeysFromFile(file, extractor);
     result.set(file, keys);
