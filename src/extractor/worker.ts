@@ -41,7 +41,7 @@ if (!isMainThread) workerInit();
 
 // --- Main thread functions
 
-let worker: Worker
+let worker: Worker;
 
 export async function callWorker(params: WorkerParams) {
   if (!worker) {
@@ -50,7 +50,7 @@ export async function callWorker(params: WorkerParams) {
       execArgv: IS_TS_NODE ? ['--require', 'ts-node/register'] : undefined,
     });
 
-    worker.unref()
+    worker.unref();
   }
 
   const timeout = setTimeout(() => {
@@ -59,7 +59,7 @@ export async function callWorker(params: WorkerParams) {
   }, 10e3);
 
   const deferred = createDeferred();
-  worker.postMessage(params)
+  worker.postMessage(params);
   worker.once('message', (msg) => {
     if ('data' in msg) {
       deferred.resolve(msg.data);

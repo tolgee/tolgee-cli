@@ -70,7 +70,7 @@ function tokenize(code: string, grammar: IGrammar) {
   let stack = INITIAL;
   let linePtr = 0;
   const lines = code.split('\n');
-  const tokens: Token[] = []
+  const tokens: Token[] = [];
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
     const res = grammar.tokenizeLine(line, stack);
@@ -91,7 +91,7 @@ function tokenize(code: string, grammar: IGrammar) {
           startIndex: linePtr + token.startIndex,
           endIndex: linePtr + token.endIndex,
           scopes: token.scopes,
-        })
+        });
       }
     }
 
@@ -102,13 +102,13 @@ function tokenize(code: string, grammar: IGrammar) {
       startIndex: linePtr + line.length,
       endIndex: linePtr + line.length + 1,
       scopes: [],
-    })
+    });
 
     linePtr += line.length + 1;
     stack = res.ruleStack;
   }
 
-  return tokens
+  return tokens;
 }
 
 export default async function (code: string, fileName: string) {

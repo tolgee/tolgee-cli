@@ -5,7 +5,7 @@ import tokenizer from '../tokenizer';
 
 const EXTS = ['.js', '.mjs', '.cjs', '.ts', '.mts', '.cts', '.jsx', '.tsx'];
 
-const TOLGEE_REACT_PKG_RE = /["'`]@tolgee\/react["'`]/
+const TOLGEE_REACT_PKG_RE = /["'`]@tolgee\/react["'`]/;
 
 export default async function (code: string, fileName: string) {
   if (!EXTS.includes(extname(fileName)) || !TOLGEE_REACT_PKG_RE.test(code)) {
