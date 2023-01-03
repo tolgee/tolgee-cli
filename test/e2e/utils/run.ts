@@ -75,13 +75,9 @@ function runProcess(
     }, timeoutTime);
 
     cliProcess.on('exit', (code) => {
-      if (code !== 0) {
-        console.log('::group::stdout')
-        console.log(stdout)
-        console.log('::endgroup::')
-        console.log('::group::stderr')
-        console.log(stderr)
-        console.log('::endgroup::')
+      if (process.env.RUNNER_DEBUG === '1') {
+        console.log('::group::stdout\n%s\n::endgroup::', stdout);
+        console.log('::group::stderr\n%s\n::endgroup::', stderr);
       }
 
       if (killed) return;
