@@ -142,15 +142,12 @@ async function handleHttpError(e: HttpError) {
   }
 
   // Print server output for server errors
-  if (
-    e.response.status >= 500 &&
-    e.response.status !== 503 &&
-    isDebugEnabled()
-  ) {
-    // We cannot parse the response as JSON and pull error codes here: by nature 5xx class errors can happen for
-    // a lot of reasons (e.g. upstream issues, server issues, catastrophic failure) which means the output is
-    // completely unpredictable. While some errors are formatted by the Tolgee server, reality is there's a huge
-    // chance the 5xx error hasn't been raised by Tolgee's error handler.
+  if (isDebugEnabled()) {
+    // We cannot parse the response as JSON and pull error codes here as we may be here due to a 5xx error:
+    // by nature 5xx class errors can happen for a lot of reasons (e.g. upstream issues, server issues,
+    // catastrophic failure) which means the output is completely unpredictable. While some errors are
+    // formatted by the Tolgee server, reality is there's a huge chance the 5xx error hasn't been raised
+    // by Tolgee's error handler.
     const res = await e.response.text();
     debug(`Server response:\n\n---\n${res}\n---`);
   }
