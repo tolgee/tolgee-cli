@@ -75,6 +75,15 @@ function runProcess(
     }, timeoutTime);
 
     cliProcess.on('exit', (code) => {
+      if (code !== 0) {
+        console.log('::group::stdout')
+        console.log(stdout)
+        console.log('::endgroup::')
+        console.log('::group::stderr')
+        console.log(stderr)
+        console.log('::endgroup::')
+      }
+
       if (killed) return;
       clearTimeout(timeout);
       resolve({ code: code ?? -1, stdout, stderr });
