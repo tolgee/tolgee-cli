@@ -60,6 +60,10 @@ export async function callWorker(params: WorkerParams) {
 
   const deferred = createDeferred();
   worker.postMessage(params);
+  worker.once('error', (e) => {
+    console.error(e);
+    deferred.reject(e);
+  });
   worker.once('message', (msg) => {
     if ('data' in msg) {
       deferred.resolve(msg.data);

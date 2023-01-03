@@ -7,14 +7,15 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])(
 
     it('extracts keys specified as properties', async () => {
       const expected = [
-        { keyName: 'key1', line: 2 },
-        { keyName: 'key2', line: 3 },
-        { keyName: 'key3', line: 4 },
-        { keyName: 'key4', line: 5 },
-        { keyName: 'key5', defaultValue: 'not key6', line: 6 },
+        { keyName: 'key1', line: 3 },
+        { keyName: 'key2', line: 4 },
+        { keyName: 'key3', line: 5 },
+        { keyName: 'key4', line: 6 },
+        { keyName: 'key5', defaultValue: 'not key6', line: 7 },
       ];
 
       const code = `
+        import '@tolgee/react'
         React.createElement(T, { keyName: "key1" })
         React.createElement(T, { keyName: 'key2' })
         React.createElement(T, { keyName: \`key3\` })
@@ -29,14 +30,15 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])(
 
     it('extracts keys specified as children', async () => {
       const expected = [
-        { keyName: 'key1', line: 2 },
-        { keyName: 'key2', line: 3 },
-        { keyName: 'key3', line: 4 },
-        { keyName: 'key4', line: 5 },
-        { keyName: 'key5', line: 6 },
+        { keyName: 'key1', line: 3 },
+        { keyName: 'key2', line: 4 },
+        { keyName: 'key3', line: 5 },
+        { keyName: 'key4', line: 6 },
+        { keyName: 'key5', line: 7 },
       ];
 
       const code = `
+        import '@tolgee/react'
         React.createElement(T, {}, "key1")
         React.createElement(T, {}, 'key2')
         React.createElement(T, {}, \`key3\`)
@@ -51,10 +53,11 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])(
 
     it('extracts the default value from children', async () => {
       const expected = [
-        { keyName: 'key1', defaultValue: 'default value', line: 2 },
+        { keyName: 'key1', defaultValue: 'default value', line: 3 },
       ];
 
       const code = `
+        import '@tolgee/react'
         React.createElement(T, { keyName: 'key1' }, "default value")
       `;
 
@@ -65,10 +68,11 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])(
 
     it('extracts the default value from props', async () => {
       const expected = [
-        { keyName: 'key1', defaultValue: 'default value', line: 2 },
+        { keyName: 'key1', defaultValue: 'default value', line: 3 },
       ];
 
       const code = `
+        import '@tolgee/react'
         React.createElement(T, { keyName: 'key1' }, "default value")
       `;
 
@@ -79,10 +83,11 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])(
 
     it('does not extract default value from children if a defaultValue prop is set', async () => {
       const expected = [
-        { keyName: 'key1', defaultValue: 'default value', line: 2 },
+        { keyName: 'key1', defaultValue: 'default value', line: 3 },
       ];
 
       const code = `
+        import '@tolgee/react'
         React.createElement(T, { keyName: 'key1', defaultValue: 'default value' }, "ignored stuff")
       `;
 
@@ -92,9 +97,10 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])(
     });
 
     it('extracts the namespace from props', async () => {
-      const expected = [{ keyName: 'key1', namespace: 'ns1', line: 2 }];
+      const expected = [{ keyName: 'key1', namespace: 'ns1', line: 3 }];
 
       const code = `
+        import '@tolgee/react'
         React.createElement(T, { keyName: 'key1', ns: 'ns1' })
       `;
 
@@ -105,13 +111,14 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])(
 
     it('is not be confused by nested objects in properties', async () => {
       const expected = [
-        { keyName: 'key1', line: 2 },
-        { keyName: 'key2', line: 3 },
-        { keyName: 'key3', line: 4 },
-        { keyName: 'key4', line: 5 },
+        { keyName: 'key1', line: 3 },
+        { keyName: 'key2', line: 4 },
+        { keyName: 'key3', line: 5 },
+        { keyName: 'key4', line: 6 },
       ];
 
       const code = `
+        import '@tolgee/react'
         React.createElement(T, { someProp: { a: false }, keyName: 'key1' })
         React.createElement(T, { someProp: { a: false } }, 'key2')
         React.createElement(T, { keyName: 'key3', someProp: { keyName: 'not key3' } })
@@ -125,15 +132,16 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])(
 
     it('handles multiline use of createElement', async () => {
       const expected = [
-        { keyName: 'key1', line: 2 },
-        { keyName: 'key2', line: 6 },
-        { keyName: 'key3', line: 9 },
-        { keyName: 'key4', line: 15 },
-        { keyName: 'key5', line: 21 },
-        { keyName: 'key6', line: 26 },
+        { keyName: 'key1', line: 3 },
+        { keyName: 'key2', line: 7 },
+        { keyName: 'key3', line: 10 },
+        { keyName: 'key4', line: 16 },
+        { keyName: 'key5', line: 22 },
+        { keyName: 'key6', line: 27 },
       ];
 
       const code = `
+        import '@tolgee/react'
         React.createElement(
           T,
           { keyName: 'key1' }
@@ -170,11 +178,12 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])(
 
     it('handles weird/lack of spacing in declarations', async () => {
       const expected = [
-        { keyName: 'key1', line: 2 },
-        { keyName: 'key2', line: 3 },
+        { keyName: 'key1', line: 3 },
+        { keyName: 'key2', line: 4 },
       ];
 
       const code = `
+        import '@tolgee/react'
         React         .    createElement     (    T,     {     keyName: 'key1' })
         React.createElement(T,{keyName:'key2'})
       `;
@@ -187,13 +196,14 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])(
     describe('dynamic data', () => {
       it('emits warning on dynamic keys and skips', async () => {
         const expected = [
-          { warning: 'W_DYNAMIC_KEY', line: 2 },
           { warning: 'W_DYNAMIC_KEY', line: 3 },
           { warning: 'W_DYNAMIC_KEY', line: 4 },
           { warning: 'W_DYNAMIC_KEY', line: 5 },
+          { warning: 'W_DYNAMIC_KEY', line: 6 },
         ];
 
         const code = `
+          import '@tolgee/react'
           React.createElement(T, { keyName: \`dynamic-key-\${i}\` })
           React.createElement(T, { keyName: 'dynamic-key-' + i })
           React.createElement(T, { keyName: key })
@@ -207,13 +217,14 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])(
 
       it('emits warning on dynamic namespace and skips', async () => {
         const expected = [
-          { warning: 'W_DYNAMIC_NAMESPACE', line: 2 },
           { warning: 'W_DYNAMIC_NAMESPACE', line: 3 },
           { warning: 'W_DYNAMIC_NAMESPACE', line: 4 },
           { warning: 'W_DYNAMIC_NAMESPACE', line: 5 },
+          { warning: 'W_DYNAMIC_NAMESPACE', line: 6 },
         ];
 
         const code = `
+          import '@tolgee/react'
           React.createElement(T, { keyName: 'key1', ns: \`dynamic-ns-\${i}\` })
           React.createElement(T, { keyName: 'key2', ns: 'dynamic-ns-' + i })
           React.createElement(T, { keyName: 'key2', ns: ns })
@@ -227,18 +238,19 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])(
 
       it('emits warning for dynamic default values, but extracts keys', async () => {
         const expectedWarnings = [
-          { warning: 'W_DYNAMIC_DEFAULT_VALUE', line: 2 },
           { warning: 'W_DYNAMIC_DEFAULT_VALUE', line: 3 },
           { warning: 'W_DYNAMIC_DEFAULT_VALUE', line: 4 },
+          { warning: 'W_DYNAMIC_DEFAULT_VALUE', line: 5 },
         ];
 
         const expectedKeys = [
-          { keyName: 'key1', defaultValue: undefined, line: 2 },
-          { keyName: 'key2', defaultValue: undefined, line: 3 },
-          { keyName: 'key3', defaultValue: undefined, line: 4 },
+          { keyName: 'key1', defaultValue: undefined, line: 3 },
+          { keyName: 'key2', defaultValue: undefined, line: 4 },
+          { keyName: 'key3', defaultValue: undefined, line: 5 },
         ];
 
         const code = `
+          import '@tolgee/react'
           React.createElement(T, { keyName:'key1' }, someValue)
           React.createElement(T, { keyName:'key2' }, 'dynamic-' + i)
           React.createElement(T, { keyName:'key3' }, \`dynamic-\${i}\`)
@@ -256,9 +268,10 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])('useTranslate (.%s)', (ext) => {
   const FILE_NAME = `test.${ext}`;
 
   it('extracts from the t call with signature t(string))', async () => {
-    const expected = [{ keyName: 'key1', line: 4 }];
+    const expected = [{ keyName: 'key1', line: 5 }];
 
     const code = `
+      import '@tolgee/react'
       function Test () {
         const { t } = useTranslate()
         t('key1')
@@ -272,10 +285,11 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])('useTranslate (.%s)', (ext) => {
 
   it('extracts from the t call with signature t(string, string)', async () => {
     const expected = [
-      { keyName: 'key1', defaultValue: 'default value', line: 4 },
+      { keyName: 'key1', defaultValue: 'default value', line: 5 },
     ];
 
     const code = `
+      import '@tolgee/react'
       function Test () {
         const { t } = useTranslate()
         t('key1', 'default value')
@@ -293,11 +307,12 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])('useTranslate (.%s)', (ext) => {
         keyName: 'key1',
         defaultValue: 'default value',
         namespace: 'ns',
-        line: 4,
+        line: 5,
       },
     ];
 
     const code = `
+      import '@tolgee/react'
       function Test () {
         const { t } = useTranslate()
         t('key1', 'default value', { ns: 'ns', defaultValue: 'ignored' })
@@ -315,11 +330,12 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])('useTranslate (.%s)', (ext) => {
         keyName: 'key1',
         defaultValue: 'default value',
         namespace: 'ns',
-        line: 4,
+        line: 5,
       },
     ];
 
     const code = `
+      import '@tolgee/react'
       function Test () {
         const { t } = useTranslate()
         t('key1', { defaultValue: 'default value', ns: 'ns' })
@@ -337,11 +353,12 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])('useTranslate (.%s)', (ext) => {
         keyName: 'key1',
         defaultValue: 'default value',
         namespace: 'ns',
-        line: 4,
+        line: 5,
       },
     ];
 
     const code = `
+      import '@tolgee/react'
       function Test () {
         const { t } = useTranslate()
         t({ key: 'key1', defaultValue: 'default value', ns: 'ns' })
@@ -355,10 +372,11 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])('useTranslate (.%s)', (ext) => {
 
   it('extracts the default value from parameters', async () => {
     const expected = [
-      { keyName: 'key1', defaultValue: 'default value', line: 4 },
+      { keyName: 'key1', defaultValue: 'default value', line: 5 },
     ];
 
     const code = `
+      import '@tolgee/react'
       function Test () {
         const { t } = useTranslate()
         t('key1', { defaultValue: 'default value' })
@@ -371,9 +389,10 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])('useTranslate (.%s)', (ext) => {
   });
 
   it('extracts the namespace from parameters', async () => {
-    const expected = [{ keyName: 'key1', namespace: 'ns1', line: 4 }];
+    const expected = [{ keyName: 'key1', namespace: 'ns1', line: 5 }];
 
     const code = `
+      import '@tolgee/react'
       function Test () {
         const { t } = useTranslate()
         t('key1', { ns: 'ns1' })
@@ -386,9 +405,10 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])('useTranslate (.%s)', (ext) => {
   });
 
   it('keeps track of the namespace specified in useTranslate', async () => {
-    const expected = [{ keyName: 'key1', namespace: 'namespace', line: 4 }];
+    const expected = [{ keyName: 'key1', namespace: 'namespace', line: 5 }];
 
     const code = `
+      import '@tolgee/react'
       function Test () {
         const { t } = useTranslate('namespace')
         t('key1')
@@ -401,9 +421,10 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])('useTranslate (.%s)', (ext) => {
   });
 
   it('keeps track of the namespace specified in useTranslate (array)', async () => {
-    const expected = [{ keyName: 'key1', namespace: 'namespace1', line: 4 }];
+    const expected = [{ keyName: 'key1', namespace: 'namespace1', line: 5 }];
 
     const code = `
+      import '@tolgee/react'
       function Test () {
         const { t } = useTranslate([ 'namespace1', 'namespace2' ])
         t('key1')
@@ -416,9 +437,10 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])('useTranslate (.%s)', (ext) => {
   });
 
   it('overrides the specified namespace if one is passed as parameter', async () => {
-    const expected = [{ keyName: 'key1', namespace: 'ns1', line: 4 }];
+    const expected = [{ keyName: 'key1', namespace: 'ns1', line: 5 }];
 
     const code = `
+      import '@tolgee/react'
       function Test () {
         const { t } = useTranslate('namespace')
         t('key1', { ns: 'ns1' })
@@ -432,6 +454,7 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])('useTranslate (.%s)', (ext) => {
 
   it('does not extract if there was no useTranslate call', async () => {
     const code = `
+      import '@tolgee/react'
       function Test () {
         t('key1')
       }
@@ -444,6 +467,7 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])('useTranslate (.%s)', (ext) => {
 
   it('does not extract if the useTranslate call was in an unrelated block', async () => {
     const code = `
+      import '@tolgee/react'
       function Meow () {
         const { t } = useTranslate()
       }
@@ -460,6 +484,7 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])('useTranslate (.%s)', (ext) => {
 
   it('does not extract if the useTranslate call was in a deeper block', async () => {
     const code = `
+      import '@tolgee/react'
       function Test () {
         function Meow () {
           const { t } = useTranslate()
@@ -475,12 +500,13 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])('useTranslate (.%s)', (ext) => {
 
   it('keeps track of the right namespace when multiple useTranslates are in use', async () => {
     const expected = [
-      { keyName: 'key1', namespace: 'ns-test', line: 4 },
-      { keyName: 'key2', namespace: 'ns-meow', line: 8 },
-      { keyName: 'key3', namespace: 'ns-test', line: 11 },
+      { keyName: 'key1', namespace: 'ns-test', line: 5 },
+      { keyName: 'key2', namespace: 'ns-meow', line: 9 },
+      { keyName: 'key3', namespace: 'ns-test', line: 12 },
     ];
 
     const code = `
+      import '@tolgee/react'
       function Test () {
         const { t } = useTranslate('ns-test')
         t('key1')
@@ -500,9 +526,10 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])('useTranslate (.%s)', (ext) => {
   });
 
   it('handles multi-line use', async () => {
-    const expected = [{ keyName: 'key1', namespace: 'namespace', line: 7 }];
+    const expected = [{ keyName: 'key1', namespace: 'namespace', line: 8 }];
 
     const code = `
+      import '@tolgee/react'
       function Test () {
         const { t } = useTranslate(
           'namespace'
@@ -520,9 +547,10 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])('useTranslate (.%s)', (ext) => {
   });
 
   it('handles weird spacings', async () => {
-    const expected = [{ keyName: 'key1', namespace: 'namespace', line: 4 }];
+    const expected = [{ keyName: 'key1', namespace: 'namespace', line: 5 }];
 
     const code = `
+      import '@tolgee/react'
       function Test () {
         const { t } = useTranslate         (   'namespace')
         t     (      'key1')
@@ -537,12 +565,13 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])('useTranslate (.%s)', (ext) => {
   describe('dynamic data', () => {
     it('emits warning on dynamic keys and skips', async () => {
       const expected = [
-        { warning: 'W_DYNAMIC_KEY', line: 4 },
         { warning: 'W_DYNAMIC_KEY', line: 5 },
         { warning: 'W_DYNAMIC_KEY', line: 6 },
+        { warning: 'W_DYNAMIC_KEY', line: 7 },
       ];
 
       const code = `
+        import '@tolgee/react'
         function Test () {
           const { t } = useTranslate('namespace')
           t(\`dynamic-key-\${i}\`)
@@ -558,13 +587,14 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])('useTranslate (.%s)', (ext) => {
 
     it('emits warning on dynamic namespace (within t) and skips', async () => {
       const expected = [
-        { warning: 'W_DYNAMIC_NAMESPACE', line: 4 },
         { warning: 'W_DYNAMIC_NAMESPACE', line: 5 },
         { warning: 'W_DYNAMIC_NAMESPACE', line: 6 },
         { warning: 'W_DYNAMIC_NAMESPACE', line: 7 },
+        { warning: 'W_DYNAMIC_NAMESPACE', line: 8 },
       ];
 
       const code = `
+        import '@tolgee/react'
         function Test () {
           const { t } = useTranslate('namespace')
           t('key1', { ns: \`dynamic-ns-\${i}\` })
@@ -581,15 +611,16 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])('useTranslate (.%s)', (ext) => {
 
     it('emits warnings on dynamic namespace (within useTranslate) and skips', async () => {
       const expected = [
-        { warning: 'W_DYNAMIC_NAMESPACE', line: 3 },
-        { warning: 'W_UNRESOLVABLE_NAMESPACE', line: 4 },
-        { warning: 'W_DYNAMIC_NAMESPACE', line: 8 },
-        { warning: 'W_UNRESOLVABLE_NAMESPACE', line: 9 },
-        { warning: 'W_DYNAMIC_NAMESPACE', line: 13 },
-        { warning: 'W_UNRESOLVABLE_NAMESPACE', line: 14 },
+        { warning: 'W_DYNAMIC_NAMESPACE', line: 4 },
+        { warning: 'W_UNRESOLVABLE_NAMESPACE', line: 5 },
+        { warning: 'W_DYNAMIC_NAMESPACE', line: 9 },
+        { warning: 'W_UNRESOLVABLE_NAMESPACE', line: 10 },
+        { warning: 'W_DYNAMIC_NAMESPACE', line: 14 },
+        { warning: 'W_UNRESOLVABLE_NAMESPACE', line: 15 },
       ];
 
       const code = `
+        import '@tolgee/react'
         function Test1 () {
           const { t } = useTranslate(\`dynamic-ns-\${i}\`)
           t('key2')
@@ -613,15 +644,16 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])('useTranslate (.%s)', (ext) => {
 
     it('extracts if useTranslate is dynamic but a static override is specified', async () => {
       const expectedWarnings = [
-        { warning: 'W_DYNAMIC_NAMESPACE', line: 3 },
-        { warning: 'W_UNRESOLVABLE_NAMESPACE', line: 4 },
+        { warning: 'W_DYNAMIC_NAMESPACE', line: 4 },
+        { warning: 'W_UNRESOLVABLE_NAMESPACE', line: 5 },
       ];
 
       const expectedKeys = [
-        { keyName: 'key2', namespace: 'static-ns', line: 5 },
+        { keyName: 'key2', namespace: 'static-ns', line: 6 },
       ];
 
       const code = `
+        import '@tolgee/react'
         function Test3 () {
           const { t } = useTranslate(ns)
           t('key1')
@@ -635,9 +667,10 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])('useTranslate (.%s)', (ext) => {
     });
 
     it('emits warning for dynamic parameters', async () => {
-      const expectedWarnings = [{ warning: 'W_DYNAMIC_OPTIONS', line: 4 }];
+      const expectedWarnings = [{ warning: 'W_DYNAMIC_OPTIONS', line: 5 }];
 
       const code = `
+        import '@tolgee/react'
         function Test3 () {
           const { t } = useTranslate()
           t('key1', someValue)
@@ -651,16 +684,17 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])('useTranslate (.%s)', (ext) => {
 
     it('emits warning for dynamic default values, but extracts keys', async () => {
       const expectedWarnings = [
-        { warning: 'W_DYNAMIC_DEFAULT_VALUE', line: 4 },
         { warning: 'W_DYNAMIC_DEFAULT_VALUE', line: 5 },
+        { warning: 'W_DYNAMIC_DEFAULT_VALUE', line: 6 },
       ];
 
       const expectedKeys = [
-        { keyName: 'key1', defaultValue: undefined, line: 4 },
-        { keyName: 'key2', defaultValue: undefined, line: 5 },
+        { keyName: 'key1', defaultValue: undefined, line: 5 },
+        { keyName: 'key2', defaultValue: undefined, line: 6 },
       ];
 
       const code = `
+        import '@tolgee/react'
         function Test3 () {
           const { t } = useTranslate()
           t('key1', 'dynamic-' + i)
@@ -679,9 +713,10 @@ describe.each(['jsx', 'tsx'])('<T> (.%s)', (ext) => {
   const FILE_NAME = `test.${ext}`;
 
   it('extracts keys specified as properties', async () => {
-    const expected = [{ keyName: 'key1', line: 2 }];
+    const expected = [{ keyName: 'key1', line: 3 }];
 
     const code = `
+      import '@tolgee/react'
       <T keyName='key1'/>
     `;
 
@@ -691,9 +726,10 @@ describe.each(['jsx', 'tsx'])('<T> (.%s)', (ext) => {
   });
 
   it('extracts keys specified as properties with curly braces', async () => {
-    const expected = [{ keyName: 'key1', line: 2 }];
+    const expected = [{ keyName: 'key1', line: 3 }];
 
     const code = `
+      import '@tolgee/react'
       <T keyName={'key1'}/>
     `;
 
@@ -703,9 +739,10 @@ describe.each(['jsx', 'tsx'])('<T> (.%s)', (ext) => {
   });
 
   it('extracts keys specified as children', async () => {
-    const expected = [{ keyName: 'key1', line: 2 }];
+    const expected = [{ keyName: 'key1', line: 3 }];
 
     const code = `
+      import '@tolgee/react'
       <T>key1</T>
     `;
 
@@ -716,11 +753,12 @@ describe.each(['jsx', 'tsx'])('<T> (.%s)', (ext) => {
 
   it('extracts the default value from children', async () => {
     const expected = [
-      { keyName: 'key1', defaultValue: 'default value1', line: 2 },
-      { keyName: 'key2', defaultValue: 'default value2', line: 3 },
+      { keyName: 'key1', defaultValue: 'default value1', line: 3 },
+      { keyName: 'key2', defaultValue: 'default value2', line: 4 },
     ];
 
     const code = `
+      import '@tolgee/react'
       <T keyName='key1'>default value1</T>
       <T keyName='key2'>{'default value2'}</T>
     `;
@@ -732,10 +770,11 @@ describe.each(['jsx', 'tsx'])('<T> (.%s)', (ext) => {
 
   it('extracts the default value from props', async () => {
     const expected = [
-      { keyName: 'key1', defaultValue: 'default value1', line: 2 },
+      { keyName: 'key1', defaultValue: 'default value1', line: 3 },
     ];
 
     const code = `
+      import '@tolgee/react'
       <T keyName='key1' defaultValue='default value1'/>
     `;
 
@@ -746,10 +785,11 @@ describe.each(['jsx', 'tsx'])('<T> (.%s)', (ext) => {
 
   it('does not extract default value from children if a defaultValue prop is set', async () => {
     const expected = [
-      { keyName: 'key1', defaultValue: 'default value1', line: 2 },
+      { keyName: 'key1', defaultValue: 'default value1', line: 3 },
     ];
 
     const code = `
+      import '@tolgee/react'
       <T keyName='key1' defaultValue='default value1'>unused</T>
     `;
 
@@ -759,9 +799,10 @@ describe.each(['jsx', 'tsx'])('<T> (.%s)', (ext) => {
   });
 
   it('extracts the namespace from props', async () => {
-    const expected = [{ keyName: 'key1', namespace: 'ns1', line: 2 }];
+    const expected = [{ keyName: 'key1', namespace: 'ns1', line: 3 }];
 
     const code = `
+      import '@tolgee/react'
       <T keyName='key1' ns='ns1'/>
     `;
 
@@ -771,9 +812,10 @@ describe.each(['jsx', 'tsx'])('<T> (.%s)', (ext) => {
   });
 
   it('does not extract from unrelated components', async () => {
-    const expected = [{ keyName: 'key1', line: 3 }];
+    const expected = [{ keyName: 'key1', line: 4 }];
 
     const code = `
+      import '@tolgee/react'
       <div keyName='not key1'>
         <T keyName='key1'/>
       </div>
@@ -785,9 +827,10 @@ describe.each(['jsx', 'tsx'])('<T> (.%s)', (ext) => {
   });
 
   it('is undisturbed by objects in properties', async () => {
-    const expected = [{ keyName: 'key1', defaultValue: 'value', line: 2 }];
+    const expected = [{ keyName: 'key1', defaultValue: 'value', line: 3 }];
 
     const code = `
+      import '@tolgee/react'
       <T properties={{ a: 'b' }} keyName='key1'>value</T>
     `;
 
@@ -802,24 +845,25 @@ describe.each(['jsx', 'tsx'])('<T> (.%s)', (ext) => {
         keyName: 'key1',
         namespace: 'ns1',
         defaultValue: 'default value1',
-        line: 2,
+        line: 3,
       },
       {
         keyName: 'key2',
         namespace: 'ns2',
         defaultValue: 'default value2',
-        line: 8,
+        line: 9,
       },
       {
         keyName: 'key3',
         namespace: 'ns3',
         defaultValue:
           'sometimes, you really have to deal with a lot of whitespaces...',
-        line: 12,
+        line: 13,
       },
     ];
 
     const code = `
+      import '@tolgee/react'
       <T
         keyName='key1'
         ns='ns1'
@@ -843,10 +887,11 @@ describe.each(['jsx', 'tsx'])('<T> (.%s)', (ext) => {
 
   it('unrolls static JSX compound expressions that only contain a string', async () => {
     const expected = [
-      { keyName: 'key1', defaultValue: 'children with spaces', line: 2 },
+      { keyName: 'key1', defaultValue: 'children with spaces', line: 3 },
     ];
 
     const code = `
+      import '@tolgee/react'
       <T keyName='key1'>children{' '}with{' '}spaces</T>
     `;
 
@@ -858,16 +903,17 @@ describe.each(['jsx', 'tsx'])('<T> (.%s)', (ext) => {
   describe('dynamic data', () => {
     it('emits warning on dynamic keys and skips', async () => {
       const expected = [
-        { warning: 'W_DYNAMIC_KEY', line: 2 },
         { warning: 'W_DYNAMIC_KEY', line: 3 },
         { warning: 'W_DYNAMIC_KEY', line: 4 },
         { warning: 'W_DYNAMIC_KEY', line: 5 },
-        { warning: 'W_DYNAMIC_KEY', line: 7 },
+        { warning: 'W_DYNAMIC_KEY', line: 6 },
         { warning: 'W_DYNAMIC_KEY', line: 8 },
         { warning: 'W_DYNAMIC_KEY', line: 9 },
+        { warning: 'W_DYNAMIC_KEY', line: 10 },
       ];
 
       const code = `
+        import '@tolgee/react'
         <T keyName={\`dynamic-key-\${i}\`} />
         <T keyName={'dynamic-key-' + i} />
         <T keyName={key} />
@@ -885,13 +931,14 @@ describe.each(['jsx', 'tsx'])('<T> (.%s)', (ext) => {
 
     it('emits warning on dynamic namespace and skips', async () => {
       const expected = [
-        { warning: 'W_DYNAMIC_NAMESPACE', line: 2 },
         { warning: 'W_DYNAMIC_NAMESPACE', line: 3 },
         { warning: 'W_DYNAMIC_NAMESPACE', line: 4 },
         { warning: 'W_DYNAMIC_NAMESPACE', line: 5 },
+        { warning: 'W_DYNAMIC_NAMESPACE', line: 6 },
       ];
 
       const code = `
+        import '@tolgee/react'
         <T keyName='key1' ns={\`dynamic-ns-\${i}\`} />
         <T keyName='key2' ns={'dynamic-ns-' + i} />
         <T keyName='key2' ns={ns} />
@@ -905,24 +952,25 @@ describe.each(['jsx', 'tsx'])('<T> (.%s)', (ext) => {
 
     it('emits warning for dynamic default values, but extracts keys', async () => {
       const expectedWarnings = [
-        { warning: 'W_DYNAMIC_DEFAULT_VALUE', line: 2 },
         { warning: 'W_DYNAMIC_DEFAULT_VALUE', line: 3 },
         { warning: 'W_DYNAMIC_DEFAULT_VALUE', line: 4 },
         { warning: 'W_DYNAMIC_DEFAULT_VALUE', line: 5 },
         { warning: 'W_DYNAMIC_DEFAULT_VALUE', line: 6 },
         { warning: 'W_DYNAMIC_DEFAULT_VALUE', line: 7 },
+        { warning: 'W_DYNAMIC_DEFAULT_VALUE', line: 8 },
       ];
 
       const expectedKeys = [
-        { keyName: 'key1', defaultValue: undefined, line: 2 },
-        { keyName: 'key2', defaultValue: undefined, line: 3 },
-        { keyName: 'key3', defaultValue: undefined, line: 4 },
-        { keyName: 'key4', defaultValue: undefined, line: 5 },
-        { keyName: 'key5', defaultValue: undefined, line: 6 },
-        { keyName: 'key6', defaultValue: undefined, line: 7 },
+        { keyName: 'key1', defaultValue: undefined, line: 3 },
+        { keyName: 'key2', defaultValue: undefined, line: 4 },
+        { keyName: 'key3', defaultValue: undefined, line: 5 },
+        { keyName: 'key4', defaultValue: undefined, line: 6 },
+        { keyName: 'key5', defaultValue: undefined, line: 7 },
+        { keyName: 'key6', defaultValue: undefined, line: 8 },
       ];
 
       const code = `
+        import '@tolgee/react'
         <T keyName='key1' defaultValue={someValue}/>
         <T keyName='key2' defaultValue={'dynamic-' + i}/>
         <T keyName='key3' defaultValue={\`dynamic-\${i}\`}/>
@@ -944,9 +992,10 @@ describe('magic comments', () => {
       'ignores React.createElement (.%s)',
       async (ext) => {
         const code = `
-        // @tolgee-ignore
-        React.createElement(T, { keyName: 'uwu' })
-      `;
+          import '@tolgee/react'
+          // @tolgee-ignore
+          React.createElement(T, { keyName: 'uwu' })
+        `;
 
         const extracted = await extractKeys(code, `test.${ext}`);
         expect(extracted.warnings).toEqual([]);
@@ -958,13 +1007,14 @@ describe('magic comments', () => {
       'ignores useTranslate (.%s)',
       async (ext) => {
         const code = `
-        function Test () {
-          // @tolgee-ignore
-          const { t } = useTranslate()
+          import '@tolgee/react'
+          function Test () {
+            // @tolgee-ignore
+            const { t } = useTranslate()
 
-          t('uwu')
-        }
-      `;
+            t('uwu')
+          }
+        `;
 
         const extracted = await extractKeys(code, `test.${ext}`);
         expect(extracted.warnings).toEqual([]);
@@ -974,6 +1024,7 @@ describe('magic comments', () => {
 
     it.each(['js', 'ts', 'jsx', 'tsx'])('ignores t (.%s)', async (ext) => {
       const code = `
+        import '@tolgee/react'
         const { t } = useTranslate()
 
         // @tolgee-ignore
@@ -987,6 +1038,7 @@ describe('magic comments', () => {
 
     it.each(['jsx', 'tsx'])('ignores <T> (.%s)', async (ext) => {
       const code = `
+        import '@tolgee/react'
         function Test () {
           return (
             <div>
@@ -1004,11 +1056,12 @@ describe('magic comments', () => {
 
     it('emits warning upon unused marker', async () => {
       const expected = [
-        { warning: 'W_UNUSED_IGNORE', line: 2 },
-        { warning: 'W_UNUSED_IGNORE', line: 5 },
+        { warning: 'W_UNUSED_IGNORE', line: 3 },
+        { warning: 'W_UNUSED_IGNORE', line: 6 },
       ];
 
       const code = `
+        import '@tolgee/react'
         // @tolgee-ignore
         console.log('hi cutie')
 
@@ -1022,9 +1075,10 @@ describe('magic comments', () => {
     });
 
     it('suppresses warning when used', async () => {
-      const expected = [{ warning: 'W_DYNAMIC_NAMESPACE', line: 34 }];
+      const expected = [{ warning: 'W_DYNAMIC_NAMESPACE', line: 35 }];
 
       const code = `
+        import '@tolgee/react'
         // @tolgee-ignore
         React.createElement(T, { keyName: \`dynamic-key-\${i}\` })
         // @tolgee-ignore
@@ -1070,6 +1124,7 @@ describe('magic comments', () => {
 
     it('suppresses warning when used (JSX-specific)', async () => {
       const code = `
+        import '@tolgee/react'
         function Test () {
           return (
             <div>
@@ -1109,9 +1164,9 @@ describe('magic comments', () => {
         ];
 
         const code = `
-        // @tolgee-key key1
-        // @tolgee-key { key: 'key2', ns: 'ns', defaultValue: 'test value' }
-      `;
+          // @tolgee-key key1
+          // @tolgee-key { key: 'key2', ns: 'ns', defaultValue: 'test value' }
+        `;
 
         const extracted = await extractKeys(code, `test.${ext}`);
         expect(extracted.keys).toEqual(expected);
@@ -1120,11 +1175,12 @@ describe('magic comments', () => {
 
     it('overrides data from code', async () => {
       const expected = [
-        { keyName: 'key-override-1', line: 2 },
-        { keyName: 'key-override-2', namespace: undefined, line: 8 },
+        { keyName: 'key-override-1', line: 3 },
+        { keyName: 'key-override-2', namespace: undefined, line: 9 },
       ];
 
       const code = `
+        import '@tolgee/react'
         // @tolgee-key key-override-1
         React.createElement(T, { keyName: 'key-props-1' })
 
@@ -1143,10 +1199,11 @@ describe('magic comments', () => {
 
     it('overrides data from code (JSX-specific)', async () => {
       const expected = [
-        { keyName: 'key-override-1', defaultValue: undefined, line: 5 },
+        { keyName: 'key-override-1', defaultValue: undefined, line: 6 },
       ];
 
       const code = `
+        import '@tolgee/react'
         function Test () {
           return (
             <div>
@@ -1163,9 +1220,10 @@ describe('magic comments', () => {
     });
 
     it("doesn't extract json5 if escaped", async () => {
-      const expected = [{ keyName: '{key}', line: 2 }];
+      const expected = [{ keyName: '{key}', line: 3 }];
 
       const code = `
+        import '@tolgee/react'
         // @tolgee-key \\{key}
         React.createElement(T, { keyName: 'key-props-1' })
       `;
@@ -1176,9 +1234,10 @@ describe('magic comments', () => {
     });
 
     it('suppresses warning when used', async () => {
-      const expected = [{ warning: 'W_DYNAMIC_NAMESPACE', line: 20 }];
+      const expected = [{ warning: 'W_DYNAMIC_NAMESPACE', line: 21 }];
 
       const code = `
+        import '@tolgee/react'
         // @tolgee-key override-1
         React.createElement(T, { keyName: \`dynamic-key-\${i}\` })
         // @tolgee-key override-2
@@ -1209,6 +1268,7 @@ describe('magic comments', () => {
 
     it('suppresses warning when used (JSX-specific) (.%s)', async () => {
       const code = `
+        import '@tolgee/react'
         function Test () {
           return (
             <div>
