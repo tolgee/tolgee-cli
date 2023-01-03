@@ -37,9 +37,10 @@ async function printHandler(this: Command, filesPattern: string) {
     if (warnings.length) {
       warningCount += warnings.length;
       console.log(
-        '%d warning%s were emitted during extraction:',
+        '%d warning%s %s emitted during extraction:',
         warnings.length,
-        warnings.length !== 1 ? 's' : ''
+        warnings.length !== 1 ? 's' : '',
+        warnings.length !== 1 ? 'were' : 'was'
       );
       for (const warning of warnings) {
         if (warning.warning in WarningMessages) {
