@@ -33,6 +33,7 @@ export function spawn(
       DEBUG_ENABLED && '--verbose',
       '--api-url',
       'http://localhost:22222',
+      ...args,
     ].filter(Boolean) as string[],
     {
       env: {
