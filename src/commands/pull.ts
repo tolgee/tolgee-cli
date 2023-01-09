@@ -26,6 +26,7 @@ type PullOptions = {
   format: 'JSON' | 'XLIFF';
   languages?: string[];
   states?: Array<'UNTRANSLATED' | 'TRANSLATED' | 'REVIEWED'>;
+  delimiter?: string;
   overwrite?: boolean;
 };
 
@@ -67,11 +68,7 @@ async function fetchZipBlob(opts: PullOptions): Promise<Blob> {
     format: opts.format,
     languages: opts.languages,
     filterState: opts.states,
-
-    // these below as marked as required in the API types ¯\_(ツ)_/¯
-    splitByScope: false,
-    splitByScopeDelimiter: '',
-    splitByScopeDepth: 0,
+    structureDelimiter: opts.delimiter,
   });
 }
 
@@ -108,28 +105,36 @@ export default new Command()
   .description('Pulls translations to Tolgee')
   .argument(
     '<path>',
-    'Destination path where translation files will be stored in.'
+    'Destination path where translation files will be stored in'
   )
   .addOption(
-    new Option('-f, --format <format>', 'Format of the exported files.')
+    new Option('-f, --format <format>', 'Format of the exported files')
       .choices(['JSON', 'XLIFF'])
       .default('JSON')
       .argParser((v) => v.toUpperCase())
   )
   .option(
     '-l, --languages <languages...>',
-    'List of languages to pull. Leave unspecified to export them all.'
+    'List of languages to pull. Leave unspecified to export them all'
   )
   .addOption(
     new Option(
       '-s, --states <states...>',
-      'List of translation states to include. Defaults all except untranslated.'
+      'List of translation states to include. Defaults all except untranslated'
     )
       .choices(['UNTRANSLATED', 'TRANSLATED', 'REVIEWED'])
       .argParser((v, a: string[]) => [v.toUpperCase(), ...(a || [])])
   )
+  .addOption(
+    new Option(
+      '-d, --delimiter',
+      'Structure delimiter to use. By default, Tolgee interprets `.` as a nested structure. You can change the delimiter, or disable structure formatting by not specifying any value to the option'
+    )
+      .default('.')
+      .argParser((v) => v || '')
+  )
   .option(
     '-o, --overwrite',
-    'Whether to automatically overwrite existing files. BE CAREFUL, THIS WILL WIPE *ALL* THE CONTENTS OF THE TARGET FOLDER. If unspecified, the user will be prompted interactively, or the command will fail when in non-interactive.'
+    'Whether to automatically overwrite existing files. BE CAREFUL, THIS WILL WIPE *ALL* THE CONTENTS OF THE TARGET FOLDER. If unspecified, the user will be prompted interactively, or the command will fail when in non-interactive'
   )
   .action(pullHandler);

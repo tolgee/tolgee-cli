@@ -50,7 +50,10 @@ async function lintHandler(this: Command, filesPattern: string) {
 
 export default new Command('check')
   .description(
-    'Checks if the keys can be extracted automatically, and reports problems if any.'
+    'Checks if the keys can be extracted automatically, and reports problems if any'
   )
-  .argument('<pattern>', 'File pattern to include')
+  .argument(
+    '<pattern>',
+    'File pattern to include (hint: make sure to escape it in quotes, or your shell might attempt to unroll some tokens like *)'
+  )
   .action(lintHandler);

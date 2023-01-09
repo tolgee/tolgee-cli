@@ -1,7 +1,19 @@
 import type { ZipFile, Entry } from 'yauzl';
 import { createWriteStream } from 'fs';
 import { mkdir } from 'fs/promises';
-import { join } from 'path';
+import { join, dirname } from 'path';
+
+function dumpFile(zip: ZipFile, entry: Entry, dest: string) {
+  zip.openReadStream(entry, (err, stream) => {
+    if (err) throw err;
+
+    const writeStream = createWriteStream(dest);
+    stream.pipe(writeStream);
+
+    // Unlock reading loop
+    stream.on('end', () => zip.readEntry());
+  });
+}
 
 /**
  * Unzips a ZIP file loaded in memory to a destination on disk.
@@ -10,6 +22,10 @@ import { join } from 'path';
  * @param dest The destination path
  */
 export function unzip(zip: ZipFile, dest: string) {
+  // Enforce expected & security options.
+  // Lazy entries is what this reader is based upon.
+  // Decode strings ensures file paths are sanitized by yazul
+  // and does not present any security threat to the machine.
   if (!zip.lazyEntries || !zip.decodeStrings) {
     throw new TypeError(
       'Invalid ZIP file: lazyEntries and decodeStrings both must be set to true.'
@@ -20,25 +36,30 @@ export function unzip(zip: ZipFile, dest: string) {
     zip.on('error', reject);
     zip.on('end', resolve);
 
+    // There is no mechanism for zip files to contain directories
+    // by standards, and implementations diverge. Some make an explicit
+    // directory entry (ending with /), some don't make any specific treatment.
+    // The "safest" way is to check the path on files and create them as necessary.
+    const seenDirectories = new Set<string>([dest]);
+
     zip.readEntry();
     zip.on('entry', (entry: Entry) => {
-      // Security note: yauzl *does* sanitize the string and protects from path traversal thanks to decodeStrings.
-      const entryPath = join(dest, entry.fileName);
-
       if (entry.fileName.endsWith('/')) {
-        // Entry is a directory
-        mkdir(entryPath).then(() => zip.readEntry());
+        zip.readEntry();
         return;
       }
 
-      zip.openReadStream(entry, (err, stream) => {
-        if (err) return reject(err);
-        const writeStream = createWriteStream(entryPath);
-        stream.pipe(writeStream);
+      const entryPath = join(dest, entry.fileName);
 
-        // Once we're done, read the next entry
-        stream.on('end', () => zip.readEntry());
-      });
+      // Handle directory creation
+      const entryDirName = dirname(entryPath);
+      if (!seenDirectories.has(entryDirName)) {
+        mkdir(entryDirName, { recursive: true }).then(() =>
+          dumpFile(zip, entry, entryPath)
+        );
+      } else {
+        dumpFile(zip, entry, entryPath);
+      }
     });
   });
 }

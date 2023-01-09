@@ -25,8 +25,9 @@ export default class ImportClient {
 
   async addFiles(req: AddFileRequest): Promise<AddFileResponse> {
     const body = new FormData();
-    for (const file of req.files)
-      body.append('files', file.data, { filename: file.name });
+    for (const file of req.files) {
+      body.append('files', file.data, { filepath: file.name });
+    }
 
     return this.requester.requestJson({
       method: 'POST',

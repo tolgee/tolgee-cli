@@ -55,16 +55,16 @@ async function logoutHandler(this: Command) {
 export const Login = new Command()
   .name('login')
   .description(
-    'Login to Tolgee with an API key. You can be logged into multiple Tolgee instances at the same time by using --api-url.'
+    'Login to Tolgee with an API key. You can be logged into multiple Tolgee instances at the same time by using --api-url'
   )
   .argument(
-    '<api key>',
+    '<API Key>',
     'The API key. Can be either a personal access token, or a project key'
   )
   .action(loginHandler);
 
 export const Logout = new Command()
   .name('logout')
-  .description('Logs out of Tolgee.')
-  .option('--all', "Log out of *ALL* Tolgee instances you're logged into.")
+  .description('Logs out of Tolgee')
+  .option('--all', "Log out of *ALL* Tolgee instances you're logged into")
   .action(logoutHandler);

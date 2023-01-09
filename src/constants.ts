@@ -14,3 +14,5 @@ export const DEFAULT_API_URL = new URL('https://app.tolgee.io');
 
 export const API_KEY_PAT_PREFIX = 'tgpat_';
 export const API_KEY_PAK_PREFIX = 'tgpak_';
+
+export const SDKS = <const>['react'];
