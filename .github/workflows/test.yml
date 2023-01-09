@@ -55,3 +55,4 @@ jobs:
         run: npm run test:e2e-run
       - name: Stop Tolgee Container
         run: npm run tolgee:stop
+        if: always()

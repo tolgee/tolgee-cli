@@ -6,34 +6,13 @@ import { spawn as spawnProcess } from 'child_process';
 const TTY_PRELOAD = join(__dirname, '..', '__internal__', 'tty.ts');
 const PRELOAD = join(__dirname, '..', '__internal__', 'preload.ts');
 const CLI_INDEX = join(__dirname, '..', '..', '..', 'src', 'index.ts');
+const DEBUG_ENABLED = process.env.RUNNER_DEBUG === '1';
 
 export type RunResult = {
   code: number;
   stdout: string;
   stderr: string;
 };
-
-const BASE_ARGS = [
-  '--require',
-  'ts-node/register',
-  '--require',
-  PRELOAD,
-  CLI_INDEX,
-  '--api-url',
-  'http://localhost:22222',
-];
-
-const BASE_ARGS_WITH_TTY = [
-  '--require',
-  'ts-node/register',
-  '--require',
-  PRELOAD,
-  '--require',
-  TTY_PRELOAD,
-  CLI_INDEX,
-  '--api-url',
-  'http://localhost:22222',
-];
 
 export function spawn(
   args: string[],
@@ -43,7 +22,19 @@ export function spawn(
   const userEnv = env ?? {};
   return spawnProcess(
     process.argv0,
-    [...(stdin ? BASE_ARGS_WITH_TTY : BASE_ARGS), ...args],
+    [
+      '--require',
+      'ts-node/register',
+      '--require',
+      PRELOAD,
+      stdin && '--require',
+      stdin && TTY_PRELOAD,
+      CLI_INDEX,
+      DEBUG_ENABLED && '--verbose',
+      '--api-url',
+      'http://localhost:22222',
+      ...args,
+    ].filter(Boolean) as string[],
     {
       env: {
         ...userEnv,
@@ -75,6 +66,11 @@ function runProcess(
     }, timeoutTime);
 
     cliProcess.on('exit', (code) => {
+      if (DEBUG_ENABLED) {
+        console.log('::group::stdout\n%s\n::endgroup::', stdout);
+        console.log('::group::stderr\n%s\n::endgroup::', stderr);
+      }
+
       if (killed) return;
       clearTimeout(timeout);
       resolve({ code: code ?? -1, stdout, stderr });

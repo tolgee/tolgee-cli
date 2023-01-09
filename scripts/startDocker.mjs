@@ -14,33 +14,40 @@ const TG_IMPORT_FOLDER = new URL(
   import.meta.url
 ).pathname;
 
-const docker = spawn(
-  'docker',
-  [
-    'run',
-    '--rm',
-    '--name',
-    'tolgee_cli_e2e',
-    '--pull',
-    'always',
-    '--publish',
-    '22222:8080',
-    '--env-file',
-    ENV_FILE,
-    // todo: just mount the import folder when namespaces land on TG latest
-    '--mount',
-    `type=bind,source=${TG_IMPORT_FOLDER}/test1,target=/mnt/tolgee-import-data/test1`,
-    '--mount',
-    `type=bind,source=${TG_IMPORT_FOLDER}/test2,target=/mnt/tolgee-import-data/test2`,
-    'tolgee/tolgee:latest',
-  ],
-  {
-    detached: true,
-  }
-);
+const ARGS = [
+  'run',
+  '--rm',
+  '--name',
+  'tolgee_cli_e2e',
+  '--pull',
+  'always',
+  '--publish',
+  '22222:8080',
+  '--env-file',
+  ENV_FILE,
+  // todo: just mount the import folder when namespaces land on TG latest
+  '--mount',
+  `type=bind,source=${TG_IMPORT_FOLDER}/test1,target=/mnt/tolgee-import-data/test1`,
+  '--mount',
+  `type=bind,source=${TG_IMPORT_FOLDER}/test2,target=/mnt/tolgee-import-data/test2`,
+  'tolgee/tolgee:latest',
+];
+
+if (process.env.RUNNER_DEBUG === '1') {
+  console.log('Command:');
+  console.log('docker %s', ARGS.join(' '));
+}
+
+const docker = spawn('docker', ARGS, {
+  detached: true,
+});
 
 docker.stdout.setEncoding('utf8');
 docker.stdout.on('data', (d) => {
+  if (process.env.RUNNER_DEBUG === '1') {
+    console.log(d);
+  }
+
   if (d.includes('Started Application.Companion')) {
     console.log('Test Tolgee server up on port 22222.');
     process.exit(0);

@@ -36,7 +36,7 @@ async function lintHandler(this: Command, filesPattern: string) {
   if (warningCount !== 0) {
     console.log();
     console.log(
-      'Total: %d warning%s in %d file%d',
+      'Total: %d warning%s in %d file%s',
       warningCount,
       warningCount !== 1 ? 's' : '',
       filesCount,
