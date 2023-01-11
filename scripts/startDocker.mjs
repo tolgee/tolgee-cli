@@ -27,8 +27,7 @@ const ARGS = [
   ENV_FILE,
   '--mount',
   `type=bind,source=${TG_IMPORT_FOLDER},target=/mnt/tolgee-import-data`,
-  // todo: move back to latest when tg3 is GA
-  'tolgee/tolgee:v3.0.0-alpha.7',
+  'tolgee/tolgee:latest',
 ];
 
 if (process.env.RUNNER_DEBUG === '1') {
