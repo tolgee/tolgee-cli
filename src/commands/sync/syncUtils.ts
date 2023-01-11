@@ -1,11 +1,31 @@
 import type { AllKeys } from '../../client/project';
 import { type FilteredKeys, type Key, NullNamespace } from '../../extractor';
-import { WarningMessages, emitGitHubWarning } from '../../extractor/warnings';
+import ansi from 'ansi-colors';
+
+export type PartialKey = { keyName: string; namespace?: string };
 
 export type ComparatorResult = {
   added: Key[];
   removed: Array<{ id: number; keyName: string; namespace?: string }>;
 };
+
+/**
+ * Prints information about a key, with coloring and formatting.
+ *
+ * @param key The key to print.
+ * @param type Whether this is an addition or a removal.
+ */
+export function printKey(key: PartialKey, type: 'added' | 'removed') {
+  const namespace = key.namespace
+    ? ` ${ansi.italic(`(namespace: ${key.namespace})`)}`
+    : '';
+
+  if (type === 'added') {
+    console.log(`${ansi.green(`+ ${key.keyName}`)}${namespace}`);
+  } else {
+    console.log(`${ansi.red(`- ${key.keyName}`)}${namespace}`);
+  }
+}
 
 /**
  * Compares local and remote keys to detect added and deleted keys.

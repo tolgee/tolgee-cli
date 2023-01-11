@@ -43,7 +43,7 @@ if (!isMainThread) workerInit();
 
 let worker: Worker;
 let deferredJobsIdPool = 0;
-const deferredJobs = new Map<number, Deferred>()
+const deferredJobs = new Map<number, Deferred>();
 
 export async function callWorker(params: WorkerParams) {
   if (!worker) {
@@ -61,9 +61,9 @@ export async function callWorker(params: WorkerParams) {
     });
 
     worker.on('message', (msg) => {
-      const deferred = deferredJobs.get(msg.id)!
+      const deferred = deferredJobs.get(msg.id)!;
       if (!deferred) {
-        return
+        return;
       }
 
       if ('data' in msg) {
@@ -72,7 +72,7 @@ export async function callWorker(params: WorkerParams) {
         deferred.reject(msg.err);
       }
 
-      deferredJobs.delete(msg.id)
+      deferredJobs.delete(msg.id);
       clearTimeout(timeout);
     });
 

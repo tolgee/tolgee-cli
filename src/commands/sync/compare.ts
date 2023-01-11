@@ -4,26 +4,12 @@ import ansi from 'ansi-colors';
 
 import { extractKeysOfFiles, filterExtractionResult } from '../../extractor';
 import { dumpWarnings } from '../../extractor/warnings';
-import { compareKeys } from './comparator';
+import { compareKeys, printKey } from './syncUtils';
 import { EXTRACTOR } from '../../options';
 
 type Options = BaseOptions & {
   extractor: string;
 };
-
-type PartialKey = { keyName: string; namespace?: string };
-
-function printKey(key: PartialKey, type: 'added' | 'removed') {
-  const namespace = key.namespace
-    ? ` ${ansi.italic(`(namespace: ${key.namespace})`)}`
-    : '';
-
-  if (type === 'added') {
-    console.log(`${ansi.green(`+ ${key.keyName}`)}${namespace}`);
-  } else {
-    console.log(`${ansi.red(`- ${key.keyName}`)}${namespace}`);
-  }
-}
 
 async function compareHandler(this: Command, pattern: string) {
   const opts: Options = this.optsWithGlobals();

@@ -67,6 +67,7 @@ afterEach(async () => {
 it('says projects are in sync when they do match', async () => {
   const out = await run([
     'sync',
+    '--yes',
     '--api-key',
     PROJECT_PAK_2,
     '--extractor',
@@ -81,6 +82,7 @@ it('says projects are in sync when they do match', async () => {
 it('creates new keys in code projects', async () => {
   const out = await run([
     'sync',
+    '--yes',
     '--api-key',
     PROJECT_PAK_2,
     '--extractor',
@@ -114,6 +116,7 @@ it('creates new keys in code projects', async () => {
 it('deletes keys that no longer exist', async () => {
   const out = await run([
     'sync',
+    '--yes',
     '--remove-unused',
     '--api-key',
     PROJECT_PAK_2,
@@ -136,6 +139,7 @@ it('deletes keys that no longer exist', async () => {
 it('handles namespaces properly', async () => {
   const out = await run([
     'sync',
+    '--yes',
     '--api-key',
     PROJECT_PAK_3,
     '--extractor',
@@ -165,6 +169,7 @@ it('handles namespaces properly', async () => {
 it('does a proper backup', async () => {
   const out = await run([
     'sync',
+    '--yes',
     '--api-key',
     PROJECT_PAK_2,
     '--extractor',
@@ -181,6 +186,7 @@ it('does a proper backup', async () => {
 it('logs warnings to stderr and aborts', async () => {
   const out = await run([
     'sync',
+    '--yes',
     '--api-key',
     PROJECT_PAK_2,
     '--extractor',
@@ -195,6 +201,7 @@ it('logs warnings to stderr and aborts', async () => {
 it('continues when there are warnings and --continue-on-warning is set', async () => {
   const out = await run([
     'sync',
+    '--yes',
     '--continue-on-warning',
     '--api-key',
     PROJECT_PAK_2,

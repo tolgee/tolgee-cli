@@ -5,10 +5,16 @@ import ansi from 'ansi-colors';
 
 import { extractKeysOfFiles, filterExtractionResult } from '../../extractor';
 import { dumpWarnings } from '../../extractor/warnings';
-import { compareKeys } from './comparator';
+import {
+  type ComparatorResult,
+  type PartialKey,
+  compareKeys,
+  printKey,
+} from './syncUtils';
 
 import { overwriteDir } from '../../utils/overwriteDir';
 import { unzipBuffer } from '../../utils/zip';
+import { askBoolean } from '../../utils/ask';
 import { loading, error } from '../../utils/logger';
 
 import { EXTRACTOR } from '../../options';
@@ -18,6 +24,7 @@ type Options = BaseOptions & {
   backup?: string;
   removeUnused?: boolean;
   continueOnWarning?: boolean;
+  yes?: boolean;
 };
 
 async function backup(client: Client, dest: string) {
@@ -28,6 +35,50 @@ async function backup(client: Client, dest: string) {
   });
 
   await unzipBuffer(blob, dest);
+}
+
+async function askForConfirmation(
+  keys: PartialKey[],
+  operation: 'added' | 'removed'
+) {
+  if (!process.stdout.isTTY) {
+    error(
+      'You must run this command interactively, or specify --yes to proceed.'
+    );
+    process.exit(1);
+  }
+
+  const str = `The following keys will be ${operation}:`;
+  console.log(
+    operation === 'added' ? ansi.bold.green(str) : ansi.bold.red(str)
+  );
+  keys.forEach((k) => printKey(k, operation));
+
+  const shouldContinue = await askBoolean('Does this look correct?', true);
+  if (!shouldContinue) {
+    error('Aborting.');
+    process.exit(1);
+  }
+}
+
+async function syncAddedKeys(
+  opts: Options,
+  added: ComparatorResult['added'],
+  baseLanguage: string
+) {
+  if (!opts.yes) {
+    await askForConfirmation(added, 'added');
+  }
+
+  for (const key of added) {
+    await opts.client.project.createKey({
+      name: key.keyName,
+      namespace: key.namespace,
+      translations: key.defaultValue
+        ? { [baseLanguage]: key.defaultValue }
+        : undefined,
+    });
+  }
 }
 
 async function syncHandler(this: Command, pattern: string) {
@@ -63,7 +114,7 @@ async function syncHandler(this: Command, pattern: string) {
 
   // Prepare backup
   if (opts.backup) {
-    await overwriteDir(opts.backup);
+    await overwriteDir(opts.backup, opts.yes);
     await loading(
       'Backing up Tolgee project',
       backup(opts.client, opts.backup)
@@ -72,20 +123,16 @@ async function syncHandler(this: Command, pattern: string) {
 
   // Create new keys
   if (diff.added.length) {
-    for (const key of diff.added) {
-      await opts.client.project.createKey({
-        name: key.keyName,
-        namespace: key.namespace,
-        translations: key.defaultValue
-          ? { [project.baseLanguage.tag]: key.defaultValue }
-          : undefined,
-      });
-    }
+    await syncAddedKeys(opts, diff.added, project.baseLanguage.tag);
   }
 
   if (opts.removeUnused) {
     // Delete unused keys.
     if (diff.removed.length) {
+      if (!opts.yes) {
+        await askForConfirmation(diff.removed, 'removed');
+      }
+
       const ids = await diff.removed.map((k) => k.id);
       await opts.client.project.deleteBulkKeys(ids);
     }
@@ -105,7 +152,13 @@ async function syncHandler(this: Command, pattern: string) {
       )
     );
   } else {
-    console.log(ansi.italic(`${diff.removed.length} unused key${diff.removed.length === 1 ? '' : 's'} could be deleted.`));
+    console.log(
+      ansi.italic(
+        `${diff.removed.length} unused key${
+          diff.removed.length === 1 ? '' : 's'
+        } could be deleted.`
+      )
+    );
   }
 
   if (opts.backup) {
@@ -134,6 +187,10 @@ export default new Command()
   .option(
     '--continue-on-warning',
     'Set this flag to continue the sync if warnings are detected during string extraction. By default, as warnings may indicate an invalid extraction, the CLI will abort the sync.'
+  )
+  .option(
+    '-Y, --yes',
+    'Skip prompts and automatically say yes to them. You will not be asked for confirmation before creating/deleting keys.'
   )
   .option('--remove-unused', 'Also delete unused keys from the Tolgee project.')
   .action(syncHandler);
