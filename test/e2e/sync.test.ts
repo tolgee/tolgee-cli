@@ -1,7 +1,13 @@
 import { join } from 'path';
 
 import { TMP_FOLDER, setupTemporaryFolder } from './utils/tmp';
-import { PROJECT_PAK_2, PROJECT_PAK_3, requestGet, requestPost, requestDelete } from './utils/tg';
+import {
+  PROJECT_PAK_2,
+  PROJECT_PAK_3,
+  requestGet,
+  requestPost,
+  requestDelete,
+} from './utils/tg';
 import { tolgeeDataToDict } from './utils/data';
 import { run } from './utils/run';
 import './utils/toMatchContentsOf';
@@ -13,6 +19,7 @@ const PROJECT_2_DATA = join(FIXTURES_PATH, 'tolgeeImportData', 'test2');
 const CODE_PROJECT_2_COMPLETE = `${CODE_PATH}/Test2Complete.tsx`;
 const CODE_PROJECT_2_ADDED = `${CODE_PATH}/Test2New.tsx`;
 const CODE_PROJECT_2_DELETED = `${CODE_PATH}/Test2Incomplete.tsx`;
+const CODE_PROJECT_2_WARNING = `${CODE_PATH}/Test2Warning.tsx`;
 const CODE_PROJECT_3 = `${CODE_PATH}/Test3SingleDiff.tsx`;
 
 setupTemporaryFolder();
@@ -28,15 +35,23 @@ afterEach(async () => {
     await requestDelete('/v2/projects/2/keys', { ids: keys }, PROJECT_PAK_2);
   }
 
-  await requestPost('/v2/projects/2/keys', {
-    name: 'bird-name',
-    translations: { en: 'Bird', fr: 'Oiseau' },
-  }, PROJECT_PAK_2)
+  await requestPost(
+    '/v2/projects/2/keys',
+    {
+      name: 'bird-name',
+      translations: { en: 'Bird', fr: 'Oiseau' },
+    },
+    PROJECT_PAK_2
+  );
 
-  await requestPost('/v2/projects/2/keys', {
-    name: 'bird-sound',
-    translations: { en: 'Tweet', fr: 'Cui-cui' },
-  }, PROJECT_PAK_2)
+  await requestPost(
+    '/v2/projects/2/keys',
+    {
+      name: 'bird-sound',
+      translations: { en: 'Tweet', fr: 'Cui-cui' },
+    },
+    PROJECT_PAK_2
+  );
 
   // Project 3: delete welcome key
   const data2 = await requestGet(
@@ -160,4 +175,33 @@ it('does a proper backup', async () => {
 
   expect(out.code).toBe(0);
   await expect(TMP_FOLDER).toMatchContentsOf(PROJECT_2_DATA);
+});
+
+it('logs emitted warnings to stderr', async () => {
+  const out = await run([
+    'sync',
+    '--api-key',
+    PROJECT_PAK_2,
+    '--extractor',
+    'react',
+    CODE_PROJECT_2_WARNING,
+  ]);
+
+  expect(out.code).toBe(0);
+  expect(out.stderr).toContain('Warnings were emitted');
+});
+
+it('failed when there are warnings and -Werror is set', async () => {
+  const out = await run([
+    'sync',
+    '-Werror',
+    '--api-key',
+    PROJECT_PAK_2,
+    '--extractor',
+    'react',
+    CODE_PROJECT_2_WARNING,
+  ]);
+
+  expect(out.code).toBe(1);
+  expect(out.stderr).toContain('Warnings were emitted');
 });

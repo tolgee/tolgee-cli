@@ -4,6 +4,7 @@ import { Command } from 'commander';
 import ansi from 'ansi-colors';
 
 import { extractKeysOfFiles, filterExtractionResult } from '../../extractor';
+import { dumpWarnings } from '../../extractor/warnings';
 import { compareKeys } from './comparator';
 
 import { overwriteDir } from '../../utils/overwriteDir';
@@ -19,20 +20,26 @@ type Options = BaseOptions & {
   abortOnWarning?: boolean;
 };
 
-async function backup (client: Client, dest: string) {
+async function backup(client: Client, dest: string) {
   const blob = await client.export.export({
     format: 'JSON',
-    filterState: [ 'UNTRANSLATED', 'TRANSLATED', 'REVIEWED' ],
+    filterState: ['UNTRANSLATED', 'TRANSLATED', 'REVIEWED'],
     structureDelimiter: '',
-  })
+  });
 
-  await unzipBuffer(blob, dest)
+  await unzipBuffer(blob, dest);
 }
 
 async function compareHandler(this: Command, pattern: string) {
   const opts: Options = this.optsWithGlobals();
 
   const rawKeys = await extractKeysOfFiles(pattern, opts.extractor);
+  const warnCount = dumpWarnings(rawKeys);
+  if (opts.abortOnWarning && warnCount) {
+    console.log(ansi.bold.red('Aborting as warnings have been emitted.'));
+    process.exit(1);
+  }
+
   const localKeys = await filterExtractionResult(rawKeys);
   const remoteKeys = await opts.client.project.fetchAllKeys();
 
@@ -47,16 +54,20 @@ async function compareHandler(this: Command, pattern: string) {
   }
 
   // Load project settings. We're interested in the default locale here.
-  const project = await opts.client.project.fetchProjectInformation()
+  const project = await opts.client.project.fetchProjectInformation();
   if (!project.baseLanguage) {
-    error('Your project does not have a base language!')
-    process.exit(1)
+    // I'm highly unsure how we could reach this state, but this is what the OAI spec tells me ¯\_(ツ)_/¯
+    error('Your project does not have a base language!');
+    process.exit(1);
   }
 
   // Prepare backup
   if (opts.backup) {
-    await overwriteDir(opts.backup)
-    await loading('Backing up Tolgee project', backup(opts.client, opts.backup))
+    await overwriteDir(opts.backup);
+    await loading(
+      'Backing up Tolgee project',
+      backup(opts.client, opts.backup)
+    );
   }
 
   // Create new keys
@@ -67,30 +78,41 @@ async function compareHandler(this: Command, pattern: string) {
         namespace: key.namespace,
         translations: key.defaultValue
           ? { [project.baseLanguage.tag]: key.defaultValue }
-          : undefined
-      })
+          : undefined,
+      });
     }
   }
 
   if (!opts.keepUnused) {
     // Delete unused keys.
     if (diff.removed.length) {
-      const ids = await diff.removed.map((k) => k.id)
-      console.log(ids)
-      await opts.client.project.deleteBulkKeys(ids)
+      const ids = await diff.removed.map((k) => k.id);
+      await opts.client.project.deleteBulkKeys(ids);
     }
   }
 
-  console.log(ansi.bold.green('Sync complete!'))
-  console.log(ansi.green(`+ ${diff.added.length} strings`))
+  console.log(ansi.bold.green('Sync complete!'));
+  console.log(
+    ansi.green(
+      `+ ${diff.added.length} string${diff.added.length === 1 ? '' : 's'}`
+    )
+  );
   if (!opts.keepUnused) {
-    console.log(ansi.red(`- ${diff.removed.length} strings`))
+    console.log(
+      ansi.red(
+        `- ${diff.removed.length} string${diff.removed.length === 1 ? '' : 's'}`
+      )
+    );
   } else {
-    console.log(ansi.italic('Unused key deletion skipped'))
+    console.log(ansi.italic('Unused key deletion skipped'));
   }
 
   if (opts.backup) {
-    console.log(ansi.blueBright(`A backup of the project prior to the synchronization has been dumped in ${opts.backup}.`))
+    console.log(
+      ansi.blueBright(
+        `A backup of the project prior to the synchronization has been dumped in ${opts.backup}.`
+      )
+    );
   }
 }
 
@@ -104,7 +126,13 @@ export default new Command()
     'File pattern to include (hint: make sure to escape it in quotes, or your shell might attempt to unroll some tokens like *)'
   )
   .addOption(EXTRACTOR)
-  .option('--backup <path>', 'Path where a backup should be downloaded before performing the sync. If something goes wrong, the backup can be used to restore the project to its previous state.')
-  .option('-Werror, --abort-on-warning', 'Set this flag to abort the sync if warnings are detected during string extraction.')
+  .option(
+    '--backup <path>',
+    'Path where a backup should be downloaded before performing the sync. If something goes wrong, the backup can be used to restore the project to its previous state.'
+  )
+  .option(
+    '-Werror, --abort-on-warning',
+    'Set this flag to abort the sync if warnings are detected during string extraction.'
+  )
   .option('-k, --keep-unused', 'Skip deleting unused keys.')
   .action(compareHandler);

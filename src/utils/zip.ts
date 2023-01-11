@@ -29,19 +29,19 @@ function dumpFile(zip: ZipFile, entry: Entry, dest: string) {
  * @param zipBlob The ZIP blob
  * @param dest The destination path
  */
-export function unzipBuffer (zipBlob: Blob, dest: string) {
+export function unzipBuffer(zipBlob: Blob, dest: string) {
   return new Promise<void>((resolve, reject) => {
     zipBlob.arrayBuffer().then((buffer) => {
-      const nodeBuffer = Buffer.from(buffer)
+      const nodeBuffer = Buffer.from(buffer);
       fromBuffer(nodeBuffer, ZIP_PARSER_OPTS, (err, zip) => {
         if (err) {
-          return reject(err)
+          return reject(err);
         }
 
-        resolve(unzip(zip, dest))
-      })
-    })
-  })
+        resolve(unzip(zip, dest));
+      });
+    });
+  });
 }
 
 /**

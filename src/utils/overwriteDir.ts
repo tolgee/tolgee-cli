@@ -3,7 +3,7 @@ import { stat, rm, mkdir } from 'fs/promises';
 import { askBoolean } from './ask';
 import { warn, error } from './logger';
 
-export async function overwriteDir (path: string, overwrite?: boolean) {
+export async function overwriteDir(path: string, overwrite?: boolean) {
   try {
     const stats = await stat(path);
     if (!stats.isDirectory()) {
@@ -36,5 +36,5 @@ export async function overwriteDir (path: string, overwrite?: boolean) {
   }
 
   // Create the directory
-  await mkdir(path, { recursive: true })
+  await mkdir(path, { recursive: true });
 }

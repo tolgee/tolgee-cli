@@ -7,7 +7,9 @@ export default function App() {
     <Fragment>
       <section>
         <h1>
-          <T keyName="welcome" ns="greeting">Welcome!</T>
+          <T keyName="welcome" ns="greeting">
+            Welcome!
+          </T>
         </h1>
         <ul>
           <li>

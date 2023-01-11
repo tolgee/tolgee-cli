@@ -9,6 +9,7 @@ const CODE_PATH = join(FIXTURES_PATH, 'testProjectCode');
 const CODE_PROJECT_2_COMPLETE = `${CODE_PATH}/Test2Complete.tsx`;
 const CODE_PROJECT_2_ADDED = `${CODE_PATH}/Test2New.tsx`;
 const CODE_PROJECT_2_DELETED = `${CODE_PATH}/Test2Incomplete.tsx`;
+const CODE_PROJECT_2_WARNING = `${CODE_PATH}/Test2Warning.tsx`;
 const CODE_PROJECT_3 = `${CODE_PATH}/Test3Mixed.tsx`;
 
 it('says projects are in sync when they do match', async () => {
@@ -79,4 +80,18 @@ it('handles namespaces properly', async () => {
   expect(out.stdout).toContain('- soda (namespace: drinks)');
   expect(out.stdout).toContain('+ table (namespace: furniture)');
   expect(out.stdout).toContain('- table\n');
+});
+
+it('logs emitted warnings to stderr', async () => {
+  const out = await run([
+    'compare',
+    '--api-key',
+    PROJECT_PAK_2,
+    '--extractor',
+    'react',
+    CODE_PROJECT_2_WARNING,
+  ]);
+
+  expect(out.code).toBe(0);
+  expect(out.stderr).toContain('Warnings were emitted');
 });

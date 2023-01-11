@@ -5,7 +5,7 @@ import { rm } from 'fs/promises';
 
 export let TMP_FOLDER: string;
 
-export function setupTemporaryFolder () {
+export function setupTemporaryFolder() {
   beforeEach(() => {
     TMP_FOLDER = join(tmpdir(), randomUUID());
   });
