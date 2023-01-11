@@ -30,7 +30,7 @@ async function backup(client: Client, dest: string) {
   await unzipBuffer(blob, dest);
 }
 
-async function compareHandler(this: Command, pattern: string) {
+async function syncHandler(this: Command, pattern: string) {
   const opts: Options = this.optsWithGlobals();
 
   const rawKeys = await extractKeysOfFiles(pattern, opts.extractor);
@@ -135,4 +135,4 @@ export default new Command()
     'Set this flag to abort the sync if warnings are detected during string extraction.'
   )
   .option('-k, --keep-unused', 'Skip deleting unused keys.')
-  .action(compareHandler);
+  .action(syncHandler);
