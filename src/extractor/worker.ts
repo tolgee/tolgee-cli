@@ -3,7 +3,7 @@ import { Worker, isMainThread, parentPort } from 'worker_threads';
 import { readFile } from 'fs/promises';
 
 import { loadModule } from '../utils/moduleLoader';
-import { createDeferred } from '../utils/deferred';
+import { type Deferred, createDeferred } from '../utils/deferred';
 
 export type WorkerParams = { extractor: string; file: string };
 
@@ -30,10 +30,10 @@ async function handleJob(args: WorkerParams) {
 }
 
 async function workerInit() {
-  parentPort!.on('message', (msg) => {
-    handleJob(msg)
-      .then((res) => parentPort!.postMessage({ data: res }))
-      .catch((e) => parentPort!.postMessage({ err: e }));
+  parentPort!.on('message', ({ id, params }) => {
+    handleJob(params)
+      .then((res) => parentPort!.postMessage({ id: id, data: res }))
+      .catch((e) => parentPort!.postMessage({ id: id, err: e }));
   });
 }
 
@@ -42,12 +42,38 @@ if (!isMainThread) workerInit();
 // --- Main thread functions
 
 let worker: Worker;
+let deferredJobsIdPool = 0;
+const deferredJobs = new Map<number, Deferred>()
 
 export async function callWorker(params: WorkerParams) {
   if (!worker) {
     worker = new Worker(__filename, {
       // ts-node workaround
       execArgv: IS_TS_NODE ? ['--require', 'ts-node/register'] : undefined,
+    });
+
+    worker.on('error', (e) => {
+      for (const deferred of deferredJobs.values()) {
+        deferred.reject(e);
+      }
+
+      deferredJobs.clear();
+    });
+
+    worker.on('message', (msg) => {
+      const deferred = deferredJobs.get(msg.id)!
+      if (!deferred) {
+        return
+      }
+
+      if ('data' in msg) {
+        deferred.resolve(msg.data);
+      } else {
+        deferred.reject(msg.err);
+      }
+
+      deferredJobs.delete(msg.id)
+      clearTimeout(timeout);
     });
 
     worker.unref();
@@ -58,21 +84,10 @@ export async function callWorker(params: WorkerParams) {
     deferred.reject(new Error('aborted'));
   }, 10e3);
 
+  const jobId = deferredJobsIdPool++;
   const deferred = createDeferred();
-  worker.postMessage(params);
-  worker.once('error', (e) => {
-    console.error(e);
-    deferred.reject(e);
-  });
-  worker.once('message', (msg) => {
-    if ('data' in msg) {
-      deferred.resolve(msg.data);
-    } else {
-      deferred.reject(msg.err);
-    }
-
-    clearTimeout(timeout);
-  });
+  deferredJobs.set(jobId, deferred);
+  worker.postMessage({ id: jobId, params: params });
 
   return deferred.promise;
 }
