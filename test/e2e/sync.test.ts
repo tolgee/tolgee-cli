@@ -114,6 +114,7 @@ it('creates new keys in code projects', async () => {
 it('deletes keys that no longer exist', async () => {
   const out = await run([
     'sync',
+    '--remove-unused',
     '--api-key',
     PROJECT_PAK_2,
     '--extractor',
@@ -177,24 +178,9 @@ it('does a proper backup', async () => {
   await expect(TMP_FOLDER).toMatchContentsOf(PROJECT_2_DATA);
 });
 
-it('logs emitted warnings to stderr', async () => {
+it('logs warnings to stderr and aborts', async () => {
   const out = await run([
     'sync',
-    '--api-key',
-    PROJECT_PAK_2,
-    '--extractor',
-    'react',
-    CODE_PROJECT_2_WARNING,
-  ]);
-
-  expect(out.code).toBe(0);
-  expect(out.stderr).toContain('Warnings were emitted');
-});
-
-it('failed when there are warnings and -Werror is set', async () => {
-  const out = await run([
-    'sync',
-    '-Werror',
     '--api-key',
     PROJECT_PAK_2,
     '--extractor',
@@ -203,5 +189,20 @@ it('failed when there are warnings and -Werror is set', async () => {
   ]);
 
   expect(out.code).toBe(1);
+  expect(out.stderr).toContain('Warnings were emitted');
+});
+
+it('continues when there are warnings and --continue-on-warning is set', async () => {
+  const out = await run([
+    'sync',
+    '--continue-on-warning',
+    '--api-key',
+    PROJECT_PAK_2,
+    '--extractor',
+    'react',
+    CODE_PROJECT_2_WARNING,
+  ]);
+
+  expect(out.code).toBe(0);
   expect(out.stderr).toContain('Warnings were emitted');
 });

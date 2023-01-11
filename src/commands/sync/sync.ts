@@ -16,8 +16,8 @@ import { EXTRACTOR } from '../../options';
 type Options = BaseOptions & {
   extractor: string;
   backup?: string;
-  keepUnused?: boolean;
-  abortOnWarning?: boolean;
+  removeUnused?: boolean;
+  continueOnWarning?: boolean;
 };
 
 async function backup(client: Client, dest: string) {
@@ -35,7 +35,7 @@ async function syncHandler(this: Command, pattern: string) {
 
   const rawKeys = await extractKeysOfFiles(pattern, opts.extractor);
   const warnCount = dumpWarnings(rawKeys);
-  if (opts.abortOnWarning && warnCount) {
+  if (!opts.continueOnWarning && warnCount) {
     console.log(ansi.bold.red('Aborting as warnings have been emitted.'));
     process.exit(1);
   }
@@ -83,7 +83,7 @@ async function syncHandler(this: Command, pattern: string) {
     }
   }
 
-  if (!opts.keepUnused) {
+  if (opts.removeUnused) {
     // Delete unused keys.
     if (diff.removed.length) {
       const ids = await diff.removed.map((k) => k.id);
@@ -97,14 +97,15 @@ async function syncHandler(this: Command, pattern: string) {
       `+ ${diff.added.length} string${diff.added.length === 1 ? '' : 's'}`
     )
   );
-  if (!opts.keepUnused) {
+
+  if (opts.removeUnused) {
     console.log(
       ansi.red(
         `- ${diff.removed.length} string${diff.removed.length === 1 ? '' : 's'}`
       )
     );
   } else {
-    console.log(ansi.italic('Unused key deletion skipped'));
+    console.log(ansi.italic(`${diff.removed.length} unused key${diff.removed.length === 1 ? '' : 's'} could be deleted.`));
   }
 
   if (opts.backup) {
@@ -119,7 +120,7 @@ async function syncHandler(this: Command, pattern: string) {
 export default new Command()
   .name('sync')
   .description(
-    'Synchronizes the keys in your code project and in the Tolgee project, by creating missing keys and deleting unused ones. For a dry-run, use `tolgee compare`.'
+    'Synchronizes the keys in your code project and in the Tolgee project, by creating missing keys and optionally deleting unused ones. For a dry-run, use `tolgee compare`.'
   )
   .argument(
     '<pattern>',
@@ -127,12 +128,12 @@ export default new Command()
   )
   .addOption(EXTRACTOR)
   .option(
-    '--backup <path>',
+    '-B, --backup <path>',
     'Path where a backup should be downloaded before performing the sync. If something goes wrong, the backup can be used to restore the project to its previous state.'
   )
   .option(
-    '-Werror, --abort-on-warning',
-    'Set this flag to abort the sync if warnings are detected during string extraction.'
+    '--continue-on-warning',
+    'Set this flag to continue the sync if warnings are detected during string extraction. By default, as warnings may indicate an invalid extraction, the CLI will abort the sync.'
   )
-  .option('-k, --keep-unused', 'Skip deleting unused keys.')
+  .option('--remove-unused', 'Also delete unused keys from the Tolgee project.')
   .action(syncHandler);

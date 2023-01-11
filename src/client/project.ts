@@ -18,6 +18,7 @@ export type AllKeys = Exclude<
 >;
 
 export type CreateKeyPayload = BodyOf<'/v2/projects/{projectId}/keys', 'post'>;
+
 export type CreateKeyResponse = ResponseOf<
   '/v2/projects/{projectId}/keys',
   'post'
@@ -39,7 +40,7 @@ export default class ProjectClient {
         method: 'GET',
         path: `${this.requester.projectUrl}/all-keys`,
       })
-      .then((r: any) => r._embedded.keys);
+      .then((r: any) => r._embedded?.keys || []);
   }
 
   async createKey(key: CreateKeyPayload): Promise<CreateKeyResponse> {
