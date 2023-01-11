@@ -8,29 +8,13 @@ import {
   requestPut,
   requestDelete,
 } from './utils/tg';
+import { tolgeeDataToDict } from './utils/data';
 import { run } from './utils/run';
 
 const FIXTURES_PATH = join(__dirname, '..', '__fixtures__');
 const PROJECT_1_UPDATE = join(FIXTURES_PATH, 'updatedProject1');
 const PROJECT_2_UPDATE = join(FIXTURES_PATH, 'updatedProject2WithConflicts');
 const PROJECT_3_UPDATE = join(FIXTURES_PATH, 'updatedProject3');
-
-function tolgeeDataToDict(data: any) {
-  return Object.fromEntries(
-    data._embedded.keys.map((k: any) => [
-      k.keyName,
-      {
-        __ns: k.keyNamespace,
-        ...Object.fromEntries(
-          Object.entries(k.translations).map(([locale, data]: any) => [
-            locale,
-            data.text,
-          ])
-        ),
-      },
-    ])
-  );
-}
 
 async function cleanupProjectState() {
   // Project 1: delete wired & wireless

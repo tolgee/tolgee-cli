@@ -1,7 +1,15 @@
 import type { ZipFile, Entry } from 'yauzl';
+import type { Blob } from 'buffer';
 import { createWriteStream } from 'fs';
 import { mkdir } from 'fs/promises';
 import { join, dirname } from 'path';
+import { fromBuffer } from 'yauzl';
+
+const ZIP_PARSER_OPTS = {
+  strictFileNames: true,
+  decodeStrings: true,
+  lazyEntries: true,
+};
 
 function dumpFile(zip: ZipFile, entry: Entry, dest: string) {
   zip.openReadStream(entry, (err, stream) => {
@@ -13,6 +21,27 @@ function dumpFile(zip: ZipFile, entry: Entry, dest: string) {
     // Unlock reading loop
     stream.on('end', () => zip.readEntry());
   });
+}
+
+/**
+ * Unzips a ZIP blob to a destination on disk.
+ *
+ * @param zipBlob The ZIP blob
+ * @param dest The destination path
+ */
+export function unzipBuffer (zipBlob: Blob, dest: string) {
+  return new Promise<void>((resolve, reject) => {
+    zipBlob.arrayBuffer().then((buffer) => {
+      const nodeBuffer = Buffer.from(buffer)
+      fromBuffer(nodeBuffer, ZIP_PARSER_OPTS, (err, zip) => {
+        if (err) {
+          return reject(err)
+        }
+
+        resolve(unzip(zip, dest))
+      })
+    })
+  })
 }
 
 /**

@@ -1,21 +1,11 @@
 import type { Blob } from 'buffer';
-import type { ZipFile, Options } from 'yauzl';
 import type { BaseOptions } from '../options';
 
-import { resolve } from 'path';
-import { stat, rm, mkdir } from 'fs/promises';
-import { fromBuffer as zipFromBufferCb } from 'yauzl';
 import { Command, Option } from 'commander';
 
-import { unzip } from '../utils/zip';
-import { askBoolean } from '../utils/ask';
-import { loading, success, warn, error } from '../utils/logger';
-
-import { promisify } from 'util';
-
-// Cast is required as TypeScript fails to properly type it
-type ZipParser = (b: Buffer, opts?: Options) => Promise<ZipFile>;
-const zipFromBuffer = promisify(zipFromBufferCb) as ZipParser;
+import { unzipBuffer } from '../utils/zip';
+import { overwriteDir } from '../utils/overwriteDir';
+import { loading, success } from '../utils/logger';
 
 type PullOptions = BaseOptions & {
   format: 'JSON' | 'XLIFF';
@@ -24,39 +14,6 @@ type PullOptions = BaseOptions & {
   delimiter?: string;
   overwrite?: boolean;
 };
-
-async function validatePath(path: string, overwrite?: boolean) {
-  try {
-    const stats = await stat(path);
-    if (!stats.isDirectory()) {
-      error('The specified path already exists and is not a directory.');
-      process.exit(1);
-    }
-
-    if (!overwrite) {
-      if (!process.stdout.isTTY) {
-        error('The specified path already exists.');
-        process.exit(1);
-      }
-
-      warn(`The specified path ${resolve(path)} already exists.`);
-      const userOverwrite = await askBoolean(
-        'Do you want to overwrite data? *BE CAREFUL, ALL THE CONTENTS OF THE DESTINATION FOLDER WILL BE DESTROYED*.'
-      );
-      if (!userOverwrite) {
-        error('Aborting.');
-        process.exit(1);
-      }
-
-      // Purge data as requested.
-      await rm(path, { recursive: true });
-    }
-  } catch (e: any) {
-    if (e.code !== 'ENOENT') {
-      throw e;
-    }
-  }
-}
 
 async function fetchZipBlob(opts: PullOptions): Promise<Blob> {
   return opts.client.export.export({
@@ -67,31 +24,17 @@ async function fetchZipBlob(opts: PullOptions): Promise<Blob> {
   });
 }
 
-async function extractZip(zipBlob: Blob, path: string) {
-  const zipAb = await zipBlob.arrayBuffer();
-  const opts = {
-    strictFileNames: true,
-    decodeStrings: true,
-    lazyEntries: true,
-  };
-
-  const zip = await zipFromBuffer(Buffer.from(zipAb), opts);
-  await unzip(zip, path);
-}
-
 async function pullHandler(this: Command, path: string) {
   const opts: PullOptions = this.optsWithGlobals();
 
-  await validatePath(path, opts.overwrite);
-  await mkdir(path, { recursive: true });
+  await overwriteDir(path, opts.overwrite);
 
   const zipBlob = await loading(
     'Fetching strings from Tolgee...',
     fetchZipBlob(opts)
   );
 
-  await loading('Extracting strings...', extractZip(zipBlob, path));
-
+  await loading('Extracting strings...', unzipBuffer(zipBlob, path));
   success('Done!');
 }
 
