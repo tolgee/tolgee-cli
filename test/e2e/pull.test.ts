@@ -34,8 +34,7 @@ it('pulls strings from Tolgee', async () => {
   await expect(TMP_FOLDER).toMatchContentsOf(PROJECT_1_DATA);
 });
 
-// todo: enable once ns reached tg:latest
-it.skip('pulls strings with namespaces from Tolgee', async () => {
+it('pulls strings with namespaces from Tolgee', async () => {
   const out = await run(['pull', '--api-key', PROJECT_PAK_3, TMP_FOLDER]);
 
   expect(out.code).toBe(0);

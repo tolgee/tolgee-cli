@@ -1,6 +1,5 @@
 import { cosmiconfig, defaultLoaders } from 'cosmiconfig';
-
-const SDKS = <const>['react'];
+import { SDKS } from '../constants';
 
 export type ProjectSdk = typeof SDKS[number];
 
@@ -9,6 +8,7 @@ export type TolgeeConfig = {
   projectId?: number;
   sdk?: ProjectSdk;
   extractor?: string;
+  delimiter?: string;
 };
 
 const explorer = cosmiconfig('tolgee', {
@@ -62,6 +62,14 @@ function parseConfig(rc: any): TolgeeConfig {
   } else {
     // Re-use the SDK config as a fallback
     cfg.extractor = cfg.sdk;
+  }
+
+  if ('delimiter' in rc) {
+    if (typeof rc.delimiter !== 'string' && rc.delimiter !== null) {
+      throw new Error('Invalid config: delimiter is not a string');
+    }
+
+    cfg.delimiter = rc.delimiter || void 0;
   }
 
   return cfg;

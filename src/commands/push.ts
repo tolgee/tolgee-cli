@@ -19,16 +19,23 @@ type PushOptions = {
   forceMode: 'KEEP' | 'OVERRIDE' | 'NO';
 };
 
-async function readDirectory(directory: string): Promise<File[]> {
+async function readDirectory(
+  directory: string,
+  base: string = ''
+): Promise<File[]> {
   const files: File[] = [];
 
   const dir = await readdir(directory);
   for (const file of dir) {
     const filePath = join(directory, file);
     const fileStat = await stat(filePath);
-    if (fileStat.isFile()) {
+
+    if (fileStat.isDirectory()) {
+      const dirFiles = await readDirectory(filePath, `${file}/`);
+      files.push(...dirFiles);
+    } else {
       const blob = await readFile(filePath);
-      files.push({ name: file, data: blob });
+      files.push({ name: base + file, data: blob });
     }
   }
 
@@ -170,7 +177,7 @@ export default new Command()
   .addOption(
     new Option(
       '-f, --force-mode <mode>',
-      'What should we do with possible conflicts? If unspecified, the user will be prompted interactively, or the command will fail when in non-interactive.'
+      'What should we do with possible conflicts? If unspecified, the user will be prompted interactively, or the command will fail when in non-interactive'
     )
       .choices(['OVERRIDE', 'KEEP', 'NO'])
       .argParser((v) => v.toUpperCase())

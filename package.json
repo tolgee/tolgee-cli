@@ -10,7 +10,7 @@
     "build": "rimraf dist && tsc",
     "pretest": "npm run tolgee:start",
     "posttest": "npm run tolgee:stop",
-    "test": "jest",
+    "test": "npm run test:unit && npm run test:e2e",
     "test:unit": "jest -c jest.unit.config.ts",
     "pretest:e2e": "npm run tolgee:start",
     "posttest:e2e": "npm run tolgee:stop",

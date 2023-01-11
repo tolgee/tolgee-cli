@@ -63,5 +63,8 @@ async function printHandler(this: Command, filesPattern: string) {
 
 export default new Command('print')
   .description('Prints extracted data to the console')
-  .argument('<pattern>', 'File pattern to include')
+  .argument(
+    '<pattern>',
+    'File glob pattern to include (hint: make sure to escape it in quotes, or your shell might attempt to unroll some tokens like *)'
+  )
   .action(printHandler);

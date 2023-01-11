@@ -25,11 +25,8 @@ const ARGS = [
   '22222:8080',
   '--env-file',
   ENV_FILE,
-  // todo: just mount the import folder when namespaces land on TG latest
   '--mount',
-  `type=bind,source=${TG_IMPORT_FOLDER}/test1,target=/mnt/tolgee-import-data/test1`,
-  '--mount',
-  `type=bind,source=${TG_IMPORT_FOLDER}/test2,target=/mnt/tolgee-import-data/test2`,
+  `type=bind,source=${TG_IMPORT_FOLDER},target=/mnt/tolgee-import-data`,
   'tolgee/tolgee:latest',
 ];
 
