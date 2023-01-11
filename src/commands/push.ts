@@ -1,5 +1,6 @@
 import type { File, AddFileResponse } from '../client/import';
 import type Client from '../client';
+import type { BaseOptions } from '../options';
 
 import { join } from 'path';
 import { readdir, readFile, stat } from 'fs/promises';
@@ -10,12 +11,7 @@ import { HttpError } from '../client/errors';
 import { askString } from '../utils/ask';
 import { loading, success, warn, error } from '../utils/logger';
 
-type PushOptions = {
-  apiUrl: URL;
-  apiKey: string;
-  projectId: number;
-  client: Client;
-
+type PushOptions = BaseOptions & {
   forceMode: 'KEEP' | 'OVERRIDE' | 'NO';
 };
 

@@ -16,6 +16,7 @@ import { Login, Logout } from './commands/login';
 import PushCommand from './commands/push';
 import PullCommand from './commands/pull';
 import ExtractCommand from './commands/extract';
+import CompareCommand from './commands/sync/compare';
 
 const NO_KEY_COMMANDS = ['login', 'logout', 'extract'];
 
@@ -117,6 +118,7 @@ program.addCommand(Logout);
 program.addCommand(PushCommand);
 program.addCommand(PullCommand);
 program.addCommand(ExtractCommand);
+program.addCommand(CompareCommand);
 
 async function loadConfig() {
   const tgConfig = await loadTolgeeRc();

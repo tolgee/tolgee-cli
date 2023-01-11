@@ -4,6 +4,7 @@ import type { components } from './internal/schema.generated';
 import base32Decode from 'base32-decode';
 import Requester from './internal/requester';
 
+import ProjectClient from './project';
 import LanguagesClient from './languages';
 import ImportClient from './import';
 import ExportClient from './export';
@@ -33,6 +34,7 @@ export type ApiKeyInfo = ApiKeyInfoPat | ApiKeyInfoPak;
 
 export default class RestClient {
   private requester: Requester;
+  readonly project: ProjectClient;
   readonly languages: LanguagesClient;
   readonly import: ImportClient;
   readonly export: ExportClient;
@@ -40,6 +42,7 @@ export default class RestClient {
   constructor(private params: RequesterParams) {
     this.requester = new Requester(params);
 
+    this.project = new ProjectClient(this.requester);
     this.languages = new LanguagesClient(this.requester);
     this.import = new ImportClient(this.requester);
     this.export = new ExportClient(this.requester);

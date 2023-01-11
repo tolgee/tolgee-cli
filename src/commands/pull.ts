@@ -1,6 +1,6 @@
 import type { Blob } from 'buffer';
-import { ZipFile, Options } from 'yauzl';
-import type Client from '../client';
+import type { ZipFile, Options } from 'yauzl';
+import type { BaseOptions } from '../options';
 
 import { resolve } from 'path';
 import { stat, rm, mkdir } from 'fs/promises';
@@ -17,12 +17,7 @@ import { promisify } from 'util';
 type ZipParser = (b: Buffer, opts?: Options) => Promise<ZipFile>;
 const zipFromBuffer = promisify(zipFromBufferCb) as ZipParser;
 
-type PullOptions = {
-  apiUrl: URL;
-  apiKey: string;
-  projectId: number;
-  client: Client;
-
+type PullOptions = BaseOptions & {
   format: 'JSON' | 'XLIFF';
   languages?: string[];
   states?: Array<'UNTRANSLATED' | 'TRANSLATED' | 'REVIEWED'>;
