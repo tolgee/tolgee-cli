@@ -2,10 +2,11 @@ import type { BaseOptions } from '../../options';
 import { Command } from 'commander';
 import ansi from 'ansi-colors';
 
+import { compareKeys, printKey } from './syncUtils';
 import { extractKeysOfFiles, filterExtractionResult } from '../../extractor';
 import { dumpWarnings } from '../../extractor/warnings';
-import { compareKeys, printKey } from './syncUtils';
 import { EXTRACTOR } from '../../options';
+import { loading } from '../../utils/logger';
 
 type Options = BaseOptions & {
   extractor: string;
@@ -14,10 +15,10 @@ type Options = BaseOptions & {
 async function compareHandler(this: Command, pattern: string) {
   const opts: Options = this.optsWithGlobals();
 
-  const rawKeys = await extractKeysOfFiles(pattern, opts.extractor);
+  const rawKeys = await loading('Analyzing code...', extractKeysOfFiles(pattern, opts.extractor));
   dumpWarnings(rawKeys);
 
-  const localKeys = await filterExtractionResult(rawKeys);
+  const localKeys = filterExtractionResult(rawKeys);
   const remoteKeys = await opts.client.project.fetchAllKeys();
 
   const diff = compareKeys(localKeys, remoteKeys);

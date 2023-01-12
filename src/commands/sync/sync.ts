@@ -84,14 +84,14 @@ async function syncAddedKeys(
 async function syncHandler(this: Command, pattern: string) {
   const opts: Options = this.optsWithGlobals();
 
-  const rawKeys = await extractKeysOfFiles(pattern, opts.extractor);
+  const rawKeys = await loading('Analyzing code...', extractKeysOfFiles(pattern, opts.extractor));
   const warnCount = dumpWarnings(rawKeys);
   if (!opts.continueOnWarning && warnCount) {
     console.log(ansi.bold.red('Aborting as warnings have been emitted.'));
     process.exit(1);
   }
 
-  const localKeys = await filterExtractionResult(rawKeys);
+  const localKeys = filterExtractionResult(rawKeys);
   const remoteKeys = await opts.client.project.fetchAllKeys();
 
   const diff = compareKeys(localKeys, remoteKeys);
