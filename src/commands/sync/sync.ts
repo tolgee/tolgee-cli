@@ -5,12 +5,7 @@ import ansi from 'ansi-colors';
 
 import { extractKeysOfFiles, filterExtractionResult } from '../../extractor';
 import { dumpWarnings } from '../../extractor/warnings';
-import {
-  type ComparatorResult,
-  type PartialKey,
-  compareKeys,
-  printKey,
-} from './syncUtils';
+import { type PartialKey, compareKeys, printKey } from './syncUtils';
 
 import { overwriteDir } from '../../utils/overwriteDir';
 import { unzipBuffer } from '../../utils/zip';
@@ -61,30 +56,13 @@ async function askForConfirmation(
   }
 }
 
-async function syncAddedKeys(
-  opts: Options,
-  added: ComparatorResult['added'],
-  baseLanguage: string
-) {
-  if (!opts.yes) {
-    await askForConfirmation(added, 'added');
-  }
-
-  for (const key of added) {
-    await opts.client.project.createKey({
-      name: key.keyName,
-      namespace: key.namespace,
-      translations: key.defaultValue
-        ? { [baseLanguage]: key.defaultValue }
-        : undefined,
-    });
-  }
-}
-
 async function syncHandler(this: Command, pattern: string) {
   const opts: Options = this.optsWithGlobals();
 
-  const rawKeys = await loading('Analyzing code...', extractKeysOfFiles(pattern, opts.extractor));
+  const rawKeys = await loading(
+    'Analyzing code...',
+    extractKeysOfFiles(pattern, opts.extractor)
+  );
   const warnCount = dumpWarnings(rawKeys);
   if (!opts.continueOnWarning && warnCount) {
     console.log(ansi.bold.red('Aborting as warnings have been emitted.'));
@@ -105,8 +83,8 @@ async function syncHandler(this: Command, pattern: string) {
   }
 
   // Load project settings. We're interested in the default locale here.
-  const project = await opts.client.project.fetchProjectInformation();
-  if (!project.baseLanguage) {
+  const { baseLanguage } = await opts.client.project.fetchProjectInformation();
+  if (!baseLanguage) {
     // I'm highly unsure how we could reach this state, but this is what the OAI spec tells me ¯\_(ツ)_/¯
     error('Your project does not have a base language!');
     process.exit(1);
@@ -123,7 +101,18 @@ async function syncHandler(this: Command, pattern: string) {
 
   // Create new keys
   if (diff.added.length) {
-    await syncAddedKeys(opts, diff.added, project.baseLanguage.tag);
+    const keys = diff.added.map((key) => ({
+      name: key.keyName,
+      namespace: key.namespace,
+      translations: key.defaultValue
+        ? { [baseLanguage.tag]: key.defaultValue }
+        : {},
+    }));
+
+    await loading(
+      'Creating missing keys...',
+      opts.client.project.createBulkKey(keys)
+    );
   }
 
   if (opts.removeUnused) {
@@ -134,7 +123,10 @@ async function syncHandler(this: Command, pattern: string) {
       }
 
       const ids = await diff.removed.map((k) => k.id);
-      await opts.client.project.deleteBulkKeys(ids);
+      await loading(
+        'Deleting unused keys...',
+        opts.client.project.deleteBulkKeys(ids)
+      );
     }
   }
 

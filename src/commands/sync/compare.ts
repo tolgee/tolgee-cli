@@ -15,7 +15,10 @@ type Options = BaseOptions & {
 async function compareHandler(this: Command, pattern: string) {
   const opts: Options = this.optsWithGlobals();
 
-  const rawKeys = await loading('Analyzing code...', extractKeysOfFiles(pattern, opts.extractor));
+  const rawKeys = await loading(
+    'Analyzing code...',
+    extractKeysOfFiles(pattern, opts.extractor)
+  );
   dumpWarnings(rawKeys);
 
   const localKeys = filterExtractionResult(rawKeys);

@@ -188,6 +188,9 @@ export interface paths {
     get: operations['getAll'];
     post: operations['createProject'];
   };
+  '/v2/projects/{projectId}/keys/import': {
+    post: operations['importKeys'];
+  };
   '/v2/projects/{projectId}/keys/create': {
     post: operations['create'];
   };
@@ -956,11 +959,11 @@ export interface components {
       /** Format: int64 */
       lastUsedAt?: number;
       /** Format: int64 */
-      expiresAt?: number;
-      /** Format: int64 */
       createdAt: number;
       /** Format: int64 */
       updatedAt: number;
+      /** Format: int64 */
+      expiresAt?: number;
       description: string;
     };
     SetOrganizationRoleDto: {
@@ -1079,12 +1082,12 @@ export interface components {
       projectName: string;
       scopes: string[];
       /** Format: int64 */
-      lastUsedAt?: number;
-      /** Format: int64 */
       projectId: number;
       /** Format: int64 */
-      expiresAt?: number;
+      lastUsedAt?: number;
       username?: string;
+      /** Format: int64 */
+      expiresAt?: number;
       description: string;
     };
     SuperTokenRequest: {
@@ -1109,6 +1112,26 @@ export interface components {
       organizationId: number;
       /** @description Tag of one of created languages, to select it as base language. If not provided, first language will be selected as base. */
       baseLanguageTag?: string;
+    };
+    ImportKeysDto: {
+      keys: components['schemas']['ImportKeysItemDto'][];
+    };
+    ImportKeysItemDto: {
+      /**
+       * @description Key name to set translations for
+       * @example what_a_key_to_translate
+       */
+      name: string;
+      /** @description The namespace of the key. (When empty or null default namespace will be used) */
+      namespace?: string;
+      /**
+       * @description Object mapping language tag to translation
+       * @example {
+       *   "en": "What a translated value!",
+       *   "cs": "Jaká to přeložená hodnota!"
+       * }
+       */
+      translations: { [key: string]: string };
     };
     CreateKeyDto: {
       /** @description Name of the key */
@@ -1363,6 +1386,7 @@ export interface components {
       recaptchaSiteKey?: string;
       openReplayApiKey?: string;
       chatwootToken?: string;
+      capterraTracker?: string;
     };
     PagedModelProjectModel: {
       _embedded?: {
@@ -1880,11 +1904,11 @@ export interface components {
       /** Format: int64 */
       lastUsedAt?: number;
       /** Format: int64 */
-      expiresAt?: number;
-      /** Format: int64 */
       createdAt: number;
       /** Format: int64 */
       updatedAt: number;
+      /** Format: int64 */
+      expiresAt?: number;
       description: string;
     };
     OrganizationRequestParamsDto: {
@@ -1968,12 +1992,12 @@ export interface components {
       projectName: string;
       scopes: string[];
       /** Format: int64 */
-      lastUsedAt?: number;
-      /** Format: int64 */
       projectId: number;
       /** Format: int64 */
-      expiresAt?: number;
+      lastUsedAt?: number;
       username?: string;
+      /** Format: int64 */
+      expiresAt?: number;
       description: string;
     };
     PagedModelUserAccountModel: {
@@ -4059,6 +4083,34 @@ export interface operations {
       };
     };
   };
+  importKeys: {
+    parameters: {
+      path: {
+        projectId: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: unknown;
+      /** Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ImportKeysDto'];
+      };
+    };
+  };
   create: {
     parameters: {
       path: {
@@ -4154,6 +4206,10 @@ export interface operations {
   /** Prepares provided files to import. */
   addFiles: {
     parameters: {
+      query: {
+        /** When importing structured JSONs, you can set the delimiter which will be used in names of improted keys. */
+        structureDelimiter?: string;
+      };
       path: {
         projectId: number;
       };

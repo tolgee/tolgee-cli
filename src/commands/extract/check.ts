@@ -10,7 +10,10 @@ type ExtractLintOptions = BaseExtractOptions;
 
 async function lintHandler(this: Command, filesPattern: string) {
   const opts: ExtractLintOptions = this.optsWithGlobals();
-  const extracted = await loading('Analyzing code...', extractKeysOfFiles(filesPattern, opts.extractor));
+  const extracted = await loading(
+    'Analyzing code...',
+    extractKeysOfFiles(filesPattern, opts.extractor)
+  );
 
   let warningCount = 0;
   let filesCount = 0;

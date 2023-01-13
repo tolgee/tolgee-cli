@@ -19,6 +19,11 @@ export type AllKeys = Exclude<
 
 export type CreateKeyPayload = BodyOf<'/v2/projects/{projectId}/keys', 'post'>;
 
+export type CreateKeysPayload = BodyOf<
+  '/v2/projects/{projectId}/keys/import',
+  'post'
+>['keys'];
+
 export type CreateKeyResponse = ResponseOf<
   '/v2/projects/{projectId}/keys',
   'post'
@@ -48,6 +53,14 @@ export default class ProjectClient {
       method: 'POST',
       path: `${this.requester.projectUrl}/keys`,
       body: key,
+    });
+  }
+
+  async createBulkKey(keys: CreateKeysPayload): Promise<void> {
+    return this.requester.requestVoid({
+      method: 'POST',
+      path: `${this.requester.projectUrl}/keys/import`,
+      body: { keys },
     });
   }
 
