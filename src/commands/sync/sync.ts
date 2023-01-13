@@ -101,6 +101,10 @@ async function syncHandler(this: Command, pattern: string) {
 
   // Create new keys
   if (diff.added.length) {
+    if (!opts.yes) {
+      await askForConfirmation(diff.added, 'added');
+    }
+
     const keys = diff.added.map((key) => ({
       name: key.keyName,
       namespace: key.namespace,
