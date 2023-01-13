@@ -1,31 +1,16 @@
-import { randomUUID } from 'crypto';
-import { tmpdir } from 'os';
 import { join } from 'path';
-import { rm, mkdir } from 'fs/promises';
+import { mkdir } from 'fs/promises';
 
+import { TMP_FOLDER, setupTemporaryFolder } from './utils/tmp';
 import { PROJECT_PAK_1, PROJECT_PAK_3 } from './utils/tg';
 import { run, runWithStdin } from './utils/run';
-import './utils/toMatchPath';
+import './utils/toMatchContentsOf';
 
 const FIXTURES_PATH = join(__dirname, '..', '__fixtures__');
 const PROJECT_1_DATA = join(FIXTURES_PATH, 'tolgeeImportData', 'test1');
 const PROJECT_3_DATA = join(FIXTURES_PATH, 'tolgeeImportData', 'test3');
 
-let TMP_FOLDER: string;
-
-beforeEach(() => {
-  TMP_FOLDER = join(tmpdir(), randomUUID());
-});
-
-afterEach(async () => {
-  try {
-    await rm(TMP_FOLDER, { recursive: true });
-  } catch (e: any) {
-    if (e.code !== 'ENOENT') {
-      throw e;
-    }
-  }
-});
+setupTemporaryFolder();
 
 it('pulls strings from Tolgee', async () => {
   const out = await run(['pull', '--api-key', PROJECT_PAK_1, TMP_FOLDER]);

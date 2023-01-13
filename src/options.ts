@@ -1,5 +1,8 @@
+import type Client from './client';
 import { Option, InvalidArgumentError } from 'commander';
-import { DEFAULT_API_URL } from './constants';
+import { DEFAULT_API_URL, SDKS } from './constants';
+
+const builtinSdks = SDKS.join(', ');
 
 function parseProjectId(v: string) {
   const val = Number(v);
@@ -16,6 +19,13 @@ function parseUrlArgument(v: string) {
     throw new InvalidArgumentError('Malformed URL.');
   }
 }
+
+export type BaseOptions = {
+  apiUrl: URL;
+  apiKey: string;
+  projectId: number;
+  client: Client;
+};
 
 export const API_KEY_OPT = new Option(
   '-ak, --api-key <key>',
@@ -35,3 +45,8 @@ export const API_URL_OPT = new Option(
 )
   .default(DEFAULT_API_URL)
   .argParser(parseUrlArgument);
+
+export const EXTRACTOR = new Option(
+  '-e, --extractor <extractor>',
+  `The extractor to use. Either one of the builtins (${builtinSdks}), or a path to a JS/TS file with a custom extractor.`
+).makeOptionMandatory(true);

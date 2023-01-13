@@ -1,6 +1,7 @@
 // @ts-nocheck
 
 import { T } from '@tolgee/react';
+import { bird } from '#earth/animals';
 
 export default function App() {
   return (
@@ -13,12 +14,11 @@ export default function App() {
           <T keyName="dog-name" /> goes <T keyName="dog-sound" />
         </li>
         <li>
-          <T keyName="bird-name" /> goes <T keyName="bird-sound" />
+          <T keyName="bird-name" /> goes{' '}
+          <T keyName="bird-sound" defaultValue={bird.sound} />
         </li>
-        <li>
-          and <T keyName="mouse-name">Mouse</T> goes{' '}
-          <T keyName="mouse-sound">Squeek</T>
-        </li>
+        <li>and Mouse goes Squeek</li>
+        <li>...</li>
       </ul>
       <p>What does the fox say?</p>
     </Fragment>

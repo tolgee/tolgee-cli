@@ -1,3 +1,4 @@
+import type { ExtractionResult } from '.';
 import { relative } from 'path';
 
 export type WarningMessage = { name: string; description: string };
@@ -43,6 +44,49 @@ export const WarningMessages: Record<string, WarningMessage> = {
   },
 };
 
+/**
+ * Dumps warnings emitted during an extraction to stdout, with GitHub integration, and counts them.
+ *
+ * @param extractionResult Extraction result to dump warnings from.
+ * @returns Count of emitted warnings in the extraction.
+ */
+export function dumpWarnings(extractionResult: ExtractionResult) {
+  let warningCount = 0;
+
+  for (const [file, { warnings }] of extractionResult.entries()) {
+    if (warnings.length) {
+      if (!warningCount) {
+        console.error('Warnings were emitted during extraction.');
+      }
+
+      console.error(file);
+      for (const warning of warnings) {
+        const warnText =
+          warning.warning in WarningMessages
+            ? WarningMessages[warning.warning].name
+            : warning.warning;
+
+        console.error('\tline %d: %s', warning.line, warnText);
+        emitGitHubWarning(warning.warning, file, warning.line);
+      }
+
+      warningCount += warnings.length;
+    }
+  }
+
+  if (warningCount) {
+    console.error(
+      'Total: %d warning%s',
+      warningCount,
+      warningCount === 1 ? '' : 's'
+    );
+  }
+
+  return warningCount;
+}
+
+// TODO: Revisit this function and turn it into an actual GitHub Action Annotation?
+// https://docs.github.com/en/rest/checks/runs?apiVersion=2022-11-28#update-a-check-run
 export function emitGitHubWarning(warning: string, file: string, line: number) {
   if (!process.env.GITHUB_ACTIONS) return;
 

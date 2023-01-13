@@ -1,4 +1,4 @@
-import type { Key, Warning } from '../index.js';
+import type { ExtractedKey, Warning } from '../index.js';
 
 import { createMachine, assign, send, forwardTo } from 'xstate';
 import propertiesMachine from './shared/properties';
@@ -6,8 +6,8 @@ import commentsService from './shared/comments';
 
 type HookVisibility = { depth: number; namespace?: string | false };
 
-type KeyWithDynamicNs = Omit<Key, 'namespace'> & {
-  namespace?: Key['namespace'] | false;
+type KeyWithDynamicNs = Omit<ExtractedKey, 'namespace'> & {
+  namespace?: ExtractedKey['namespace'] | false;
 };
 
 type MachineCtx = {
@@ -19,7 +19,7 @@ type MachineCtx = {
   hooks: HookVisibility[];
   ignore: null | { type: 'key' | 'ignore'; line: number };
 
-  keys: Key[];
+  keys: ExtractedKey[];
   warnings: Warning[];
 };
 

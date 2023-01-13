@@ -4,12 +4,16 @@ import { Command } from 'commander';
 
 import { extractKeysOfFiles } from '../../extractor';
 import { WarningMessages } from '../../extractor/warnings';
+import { loading } from '../../utils/logger';
 
 type ExtractPrintOptions = BaseExtractOptions;
 
 async function printHandler(this: Command, filesPattern: string) {
   const opts: ExtractPrintOptions = this.optsWithGlobals();
-  const extracted = await extractKeysOfFiles(filesPattern, opts.extractor);
+  const extracted = await loading(
+    'Analyzing code...',
+    extractKeysOfFiles(filesPattern, opts.extractor)
+  );
 
   let warningCount = 0;
   const keySet = new Set();

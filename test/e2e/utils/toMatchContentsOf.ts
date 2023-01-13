@@ -18,6 +18,7 @@ async function recursiveReaddir(path: string, base: string = '') {
     } else {
       const contents = await readFile(filePath);
 
+      // Read in a sort-of-smart way to not nitpick on file format, key orders, ...
       switch (extname(filePath)) {
         case '.json':
           files[`${base}${file}`] = JSON.parse(contents.toString('utf8'));
