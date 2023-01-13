@@ -60,9 +60,11 @@ function parseConfig(rc: any): TolgeeConfig {
       throw new Error('Invalid config: extractor is not a string');
     }
 
-    const extractorPath = resolve(rc.extractor)
+    const extractorPath = resolve(rc.extractor);
     if (!existsSync(extractorPath)) {
-      throw new Error(`Invalid config: extractor points to a file that does not exists (${extractorPath})`);
+      throw new Error(
+        `Invalid config: extractor points to a file that does not exists (${extractorPath})`
+      );
     }
 
     cfg.extractor = extractorPath;

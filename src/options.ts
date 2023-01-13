@@ -21,12 +21,12 @@ function parseUrlArgument(v: string) {
 }
 
 function parsePath(v: string) {
-  const path = resolve(v)
+  const path = resolve(v);
   if (!existsSync(path)) {
     throw new InvalidArgumentError(`The specified path "${v}" does not exist.`);
   }
 
-  return path
+  return path;
 }
 
 export type BaseOptions = {

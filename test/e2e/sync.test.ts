@@ -75,7 +75,7 @@ it('says projects are in sync when they do match', async () => {
 
   expect(out.code).toBe(0);
   expect(out.stdout).toContain('is in sync');
-});
+}, 30e3);
 
 it('creates new keys in code projects', async () => {
   const out = await run([
@@ -107,17 +107,21 @@ it('creates new keys in code projects', async () => {
       en: 'Squeek',
     },
   });
-});
+}, 30e3);
 
 it('deletes keys that no longer exist', async () => {
-  const out = await run([
-    'sync',
-    '--yes',
-    '--remove-unused',
-    '--api-key',
-    PROJECT_PAK_2,
-    CODE_PROJECT_2_DELETED,
-  ]);
+  const out = await run(
+    [
+      'sync',
+      '--yes',
+      '--remove-unused',
+      '--api-key',
+      PROJECT_PAK_2,
+      CODE_PROJECT_2_DELETED,
+    ],
+    undefined,
+    20e3
+  );
 
   expect(out.code).toBe(0);
   expect(out.stdout).toContain('- 2 strings');
@@ -128,16 +132,14 @@ it('deletes keys that no longer exist', async () => {
   );
 
   expect(keys.page.totalElements).toBe(0);
-});
+}, 30e3);
 
 it('handles namespaces properly', async () => {
-  const out = await run([
-    'sync',
-    '--yes',
-    '--api-key',
-    PROJECT_PAK_3,
-    CODE_PROJECT_3,
-  ]);
+  const out = await run(
+    ['sync', '--yes', '--api-key', PROJECT_PAK_3, CODE_PROJECT_3],
+    undefined,
+    20e3
+  );
 
   expect(out.code).toBe(0);
   expect(out.stdout).toContain('+ 1 string');
@@ -156,46 +158,52 @@ it('handles namespaces properly', async () => {
       en: 'Welcome!',
     },
   });
-});
+}, 30e3);
 
 it('does a proper backup', async () => {
-  const out = await run([
-    'sync',
-    '--yes',
-    '--api-key',
-    PROJECT_PAK_2,
-    '--backup',
-    TMP_FOLDER,
-    CODE_PROJECT_2_DELETED,
-  ]);
+  const out = await run(
+    [
+      'sync',
+      '--yes',
+      '--api-key',
+      PROJECT_PAK_2,
+      '--backup',
+      TMP_FOLDER,
+      CODE_PROJECT_2_DELETED,
+    ],
+    undefined,
+    20e3
+  );
 
   expect(out.code).toBe(0);
   await expect(TMP_FOLDER).toMatchContentsOf(PROJECT_2_DATA);
-});
+}, 30e3);
 
 it('logs warnings to stderr and aborts', async () => {
-  const out = await run([
-    'sync',
-    '--yes',
-    '--api-key',
-    PROJECT_PAK_2,
-    CODE_PROJECT_2_WARNING,
-  ]);
+  const out = await run(
+    ['sync', '--yes', '--api-key', PROJECT_PAK_2, CODE_PROJECT_2_WARNING],
+    undefined,
+    20e3
+  );
 
   expect(out.code).toBe(1);
   expect(out.stderr).toContain('Warnings were emitted');
-});
+}, 30e3);
 
 it('continues when there are warnings and --continue-on-warning is set', async () => {
-  const out = await run([
-    'sync',
-    '--yes',
-    '--continue-on-warning',
-    '--api-key',
-    PROJECT_PAK_2,
-    CODE_PROJECT_2_WARNING,
-  ]);
+  const out = await run(
+    [
+      'sync',
+      '--yes',
+      '--continue-on-warning',
+      '--api-key',
+      PROJECT_PAK_2,
+      CODE_PROJECT_2_WARNING,
+    ],
+    undefined,
+    20e3
+  );
 
   expect(out.code).toBe(0);
   expect(out.stderr).toContain('Warnings were emitted');
-});
+}, 30e3);

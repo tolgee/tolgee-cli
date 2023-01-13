@@ -3,7 +3,10 @@ import { Command } from 'commander';
 import ansi from 'ansi-colors';
 
 import { compareKeys, printKey } from './syncUtils';
-import { extractKeysOfFiles, filterExtractionResult } from '../../extractor/runner';
+import {
+  extractKeysOfFiles,
+  filterExtractionResult,
+} from '../../extractor/runner';
 import { dumpWarnings } from '../../extractor/warnings';
 import { EXTRACTOR } from '../../options';
 import { loading } from '../../utils/logger';

@@ -21,7 +21,7 @@ async function handleJob(args: WorkerParams) {
     loadedExtractor = args.extractor;
     extractor = args.extractor
       ? await loadModule(args.extractor).then((mdl) => mdl.default)
-      : internalExtractor
+      : internalExtractor;
   }
 
   const file = resolve(args.file);
@@ -88,7 +88,7 @@ export async function callWorker(params: WorkerParams) {
   jobQueue.push([params, deferred]);
 
   if (!worker) {
-    worker = createWorker()
+    worker = createWorker();
   }
 
   return deferred.promise;
