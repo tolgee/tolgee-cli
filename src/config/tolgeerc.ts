@@ -1,4 +1,6 @@
 import { cosmiconfig, defaultLoaders } from 'cosmiconfig';
+import { resolve } from 'path';
+import { existsSync } from 'fs';
 import { SDKS } from '../constants';
 
 export type ProjectSdk = typeof SDKS[number];
@@ -58,10 +60,12 @@ function parseConfig(rc: any): TolgeeConfig {
       throw new Error('Invalid config: extractor is not a string');
     }
 
-    cfg.extractor = rc.extractor;
-  } else {
-    // Re-use the SDK config as a fallback
-    cfg.extractor = cfg.sdk;
+    const extractorPath = resolve(rc.extractor)
+    if (!existsSync(extractorPath)) {
+      throw new Error(`Invalid config: extractor points to a file that does not exists (${extractorPath})`);
+    }
+
+    cfg.extractor = extractorPath;
   }
 
   if ('delimiter' in rc) {

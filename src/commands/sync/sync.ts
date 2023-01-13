@@ -3,7 +3,7 @@ import type Client from '../../client';
 import { Command } from 'commander';
 import ansi from 'ansi-colors';
 
-import { extractKeysOfFiles, filterExtractionResult } from '../../extractor';
+import { extractKeysOfFiles, filterExtractionResult } from '../../extractor/runner';
 import { dumpWarnings } from '../../extractor/warnings';
 import { type PartialKey, compareKeys, printKey } from './syncUtils';
 

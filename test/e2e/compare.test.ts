@@ -17,8 +17,6 @@ it('says projects are in sync when they do match', async () => {
     'compare',
     '--api-key',
     PROJECT_PAK_2,
-    '--extractor',
-    'react',
     CODE_PROJECT_2_COMPLETE,
   ]);
 
@@ -31,8 +29,6 @@ it('detects new keys in code projects', async () => {
     'compare',
     '--api-key',
     PROJECT_PAK_2,
-    '--extractor',
-    'react',
     CODE_PROJECT_2_ADDED,
   ]);
 
@@ -49,8 +45,6 @@ it('detects keys that no longer exist', async () => {
     'compare',
     '--api-key',
     PROJECT_PAK_2,
-    '--extractor',
-    'react',
     CODE_PROJECT_2_DELETED,
   ]);
 
@@ -67,8 +61,6 @@ it('handles namespaces properly', async () => {
     'compare',
     '--api-key',
     PROJECT_PAK_3,
-    '--extractor',
-    'react',
     CODE_PROJECT_3,
   ]);
 
@@ -87,8 +79,6 @@ it('logs emitted warnings to stderr', async () => {
     'compare',
     '--api-key',
     PROJECT_PAK_2,
-    '--extractor',
-    'react',
     CODE_PROJECT_2_WARNING,
   ]);
 

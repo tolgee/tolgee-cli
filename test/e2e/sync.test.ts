@@ -70,8 +70,6 @@ it('says projects are in sync when they do match', async () => {
     '--yes',
     '--api-key',
     PROJECT_PAK_2,
-    '--extractor',
-    'react',
     CODE_PROJECT_2_COMPLETE,
   ]);
 
@@ -85,8 +83,6 @@ it('creates new keys in code projects', async () => {
     '--yes',
     '--api-key',
     PROJECT_PAK_2,
-    '--extractor',
-    'react',
     CODE_PROJECT_2_ADDED,
   ]);
 
@@ -120,8 +116,6 @@ it('deletes keys that no longer exist', async () => {
     '--remove-unused',
     '--api-key',
     PROJECT_PAK_2,
-    '--extractor',
-    'react',
     CODE_PROJECT_2_DELETED,
   ]);
 
@@ -142,8 +136,6 @@ it('handles namespaces properly', async () => {
     '--yes',
     '--api-key',
     PROJECT_PAK_3,
-    '--extractor',
-    'react',
     CODE_PROJECT_3,
   ]);
 
@@ -172,8 +164,6 @@ it('does a proper backup', async () => {
     '--yes',
     '--api-key',
     PROJECT_PAK_2,
-    '--extractor',
-    'react',
     '--backup',
     TMP_FOLDER,
     CODE_PROJECT_2_DELETED,
@@ -189,8 +179,6 @@ it('logs warnings to stderr and aborts', async () => {
     '--yes',
     '--api-key',
     PROJECT_PAK_2,
-    '--extractor',
-    'react',
     CODE_PROJECT_2_WARNING,
   ]);
 
@@ -205,8 +193,6 @@ it('continues when there are warnings and --continue-on-warning is set', async (
     '--continue-on-warning',
     '--api-key',
     PROJECT_PAK_2,
-    '--extractor',
-    'react',
     CODE_PROJECT_2_WARNING,
   ]);
 

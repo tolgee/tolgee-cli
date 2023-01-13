@@ -2,7 +2,7 @@ import type { BaseExtractOptions } from '../extract';
 import { relative } from 'path';
 import { Command } from 'commander';
 
-import { extractKeysOfFiles } from '../../extractor';
+import { extractKeysOfFiles } from '../../extractor/runner';
 import { WarningMessages } from '../../extractor/warnings';
 import { loading } from '../../utils/logger';
 
