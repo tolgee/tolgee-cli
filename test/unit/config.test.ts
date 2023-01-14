@@ -174,7 +174,6 @@ describe('.tolgeerc', () => {
       apiUrl: new URL('https://app.tolgee.io'),
       projectId: 1337,
       sdk: 'react',
-      extractor: 'react',
     });
   });
 

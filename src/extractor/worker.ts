@@ -2,26 +2,26 @@ import { resolve, extname } from 'path';
 import { Worker, isMainThread, parentPort } from 'worker_threads';
 import { readFile } from 'fs/promises';
 
+// TODO: this solution won't handle new integrations and it will need a slight tweaking before adding new ones
+import internalExtractor from './presets/react';
 import { loadModule } from '../utils/moduleLoader';
 import { type Deferred, createDeferred } from '../utils/deferred';
 
-export type WorkerParams = { extractor: string; file: string };
+export type WorkerParams = { extractor?: string; file: string };
 
 const IS_TS_NODE = extname(__filename) === '.ts';
 
 // --- Worker functions
 
-let loadedExtractor: string;
+let loadedExtractor: string | undefined | symbol = Symbol('unloaded');
 let extractor: Function;
-
-async function loadExtractor(extractorScript: string) {
-  const mdl = await loadModule(extractorScript);
-  extractor = mdl.default;
-}
 
 async function handleJob(args: WorkerParams) {
   if (loadedExtractor !== args.extractor) {
-    await loadExtractor(args.extractor);
+    loadedExtractor = args.extractor;
+    extractor = args.extractor
+      ? await loadModule(args.extractor).then((mdl) => mdl.default)
+      : internalExtractor;
   }
 
   const file = resolve(args.file);
@@ -30,10 +30,10 @@ async function handleJob(args: WorkerParams) {
 }
 
 async function workerInit() {
-  parentPort!.on('message', ({ id, params }) => {
+  parentPort!.on('message', (params) => {
     handleJob(params)
-      .then((res) => parentPort!.postMessage({ id: id, data: res }))
-      .catch((e) => parentPort!.postMessage({ id: id, err: e }));
+      .then((res) => parentPort!.postMessage({ data: res }))
+      .catch((e) => parentPort!.postMessage({ err: e }));
   });
 }
 
@@ -42,52 +42,54 @@ if (!isMainThread) workerInit();
 // --- Main thread functions
 
 let worker: Worker;
-let deferredJobsIdPool = 0;
-const deferredJobs = new Map<number, Deferred>();
+const jobQueue: Array<[WorkerParams, Deferred]> = [];
 
-export async function callWorker(params: WorkerParams) {
-  if (!worker) {
-    worker = new Worker(__filename, {
-      // ts-node workaround
-      execArgv: IS_TS_NODE ? ['--require', 'ts-node/register'] : undefined,
-    });
+function createWorker() {
+  const worker = new Worker(__filename, {
+    // ts-node workaround
+    execArgv: IS_TS_NODE ? ['--require', 'ts-node/register'] : undefined,
+  });
 
-    worker.on('error', (e) => {
-      for (const deferred of deferredJobs.values()) {
-        deferred.reject(e);
-      }
+  let timeout: NodeJS.Timeout;
+  let currentDeferred: Deferred;
 
-      deferredJobs.clear();
-    });
+  function workOrDie() {
+    const job = jobQueue.shift();
+    if (!job) {
+      worker.terminate();
+      return;
+    }
 
-    worker.on('message', (msg) => {
-      const deferred = deferredJobs.get(msg.id)!;
-      if (!deferred) {
-        return;
-      }
-
-      if ('data' in msg) {
-        deferred.resolve(msg.data);
-      } else {
-        deferred.reject(msg.err);
-      }
-
-      deferredJobs.delete(msg.id);
-      clearTimeout(timeout);
-    });
-
-    worker.unref();
+    worker.postMessage(job[0]);
+    currentDeferred = job[1];
+    timeout = setTimeout(() => {
+      worker.terminate();
+      currentDeferred.reject(new Error('aborted'));
+    }, 10e3);
   }
 
-  const timeout = setTimeout(() => {
-    worker.terminate();
-    deferred.reject(new Error('aborted'));
-  }, 10e3);
+  worker.on('message', (msg) => {
+    if ('data' in msg) {
+      currentDeferred.resolve(msg.data);
+    } else {
+      currentDeferred.reject(msg.err);
+    }
 
-  const jobId = deferredJobsIdPool++;
+    clearTimeout(timeout);
+    workOrDie();
+  });
+
+  workOrDie();
+  return worker;
+}
+
+export async function callWorker(params: WorkerParams) {
   const deferred = createDeferred();
-  deferredJobs.set(jobId, deferred);
-  worker.postMessage({ id: jobId, params: params });
+  jobQueue.push([params, deferred]);
+
+  if (!worker) {
+    worker = createWorker();
+  }
 
   return deferred.promise;
 }

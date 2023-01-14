@@ -13,28 +13,22 @@ const CODE_PROJECT_2_WARNING = `${CODE_PATH}/Test2Warning.tsx`;
 const CODE_PROJECT_3 = `${CODE_PATH}/Test3Mixed.tsx`;
 
 it('says projects are in sync when they do match', async () => {
-  const out = await run([
-    'compare',
-    '--api-key',
-    PROJECT_PAK_2,
-    '--extractor',
-    'react',
-    CODE_PROJECT_2_COMPLETE,
-  ]);
+  const out = await run(
+    ['compare', '--api-key', PROJECT_PAK_2, CODE_PROJECT_2_COMPLETE],
+    undefined,
+    20e3
+  );
 
   expect(out.code).toBe(0);
   expect(out.stdout).toContain('is in sync');
-});
+}, 30e3);
 
 it('detects new keys in code projects', async () => {
-  const out = await run([
-    'compare',
-    '--api-key',
-    PROJECT_PAK_2,
-    '--extractor',
-    'react',
-    CODE_PROJECT_2_ADDED,
-  ]);
+  const out = await run(
+    ['compare', '--api-key', PROJECT_PAK_2, CODE_PROJECT_2_ADDED],
+    undefined,
+    20e3
+  );
 
   expect(out.code).toBe(0);
   expect(out.stdout).toContain('out of sync');
@@ -42,17 +36,14 @@ it('detects new keys in code projects', async () => {
   // Matching \n is important to ensure it properly understood it is not a namespaced string
   expect(out.stdout).toContain('+ mouse-name\n');
   expect(out.stdout).toContain('+ mouse-sound\n');
-});
+}, 30e3);
 
 it('detects keys that no longer exist', async () => {
-  const out = await run([
-    'compare',
-    '--api-key',
-    PROJECT_PAK_2,
-    '--extractor',
-    'react',
-    CODE_PROJECT_2_DELETED,
-  ]);
+  const out = await run(
+    ['compare', '--api-key', PROJECT_PAK_2, CODE_PROJECT_2_DELETED],
+    undefined,
+    20e3
+  );
 
   expect(out.code).toBe(0);
   expect(out.stdout).toContain('out of sync');
@@ -60,17 +51,14 @@ it('detects keys that no longer exist', async () => {
   // Matching \n is important to ensure it properly understood it is not a namespaced string
   expect(out.stdout).toContain('- bird-name\n');
   expect(out.stdout).toContain('- bird-sound\n');
-});
+}, 30e3);
 
 it('handles namespaces properly', async () => {
-  const out = await run([
-    'compare',
-    '--api-key',
-    PROJECT_PAK_3,
-    '--extractor',
-    'react',
-    CODE_PROJECT_3,
-  ]);
+  const out = await run(
+    ['compare', '--api-key', PROJECT_PAK_3, CODE_PROJECT_3],
+    undefined,
+    20e3
+  );
 
   expect(out.code).toBe(0);
   expect(out.stdout).toContain('out of sync');
@@ -80,18 +68,15 @@ it('handles namespaces properly', async () => {
   expect(out.stdout).toContain('- soda (namespace: drinks)');
   expect(out.stdout).toContain('+ table (namespace: furniture)');
   expect(out.stdout).toContain('- table\n');
-});
+}, 30e3);
 
 it('logs emitted warnings to stderr', async () => {
-  const out = await run([
-    'compare',
-    '--api-key',
-    PROJECT_PAK_2,
-    '--extractor',
-    'react',
-    CODE_PROJECT_2_WARNING,
-  ]);
+  const out = await run(
+    ['compare', '--api-key', PROJECT_PAK_2, CODE_PROJECT_2_WARNING],
+    undefined,
+    20e3
+  );
 
   expect(out.code).toBe(0);
   expect(out.stderr).toContain('Warnings were emitted');
-});
+}, 30e3);

@@ -1,8 +1,8 @@
 import type Client from './client';
+import { existsSync } from 'fs';
+import { resolve } from 'path';
 import { Option, InvalidArgumentError } from 'commander';
-import { DEFAULT_API_URL, SDKS } from './constants';
-
-const builtinSdks = SDKS.join(', ');
+import { DEFAULT_API_URL } from './constants';
 
 function parseProjectId(v: string) {
   const val = Number(v);
@@ -18,6 +18,15 @@ function parseUrlArgument(v: string) {
   } catch {
     throw new InvalidArgumentError('Malformed URL.');
   }
+}
+
+function parsePath(v: string) {
+  const path = resolve(v);
+  if (!existsSync(path)) {
+    throw new InvalidArgumentError(`The specified path "${v}" does not exist.`);
+  }
+
+  return path;
 }
 
 export type BaseOptions = {
@@ -48,5 +57,5 @@ export const API_URL_OPT = new Option(
 
 export const EXTRACTOR = new Option(
   '-e, --extractor <extractor>',
-  `The extractor to use. Either one of the builtins (${builtinSdks}), or a path to a JS/TS file with a custom extractor.`
-).makeOptionMandatory(true);
+  `A path to a custom extractor to use instead of the default one.`
+).argParser(parsePath);

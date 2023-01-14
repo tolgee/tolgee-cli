@@ -1,4 +1,4 @@
-import type { ExtractionResult } from '.';
+import type { ExtractionResults } from '.';
 import { relative } from 'path';
 
 export type WarningMessage = { name: string; description: string };
@@ -50,7 +50,7 @@ export const WarningMessages: Record<string, WarningMessage> = {
  * @param extractionResult Extraction result to dump warnings from.
  * @returns Count of emitted warnings in the extraction.
  */
-export function dumpWarnings(extractionResult: ExtractionResult) {
+export function dumpWarnings(extractionResult: ExtractionResults) {
   let warningCount = 0;
 
   for (const [file, { warnings }] of extractionResult.entries()) {
