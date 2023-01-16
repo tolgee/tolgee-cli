@@ -5,130 +5,198 @@
 
 export interface paths {
   '/v2/user': {
+    /** Returns current user's data. */
     get: operations['getInfo'];
+    /** Updates current user's data. */
     put: operations['updateUser'];
+    /**
+     * Updates current user's data.
+     * @deprecated
+     */
     post: operations['updateUserOld'];
+    /** Deletes current user. */
     delete: operations['delete'];
   };
   '/v2/user/password': {
+    /** Updates current user's password. Invalidates all previous sessions upon success. */
     put: operations['updateUserPassword'];
   };
   '/v2/user/mfa/totp': {
+    /** Enables TOTP-based two-factor authentication. Invalidates all previous sessions upon success. */
     put: operations['enableMfa'];
+    /** Disables TOTP-based two-factor authentication. Invalidates all previous sessions upon success. */
     delete: operations['disableMfa'];
   };
   '/v2/user/mfa/recovery': {
+    /** Regenerates multi-factor authentication recovery codes */
     put: operations['regenerateRecoveryCodes'];
   };
   '/v2/user/avatar': {
+    /** Uploads user's avatar. */
     put: operations['uploadAvatar'];
+    /** Deletes user's avatar. */
     delete: operations['removeAvatar'];
   };
   '/v2/user-preferences/set-preferred-organization/{organizationId}': {
+    /** Set user preferred organization */
     put: operations['setPreferredOrganization'];
   };
   '/v2/user-preferences/set-language/{languageTag}': {
+    /** Set user's UI language */
     put: operations['setLanguage'];
   };
   '/v2/projects/{projectId}': {
+    /** Returns project by id */
     get: operations['get_2'];
+    /** Modifies project */
     put: operations['editProject'];
+    /** Deletes project by id */
     delete: operations['deleteProject'];
   };
   '/v2/projects/{projectId}/users/{userId}/set-permissions/{permissionType}': {
+    /** Sets user's direct permission */
     put: operations['setUsersPermissions'];
   };
   '/v2/projects/{projectId}/users/{userId}/revoke-access': {
+    /** Revokes user's access */
     put: operations['revokePermission'];
   };
   '/v2/projects/{projectId}/namespaces/{id}': {
+    /** Update namespace */
     put: operations['update'];
   };
   '/v2/projects/{projectId}/machine-translation-service-settings': {
+    /** Returns machine translation settings for project */
     get: operations['getMachineTranslationSettings'];
+    /** Sets machine translation settings for project */
     put: operations['setMachineTranslationSettings'];
   };
   '/v2/projects/{projectId}/keys/{keyId}/tags': {
+    /** Tags a key with tag. If tag with provided name doesn't exist, it is created */
     put: operations['tagKey'];
   };
   '/v2/projects/{projectId}/keys/{id}/complex-update': {
+    /** More */
     put: operations['complexEdit'];
   };
   '/v2/projects/{projectId}/keys/{id}': {
+    /** Edits key name */
     put: operations['edit'];
   };
   '/v2/projects/{projectId}/invite': {
+    /** Generates user invitation link for project */
     put: operations['inviteUser'];
   };
   '/v2/projects/{projectId}/auto-translation-settings': {
+    /** Returns auto translation settings for project */
     get: operations['getAutoTranslationSettings'];
+    /** Sets auto translation settings for project */
     put: operations['setAutoTranslationSettings'];
   };
   '/v2/projects/{projectId}/import/result/languages/{languageId}/translations/{translationId}/resolve/set-override': {
-    /** Resolves translation conflict. The old translation will be overridden. */
+    /**
+     * Resolve conflict (override)
+     * @description Resolves translation conflict. The old translation will be overridden.
+     */
     put: operations['resolveTranslationSetOverride'];
   };
   '/v2/projects/{projectId}/import/result/languages/{languageId}/translations/{translationId}/resolve/set-keep-existing': {
-    /** Resolves translation conflict. The old translation will be kept. */
+    /**
+     * Resolve conflict (keep existing)
+     * @description Resolves translation conflict. The old translation will be kept.
+     */
     put: operations['resolveTranslationSetKeepExisting'];
   };
   '/v2/projects/{projectId}/import/result/languages/{languageId}/resolve-all/set-override': {
-    /** Resolves all translation conflicts for provided language. The old translations will be overridden. */
+    /**
+     * Resolve all translation conflicts (override)
+     * @description Resolves all translation conflicts for provided language. The old translations will be overridden.
+     */
     put: operations['resolveTranslationSetOverride_2'];
   };
   '/v2/projects/{projectId}/import/result/languages/{languageId}/resolve-all/set-keep-existing': {
-    /** Resolves all translation conflicts for provided language. The old translations will be kept. */
+    /**
+     * Resolve all translation conflicts (keep existing)
+     * @description Resolves all translation conflicts for provided language. The old translations will be kept.
+     */
     put: operations['resolveTranslationSetKeepExisting_2'];
   };
   '/v2/projects/{projectId}/import/result/languages/{importLanguageId}/select-existing/{existingLanguageId}': {
-    /** Sets existing language to pair with language to import. Data will be imported to selected existing language when applied. */
+    /**
+     * Pair existing language
+     * @description Sets existing language to pair with language to import. Data will be imported to selected existing language when applied.
+     */
     put: operations['selectExistingLanguage'];
   };
   '/v2/projects/{projectId}/import/result/languages/{importLanguageId}/reset-existing': {
-    /** Resets existing language paired with language to import. */
+    /**
+     * Reset existing language pairing
+     * @description Resets existing language paired with language to import.
+     */
     put: operations['resetExistingLanguage'];
   };
   '/v2/projects/{projectId}/import/result/files/{fileId}/select-namespace': {
-    /** Sets namespace for file to import. */
+    /**
+     * Select namespace
+     * @description Sets namespace for file to import.
+     */
     put: operations['selectNamespace'];
   };
   '/v2/projects/{projectId}/import/apply': {
-    /** Imports the data prepared in previous step */
+    /**
+     * Apply
+     * @description Imports the data prepared in previous step
+     */
     put: operations['applyImport'];
   };
   '/v2/projects/{projectId}/translations/{translationId}/set-state/{state}': {
+    /** Sets translation state */
     put: operations['setTranslationState'];
   };
   '/v2/projects/{projectId}/translations/{translationId}/comments/{commentId}/set-state/{state}': {
+    /** Sets state of translation comment */
     put: operations['setState'];
   };
   '/v2/projects/{projectId}/translations/{translationId}/comments/{commentId}': {
+    /** Returns single translation comment */
     get: operations['get_3'];
+    /** Updates single translation comment */
     put: operations['update_1'];
+    /** Deletes the translation comment */
     delete: operations['delete_5'];
   };
   '/v2/projects/{projectId}/translations/{translationId}/dismiss-auto-translated-state': {
+    /** Removes "auto translated" indication */
     put: operations['dismissAutoTranslatedState'];
   };
   '/v2/projects/{projectId}/translations': {
+    /** Returns translations in project */
     get: operations['getTranslations'];
+    /** Sets translations for existing key */
     put: operations['setTranslations'];
+    /** Sets translations for existing or not existing key */
     post: operations['createOrUpdateTranslations'];
   };
   '/v2/projects/{projectId}/transfer-to-organization/{organizationId}': {
+    /** Transfers project's ownership to organization */
     put: operations['transferProjectToOrganization'];
   };
   '/v2/projects/{projectId}/leave': {
+    /** Leave project */
     put: operations['leaveProject'];
   };
   '/v2/projects/{projectId}/languages/{languageId}': {
+    /** Returns specific language */
     get: operations['get_5'];
+    /** Edits language */
     put: operations['editLanguage'];
+    /** Deletes specific language */
     delete: operations['deleteLanguage_2'];
   };
   '/v2/projects/{projectId}/keys/{keyId}/auto-translate': {
     /**
-     * Uses enabled auto-translation methods.
+     * Auto translates keys
+     * @description Uses enabled auto-translation methods.
      * You need to set at least one of useMachineTranslation or useTranslationMemory to true.
      *
      * This will replace the the existing translation with the result obtained from specified source!
@@ -136,310 +204,450 @@ export interface paths {
     put: operations['autoTranslate'];
   };
   '/v2/projects/{projectId}/avatar': {
+    /** Uploads organizations avatar */
     put: operations['uploadAvatar_1'];
+    /** Deletes organization avatar */
     delete: operations['removeAvatar_1'];
   };
   '/v2/pats/{id}': {
+    /** Get Personal Access Token */
     get: operations['get_7'];
+    /** Updates Personal Access Token */
     put: operations['update_3'];
+    /** Deletes Personal Access Token */
     delete: operations['delete_7'];
   };
   '/v2/pats/{id}/regenerate': {
+    /** Regenerates Personal Access Token. It generates new token value and updates its time of expiration. */
     put: operations['regenerate'];
   };
   '/v2/organizations/{organizationId}/users/{userId}/set-role': {
+    /** Sets user role (Owner or Member) */
     put: operations['setUserRole'];
   };
   '/v2/organizations/{id}': {
+    /** Returns organization by ID */
     get: operations['get_9'];
+    /** Updates organization data */
     put: operations['update_4'];
+    /** Deletes organization and all its projects */
     delete: operations['delete_8'];
   };
   '/v2/organizations/{id}/leave': {
+    /** Removes current user from organization */
     put: operations['leaveOrganization'];
   };
   '/v2/organizations/{id}/invite': {
+    /** Generates user invitation link for organization */
     put: operations['inviteUser_1'];
   };
   '/v2/organizations/{id}/avatar': {
+    /** Uploads organizations avatar */
     put: operations['uploadAvatar_2'];
+    /** Deletes organization avatar */
     delete: operations['removeAvatar_2'];
   };
   '/v2/api-keys/{apiKeyId}': {
+    /** Edits existing API key */
     put: operations['update_5'];
+    /** Deletes API key */
     delete: operations['delete_10'];
   };
   '/v2/api-keys/{apiKeyId}/regenerate': {
+    /** Regenerates API key. It generates new API key value and updates its time of expiration. */
     put: operations['regenerate_1'];
   };
   '/v2/administration/users/{userId}/set-role/{role}': {
     put: operations['setRole'];
   };
   '/v2/user/generate-super-token': {
+    /** Generates new JWT token permitted to sensitive operations */
     post: operations['getSuperToken'];
   };
   '/v2/slug/generate-project': {
+    /** Generate project address part */
     post: operations['generateProjectSlug'];
   };
   '/v2/slug/generate-organization': {
+    /** Generate organization address part */
     post: operations['generateOrganizationSlug'];
   };
   '/v2/projects': {
+    /** Returns all projects where current user has any permission */
     get: operations['getAll'];
+    /** Creates project with specified languages */
     post: operations['createProject'];
   };
   '/v2/projects/{projectId}/keys/import': {
+    /** Import's new keys with translations. If key already exists, it's translations are not updated. */
     post: operations['importKeys'];
   };
   '/v2/projects/{projectId}/keys/create': {
+    /** Creates new key */
     post: operations['create'];
   };
   '/v2/projects/{projectId}/keys': {
+    /** Creates new key */
     post: operations['create_1'];
+    /** Deletes one or multiple keys by their IDs in request body */
     delete: operations['delete_3'];
   };
   '/v2/projects/{projectId}/import': {
-    /** Prepares provided files to import. */
+    /**
+     * Add files
+     * @description Prepares provided files to import.
+     */
     post: operations['addFiles'];
-    /** Deletes prepared import data. */
+    /**
+     * Delete
+     * @description Deletes prepared import data.
+     */
     delete: operations['cancelImport'];
   };
   '/v2/projects/{projectId}/export': {
+    /** Exports data */
     get: operations['export'];
+    /** Exports data (post). Useful when providing params exceeding allowed query size. */
     post: operations['exportPost'];
   };
   '/v2/projects/{projectId}/translations/{translationId}/comments': {
+    /** Returns translation comments of translation */
     get: operations['getAll_3'];
+    /** Creates a translation comment */
     post: operations['create_4'];
   };
   '/v2/projects/{projectId}/translations/create-comment': {
+    /** Creates a translation comment. Empty translation is stored, when not exists. */
     post: operations['create_6'];
   };
   '/v2/projects/{projectId}/suggest/translation-memory': {
+    /**
+     * Suggests machine translations from translation memory.
+     *
+     * The result is always sorted by similarity, so sorting is not supported.
+     */
     post: operations['suggestTranslationMemory'];
   };
   '/v2/projects/{projectId}/suggest/machine-translations': {
+    /** Suggests machine translations from enabled services */
     post: operations['suggestMachineTranslations'];
   };
   '/v2/projects/{projectId}/languages': {
+    /** Returns all project languages */
     get: operations['getAll_5'];
+    /** Creates language */
     post: operations['createLanguage'];
   };
   '/v2/projects/{projectId}/keys/{keyId}/screenshots': {
+    /** Returns all screenshots for specified key */
     get: operations['getKeyScreenshots_1'];
+    /** Upload screenshot for specific key */
     post: operations['uploadScreenshot_1'];
   };
   '/v2/pats': {
+    /** Get all Personal Access Tokens */
     get: operations['getAll_7'];
+    /** Creates new Personal Access Token */
     post: operations['create_8'];
   };
   '/v2/organizations': {
+    /** Returns all organizations, which is current user allowed to view */
     get: operations['getAll_8'];
+    /** Creates organization */
     post: operations['create_9'];
   };
   '/v2/image-upload': {
+    /** Uploads an image for later use */
     post: operations['upload'];
   };
   '/v2/api-keys': {
+    /** Returns user's api keys */
     get: operations['allByUser'];
+    /** Creates new API key with provided scopes */
     post: operations['create_10'];
   };
   '/api/public/validate_email': {
+    /** Validates if email is not in use */
     post: operations['validateEmail'];
   };
   '/api/public/sign_up': {
+    /**
+     * Creates new user account.
+     *
+     * When E-mail verification is enabled, null is returned. Otherwise JWT token is provided.
+     */
     post: operations['signUp'];
   };
   '/api/public/reset_password_set': {
+    /** Sets new password with password reset code from e-mail */
     post: operations['resetPasswordSet'];
   };
   '/api/public/reset_password_request': {
+    /** Reset password request */
     post: operations['resetPasswordRequest'];
   };
   '/api/public/generatetoken': {
+    /** Generates JWT token */
     post: operations['authenticateUser'];
   };
   '/v2/user/single-owned-organizations': {
+    /** Returns all organizations owned only by current user */
     get: operations['getAllSingleOwnedOrganizations'];
   };
   '/v2/user-preferences': {
+    /** Get user's preferences */
     get: operations['get'];
   };
   '/v2/slug/validate-project/{slug}': {
+    /** Validate project address part */
     get: operations['validateProjectSlug'];
   };
   '/v2/slug/validate-organization/{slug}': {
+    /** Validate organization address part */
     get: operations['validateOrganizationSlug'];
   };
   '/v2/public/initial-data': {
-    /** Returns initial data always required by frontend */
+    /** @description Returns initial data always required by frontend */
     get: operations['get_1'];
   };
   '/v2/projects/{projectId}/users': {
+    /** Returns project all users, who have permission to access project */
     get: operations['getAllUsers'];
   };
   '/v2/projects/{projectId}/used-namespaces': {
+    /** Returns all used project namespaces. Response contains default (null) namespace if used. */
     get: operations['getUsedNamespaces'];
   };
   '/v2/projects/{projectId}/tags': {
+    /** Returns project tags */
     get: operations['getAll_1'];
   };
   '/v2/projects/{projectId}/namespaces': {
+    /** Returns all project namespaces */
     get: operations['getAllNamespaces'];
   };
   '/v2/projects/{projectId}/namespace-by-name/{name}': {
+    /** Update namespace */
     get: operations['getByName'];
   };
   '/v2/projects/{projectId}/machine-translation-credit-balance': {
+    /** Returns machine translation credit balance for specified project */
     get: operations['getProjectCredits'];
   };
   '/v2/projects/{projectId}/all-keys': {
+    /** Get all keys in project */
     get: operations['getAllKeys'];
   };
   '/v2/projects/{projectId}/activity': {
+    /** Returns project history */
     get: operations['getActivity'];
   };
   '/v2/projects/{projectId}/import/result/languages/{languageId}/translations': {
-    /** Returns translations prepared to import. */
+    /**
+     * Get translations
+     * @description Returns translations prepared to import.
+     */
     get: operations['getImportTranslations'];
   };
   '/v2/projects/{projectId}/import/result/languages/{languageId}': {
-    /** Returns language prepared to import. */
+    /**
+     * Get import language
+     * @description Returns language prepared to import.
+     */
     get: operations['getImportLanguage'];
-    /** Deletes language prepared to import. */
+    /**
+     * Delete language
+     * @description Deletes language prepared to import.
+     */
     delete: operations['deleteLanguage'];
   };
   '/v2/projects/{projectId}/import/result/files/{importFileId}/issues': {
-    /** Returns issues for uploaded file. */
+    /**
+     * Get file issues
+     * @description Returns issues for uploaded file.
+     */
     get: operations['getImportFileIssues'];
   };
   '/v2/projects/{projectId}/import/result': {
-    /** Returns the result of preparation. */
+    /**
+     * Get result
+     * @description Returns the result of preparation.
+     */
     get: operations['getImportResult'];
   };
   '/v2/projects/{projectId}/import/all-namespaces': {
-    /** Returns all existing and imported namespaces */
+    /**
+     * Get namespaces
+     * @description Returns all existing and imported namespaces
+     */
     get: operations['getAllNamespaces_1'];
   };
   '/v2/projects/{projectId}/translations/{translationId}/history': {
+    /**
+     * Returns history of specific translation.
+     *
+     * Sorting is not supported for supported. It is automatically sorted from newest to oldest.
+     */
     get: operations['getTranslationHistory'];
   };
   '/v2/projects/{projectId}/translations/{languages}': {
+    /** Returns all translations for specified languages */
     get: operations['getAllTranslations'];
   };
   '/v2/projects/{projectId}/translations/select-all': {
+    /** Get select all keys */
     get: operations['getSelectAllKeyIds'];
   };
   '/v2/projects/{projectId}/transfer-options': {
+    /** Returns transfer option */
     get: operations['getTransferOptions'];
   };
   '/v2/projects/{projectId}/stats/daily-activity': {
+    /** Returns project daily amount of events */
     get: operations['getProjectDailyActivity'];
   };
   '/v2/projects/{projectId}/stats': {
+    /** Returns project stats */
     get: operations['getProjectStats'];
   };
   '/v2/projects/{projectId}/invitations': {
+    /** Returns all invitations to project */
     get: operations['getProjectInvitations'];
   };
   '/v2/projects/{projectId}/api-keys': {
+    /** Returns all API keys for project */
     get: operations['allByProject'];
   };
   '/v2/projects/with-stats': {
+    /** Returns all projects (including statistics) where current user has any permission */
     get: operations['getAllWithStatistics'];
   };
   '/v2/preferred-organization': {
+    /** Returns preferred organization. If server allows users to create organization, preferred organization is automatically created if user doesn't have access to any organization. */
     get: operations['getPreferred'];
   };
   '/v2/pats/current': {
+    /** Returns current Personal Access Token info */
     get: operations['getCurrent'];
   };
   '/v2/organizations/{slug}': {
+    /** Returns organization by address part */
     get: operations['get_8'];
   };
   '/v2/organizations/{slug}/projects': {
+    /** Returns all organization projects */
     get: operations['getAllProjects'];
   };
   '/v2/organizations/{slug}/projects-with-stats': {
+    /** Returns all projects (including statistics) where current user has any permission */
     get: operations['getAllWithStatistics_1'];
   };
   '/v2/organizations/{organizationId}/machine-translation-credit-balance': {
+    /** Returns machine translation credit balance for organization */
     get: operations['getOrganizationCredits'];
   };
   '/v2/organizations/{organizationId}/invitations': {
+    /** Returns all invitations to organization */
     get: operations['getInvitations'];
   };
   '/v2/organizations/{organizationId}/usage': {
-    /** Returns current organization usage */
+    /** @description Returns current organization usage */
     get: operations['getUsage'];
   };
   '/v2/organizations/{organizationId}/projects-with-stats': {
+    /** Returns all projects (including statistics) where current user has any permission */
     get: operations['getAllWithStatistics_2'];
   };
   '/v2/organizations/{id}/users': {
+    /** Returns all users in organization */
     get: operations['getAllUsers_1'];
   };
   '/v2/organizations/{id}/projects': {
+    /** Returns all organization projects */
     get: operations['getAllProjects_1'];
   };
   '/v2/invitations/{code}/accept': {
+    /** Accepts invitation to project or organization */
     get: operations['acceptInvitation'];
   };
   '/v2/api-keys/{keyId}': {
+    /** Returns specific API key info */
     get: operations['get_10'];
   };
   '/v2/api-keys/current': {
+    /** Returns current API key info */
     get: operations['getCurrent_1'];
   };
   '/v2/api-keys/availableScopes': {
+    /** Returns API key scopes for every permission type */
     get: operations['getScopes'];
   };
   '/v2/administration/users': {
+    /** Get all server users */
     get: operations['getUsers'];
   };
   '/v2/administration/users/{userId}/generate-token': {
+    /** Get all server users */
     get: operations['generateUserToken'];
   };
   '/v2/administration/organizations': {
+    /** Get all server organizations */
     get: operations['getOrganizations'];
   };
   '/api/public/verify_email/{userId}/{code}': {
+    /** Sets user account as verified, when code from email is OK */
     get: operations['verifyEmail'];
   };
   '/api/public/reset_password_validate/{email}/{code}': {
+    /** Validates key sent by email */
     get: operations['resetPasswordValidate'];
   };
   '/api/public/configuration': {
+    /** Returns server configuration information */
     get: operations['getPublicConfiguration'];
   };
   '/api/public/authorize_oauth/{serviceType}': {
+    /** Authenticates user using third party oAuth service */
     get: operations['authenticateUser_1'];
   };
   '/api/project/{projectId}/export/jsonZip': {
+    /**
+     * Exports data as ZIP of jsons
+     * @deprecated
+     */
     get: operations['doExportJsonZip'];
   };
   '/v2/projects/{projectId}/keys/{keyId}/tags/{tagId}': {
+    /** Removes tag with provided id from key with provided id */
     delete: operations['removeTag'];
   };
   '/v2/projects/{projectId}/keys/{ids}': {
+    /** Deletes one or multiple keys by their IDs */
     delete: operations['delete_1'];
   };
   '/v2/projects/{projectId}/keys/{keyId}/screenshots/{ids}': {
+    /** Deletes multiple screenshots by ids */
     delete: operations['deleteScreenshots_1'];
   };
   '/v2/organizations/{organizationId}/users/{userId}': {
+    /** Removes user from organization */
     delete: operations['removeUser'];
   };
   '/v2/invitations/{invitationId}': {
+    /** Deletes invitation by ID */
     delete: operations['deleteInvitation'];
   };
   '/v2/image-upload/{ids}': {
+    /** Deletes uploaded images */
     delete: operations['delete_9'];
   };
   '/v2/administration/users/{userId}': {
+    /** Deletes an user */
     delete: operations['deleteUser'];
   };
 }
+
+export type webhooks = Record<string, never>;
 
 export interface components {
   schemas: {
@@ -656,7 +864,9 @@ export interface components {
       /** @description The namespace of the key. (When empty or null default namespace will be used) */
       namespace?: string;
       /** @description Translations to update */
-      translations?: { [key: string]: string };
+      translations?: {
+        [key: string]: string | undefined;
+      };
       /** @description Tags of the key. If not provided tags won't be modified */
       tags?: string[];
       /** @description IDs of screenshots to delete */
@@ -690,7 +900,7 @@ export interface components {
        * }
        */
       translations: {
-        [key: string]: components['schemas']['TranslationModel'];
+        [key: string]: components['schemas']['TranslationModel'] | undefined;
       };
       /** @description Tags of key */
       tags: components['schemas']['TagModel'][];
@@ -862,7 +1072,9 @@ export interface components {
        *   "cs": "Jaká to přeložená hodnota!"
        * }
        */
-      translations: { [key: string]: string };
+      translations: {
+        [key: string]: string | undefined;
+      };
       /**
        * @description List of languages to return translations for.
        *
@@ -902,7 +1114,7 @@ export interface components {
        * }
        */
       translations: {
-        [key: string]: components['schemas']['TranslationModel'];
+        [key: string]: components['schemas']['TranslationModel'] | undefined;
       };
     };
     LanguageDto: {
@@ -1131,21 +1343,25 @@ export interface components {
        *   "cs": "Jaká to přeložená hodnota!"
        * }
        */
-      translations: { [key: string]: string };
+      translations: {
+        [key: string]: string | undefined;
+      };
     };
     CreateKeyDto: {
       /** @description Name of the key */
       name: string;
       /** @description The namespace of the key. (When empty or null default namespace will be used) */
       namespace?: string;
-      translations?: { [key: string]: string };
+      translations?: {
+        [key: string]: string | undefined;
+      };
       tags?: string[];
       /** @description Ids of screenshots uploaded with /v2/image-upload endpoint */
       screenshotUploadedImageIds?: number[];
     };
     ErrorResponseBody: {
       code: string;
-      params?: { [key: string]: unknown }[];
+      params?: Record<string, never>[];
     };
     ImportAddFilesResultModel: {
       errors: components['schemas']['ErrorResponseBody'][];
@@ -1202,7 +1418,7 @@ export interface components {
       filterNamespace?: string[];
       zip: boolean;
     };
-    StreamingResponseBody: { [key: string]: unknown };
+    StreamingResponseBody: Record<string, never>;
     TranslationCommentWithLangKeyDto: {
       /** Format: int64 */
       keyId: number;
@@ -1250,7 +1466,9 @@ export interface components {
        *   "AZURE": "This was translated by Azure Cognitive"
        * }
        */
-      machineTranslations?: { [key: string]: string };
+      machineTranslations?: {
+        [key: string]: string | undefined;
+      };
       /** Format: int64 */
       translationCreditsBalanceBefore: number;
       /** Format: int64 */
@@ -1298,7 +1516,7 @@ export interface components {
        */
       expiresAt?: number;
     };
-    TextNode: { [key: string]: unknown };
+    TextNode: Record<string, never>;
     SignUpDto: {
       name: string;
       email: string;
@@ -1350,7 +1568,9 @@ export interface components {
     MtServicesDTO: {
       /** @enum {string} */
       defaultPrimaryService?: 'GOOGLE' | 'AWS' | 'DEEPL' | 'AZURE';
-      services: { [key: string]: components['schemas']['MtServiceDTO'] };
+      services: {
+        [key: string]: components['schemas']['MtServiceDTO'] | undefined;
+      };
     };
     OAuthPublicConfigDTO: {
       clientId?: string;
@@ -1460,27 +1680,39 @@ export interface components {
       entityClass: string;
       /** Format: int64 */
       entityId: number;
-      data: { [key: string]: { [key: string]: unknown } };
+      data: {
+        [key: string]: Record<string, never> | undefined;
+      };
     };
     ExistenceEntityDescription: {
       entityClass: string;
       /** Format: int64 */
       entityId: number;
-      data: { [key: string]: { [key: string]: unknown } };
+      data: {
+        [key: string]: Record<string, never> | undefined;
+      };
       relations: {
-        [key: string]: components['schemas']['EntityDescriptionWithRelations'];
+        [key: string]:
+          | components['schemas']['EntityDescriptionWithRelations']
+          | undefined;
       };
       exists?: boolean;
     };
     ModifiedEntityModel: {
       /** Format: int64 */
       entityId: number;
-      description?: { [key: string]: { [key: string]: unknown } };
+      description?: {
+        [key: string]: Record<string, never> | undefined;
+      };
       modifications?: {
-        [key: string]: components['schemas']['PropertyModification'];
+        [key: string]:
+          | components['schemas']['PropertyModification']
+          | undefined;
       };
       relations?: {
-        [key: string]: components['schemas']['ExistenceEntityDescription'];
+        [key: string]:
+          | components['schemas']['ExistenceEntityDescription']
+          | undefined;
       };
       exists?: boolean;
     };
@@ -1529,14 +1761,20 @@ export interface components {
         | 'NAMESPACE_EDIT';
       author?: components['schemas']['ProjectActivityAuthorModel'];
       modifiedEntities?: {
-        [key: string]: components['schemas']['ModifiedEntityModel'][];
+        [key: string]:
+          | components['schemas']['ModifiedEntityModel'][]
+          | undefined;
       };
-      meta?: { [key: string]: { [key: string]: unknown } };
-      counts?: { [key: string]: number };
+      meta?: {
+        [key: string]: Record<string, never> | undefined;
+      };
+      counts?: {
+        [key: string]: number | undefined;
+      };
     };
     PropertyModification: {
-      old?: { [key: string]: unknown };
-      new?: { [key: string]: unknown };
+      old?: Record<string, never>;
+      new?: Record<string, never>;
     };
     ImportTranslationModel: {
       /** Format: int64 */
@@ -1630,7 +1868,9 @@ export interface components {
     TranslationHistoryModel: {
       /** @description Modified fields */
       modifications?: {
-        [key: string]: components['schemas']['PropertyModification'];
+        [key: string]:
+          | components['schemas']['PropertyModification']
+          | undefined;
       };
       /**
        * Format: int64
@@ -1689,7 +1929,9 @@ export interface components {
        *     }
        */
       translations: {
-        [key: string]: components['schemas']['TranslationViewModel'];
+        [key: string]:
+          | components['schemas']['TranslationViewModel']
+          | undefined;
       };
     };
     KeysWithTranslationsPageModel: {
@@ -1843,7 +2085,9 @@ export interface components {
       keyCount: number;
       /** Format: int64 */
       languageCount: number;
-      translationStatePercentages: { [key: string]: number };
+      translationStatePercentages: {
+        [key: string]: number | undefined;
+      };
     };
     ProjectWithStatsModel: {
       /** Format: int64 */
@@ -2014,24 +2258,32 @@ export interface components {
       ids: number[];
     };
   };
+  responses: never;
+  parameters: never;
+  requestBodies: never;
+  headers: never;
+  pathItems: never;
 }
+
+export type external = Record<string, never>;
 
 export interface operations {
   getInfo: {
+    /** Returns current user's data. */
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['PrivateUserAccountModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -2040,70 +2292,76 @@ export interface operations {
     };
   };
   updateUser: {
+    /** Updates current user's data. */
+    requestBody?: {
+      content: {
+        'application/json': components['schemas']['UserUpdateRequestDto'];
+      };
+    };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['PrivateUserAccountModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
         };
-      };
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UserUpdateRequestDto'];
       };
     };
   };
   updateUserOld: {
+    /**
+     * Updates current user's data.
+     * @deprecated
+     */
+    requestBody?: {
+      content: {
+        'application/json': components['schemas']['UserUpdateRequestDto'];
+      };
+    };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['PrivateUserAccountModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
         };
       };
     };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UserUpdateRequestDto'];
-      };
-    };
   };
   delete: {
+    /** Deletes current user. */
     responses: {
-      /** OK */
-      200: unknown;
-      /** Bad Request */
+      /** @description OK */
+      200: never;
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -2112,135 +2370,120 @@ export interface operations {
     };
   };
   updateUserPassword: {
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          '*/*': components['schemas']['JwtAuthenticationResponse'];
-        };
-      };
-      /** Bad Request */
-      400: {
-        content: {
-          '*/*': string;
-        };
-      };
-      /** Not Found */
-      404: {
-        content: {
-          '*/*': string;
-        };
-      };
-    };
-    requestBody: {
+    /** Updates current user's password. Invalidates all previous sessions upon success. */
+    requestBody?: {
       content: {
         'application/json': components['schemas']['UserUpdatePasswordRequestDto'];
       };
     };
-  };
-  enableMfa: {
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['JwtAuthenticationResponse'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
         };
       };
     };
+  };
+  enableMfa: {
+    /** Enables TOTP-based two-factor authentication. Invalidates all previous sessions upon success. */
     requestBody: {
       content: {
         'application/json': components['schemas']['UserTotpEnableRequestDto'];
       };
     };
-  };
-  disableMfa: {
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['JwtAuthenticationResponse'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
         };
       };
     };
+  };
+  disableMfa: {
+    /** Disables TOTP-based two-factor authentication. Invalidates all previous sessions upon success. */
     requestBody: {
       content: {
         'application/json': components['schemas']['UserTotpDisableRequestDto'];
       };
     };
-  };
-  regenerateRecoveryCodes: {
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
-          '*/*': string[];
+          '*/*': components['schemas']['JwtAuthenticationResponse'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
         };
       };
     };
+  };
+  regenerateRecoveryCodes: {
+    /** Regenerates multi-factor authentication recovery codes */
     requestBody: {
       content: {
         'application/json': components['schemas']['UserMfaRecoveryRequestDto'];
       };
     };
-  };
-  uploadAvatar: {
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
-          '*/*': components['schemas']['PrivateUserAccountModel'];
+          '*/*': string[];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
         };
       };
     };
-    requestBody: {
+  };
+  uploadAvatar: {
+    /** Uploads user's avatar. */
+    requestBody?: {
       content: {
         'multipart/form-data': {
           /** Format: binary */
@@ -2248,22 +2491,43 @@ export interface operations {
         };
       };
     };
-  };
-  removeAvatar: {
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['PrivateUserAccountModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  removeAvatar: {
+    /** Deletes user's avatar. */
+    responses: {
+      /** @description OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['PrivateUserAccountModel'];
+        };
+      };
+      /** @description Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -2272,21 +2536,22 @@ export interface operations {
     };
   };
   setPreferredOrganization: {
+    /** Set user preferred organization */
     parameters: {
       path: {
         organizationId: number;
       };
     };
     responses: {
-      /** OK */
-      200: unknown;
-      /** Bad Request */
+      /** @description OK */
+      200: never;
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -2295,21 +2560,22 @@ export interface operations {
     };
   };
   setLanguage: {
+    /** Set user's UI language */
     parameters: {
       path: {
         languageTag: string;
       };
     };
     responses: {
-      /** OK */
-      200: unknown;
-      /** Bad Request */
+      /** @description OK */
+      200: never;
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -2318,25 +2584,26 @@ export interface operations {
     };
   };
   get_2: {
+    /** Returns project by id */
     parameters: {
       path: {
         projectId: number;
       };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['ProjectModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -2345,29 +2612,10 @@ export interface operations {
     };
   };
   editProject: {
+    /** Modifies project */
     parameters: {
       path: {
         projectId: number;
-      };
-    };
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          '*/*': components['schemas']['ProjectModel'];
-        };
-      };
-      /** Bad Request */
-      400: {
-        content: {
-          '*/*': string;
-        };
-      };
-      /** Not Found */
-      404: {
-        content: {
-          '*/*': string;
-        };
       };
     };
     requestBody: {
@@ -2375,23 +2623,44 @@ export interface operations {
         'application/json': components['schemas']['EditProjectDTO'];
       };
     };
+    responses: {
+      /** @description OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['ProjectModel'];
+        };
+      };
+      /** @description Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** @description Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
   };
   deleteProject: {
+    /** Deletes project by id */
     parameters: {
       path: {
         projectId: number;
       };
     };
     responses: {
-      /** OK */
-      200: unknown;
-      /** Bad Request */
+      /** @description OK */
+      200: never;
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -2400,26 +2669,27 @@ export interface operations {
     };
   };
   setUsersPermissions: {
+    /** Sets user's direct permission */
     parameters: {
+      query?: {
+        languages?: number[];
+      };
       path: {
         projectId: number;
         userId: number;
         permissionType: 'VIEW' | 'TRANSLATE' | 'EDIT' | 'MANAGE';
       };
-      query: {
-        languages?: number[];
-      };
     };
     responses: {
-      /** OK */
-      200: unknown;
-      /** Bad Request */
+      /** @description OK */
+      200: never;
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -2428,6 +2698,7 @@ export interface operations {
     };
   };
   revokePermission: {
+    /** Revokes user's access */
     parameters: {
       path: {
         projectId: number;
@@ -2435,15 +2706,15 @@ export interface operations {
       };
     };
     responses: {
-      /** OK */
-      200: unknown;
-      /** Bad Request */
+      /** @description OK */
+      200: never;
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -2452,30 +2723,11 @@ export interface operations {
     };
   };
   update: {
+    /** Update namespace */
     parameters: {
       path: {
         id: number;
         projectId: number;
-      };
-    };
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          '*/*': components['schemas']['NamespaceModel'];
-        };
-      };
-      /** Bad Request */
-      400: {
-        content: {
-          '*/*': string;
-        };
-      };
-      /** Not Found */
-      404: {
-        content: {
-          '*/*': string;
-        };
       };
     };
     requestBody: {
@@ -2483,27 +2735,48 @@ export interface operations {
         'application/json': components['schemas']['UpdateNamespaceDto'];
       };
     };
+    responses: {
+      /** @description OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['NamespaceModel'];
+        };
+      };
+      /** @description Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** @description Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
   };
   getMachineTranslationSettings: {
+    /** Returns machine translation settings for project */
     parameters: {
       path: {
         projectId: number;
       };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['CollectionModelLanguageConfigItemModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -2512,29 +2785,10 @@ export interface operations {
     };
   };
   setMachineTranslationSettings: {
+    /** Sets machine translation settings for project */
     parameters: {
       path: {
         projectId: number;
-      };
-    };
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          '*/*': components['schemas']['CollectionModelLanguageConfigItemModel'];
-        };
-      };
-      /** Bad Request */
-      400: {
-        content: {
-          '*/*': string;
-        };
-      };
-      /** Not Found */
-      404: {
-        content: {
-          '*/*': string;
-        };
       };
     };
     requestBody: {
@@ -2542,32 +2796,33 @@ export interface operations {
         'application/json': components['schemas']['SetMachineTranslationSettingsDto'];
       };
     };
-  };
-  tagKey: {
-    parameters: {
-      path: {
-        keyId: number;
-        projectId: number;
-      };
-    };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
-          '*/*': components['schemas']['TagModel'];
+          '*/*': components['schemas']['CollectionModelLanguageConfigItemModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
         };
+      };
+    };
+  };
+  tagKey: {
+    /** Tags a key with tag. If tag with provided name doesn't exist, it is created */
+    parameters: {
+      path: {
+        keyId: number;
+        projectId: number;
       };
     };
     requestBody: {
@@ -2575,32 +2830,33 @@ export interface operations {
         'application/json': components['schemas']['TagKeyDto'];
       };
     };
-  };
-  complexEdit: {
-    parameters: {
-      path: {
-        id: number;
-        projectId: number;
-      };
-    };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
-          '*/*': components['schemas']['KeyWithDataModel'];
+          '*/*': components['schemas']['TagModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
         };
+      };
+    };
+  };
+  complexEdit: {
+    /** More */
+    parameters: {
+      path: {
+        id: number;
+        projectId: number;
       };
     };
     requestBody: {
@@ -2608,32 +2864,33 @@ export interface operations {
         'application/json': components['schemas']['ComplexEditKeyDto'];
       };
     };
-  };
-  edit: {
-    parameters: {
-      path: {
-        id: number;
-        projectId: number;
-      };
-    };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
-          '*/*': components['schemas']['KeyModel'];
+          '*/*': components['schemas']['KeyWithDataModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
         };
+      };
+    };
+  };
+  edit: {
+    /** Edits key name */
+    parameters: {
+      path: {
+        id: number;
+        projectId: number;
       };
     };
     requestBody: {
@@ -2641,31 +2898,32 @@ export interface operations {
         'application/json': components['schemas']['EditKeyDto'];
       };
     };
-  };
-  inviteUser: {
-    parameters: {
-      path: {
-        projectId: number;
-      };
-    };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
-          '*/*': components['schemas']['ProjectInvitationModel'];
+          '*/*': components['schemas']['KeyModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
         };
+      };
+    };
+  };
+  inviteUser: {
+    /** Generates user invitation link for project */
+    parameters: {
+      path: {
+        projectId: number;
       };
     };
     requestBody: {
@@ -2673,27 +2931,48 @@ export interface operations {
         'application/json': components['schemas']['ProjectInviteUserDto'];
       };
     };
+    responses: {
+      /** @description OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['ProjectInvitationModel'];
+        };
+      };
+      /** @description Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** @description Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
   };
   getAutoTranslationSettings: {
+    /** Returns auto translation settings for project */
     parameters: {
       path: {
         projectId: number;
       };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['AutoTranslationSettingsDto'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -2702,29 +2981,10 @@ export interface operations {
     };
   };
   setAutoTranslationSettings: {
+    /** Sets auto translation settings for project */
     parameters: {
       path: {
         projectId: number;
-      };
-    };
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          '*/*': components['schemas']['AutoTranslationSettingsDto'];
-        };
-      };
-      /** Bad Request */
-      400: {
-        content: {
-          '*/*': string;
-        };
-      };
-      /** Not Found */
-      404: {
-        content: {
-          '*/*': string;
-        };
       };
     };
     requestBody: {
@@ -2732,9 +2992,32 @@ export interface operations {
         'application/json': components['schemas']['AutoTranslationSettingsDto'];
       };
     };
+    responses: {
+      /** @description OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['AutoTranslationSettingsDto'];
+        };
+      };
+      /** @description Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** @description Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
   };
-  /** Resolves translation conflict. The old translation will be overridden. */
   resolveTranslationSetOverride: {
+    /**
+     * Resolve conflict (override)
+     * @description Resolves translation conflict. The old translation will be overridden.
+     */
     parameters: {
       path: {
         languageId: number;
@@ -2743,15 +3026,15 @@ export interface operations {
       };
     };
     responses: {
-      /** OK */
-      200: unknown;
-      /** Bad Request */
+      /** @description OK */
+      200: never;
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -2759,8 +3042,11 @@ export interface operations {
       };
     };
   };
-  /** Resolves translation conflict. The old translation will be kept. */
   resolveTranslationSetKeepExisting: {
+    /**
+     * Resolve conflict (keep existing)
+     * @description Resolves translation conflict. The old translation will be kept.
+     */
     parameters: {
       path: {
         languageId: number;
@@ -2769,15 +3055,15 @@ export interface operations {
       };
     };
     responses: {
-      /** OK */
-      200: unknown;
-      /** Bad Request */
+      /** @description OK */
+      200: never;
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -2785,8 +3071,11 @@ export interface operations {
       };
     };
   };
-  /** Resolves all translation conflicts for provided language. The old translations will be overridden. */
   resolveTranslationSetOverride_2: {
+    /**
+     * Resolve all translation conflicts (override)
+     * @description Resolves all translation conflicts for provided language. The old translations will be overridden.
+     */
     parameters: {
       path: {
         languageId: number;
@@ -2794,15 +3083,15 @@ export interface operations {
       };
     };
     responses: {
-      /** OK */
-      200: unknown;
-      /** Bad Request */
+      /** @description OK */
+      200: never;
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -2810,8 +3099,11 @@ export interface operations {
       };
     };
   };
-  /** Resolves all translation conflicts for provided language. The old translations will be kept. */
   resolveTranslationSetKeepExisting_2: {
+    /**
+     * Resolve all translation conflicts (keep existing)
+     * @description Resolves all translation conflicts for provided language. The old translations will be kept.
+     */
     parameters: {
       path: {
         languageId: number;
@@ -2819,15 +3111,15 @@ export interface operations {
       };
     };
     responses: {
-      /** OK */
-      200: unknown;
-      /** Bad Request */
+      /** @description OK */
+      200: never;
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -2835,8 +3127,11 @@ export interface operations {
       };
     };
   };
-  /** Sets existing language to pair with language to import. Data will be imported to selected existing language when applied. */
   selectExistingLanguage: {
+    /**
+     * Pair existing language
+     * @description Sets existing language to pair with language to import. Data will be imported to selected existing language when applied.
+     */
     parameters: {
       path: {
         importLanguageId: number;
@@ -2845,15 +3140,15 @@ export interface operations {
       };
     };
     responses: {
-      /** OK */
-      200: unknown;
-      /** Bad Request */
+      /** @description OK */
+      200: never;
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -2861,8 +3156,11 @@ export interface operations {
       };
     };
   };
-  /** Resets existing language paired with language to import. */
   resetExistingLanguage: {
+    /**
+     * Reset existing language pairing
+     * @description Resets existing language paired with language to import.
+     */
     parameters: {
       path: {
         importLanguageId: number;
@@ -2870,15 +3168,15 @@ export interface operations {
       };
     };
     responses: {
-      /** OK */
-      200: unknown;
-      /** Bad Request */
+      /** @description OK */
+      200: never;
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -2886,28 +3184,15 @@ export interface operations {
       };
     };
   };
-  /** Sets namespace for file to import. */
   selectNamespace: {
+    /**
+     * Select namespace
+     * @description Sets namespace for file to import.
+     */
     parameters: {
       path: {
         fileId: number;
         projectId: number;
-      };
-    };
-    responses: {
-      /** OK */
-      200: unknown;
-      /** Bad Request */
-      400: {
-        content: {
-          '*/*': string;
-        };
-      };
-      /** Not Found */
-      404: {
-        content: {
-          '*/*': string;
-        };
       };
     };
     requestBody: {
@@ -2915,11 +3200,30 @@ export interface operations {
         'application/json': components['schemas']['SetFileNamespaceRequest'];
       };
     };
+    responses: {
+      /** @description OK */
+      200: never;
+      /** @description Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** @description Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
   };
-  /** Imports the data prepared in previous step */
   applyImport: {
+    /**
+     * Apply
+     * @description Imports the data prepared in previous step
+     */
     parameters: {
-      query: {
+      query?: {
         forceMode?: 'OVERRIDE' | 'KEEP' | 'NO_FORCE';
       };
       path: {
@@ -2927,15 +3231,15 @@ export interface operations {
       };
     };
     responses: {
-      /** OK */
-      200: unknown;
-      /** Bad Request */
+      /** @description OK */
+      200: never;
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -2944,6 +3248,7 @@ export interface operations {
     };
   };
   setTranslationState: {
+    /** Sets translation state */
     parameters: {
       path: {
         translationId: number;
@@ -2952,19 +3257,19 @@ export interface operations {
       };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['TranslationModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -2973,6 +3278,7 @@ export interface operations {
     };
   };
   setState: {
+    /** Sets state of translation comment */
     parameters: {
       path: {
         commentId: number;
@@ -2981,19 +3287,19 @@ export interface operations {
       };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['TranslationCommentModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -3002,6 +3308,7 @@ export interface operations {
     };
   };
   get_3: {
+    /** Returns single translation comment */
     parameters: {
       path: {
         translationId: number;
@@ -3010,19 +3317,19 @@ export interface operations {
       };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['TranslationCommentModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -3031,30 +3338,11 @@ export interface operations {
     };
   };
   update_1: {
+    /** Updates single translation comment */
     parameters: {
       path: {
         commentId: number;
         projectId: number;
-      };
-    };
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          '*/*': components['schemas']['TranslationCommentModel'];
-        };
-      };
-      /** Bad Request */
-      400: {
-        content: {
-          '*/*': string;
-        };
-      };
-      /** Not Found */
-      404: {
-        content: {
-          '*/*': string;
-        };
       };
     };
     requestBody: {
@@ -3062,8 +3350,29 @@ export interface operations {
         'application/json': components['schemas']['TranslationCommentDto'];
       };
     };
+    responses: {
+      /** @description OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['TranslationCommentModel'];
+        };
+      };
+      /** @description Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** @description Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
   };
   delete_5: {
+    /** Deletes the translation comment */
     parameters: {
       path: {
         commentId: number;
@@ -3071,15 +3380,15 @@ export interface operations {
       };
     };
     responses: {
-      /** OK */
-      200: unknown;
-      /** Bad Request */
+      /** @description OK */
+      200: never;
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -3088,6 +3397,7 @@ export interface operations {
     };
   };
   dismissAutoTranslatedState: {
+    /** Removes "auto translated" indication */
     parameters: {
       path: {
         translationId: number;
@@ -3095,19 +3405,19 @@ export interface operations {
       };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['TranslationModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -3116,55 +3426,63 @@ export interface operations {
     };
   };
   getTranslations: {
+    /** Returns translations in project */
     parameters: {
-      query: {
-        /** Cursor to get next data */
+      /** @description Cursor to get next data */
+      /**
+       * @description Translation state in the format: languageTag,state. You can use this parameter multiple times.
+       *
+       * When used with multiple states for same language it is applied with logical OR.
+       *
+       * When used with multiple languages, it is applied with logical AND.
+       */
+      /**
+       * @description Languages to be contained in response.
+       *
+       * To add multiple languages, repeat this param (eg. ?languages=en&languages=de)
+       * @example en
+       */
+      /** @description String to search in key name or translation text */
+      /** @description Selects key with provided names. Use this param multiple times to fetch more keys. */
+      /** @description Selects key with provided ID. Use this param multiple times to fetch more keys. */
+      /** @description Selects only keys, where translation is missing in any language */
+      /** @description Selects only keys, where translation is provided in any language */
+      /**
+       * @description Selects only keys, where translation is missing in specified language
+       * @example en-US
+       */
+      /**
+       * @description Selects only keys, where translation is provided in specified language
+       * @example en-US
+       */
+      /** @description Selects only keys with screenshots */
+      /** @description Selects only keys without screenshots */
+      /**
+       * @description Filter namespaces.
+       *
+       * To filter default namespace, set to empty string.
+       */
+      /** @description Selects only keys with provided tag */
+      /** @description Zero-based page index (0..N) */
+      /** @description The size of the page to be returned */
+      /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+      query?: {
         cursor?: string;
-        /**
-         * Translation state in the format: languageTag,state. You can use this parameter multiple times.
-         *
-         * When used with multiple states for same language it is applied with logical OR.
-         *
-         * When used with multiple languages, it is applied with logical AND.
-         */
         filterState?: string[];
-        /**
-         * Languages to be contained in response.
-         *
-         * To add multiple languages, repeat this param (eg. ?languages=en&languages=de)
-         */
         languages?: string[];
-        /** String to search in key name or translation text */
         search?: string;
-        /** Selects key with provided names. Use this param multiple times to fetch more keys. */
         filterKeyName?: string[];
-        /** Selects key with provided ID. Use this param multiple times to fetch more keys. */
         filterKeyId?: number[];
-        /** Selects only keys, where translation is missing in any language */
         filterUntranslatedAny?: boolean;
-        /** Selects only keys, where translation is provided in any language */
         filterTranslatedAny?: boolean;
-        /** Selects only keys, where translation is missing in specified language */
         filterUntranslatedInLang?: string;
-        /** Selects only keys, where translation is provided in specified language */
         filterTranslatedInLang?: string;
-        /** Selects only keys with screenshots */
         filterHasScreenshot?: boolean;
-        /** Selects only keys without screenshots */
         filterHasNoScreenshot?: boolean;
-        /**
-         * Filter namespaces.
-         *
-         * To filter default namespace, set to empty string.
-         */
         filterNamespace?: string[];
-        /** Selects only keys with provided tag */
         filterTag?: string[];
-        /** Zero-based page index (0..N) */
         page?: number;
-        /** The size of the page to be returned */
         size?: number;
-        /** Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
         sort?: string[];
       };
       path: {
@@ -3172,19 +3490,19 @@ export interface operations {
       };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['KeysWithTranslationsPageModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -3193,61 +3511,43 @@ export interface operations {
     };
   };
   setTranslations: {
+    /** Sets translations for existing key */
     parameters: {
       path: {
         projectId: number;
       };
     };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SetTranslationsWithKeyDto'];
+      };
+    };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['SetTranslationsResponseModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
         };
-      };
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['SetTranslationsWithKeyDto'];
       };
     };
   };
   createOrUpdateTranslations: {
+    /** Sets translations for existing or not existing key */
     parameters: {
       path: {
         projectId: number;
-      };
-    };
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          '*/*': components['schemas']['SetTranslationsResponseModel'];
-        };
-      };
-      /** Bad Request */
-      400: {
-        content: {
-          '*/*': string;
-        };
-      };
-      /** Not Found */
-      404: {
-        content: {
-          '*/*': string;
-        };
       };
     };
     requestBody: {
@@ -3255,8 +3555,29 @@ export interface operations {
         'application/json': components['schemas']['SetTranslationsWithKeyDto'];
       };
     };
+    responses: {
+      /** @description OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['SetTranslationsResponseModel'];
+        };
+      };
+      /** @description Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** @description Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
   };
   transferProjectToOrganization: {
+    /** Transfers project's ownership to organization */
     parameters: {
       path: {
         projectId: number;
@@ -3264,15 +3585,15 @@ export interface operations {
       };
     };
     responses: {
-      /** OK */
-      200: unknown;
-      /** Bad Request */
+      /** @description OK */
+      200: never;
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -3281,21 +3602,22 @@ export interface operations {
     };
   };
   leaveProject: {
+    /** Leave project */
     parameters: {
       path: {
         projectId: number;
       };
     };
     responses: {
-      /** OK */
-      200: unknown;
-      /** Bad Request */
+      /** @description OK */
+      200: never;
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -3304,6 +3626,7 @@ export interface operations {
     };
   };
   get_5: {
+    /** Returns specific language */
     parameters: {
       path: {
         languageId: number;
@@ -3311,19 +3634,19 @@ export interface operations {
       };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['LanguageModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -3332,30 +3655,11 @@ export interface operations {
     };
   };
   editLanguage: {
+    /** Edits language */
     parameters: {
       path: {
         languageId: number;
         projectId: number;
-      };
-    };
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          '*/*': components['schemas']['LanguageModel'];
-        };
-      };
-      /** Bad Request */
-      400: {
-        content: {
-          '*/*': string;
-        };
-      };
-      /** Not Found */
-      404: {
-        content: {
-          '*/*': string;
-        };
       };
     };
     requestBody: {
@@ -3363,24 +3667,20 @@ export interface operations {
         'application/json': components['schemas']['LanguageDto'];
       };
     };
-  };
-  deleteLanguage_2: {
-    parameters: {
-      path: {
-        languageId: number;
-        projectId: number;
-      };
-    };
     responses: {
-      /** OK */
-      200: unknown;
-      /** Bad Request */
+      /** @description OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['LanguageModel'];
+        };
+      };
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -3388,38 +3688,64 @@ export interface operations {
       };
     };
   };
-  /**
-   * Uses enabled auto-translation methods.
-   * You need to set at least one of useMachineTranslation or useTranslationMemory to true.
-   *
-   * This will replace the the existing translation with the result obtained from specified source!
-   */
-  autoTranslate: {
+  deleteLanguage_2: {
+    /** Deletes specific language */
     parameters: {
       path: {
-        keyId: number;
+        languageId: number;
         projectId: number;
-      };
-      query: {
-        /**
-         * Tags of languages to auto-translate.
-         * When no languages provided, it translates only untranslated languages.
-         */
-        languages?: string[];
-        useMachineTranslation?: boolean;
-        useTranslationMemory?: boolean;
       };
     };
     responses: {
-      /** OK */
-      200: unknown;
-      /** Bad Request */
+      /** @description OK */
+      200: never;
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  autoTranslate: {
+    /**
+     * Auto translates keys
+     * @description Uses enabled auto-translation methods.
+     * You need to set at least one of useMachineTranslation or useTranslationMemory to true.
+     *
+     * This will replace the the existing translation with the result obtained from specified source!
+     */
+    parameters: {
+      /**
+       * @description Tags of languages to auto-translate.
+       * When no languages provided, it translates only untranslated languages.
+       */
+      query?: {
+        languages?: string[];
+        useMachineTranslation?: boolean;
+        useTranslationMemory?: boolean;
+      };
+      path: {
+        keyId: number;
+        projectId: number;
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: never;
+      /** @description Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -3428,32 +3754,13 @@ export interface operations {
     };
   };
   uploadAvatar_1: {
+    /** Uploads organizations avatar */
     parameters: {
       path: {
         projectId: number;
       };
     };
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          '*/*': components['schemas']['ProjectModel'];
-        };
-      };
-      /** Bad Request */
-      400: {
-        content: {
-          '*/*': string;
-        };
-      };
-      /** Not Found */
-      404: {
-        content: {
-          '*/*': string;
-        };
-      };
-    };
-    requestBody: {
+    requestBody?: {
       content: {
         'multipart/form-data': {
           /** Format: binary */
@@ -3461,27 +3768,48 @@ export interface operations {
         };
       };
     };
+    responses: {
+      /** @description OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['ProjectModel'];
+        };
+      };
+      /** @description Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** @description Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
   };
   removeAvatar_1: {
+    /** Deletes organization avatar */
     parameters: {
       path: {
         projectId: number;
       };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['ProjectModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -3490,25 +3818,26 @@ export interface operations {
     };
   };
   get_7: {
+    /** Get Personal Access Token */
     parameters: {
       path: {
         id: number;
       };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['PatModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -3517,29 +3846,10 @@ export interface operations {
     };
   };
   update_3: {
+    /** Updates Personal Access Token */
     parameters: {
       path: {
         id: number;
-      };
-    };
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          '*/*': components['schemas']['PatModel'];
-        };
-      };
-      /** Bad Request */
-      400: {
-        content: {
-          '*/*': string;
-        };
-      };
-      /** Not Found */
-      404: {
-        content: {
-          '*/*': string;
-        };
       };
     };
     requestBody: {
@@ -3547,23 +3857,44 @@ export interface operations {
         'application/json': components['schemas']['UpdatePatDto'];
       };
     };
+    responses: {
+      /** @description OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['PatModel'];
+        };
+      };
+      /** @description Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** @description Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
   };
   delete_7: {
+    /** Deletes Personal Access Token */
     parameters: {
       path: {
         id: number;
       };
     };
     responses: {
-      /** OK */
-      200: unknown;
-      /** Bad Request */
+      /** @description OK */
+      200: never;
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -3572,29 +3903,10 @@ export interface operations {
     };
   };
   regenerate: {
+    /** Regenerates Personal Access Token. It generates new token value and updates its time of expiration. */
     parameters: {
       path: {
         id: number;
-      };
-    };
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          '*/*': components['schemas']['RevealedPatModel'];
-        };
-      };
-      /** Bad Request */
-      400: {
-        content: {
-          '*/*': string;
-        };
-      };
-      /** Not Found */
-      404: {
-        content: {
-          '*/*': string;
-        };
       };
     };
     requestBody: {
@@ -3602,28 +3914,33 @@ export interface operations {
         'application/json': components['schemas']['RegeneratePatDto'];
       };
     };
-  };
-  setUserRole: {
-    parameters: {
-      path: {
-        organizationId: number;
-        userId: number;
-      };
-    };
     responses: {
-      /** OK */
-      200: unknown;
-      /** Bad Request */
+      /** @description OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['RevealedPatModel'];
+        };
+      };
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
         };
+      };
+    };
+  };
+  setUserRole: {
+    /** Sets user role (Owner or Member) */
+    parameters: {
+      path: {
+        organizationId: number;
+        userId: number;
       };
     };
     requestBody: {
@@ -3631,27 +3948,44 @@ export interface operations {
         'application/json': components['schemas']['SetOrganizationRoleDto'];
       };
     };
+    responses: {
+      /** @description OK */
+      200: never;
+      /** @description Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** @description Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
   };
   get_9: {
+    /** Returns organization by ID */
     parameters: {
       path: {
         id: number;
       };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['OrganizationModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -3660,29 +3994,10 @@ export interface operations {
     };
   };
   update_4: {
+    /** Updates organization data */
     parameters: {
       path: {
         id: number;
-      };
-    };
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          '*/*': components['schemas']['OrganizationModel'];
-        };
-      };
-      /** Bad Request */
-      400: {
-        content: {
-          '*/*': string;
-        };
-      };
-      /** Not Found */
-      404: {
-        content: {
-          '*/*': string;
-        };
       };
     };
     requestBody: {
@@ -3690,23 +4005,44 @@ export interface operations {
         'application/json': components['schemas']['OrganizationDto'];
       };
     };
+    responses: {
+      /** @description OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['OrganizationModel'];
+        };
+      };
+      /** @description Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** @description Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
   };
   delete_8: {
+    /** Deletes organization and all its projects */
     parameters: {
       path: {
         id: number;
       };
     };
     responses: {
-      /** OK */
-      200: unknown;
-      /** Bad Request */
+      /** @description OK */
+      200: never;
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -3715,21 +4051,22 @@ export interface operations {
     };
   };
   leaveOrganization: {
+    /** Removes current user from organization */
     parameters: {
       path: {
         id: number;
       };
     };
     responses: {
-      /** OK */
-      200: unknown;
-      /** Bad Request */
+      /** @description OK */
+      200: never;
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -3738,29 +4075,10 @@ export interface operations {
     };
   };
   inviteUser_1: {
+    /** Generates user invitation link for organization */
     parameters: {
       path: {
         id: number;
-      };
-    };
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          '*/*': components['schemas']['OrganizationInvitationModel'];
-        };
-      };
-      /** Bad Request */
-      400: {
-        content: {
-          '*/*': string;
-        };
-      };
-      /** Not Found */
-      404: {
-        content: {
-          '*/*': string;
-        };
       };
     };
     requestBody: {
@@ -3768,34 +4086,35 @@ export interface operations {
         'application/json': components['schemas']['OrganizationInviteUserDto'];
       };
     };
-  };
-  uploadAvatar_2: {
-    parameters: {
-      path: {
-        id: number;
-      };
-    };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
-          '*/*': components['schemas']['OrganizationModel'];
+          '*/*': components['schemas']['OrganizationInvitationModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
         };
       };
     };
-    requestBody: {
+  };
+  uploadAvatar_2: {
+    /** Uploads organizations avatar */
+    parameters: {
+      path: {
+        id: number;
+      };
+    };
+    requestBody?: {
       content: {
         'multipart/form-data': {
           /** Format: binary */
@@ -3803,27 +4122,48 @@ export interface operations {
         };
       };
     };
+    responses: {
+      /** @description OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['OrganizationModel'];
+        };
+      };
+      /** @description Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** @description Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
   };
   removeAvatar_2: {
+    /** Deletes organization avatar */
     parameters: {
       path: {
         id: number;
       };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['OrganizationModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -3832,29 +4172,10 @@ export interface operations {
     };
   };
   update_5: {
+    /** Edits existing API key */
     parameters: {
       path: {
         apiKeyId: number;
-      };
-    };
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          '*/*': components['schemas']['ApiKeyModel'];
-        };
-      };
-      /** Bad Request */
-      400: {
-        content: {
-          '*/*': string;
-        };
-      };
-      /** Not Found */
-      404: {
-        content: {
-          '*/*': string;
-        };
       };
     };
     requestBody: {
@@ -3862,23 +4183,44 @@ export interface operations {
         'application/json': components['schemas']['V2EditApiKeyDto'];
       };
     };
+    responses: {
+      /** @description OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['ApiKeyModel'];
+        };
+      };
+      /** @description Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** @description Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
   };
   delete_10: {
+    /** Deletes API key */
     parameters: {
       path: {
         apiKeyId: number;
       };
     };
     responses: {
-      /** OK */
-      200: unknown;
-      /** Bad Request */
+      /** @description OK */
+      200: never;
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -3887,34 +4229,35 @@ export interface operations {
     };
   };
   regenerate_1: {
+    /** Regenerates API key. It generates new API key value and updates its time of expiration. */
     parameters: {
       path: {
         apiKeyId: number;
       };
     };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RegenerateApiKeyDto'];
+      };
+    };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['RevealedApiKeyModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
         };
-      };
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['RegenerateApiKeyDto'];
       };
     };
   };
@@ -3926,15 +4269,15 @@ export interface operations {
       };
     };
     responses: {
-      /** OK */
-      200: unknown;
-      /** Bad Request */
+      /** @description OK */
+      200: never;
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -3943,112 +4286,116 @@ export interface operations {
     };
   };
   getSuperToken: {
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          '*/*': components['schemas']['JwtAuthenticationResponse'];
-        };
-      };
-      /** Bad Request */
-      400: {
-        content: {
-          '*/*': string;
-        };
-      };
-      /** Not Found */
-      404: {
-        content: {
-          '*/*': string;
-        };
-      };
-    };
+    /** Generates new JWT token permitted to sensitive operations */
     requestBody: {
       content: {
         'application/json': components['schemas']['SuperTokenRequest'];
       };
     };
-  };
-  generateProjectSlug: {
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
-          'application/json': string;
+          '*/*': components['schemas']['JwtAuthenticationResponse'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
         };
       };
     };
+  };
+  generateProjectSlug: {
+    /** Generate project address part */
     requestBody: {
       content: {
         'application/json': components['schemas']['GenerateSlugDto'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        content: {
+          'application/json': string;
+        };
+      };
+      /** @description Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** @description Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
       };
     };
   };
   generateOrganizationSlug: {
+    /** Generate organization address part */
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['GenerateSlugDto'];
+      };
+    };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           'application/json': string;
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
         };
       };
     };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['GenerateSlugDto'];
-      };
-    };
   };
   getAll: {
-    parameters: {
-      query: {
-        /** Zero-based page index (0..N) */
+    /** Returns all projects where current user has any permission */
+    parameters?: {
+      /** @description Zero-based page index (0..N) */
+      /** @description The size of the page to be returned */
+      /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+      query?: {
         page?: number;
-        /** The size of the page to be returned */
         size?: number;
-        /** Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
         sort?: string[];
         search?: string;
       };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           'application/hal+json': components['schemas']['PagedModelProjectModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -4057,52 +4404,38 @@ export interface operations {
     };
   };
   createProject: {
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          '*/*': components['schemas']['ProjectModel'];
-        };
-      };
-      /** Bad Request */
-      400: {
-        content: {
-          '*/*': string;
-        };
-      };
-      /** Not Found */
-      404: {
-        content: {
-          '*/*': string;
-        };
-      };
-    };
+    /** Creates project with specified languages */
     requestBody: {
       content: {
         'application/json': components['schemas']['CreateProjectDTO'];
       };
     };
-  };
-  importKeys: {
-    parameters: {
-      path: {
-        projectId: number;
-      };
-    };
     responses: {
-      /** OK */
-      200: unknown;
-      /** Bad Request */
+      /** @description OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['ProjectModel'];
+        };
+      };
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
         };
+      };
+    };
+  };
+  importKeys: {
+    /** Import's new keys with translations. If key already exists, it's translations are not updated. */
+    parameters: {
+      path: {
+        projectId: number;
       };
     };
     requestBody: {
@@ -4110,63 +4443,61 @@ export interface operations {
         'application/json': components['schemas']['ImportKeysDto'];
       };
     };
-  };
-  create: {
-    parameters: {
-      path: {
-        projectId: number;
-      };
-    };
     responses: {
-      /** Created */
-      201: {
-        content: {
-          '*/*': components['schemas']['KeyWithDataModel'];
-        };
-      };
-      /** Bad Request */
+      /** @description OK */
+      200: never;
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
         };
       };
     };
+  };
+  create: {
+    /** Creates new key */
+    parameters: {
+      path: {
+        projectId: number;
+      };
+    };
     requestBody: {
       content: {
         'application/json': components['schemas']['CreateKeyDto'];
+      };
+    };
+    responses: {
+      /** @description Created */
+      201: {
+        content: {
+          '*/*': components['schemas']['KeyWithDataModel'];
+        };
+      };
+      /** @description Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** @description Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
       };
     };
   };
   create_1: {
+    /** Creates new key */
     parameters: {
       path: {
         projectId: number;
-      };
-    };
-    responses: {
-      /** Created */
-      201: {
-        content: {
-          '*/*': components['schemas']['KeyWithDataModel'];
-        };
-      };
-      /** Bad Request */
-      400: {
-        content: {
-          '*/*': string;
-        };
-      };
-      /** Not Found */
-      404: {
-        content: {
-          '*/*': string;
-        };
       };
     };
     requestBody: {
@@ -4174,27 +4505,32 @@ export interface operations {
         'application/json': components['schemas']['CreateKeyDto'];
       };
     };
-  };
-  delete_3: {
-    parameters: {
-      path: {
-        projectId: number;
-      };
-    };
     responses: {
-      /** OK */
-      200: unknown;
-      /** Bad Request */
+      /** @description Created */
+      201: {
+        content: {
+          '*/*': components['schemas']['KeyWithDataModel'];
+        };
+      };
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
         };
+      };
+    };
+  };
+  delete_3: {
+    /** Deletes one or multiple keys by their IDs in request body */
+    parameters: {
+      path: {
+        projectId: number;
       };
     };
     requestBody: {
@@ -4202,63 +4538,85 @@ export interface operations {
         'application/json': components['schemas']['DeleteKeysDto'];
       };
     };
-  };
-  /** Prepares provided files to import. */
-  addFiles: {
-    parameters: {
-      query: {
-        /** When importing structured JSONs, you can set the delimiter which will be used in names of improted keys. */
-        structureDelimiter?: string;
-      };
-      path: {
-        projectId: number;
-      };
-    };
     responses: {
-      /** OK */
-      200: {
-        content: {
-          '*/*': components['schemas']['ImportAddFilesResultModel'];
-        };
-      };
-      /** Bad Request */
+      /** @description OK */
+      200: never;
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
         };
       };
     };
-    requestBody: {
+  };
+  addFiles: {
+    /**
+     * Add files
+     * @description Prepares provided files to import.
+     */
+    parameters: {
+      /** @description When importing structured JSONs, you can set the delimiter which will be used in names of improted keys. */
+      query?: {
+        structureDelimiter?: string;
+      };
+      path: {
+        projectId: number;
+      };
+    };
+    requestBody?: {
       content: {
         'multipart/form-data': {
           files: string[];
         };
       };
     };
+    responses: {
+      /** @description OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['ImportAddFilesResultModel'];
+        };
+      };
+      /** @description Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** @description Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
   };
-  /** Deletes prepared import data. */
   cancelImport: {
+    /**
+     * Delete
+     * @description Deletes prepared import data.
+     */
     parameters: {
       path: {
         projectId: number;
       };
     };
     responses: {
-      /** OK */
-      200: unknown;
-      /** Bad Request */
+      /** @description OK */
+      200: never;
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -4267,41 +4625,43 @@ export interface operations {
     };
   };
   export: {
+    /** Exports data */
     parameters: {
-      query: {
-        /**
-         * Languages to be contained in export.
-         *
-         * If null, all languages are exported
-         */
+      /**
+       * @description Languages to be contained in export.
+       *
+       * If null, all languages are exported
+       * @example en
+       */
+      /** @description Format to export to */
+      /**
+       * @description Delimiter to structure file content.
+       *
+       * e.g. For key "home.header.title" would result in {"home": {"header": "title": {"Hello"}}} structure.
+       *
+       * When null, resulting file won't be structured.
+       */
+      /** @description Filter key IDs to be contained in export */
+      /** @description Filter key IDs not to be contained in export */
+      /** @description Filter keys tagged by */
+      /** @description Filter keys with prefix */
+      /** @description Filter translations with state. By default, everything except untranslated is exported. */
+      /** @description Select one ore multiple namespaces to export */
+      /**
+       * @description If false, it doesn't return zip of files, but it returns single file.
+       *
+       * This is possible only when single language is exported. Otherwise it returns "400 - Bad Request" response.
+       */
+      query?: {
         languages?: string[];
-        /** Format to export to */
         format?: 'JSON' | 'XLIFF';
-        /**
-         * Delimiter to structure file content.
-         *
-         * e.g. For key "home.header.title" would result in {"home": {"header": "title": {"Hello"}}} structure.
-         *
-         * When null, resulting file won't be structured.
-         */
         structureDelimiter?: string;
-        /** Filter key IDs to be contained in export */
         filterKeyId?: number[];
-        /** Filter key IDs not to be contained in export */
         filterKeyIdNot?: number[];
-        /** Filter keys tagged by */
         filterTag?: string;
-        /** Filter keys with prefix */
         filterKeyPrefix?: string;
-        /** Filter translations with state. By default, everything except untranslated is exported. */
         filterState?: ('UNTRANSLATED' | 'TRANSLATED' | 'REVIEWED')[];
-        /** Select one ore multiple namespaces to export */
         filterNamespace?: string[];
-        /**
-         * If false, it doesn't return zip of files, but it returns single file.
-         *
-         * This is possible only when single language is exported. Otherwise it returns "400 - Bad Request" response.
-         */
         zip?: boolean;
       };
       path: {
@@ -4309,19 +4669,19 @@ export interface operations {
       };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['StreamingResponseBody'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -4330,29 +4690,10 @@ export interface operations {
     };
   };
   exportPost: {
+    /** Exports data (post). Useful when providing params exceeding allowed query size. */
     parameters: {
       path: {
         projectId: number;
-      };
-    };
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          '*/*': components['schemas']['StreamingResponseBody'];
-        };
-      };
-      /** Bad Request */
-      400: {
-        content: {
-          '*/*': string;
-        };
-      };
-      /** Not Found */
-      404: {
-        content: {
-          '*/*': string;
-        };
       };
     };
     requestBody: {
@@ -4360,36 +4701,57 @@ export interface operations {
         'application/json': components['schemas']['ExportParams'];
       };
     };
-  };
-  getAll_3: {
-    parameters: {
-      path: {
-        translationId: number;
-        projectId: number;
-      };
-      query: {
-        /** Zero-based page index (0..N) */
-        page?: number;
-        /** The size of the page to be returned */
-        size?: number;
-        /** Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
-        sort?: string[];
-      };
-    };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
-          '*/*': components['schemas']['PagedModelTranslationCommentModel'];
+          '*/*': components['schemas']['StreamingResponseBody'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  getAll_3: {
+    /** Returns translation comments of translation */
+    parameters: {
+      /** @description Zero-based page index (0..N) */
+      /** @description The size of the page to be returned */
+      /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+      query?: {
+        page?: number;
+        size?: number;
+        sort?: string[];
+      };
+      path: {
+        translationId: number;
+        projectId: number;
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['PagedModelTranslationCommentModel'];
+        };
+      };
+      /** @description Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -4398,30 +4760,11 @@ export interface operations {
     };
   };
   create_4: {
+    /** Creates a translation comment */
     parameters: {
       path: {
         translationId: number;
         projectId: number;
-      };
-    };
-    responses: {
-      /** Created */
-      201: {
-        content: {
-          '*/*': components['schemas']['TranslationCommentModel'];
-        };
-      };
-      /** Bad Request */
-      400: {
-        content: {
-          '*/*': string;
-        };
-      };
-      /** Not Found */
-      404: {
-        content: {
-          '*/*': string;
-        };
       };
     };
     requestBody: {
@@ -4429,31 +4772,32 @@ export interface operations {
         'application/json': components['schemas']['TranslationCommentDto'];
       };
     };
-  };
-  create_6: {
-    parameters: {
-      path: {
-        projectId: number;
-      };
-    };
     responses: {
-      /** Created */
+      /** @description Created */
       201: {
         content: {
-          '*/*': components['schemas']['TranslationWithCommentModel'];
+          '*/*': components['schemas']['TranslationCommentModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
         };
+      };
+    };
+  };
+  create_6: {
+    /** Creates a translation comment. Empty translation is stored, when not exists. */
+    parameters: {
+      path: {
+        projectId: number;
       };
     };
     requestBody: {
@@ -4461,39 +4805,77 @@ export interface operations {
         'application/json': components['schemas']['TranslationCommentWithLangKeyDto'];
       };
     };
+    responses: {
+      /** @description Created */
+      201: {
+        content: {
+          '*/*': components['schemas']['TranslationWithCommentModel'];
+        };
+      };
+      /** @description Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** @description Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
   };
   suggestTranslationMemory: {
+    /**
+     * Suggests machine translations from translation memory.
+     *
+     * The result is always sorted by similarity, so sorting is not supported.
+     */
     parameters: {
-      query: {
-        /** Zero-based page index (0..N) */
+      /** @description Zero-based page index (0..N) */
+      /** @description The size of the page to be returned */
+      /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+      query?: {
         page?: number;
-        /** The size of the page to be returned */
         size?: number;
-        /** Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
         sort?: string[];
       };
       path: {
         projectId: number;
       };
     };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SuggestRequestDto'];
+      };
+    };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['PagedModelTranslationMemoryItemModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
         };
+      };
+    };
+  };
+  suggestMachineTranslations: {
+    /** Suggests machine translations from enabled services */
+    parameters: {
+      path: {
+        projectId: number;
       };
     };
     requestBody: {
@@ -4501,67 +4883,56 @@ export interface operations {
         'application/json': components['schemas']['SuggestRequestDto'];
       };
     };
-  };
-  suggestMachineTranslations: {
-    parameters: {
-      path: {
-        projectId: number;
-      };
-    };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['SuggestResultModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
         };
       };
     };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['SuggestRequestDto'];
-      };
-    };
   };
   getAll_5: {
+    /** Returns all project languages */
     parameters: {
+      /** @description Zero-based page index (0..N) */
+      /** @description The size of the page to be returned */
+      /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+      query?: {
+        page?: number;
+        size?: number;
+        sort?: string[];
+      };
       path: {
         projectId: number;
       };
-      query: {
-        /** Zero-based page index (0..N) */
-        page?: number;
-        /** The size of the page to be returned */
-        size?: number;
-        /** Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
-        sort?: string[];
-      };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['PagedModelLanguageModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -4570,29 +4941,10 @@ export interface operations {
     };
   };
   createLanguage: {
+    /** Creates language */
     parameters: {
       path: {
         projectId: number;
-      };
-    };
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          '*/*': components['schemas']['LanguageModel'];
-        };
-      };
-      /** Bad Request */
-      400: {
-        content: {
-          '*/*': string;
-        };
-      };
-      /** Not Found */
-      404: {
-        content: {
-          '*/*': string;
-        };
       };
     };
     requestBody: {
@@ -4600,8 +4952,29 @@ export interface operations {
         'application/json': components['schemas']['LanguageDto'];
       };
     };
+    responses: {
+      /** @description OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['LanguageModel'];
+        };
+      };
+      /** @description Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** @description Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
   };
   getKeyScreenshots_1: {
+    /** Returns all screenshots for specified key */
     parameters: {
       path: {
         keyId: number;
@@ -4609,19 +4982,19 @@ export interface operations {
       };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['CollectionModelScreenshotModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -4630,33 +5003,14 @@ export interface operations {
     };
   };
   uploadScreenshot_1: {
+    /** Upload screenshot for specific key */
     parameters: {
       path: {
         keyId: number;
         projectId: number;
       };
     };
-    responses: {
-      /** Created */
-      201: {
-        content: {
-          '*/*': components['schemas']['ScreenshotModel'];
-        };
-      };
-      /** Bad Request */
-      400: {
-        content: {
-          '*/*': string;
-        };
-      };
-      /** Not Found */
-      404: {
-        content: {
-          '*/*': string;
-        };
-      };
-    };
-    requestBody: {
+    requestBody?: {
       content: {
         'multipart/form-data': {
           /** Format: binary */
@@ -4664,32 +5018,53 @@ export interface operations {
         };
       };
     };
-  };
-  getAll_7: {
-    parameters: {
-      query: {
-        /** Zero-based page index (0..N) */
-        page?: number;
-        /** The size of the page to be returned */
-        size?: number;
-        /** Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
-        sort?: string[];
-      };
-    };
     responses: {
-      /** OK */
-      200: {
+      /** @description Created */
+      201: {
         content: {
-          '*/*': components['schemas']['PagedModelPatModel'];
+          '*/*': components['schemas']['ScreenshotModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  getAll_7: {
+    /** Get all Personal Access Tokens */
+    parameters?: {
+      /** @description Zero-based page index (0..N) */
+      /** @description The size of the page to be returned */
+      /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+      query?: {
+        page?: number;
+        size?: number;
+        sort?: string[];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['PagedModelPatModel'];
+        };
+      };
+      /** @description Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -4698,58 +5073,60 @@ export interface operations {
     };
   };
   create_8: {
+    /** Creates new Personal Access Token */
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreatePatDto'];
+      };
+    };
     responses: {
-      /** Created */
+      /** @description Created */
       201: {
         content: {
           '*/*': components['schemas']['RevealedPatModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
         };
       };
     };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreatePatDto'];
-      };
-    };
   };
   getAll_8: {
+    /** Returns all organizations, which is current user allowed to view */
     parameters: {
+      /** @description Zero-based page index (0..N) */
+      /** @description The size of the page to be returned */
+      /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
       query: {
-        /** Zero-based page index (0..N) */
         page?: number;
-        /** The size of the page to be returned */
         size?: number;
-        /** Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
         sort?: string[];
         params: components['schemas']['OrganizationRequestParamsDto'];
       };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           'application/hal+json': components['schemas']['PagedModelOrganizationModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -4758,55 +5135,36 @@ export interface operations {
     };
   };
   create_9: {
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          '*/*': components['schemas']['OrganizationModel'];
-        };
-      };
-      /** Bad Request */
-      400: {
-        content: {
-          '*/*': string;
-        };
-      };
-      /** Not Found */
-      404: {
-        content: {
-          '*/*': string;
-        };
-      };
-    };
+    /** Creates organization */
     requestBody: {
       content: {
         'application/json': components['schemas']['OrganizationDto'];
       };
     };
-  };
-  upload: {
-    parameters: {};
     responses: {
-      /** Created */
-      201: {
+      /** @description OK */
+      200: {
         content: {
-          '*/*': components['schemas']['UploadedImageModel'];
+          '*/*': components['schemas']['OrganizationModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
         };
       };
     };
-    requestBody: {
+  };
+  upload: {
+    /** Uploads an image for later use */
+    requestBody?: {
       content: {
         'multipart/form-data': {
           /** Format: binary */
@@ -4814,8 +5172,29 @@ export interface operations {
         };
       };
     };
+    responses: {
+      /** @description Created */
+      201: {
+        content: {
+          '*/*': components['schemas']['UploadedImageModel'];
+        };
+      };
+      /** @description Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** @description Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
   };
   allByUser: {
+    /** Returns user's api keys */
     parameters: {
       query: {
         pageable: components['schemas']['Pageable'];
@@ -4823,19 +5202,19 @@ export interface operations {
       };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['PagedModelApiKeyModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -4844,174 +5223,185 @@ export interface operations {
     };
   };
   create_10: {
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          '*/*': components['schemas']['RevealedApiKeyModel'];
-        };
-      };
-      /** Bad Request */
-      400: {
-        content: {
-          '*/*': string;
-        };
-      };
-      /** Not Found */
-      404: {
-        content: {
-          '*/*': string;
-        };
-      };
-    };
+    /** Creates new API key with provided scopes */
     requestBody: {
       content: {
         'application/json': components['schemas']['CreateApiKeyDto'];
       };
     };
-  };
-  validateEmail: {
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
-          '*/*': boolean;
+          '*/*': components['schemas']['RevealedApiKeyModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
         };
       };
     };
+  };
+  validateEmail: {
+    /** Validates if email is not in use */
     requestBody: {
       content: {
         'application/json': components['schemas']['TextNode'];
       };
     };
-  };
-  signUp: {
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
-          '*/*': components['schemas']['JwtAuthenticationResponse'];
+          '*/*': boolean;
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
         };
       };
     };
+  };
+  signUp: {
+    /**
+     * Creates new user account.
+     *
+     * When E-mail verification is enabled, null is returned. Otherwise JWT token is provided.
+     */
     requestBody: {
       content: {
         'application/json': components['schemas']['SignUpDto'];
       };
     };
-  };
-  resetPasswordSet: {
     responses: {
-      /** OK */
-      200: unknown;
-      /** Bad Request */
+      /** @description OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['JwtAuthenticationResponse'];
+        };
+      };
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
         };
       };
     };
+  };
+  resetPasswordSet: {
+    /** Sets new password with password reset code from e-mail */
     requestBody: {
       content: {
         'application/json': components['schemas']['ResetPassword'];
       };
     };
-  };
-  resetPasswordRequest: {
     responses: {
-      /** OK */
-      200: unknown;
-      /** Bad Request */
+      /** @description OK */
+      200: never;
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
         };
       };
     };
+  };
+  resetPasswordRequest: {
+    /** Reset password request */
     requestBody: {
       content: {
         'application/json': components['schemas']['ResetPasswordRequest'];
       };
     };
-  };
-  authenticateUser: {
     responses: {
-      /** OK */
-      200: {
-        content: {
-          '*/*': { [key: string]: unknown };
-        };
-      };
-      /** Bad Request */
+      /** @description OK */
+      200: never;
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
         };
       };
     };
+  };
+  authenticateUser: {
+    /** Generates JWT token */
     requestBody: {
       content: {
         'application/json': components['schemas']['LoginRequest'];
       };
     };
-  };
-  getAllSingleOwnedOrganizations: {
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
-          '*/*': components['schemas']['CollectionModelSimpleOrganizationModel'];
+          '*/*': Record<string, never>;
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
+      404: {
+        content: {
+          '*/*': string;
+        };
+      };
+    };
+  };
+  getAllSingleOwnedOrganizations: {
+    /** Returns all organizations owned only by current user */
+    responses: {
+      /** @description OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['CollectionModelSimpleOrganizationModel'];
+        };
+      };
+      /** @description Bad Request */
+      400: {
+        content: {
+          '*/*': string;
+        };
+      };
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -5020,20 +5410,21 @@ export interface operations {
     };
   };
   get: {
+    /** Get user's preferences */
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['UserPreferencesModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -5042,25 +5433,26 @@ export interface operations {
     };
   };
   validateProjectSlug: {
+    /** Validate project address part */
     parameters: {
       path: {
         slug: string;
       };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': boolean;
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -5069,25 +5461,26 @@ export interface operations {
     };
   };
   validateOrganizationSlug: {
+    /** Validate organization address part */
     parameters: {
       path: {
         slug: string;
       };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': boolean;
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -5095,22 +5488,22 @@ export interface operations {
       };
     };
   };
-  /** Returns initial data always required by frontend */
   get_1: {
+    /** @description Returns initial data always required by frontend */
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['InitialDataModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -5119,34 +5512,35 @@ export interface operations {
     };
   };
   getAllUsers: {
+    /** Returns project all users, who have permission to access project */
     parameters: {
-      path: {
-        projectId: number;
-      };
-      query: {
-        /** Zero-based page index (0..N) */
+      /** @description Zero-based page index (0..N) */
+      /** @description The size of the page to be returned */
+      /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+      query?: {
         page?: number;
-        /** The size of the page to be returned */
         size?: number;
-        /** Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
         sort?: string[];
         search?: string;
       };
+      path: {
+        projectId: number;
+      };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['PagedModelUserAccountInProjectModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -5155,25 +5549,26 @@ export interface operations {
     };
   };
   getUsedNamespaces: {
+    /** Returns all used project namespaces. Response contains default (null) namespace if used. */
     parameters: {
       path: {
         projectId: number;
       };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['CollectionModelUsedNamespaceModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -5182,14 +5577,15 @@ export interface operations {
     };
   };
   getAll_1: {
+    /** Returns project tags */
     parameters: {
-      query: {
+      /** @description Zero-based page index (0..N) */
+      /** @description The size of the page to be returned */
+      /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+      query?: {
         search?: string;
-        /** Zero-based page index (0..N) */
         page?: number;
-        /** The size of the page to be returned */
         size?: number;
-        /** Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
         sort?: string[];
       };
       path: {
@@ -5197,19 +5593,19 @@ export interface operations {
       };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['PagedModelTagModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -5218,13 +5614,14 @@ export interface operations {
     };
   };
   getAllNamespaces: {
+    /** Returns all project namespaces */
     parameters: {
-      query: {
-        /** Zero-based page index (0..N) */
+      /** @description Zero-based page index (0..N) */
+      /** @description The size of the page to be returned */
+      /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+      query?: {
         page?: number;
-        /** The size of the page to be returned */
         size?: number;
-        /** Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
         sort?: string[];
       };
       path: {
@@ -5232,19 +5629,19 @@ export interface operations {
       };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['PagedModelNamespaceModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -5253,6 +5650,7 @@ export interface operations {
     };
   };
   getByName: {
+    /** Update namespace */
     parameters: {
       path: {
         name: string;
@@ -5260,19 +5658,19 @@ export interface operations {
       };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['NamespaceModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -5281,25 +5679,26 @@ export interface operations {
     };
   };
   getProjectCredits: {
+    /** Returns machine translation credit balance for specified project */
     parameters: {
       path: {
         projectId: number;
       };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['CreditBalanceModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -5308,25 +5707,26 @@ export interface operations {
     };
   };
   getAllKeys: {
+    /** Get all keys in project */
     parameters: {
       path: {
         projectId: number;
       };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['CollectionModelKeyModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -5335,13 +5735,14 @@ export interface operations {
     };
   };
   getActivity: {
+    /** Returns project history */
     parameters: {
-      query: {
-        /** Zero-based page index (0..N) */
+      /** @description Zero-based page index (0..N) */
+      /** @description The size of the page to be returned */
+      /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+      query?: {
         page?: number;
-        /** The size of the page to be returned */
         size?: number;
-        /** Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
         sort?: string[];
       };
       path: {
@@ -5349,19 +5750,19 @@ export interface operations {
       };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           'application/hal+json': components['schemas']['PagedModelProjectActivityModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -5369,39 +5770,42 @@ export interface operations {
       };
     };
   };
-  /** Returns translations prepared to import. */
   getImportTranslations: {
+    /**
+     * Get translations
+     * @description Returns translations prepared to import.
+     */
     parameters: {
+      /** @description Zero-based page index (0..N) */
+      /** @description The size of the page to be returned */
+      /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+      query?: {
+        onlyConflicts?: boolean;
+        onlyUnresolved?: boolean;
+        search?: string;
+        page?: number;
+        size?: number;
+        sort?: string[];
+      };
       path: {
         projectId: number;
         languageId: number;
       };
-      query: {
-        onlyConflicts?: boolean;
-        onlyUnresolved?: boolean;
-        search?: string;
-        /** Zero-based page index (0..N) */
-        page?: number;
-        /** The size of the page to be returned */
-        size?: number;
-        /** Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
-        sort?: string[];
-      };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['PagedModelImportTranslationModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -5409,8 +5813,11 @@ export interface operations {
       };
     };
   };
-  /** Returns language prepared to import. */
   getImportLanguage: {
+    /**
+     * Get import language
+     * @description Returns language prepared to import.
+     */
     parameters: {
       path: {
         languageId: number;
@@ -5418,19 +5825,19 @@ export interface operations {
       };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['ImportLanguageModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -5438,8 +5845,11 @@ export interface operations {
       };
     };
   };
-  /** Deletes language prepared to import. */
   deleteLanguage: {
+    /**
+     * Delete language
+     * @description Deletes language prepared to import.
+     */
     parameters: {
       path: {
         languageId: number;
@@ -5447,15 +5857,15 @@ export interface operations {
       };
     };
     responses: {
-      /** OK */
-      200: unknown;
-      /** Bad Request */
+      /** @description OK */
+      200: never;
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -5463,36 +5873,39 @@ export interface operations {
       };
     };
   };
-  /** Returns issues for uploaded file. */
   getImportFileIssues: {
+    /**
+     * Get file issues
+     * @description Returns issues for uploaded file.
+     */
     parameters: {
+      /** @description Zero-based page index (0..N) */
+      /** @description The size of the page to be returned */
+      /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+      query?: {
+        page?: number;
+        size?: number;
+        sort?: string[];
+      };
       path: {
         importFileId: number;
         projectId: number;
       };
-      query: {
-        /** Zero-based page index (0..N) */
-        page?: number;
-        /** The size of the page to be returned */
-        size?: number;
-        /** Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
-        sort?: string[];
-      };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['PagedModelEntityModelImportFileIssueView'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -5500,15 +5913,18 @@ export interface operations {
       };
     };
   };
-  /** Returns the result of preparation. */
   getImportResult: {
+    /**
+     * Get result
+     * @description Returns the result of preparation.
+     */
     parameters: {
-      query: {
-        /** Zero-based page index (0..N) */
+      /** @description Zero-based page index (0..N) */
+      /** @description The size of the page to be returned */
+      /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+      query?: {
         page?: number;
-        /** The size of the page to be returned */
         size?: number;
-        /** Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
         sort?: string[];
       };
       path: {
@@ -5516,19 +5932,19 @@ export interface operations {
       };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['PagedModelImportLanguageModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -5536,27 +5952,30 @@ export interface operations {
       };
     };
   };
-  /** Returns all existing and imported namespaces */
   getAllNamespaces_1: {
+    /**
+     * Get namespaces
+     * @description Returns all existing and imported namespaces
+     */
     parameters: {
       path: {
         projectId: number;
       };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['CollectionModelImportNamespaceModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -5565,34 +5984,39 @@ export interface operations {
     };
   };
   getTranslationHistory: {
+    /**
+     * Returns history of specific translation.
+     *
+     * Sorting is not supported for supported. It is automatically sorted from newest to oldest.
+     */
     parameters: {
+      /** @description Zero-based page index (0..N) */
+      /** @description The size of the page to be returned */
+      /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+      query?: {
+        page?: number;
+        size?: number;
+        sort?: string[];
+      };
       path: {
         translationId: number;
         projectId: number;
       };
-      query: {
-        /** Zero-based page index (0..N) */
-        page?: number;
-        /** The size of the page to be returned */
-        size?: number;
-        /** Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
-        sort?: string[];
-      };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['PagedModelTranslationHistoryModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -5601,38 +6025,39 @@ export interface operations {
     };
   };
   getAllTranslations: {
+    /** Returns all translations for specified languages */
     parameters: {
+      /** @description Namespace to return */
+      /**
+       * @description Delimiter to structure response content.
+       *
+       * e.g. For key "home.header.title" would result in {"home": {"header": {"title": "Hello"}}} structure.
+       *
+       * When null, resulting file will be a flat key-value object.
+       */
+      query?: {
+        ns?: string;
+        structureDelimiter?: string;
+      };
       path: {
         languages: string[];
         projectId: number;
       };
-      query: {
-        /** Namespace to return */
-        ns?: string;
-        /**
-         * Delimiter to structure response content.
-         *
-         * e.g. For key "home.header.title" would result in {"home": {"header": {"title": "Hello"}}} structure.
-         *
-         * When null, resulting file will be a flat key-value object.
-         */
-        structureDelimiter?: string;
-      };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': string;
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -5641,47 +6066,55 @@ export interface operations {
     };
   };
   getSelectAllKeyIds: {
+    /** Get select all keys */
     parameters: {
-      query: {
-        /**
-         * Translation state in the format: languageTag,state. You can use this parameter multiple times.
-         *
-         * When used with multiple states for same language it is applied with logical OR.
-         *
-         * When used with multiple languages, it is applied with logical AND.
-         */
+      /**
+       * @description Translation state in the format: languageTag,state. You can use this parameter multiple times.
+       *
+       * When used with multiple states for same language it is applied with logical OR.
+       *
+       * When used with multiple languages, it is applied with logical AND.
+       */
+      /**
+       * @description Languages to be contained in response.
+       *
+       * To add multiple languages, repeat this param (eg. ?languages=en&languages=de)
+       * @example en
+       */
+      /** @description String to search in key name or translation text */
+      /** @description Selects key with provided names. Use this param multiple times to fetch more keys. */
+      /** @description Selects key with provided ID. Use this param multiple times to fetch more keys. */
+      /** @description Selects only keys, where translation is missing in any language */
+      /** @description Selects only keys, where translation is provided in any language */
+      /**
+       * @description Selects only keys, where translation is missing in specified language
+       * @example en-US
+       */
+      /**
+       * @description Selects only keys, where translation is provided in specified language
+       * @example en-US
+       */
+      /** @description Selects only keys with screenshots */
+      /** @description Selects only keys without screenshots */
+      /**
+       * @description Filter namespaces.
+       *
+       * To filter default namespace, set to empty string.
+       */
+      /** @description Selects only keys with provided tag */
+      query?: {
         filterState?: string[];
-        /**
-         * Languages to be contained in response.
-         *
-         * To add multiple languages, repeat this param (eg. ?languages=en&languages=de)
-         */
         languages?: string[];
-        /** String to search in key name or translation text */
         search?: string;
-        /** Selects key with provided names. Use this param multiple times to fetch more keys. */
         filterKeyName?: string[];
-        /** Selects key with provided ID. Use this param multiple times to fetch more keys. */
         filterKeyId?: number[];
-        /** Selects only keys, where translation is missing in any language */
         filterUntranslatedAny?: boolean;
-        /** Selects only keys, where translation is provided in any language */
         filterTranslatedAny?: boolean;
-        /** Selects only keys, where translation is missing in specified language */
         filterUntranslatedInLang?: string;
-        /** Selects only keys, where translation is provided in specified language */
         filterTranslatedInLang?: string;
-        /** Selects only keys with screenshots */
         filterHasScreenshot?: boolean;
-        /** Selects only keys without screenshots */
         filterHasNoScreenshot?: boolean;
-        /**
-         * Filter namespaces.
-         *
-         * To filter default namespace, set to empty string.
-         */
         filterNamespace?: string[];
-        /** Selects only keys with provided tag */
         filterTag?: string[];
       };
       path: {
@@ -5689,19 +6122,19 @@ export interface operations {
       };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['SelectAllResponse'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -5710,8 +6143,9 @@ export interface operations {
     };
   };
   getTransferOptions: {
+    /** Returns transfer option */
     parameters: {
-      query: {
+      query?: {
         search?: string;
       };
       path: {
@@ -5719,19 +6153,19 @@ export interface operations {
       };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['CollectionModelProjectTransferOptionModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -5740,25 +6174,28 @@ export interface operations {
     };
   };
   getProjectDailyActivity: {
+    /** Returns project daily amount of events */
     parameters: {
       path: {
         projectId: number;
       };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
-          'application/hal+json': { [key: string]: number };
+          'application/hal+json': {
+            [key: string]: number | undefined;
+          };
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -5767,25 +6204,26 @@ export interface operations {
     };
   };
   getProjectStats: {
+    /** Returns project stats */
     parameters: {
       path: {
         projectId: number;
       };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           'application/hal+json': components['schemas']['ProjectStatsModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -5794,25 +6232,26 @@ export interface operations {
     };
   };
   getProjectInvitations: {
+    /** Returns all invitations to project */
     parameters: {
       path: {
         projectId: number;
       };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['CollectionModelProjectInvitationModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -5821,6 +6260,7 @@ export interface operations {
     };
   };
   allByProject: {
+    /** Returns all API keys for project */
     parameters: {
       query: {
         pageable: components['schemas']['Pageable'];
@@ -5830,19 +6270,19 @@ export interface operations {
       };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['PagedModelApiKeyModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -5851,31 +6291,32 @@ export interface operations {
     };
   };
   getAllWithStatistics: {
-    parameters: {
-      query: {
-        /** Zero-based page index (0..N) */
+    /** Returns all projects (including statistics) where current user has any permission */
+    parameters?: {
+      /** @description Zero-based page index (0..N) */
+      /** @description The size of the page to be returned */
+      /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+      query?: {
         page?: number;
-        /** The size of the page to be returned */
         size?: number;
-        /** Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
         sort?: string[];
         search?: string;
       };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           'application/hal+json': components['schemas']['PagedModelProjectWithStatsModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -5884,20 +6325,21 @@ export interface operations {
     };
   };
   getPreferred: {
+    /** Returns preferred organization. If server allows users to create organization, preferred organization is automatically created if user doesn't have access to any organization. */
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['OrganizationModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -5906,20 +6348,21 @@ export interface operations {
     };
   };
   getCurrent: {
+    /** Returns current Personal Access Token info */
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['PatWithUserModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -5928,25 +6371,26 @@ export interface operations {
     };
   };
   get_8: {
+    /** Returns organization by address part */
     parameters: {
       path: {
         slug: string;
       };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['OrganizationModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -5955,34 +6399,35 @@ export interface operations {
     };
   };
   getAllProjects: {
+    /** Returns all organization projects */
     parameters: {
-      path: {
-        slug: string;
-      };
-      query: {
-        /** Zero-based page index (0..N) */
+      /** @description Zero-based page index (0..N) */
+      /** @description The size of the page to be returned */
+      /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+      query?: {
         page?: number;
-        /** The size of the page to be returned */
         size?: number;
-        /** Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
         sort?: string[];
         search?: string;
       };
+      path: {
+        slug: string;
+      };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['PagedModelProjectModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -5991,13 +6436,14 @@ export interface operations {
     };
   };
   getAllWithStatistics_1: {
+    /** Returns all projects (including statistics) where current user has any permission */
     parameters: {
-      query: {
-        /** Zero-based page index (0..N) */
+      /** @description Zero-based page index (0..N) */
+      /** @description The size of the page to be returned */
+      /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+      query?: {
         page?: number;
-        /** The size of the page to be returned */
         size?: number;
-        /** Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
         sort?: string[];
         search?: string;
       };
@@ -6006,19 +6452,19 @@ export interface operations {
       };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           'application/hal+json': components['schemas']['PagedModelProjectWithStatsModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -6027,25 +6473,26 @@ export interface operations {
     };
   };
   getOrganizationCredits: {
+    /** Returns machine translation credit balance for organization */
     parameters: {
       path: {
         organizationId: number;
       };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['CreditBalanceModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -6054,25 +6501,26 @@ export interface operations {
     };
   };
   getInvitations: {
+    /** Returns all invitations to organization */
     parameters: {
       path: {
         organizationId: number;
       };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['CollectionModelOrganizationInvitationModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -6080,27 +6528,27 @@ export interface operations {
       };
     };
   };
-  /** Returns current organization usage */
   getUsage: {
+    /** @description Returns current organization usage */
     parameters: {
       path: {
         organizationId: number;
       };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['UsageModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -6109,13 +6557,14 @@ export interface operations {
     };
   };
   getAllWithStatistics_2: {
+    /** Returns all projects (including statistics) where current user has any permission */
     parameters: {
-      query: {
-        /** Zero-based page index (0..N) */
+      /** @description Zero-based page index (0..N) */
+      /** @description The size of the page to be returned */
+      /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+      query?: {
         page?: number;
-        /** The size of the page to be returned */
         size?: number;
-        /** Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
         sort?: string[];
         search?: string;
       };
@@ -6124,19 +6573,19 @@ export interface operations {
       };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           'application/hal+json': components['schemas']['PagedModelProjectWithStatsModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -6145,34 +6594,35 @@ export interface operations {
     };
   };
   getAllUsers_1: {
+    /** Returns all users in organization */
     parameters: {
-      path: {
-        id: number;
-      };
-      query: {
-        /** Zero-based page index (0..N) */
+      /** @description Zero-based page index (0..N) */
+      /** @description The size of the page to be returned */
+      /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+      query?: {
         page?: number;
-        /** The size of the page to be returned */
         size?: number;
-        /** Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
         sort?: string[];
         search?: string;
       };
+      path: {
+        id: number;
+      };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['PagedModelUserAccountWithOrganizationRoleModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -6181,34 +6631,35 @@ export interface operations {
     };
   };
   getAllProjects_1: {
+    /** Returns all organization projects */
     parameters: {
-      path: {
-        id: number;
-      };
-      query: {
-        /** Zero-based page index (0..N) */
+      /** @description Zero-based page index (0..N) */
+      /** @description The size of the page to be returned */
+      /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+      query?: {
         page?: number;
-        /** The size of the page to be returned */
         size?: number;
-        /** Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
         sort?: string[];
         search?: string;
       };
+      path: {
+        id: number;
+      };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['PagedModelProjectModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -6217,21 +6668,22 @@ export interface operations {
     };
   };
   acceptInvitation: {
+    /** Accepts invitation to project or organization */
     parameters: {
       path: {
         code: string;
       };
     };
     responses: {
-      /** OK */
-      200: unknown;
-      /** Bad Request */
+      /** @description OK */
+      200: never;
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -6240,25 +6692,26 @@ export interface operations {
     };
   };
   get_10: {
+    /** Returns specific API key info */
     parameters: {
       path: {
         keyId: number;
       };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['ApiKeyModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -6267,21 +6720,21 @@ export interface operations {
     };
   };
   getCurrent_1: {
-    parameters: {};
+    /** Returns current API key info */
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['ApiKeyWithLanguagesModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -6290,20 +6743,21 @@ export interface operations {
     };
   };
   getScopes: {
+    /** Returns API key scopes for every permission type */
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           'application/json': string;
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -6312,31 +6766,32 @@ export interface operations {
     };
   };
   getUsers: {
-    parameters: {
-      query: {
-        /** Zero-based page index (0..N) */
+    /** Get all server users */
+    parameters?: {
+      /** @description Zero-based page index (0..N) */
+      /** @description The size of the page to be returned */
+      /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+      query?: {
         page?: number;
-        /** The size of the page to be returned */
         size?: number;
-        /** Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
         sort?: string[];
         search?: string;
       };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['PagedModelUserAccountModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -6345,25 +6800,26 @@ export interface operations {
     };
   };
   generateUserToken: {
+    /** Get all server users */
     parameters: {
       path: {
         userId: number;
       };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': string;
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -6372,31 +6828,32 @@ export interface operations {
     };
   };
   getOrganizations: {
-    parameters: {
-      query: {
-        /** Zero-based page index (0..N) */
+    /** Get all server organizations */
+    parameters?: {
+      /** @description Zero-based page index (0..N) */
+      /** @description The size of the page to be returned */
+      /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+      query?: {
         page?: number;
-        /** The size of the page to be returned */
         size?: number;
-        /** Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
         sort?: string[];
         search?: string;
       };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['PagedModelOrganizationModel'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -6405,6 +6862,7 @@ export interface operations {
     };
   };
   verifyEmail: {
+    /** Sets user account as verified, when code from email is OK */
     parameters: {
       path: {
         userId: number;
@@ -6412,19 +6870,19 @@ export interface operations {
       };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['JwtAuthenticationResponse'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -6433,6 +6891,7 @@ export interface operations {
     };
   };
   resetPasswordValidate: {
+    /** Validates key sent by email */
     parameters: {
       path: {
         code: string;
@@ -6440,15 +6899,15 @@ export interface operations {
       };
     };
     responses: {
-      /** OK */
-      200: unknown;
-      /** Bad Request */
+      /** @description OK */
+      200: never;
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -6457,20 +6916,21 @@ export interface operations {
     };
   };
   getPublicConfiguration: {
+    /** Returns server configuration information */
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['PublicConfigurationDTO'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -6479,30 +6939,31 @@ export interface operations {
     };
   };
   authenticateUser_1: {
+    /** Authenticates user using third party oAuth service */
     parameters: {
-      path: {
-        serviceType: string;
-      };
-      query: {
+      query?: {
         code?: string;
         redirect_uri?: string;
         invitationCode?: string;
       };
+      path: {
+        serviceType: string;
+      };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['JwtAuthenticationResponse'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -6511,25 +6972,29 @@ export interface operations {
     };
   };
   doExportJsonZip: {
+    /**
+     * Exports data as ZIP of jsons
+     * @deprecated
+     */
     parameters: {
       path: {
         projectId: number;
       };
     };
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           'application/zip': components['schemas']['StreamingResponseBody'];
         };
       };
-      /** Bad Request */
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -6538,6 +7003,7 @@ export interface operations {
     };
   };
   removeTag: {
+    /** Removes tag with provided id from key with provided id */
     parameters: {
       path: {
         keyId: number;
@@ -6546,15 +7012,15 @@ export interface operations {
       };
     };
     responses: {
-      /** OK */
-      200: unknown;
-      /** Bad Request */
+      /** @description OK */
+      200: never;
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -6563,6 +7029,7 @@ export interface operations {
     };
   };
   delete_1: {
+    /** Deletes one or multiple keys by their IDs */
     parameters: {
       path: {
         ids: number[];
@@ -6570,15 +7037,15 @@ export interface operations {
       };
     };
     responses: {
-      /** OK */
-      200: unknown;
-      /** Bad Request */
+      /** @description OK */
+      200: never;
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -6587,6 +7054,7 @@ export interface operations {
     };
   };
   deleteScreenshots_1: {
+    /** Deletes multiple screenshots by ids */
     parameters: {
       path: {
         ids: number[];
@@ -6594,15 +7062,15 @@ export interface operations {
       };
     };
     responses: {
-      /** OK */
-      200: unknown;
-      /** Bad Request */
+      /** @description OK */
+      200: never;
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -6611,6 +7079,7 @@ export interface operations {
     };
   };
   removeUser: {
+    /** Removes user from organization */
     parameters: {
       path: {
         organizationId: number;
@@ -6618,15 +7087,15 @@ export interface operations {
       };
     };
     responses: {
-      /** OK */
-      200: unknown;
-      /** Bad Request */
+      /** @description OK */
+      200: never;
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -6635,21 +7104,22 @@ export interface operations {
     };
   };
   deleteInvitation: {
+    /** Deletes invitation by ID */
     parameters: {
       path: {
         invitationId: number;
       };
     };
     responses: {
-      /** OK */
-      200: unknown;
-      /** Bad Request */
+      /** @description OK */
+      200: never;
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -6658,21 +7128,22 @@ export interface operations {
     };
   };
   delete_9: {
+    /** Deletes uploaded images */
     parameters: {
       path: {
         ids: number[];
       };
     };
     responses: {
-      /** OK */
-      200: unknown;
-      /** Bad Request */
+      /** @description OK */
+      200: never;
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -6681,21 +7152,22 @@ export interface operations {
     };
   };
   deleteUser: {
+    /** Deletes an user */
     parameters: {
       path: {
         userId: number;
       };
     };
     responses: {
-      /** OK */
-      200: unknown;
-      /** Bad Request */
+      /** @description OK */
+      200: never;
+      /** @description Bad Request */
       400: {
         content: {
           '*/*': string;
         };
       };
-      /** Not Found */
+      /** @description Not Found */
       404: {
         content: {
           '*/*': string;
@@ -6704,5 +7176,3 @@ export interface operations {
     };
   };
 }
-
-export interface external {}

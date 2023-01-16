@@ -65,26 +65,22 @@ afterEach(async () => {
 });
 
 it('says projects are in sync when they do match', async () => {
-  const out = await run([
-    'sync',
-    '--yes',
-    '--api-key',
-    PROJECT_PAK_2,
-    CODE_PROJECT_2_COMPLETE,
-  ]);
+  const out = await run(
+    ['sync', '--yes', '--api-key', PROJECT_PAK_2, CODE_PROJECT_2_COMPLETE],
+    undefined,
+    20e3
+  );
 
   expect(out.code).toBe(0);
   expect(out.stdout).toContain('is in sync');
 }, 30e3);
 
 it('creates new keys in code projects', async () => {
-  const out = await run([
-    'sync',
-    '--yes',
-    '--api-key',
-    PROJECT_PAK_2,
-    CODE_PROJECT_2_ADDED,
-  ]);
+  const out = await run(
+    ['sync', '--yes', '--api-key', PROJECT_PAK_2, CODE_PROJECT_2_ADDED],
+    undefined,
+    20e3
+  );
 
   expect(out.code).toBe(0);
   expect(out.stdout).toContain('+ 2 strings');
