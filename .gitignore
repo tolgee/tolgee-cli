@@ -4,4 +4,4 @@
 node_modules
 dist
 dist-types
-./extractor.d.ts
+extractor.d.ts
