@@ -7,7 +7,7 @@
     "tolgee": "./dist/index.js"
   },
   "scripts": {
-    "build": "rimraf dist && tsc",
+    "build": "rimraf dist dist-types && tsc && cp dist-types/extractor/index.d.ts extractor.d.ts",
     "test": "npm run test:unit && npm run test:e2e",
     "test:unit": "jest -c jest.unit.config.ts",
     "pretest:e2e": "npm run tolgee:start",
@@ -61,6 +61,7 @@
   "files": [
     "dist",
     "textmate",
+    "extractor.d.ts",
     "README.md",
     "LICENSE"
   ],
