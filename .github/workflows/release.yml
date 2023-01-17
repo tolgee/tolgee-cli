@@ -24,6 +24,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Build the CLI
+        run: npm run build
       - name: Run npm release
         run: npm run release
         env:
