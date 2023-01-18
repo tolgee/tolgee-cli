@@ -13,9 +13,9 @@ The Tolgee CLI is published as a NPM package. You simply need to install it, and
 npm i --global tolgee-cli
 ```
 
-> **Warning**: The Tolgee CLI is currently experimental, and subject to bugs. Breaking changes may happen before stable release!
+> **Warning**: The Tolgee CLI is currently experimental and subject to bugs. Breaking changes may happen before stable release!
 >
-> Help us reach stable faster by reporting any bug you encounter on the [issue tracker](https://github.com/tolgee/tolgee-cli/issues/new?labels=bug).
+> Help us reach stable version faster by reporting any bug you encounter on the [issue tracker](https://github.com/tolgee/tolgee-cli/issues/new?labels=bug).
 > Feedback is also greatly appreciated!
 
 See our [documentation](https://tolgee.io/tolgee-cli/installation) for more information.

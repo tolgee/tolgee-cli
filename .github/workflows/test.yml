@@ -1,7 +1,7 @@
 name: Test
 on:
   push:
-    branches: [ main, next ]
+    branches: [ main, next, prerelease ]
   pull_request:
 
 jobs:
