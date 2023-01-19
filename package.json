@@ -1,5 +1,5 @@
 {
-  "name": "tolgee-cli",
+  "name": "@tolgee/cli",
   "version": "0.1.0",
   "type": "commonjs",
   "description": "A tool to interact with the Tolgee Platform through CLI",

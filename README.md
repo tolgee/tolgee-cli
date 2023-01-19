@@ -10,7 +10,7 @@ extract strings from your code, and much more!
 ## Installation
 The Tolgee CLI is published as a NPM package. You simply need to install it, and you're good to go!
 ```sh
-npm i --global tolgee-cli
+npm i --global @tolgee/cli
 ```
 
 > **Warning**: The Tolgee CLI is currently experimental and subject to bugs. Breaking changes may happen before stable release!
