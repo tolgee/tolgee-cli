@@ -72,7 +72,7 @@ console.log('TEST: tolgee-cli/extractor types are importable');
 const TEST_TYPE_FILE = join(PACKAGE_DEST, 'test.ts');
 await writeFile(
   TEST_TYPE_FILE,
-  `import type { ExtractionResult } from 'tolgee-cli/extractor'`
+  `import type { ExtractionResult } from '@tolgee/cli/extractor'`
 );
 execOrError('npm i typescript', { cwd: PACKAGE_DEST });
 const tsc = execOrError('npx --no tsc -- --noEmit --lib es2022 test.ts', {
