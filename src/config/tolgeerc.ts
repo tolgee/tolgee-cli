@@ -3,7 +3,7 @@ import { resolve } from 'path';
 import { existsSync } from 'fs';
 import { SDKS } from '../constants';
 
-export type ProjectSdk = typeof SDKS[number];
+export type ProjectSdk = (typeof SDKS)[number];
 
 export type TolgeeConfig = {
   apiUrl?: URL;

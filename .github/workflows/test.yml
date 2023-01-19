@@ -1,7 +1,7 @@
 name: Test
 on:
   push:
-    branches: [ main ]
+    branches: [ main, next, prerelease ]
   pull_request:
 
 jobs:
@@ -10,9 +10,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actionsx/prettier@v2
+      - uses: actions/setup-node@v3
         with:
-          args: --check ./src ./test ./scripts jest.config.ts jest.unit.config.ts jest.e2e.config.ts
+          node-version: 18
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: cache-node-modules-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run prettier
+        run: npm run lint
 
   test-unit:
     name: Unit Tests
@@ -21,7 +31,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
       - name: Cache dependencies
         uses: actions/cache@v3
         with:
@@ -40,7 +50,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
       - name: Cache dependencies
         uses: actions/cache@v3
         with:
@@ -56,3 +66,22 @@ jobs:
       - name: Stop Tolgee Container
         run: npm run tolgee:stop
         if: always()
+
+  test-package:
+    name: Package integrity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: cache-node-modules-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate package
+        run: npm run test:package
