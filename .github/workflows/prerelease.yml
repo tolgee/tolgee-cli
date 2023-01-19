@@ -1,14 +1,10 @@
-name: Release
+name: Pre-release
 on:
-  workflow_run:
-    workflows: [ Test ]
-    branches: [ main ]
-    types:
-      - completed
+  push:
+    branches: [ next, prerelease ]
 
 jobs:
-  release:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+  prerelease:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
