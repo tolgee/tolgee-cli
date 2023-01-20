@@ -10,4 +10,7 @@ import * as constants from '../../../src/constants';
 
 // @ts-expect-error
 constants.CONFIG_PATH = join(tmpdir(), '.tolgee-e2e');
-Object.defineProperty(ansi, 'enabled', { get: () => false, set: () => undefined })
+Object.defineProperty(ansi, 'enabled', {
+  get: () => false,
+  set: () => undefined,
+});
