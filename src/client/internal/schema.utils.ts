@@ -23,15 +23,15 @@ export type ParamsOf<
 export type QueryOf<
   P extends Path,
   M extends MethodsOf<P>
-> = paths[P][M] extends { parameters: { query: Record<string, any> } }
-  ? Omit<paths[P][M]['parameters']['query'], 'ak'>
+> = paths[P][M] extends { parameters: { query?: Record<string, any> } }
+  ? Omit<Exclude<paths[P][M]['parameters']['query'], undefined>, 'ak'>
   : void;
 
 export type BodyOf<
   P extends Path,
   M extends MethodsOf<P>
-> = paths[P][M] extends { requestBody: { content: Record<string, any> } }
-  ? ValueOf<paths[P][M]['requestBody']['content']>
+> = paths[P][M] extends { requestBody?: { content: Record<string, any> } }
+  ? ValueOf<Exclude<paths[P][M]['requestBody'], undefined>['content']>
   : void;
 
 type ExtractInnerResponse<T extends Record<any, any>> = {
