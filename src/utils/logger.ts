@@ -77,7 +77,7 @@ export function error(msg: string) {
 export function loading<T>(comment: string, promise: Promise<T>): Promise<T> {
   if (!process.stdout.isTTY) {
     // Simple stdout without animations
-    process.stdout.write(comment)
+    process.stdout.write(comment);
     promise.then(
       () => process.stdout.write(`   ✓ Success\n`),
       () => process.stdout.write(`   ✗ Failure\n`)
