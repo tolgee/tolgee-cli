@@ -75,6 +75,17 @@ export function error(msg: string) {
  * @returns The promise passed in parameter. Useful for decorating without using a buffer variable.
  */
 export function loading<T>(comment: string, promise: Promise<T>): Promise<T> {
+  if (!process.stdout.isTTY) {
+    // Simple stdout without animations
+    process.stdout.write(comment)
+    promise.then(
+      () => process.stdout.write(`   ✓ Success\n`),
+      () => process.stdout.write(`   ✗ Failure\n`)
+    );
+
+    return promise;
+  }
+
   let symbolPosition = 0;
   const interval = setInterval(() => {
     process.stdout.write(`\r${SYMBOLS[symbolPosition]} ${comment}`);

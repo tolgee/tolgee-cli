@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { Command } from 'commander';
+import ansi from 'ansi-colors';
 
 import { getApiKey, savePak, savePat } from './config/credentials';
 import loadTolgeeRc from './config/tolgeerc';
@@ -20,6 +21,8 @@ import CompareCommand from './commands/sync/compare';
 import SyncCommand from './commands/sync/sync';
 
 const NO_KEY_COMMANDS = ['login', 'logout', 'extract'];
+
+ansi.enabled = process.stdout.isTTY;
 
 function topLevelName(command: Command): string {
   return command.parent && command.parent.parent
