@@ -70,7 +70,7 @@
     "branches": [
       "main",
       { "name": "next", "channel": "next" },
-      { "name": "prerelease", "channel": "rc", "prerelease": true }
+      { "name": "prerelease", "channel": "rc", "prerelease": "rc" }
     ],
     "plugins": [
       "@semantic-release/commit-analyzer",
