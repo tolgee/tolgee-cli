@@ -77,7 +77,7 @@ docker.stdout.on('data', (d) => {
     console.log(d);
   }
 
-  if (d.includes('Started Application.Companion')) {
+  if (d.includes('Importing initial project test3')) {
     enforceBaseLanguage().then(() => {
       console.log('Test Tolgee server up on port 22222.');
       process.exit(0);
