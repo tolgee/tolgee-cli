@@ -3,6 +3,38 @@
 // ---
 
 import { spawn } from 'child_process';
+import { fetch } from 'undici';
+
+async function enforceBaseLanguage() {
+  const { accessToken } = await fetch(
+    'http://localhost:22222/api/public/generatetoken',
+    {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ username: 'admin', password: 'admin' }),
+    }
+  ).then((r) => r.json());
+
+  for (let i = 1; i < 4; i++) {
+    const locales = await fetch(
+      `http://localhost:22222/v2/projects/${i}/languages`,
+      {
+        headers: { authorization: `Bearer ${accessToken}` },
+      }
+    ).then((r) => r.json());
+
+    const enId = locales._embedded.languages.find((l) => l.tag === 'en').id;
+
+    await fetch(`http://localhost:22222/v2/projects/${i}`, {
+      method: 'PUT',
+      headers: {
+        'content-type': 'application/json',
+        authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({ name: `test${i}`, baseLanguageId: enId }),
+    });
+  }
+}
 
 console.log('Starting Tolgee test container...');
 
@@ -46,8 +78,10 @@ docker.stdout.on('data', (d) => {
   }
 
   if (d.includes('Started Application.Companion')) {
-    console.log('Test Tolgee server up on port 22222.');
-    process.exit(0);
+    enforceBaseLanguage().then(() => {
+      console.log('Test Tolgee server up on port 22222.');
+      process.exit(0);
+    });
   }
 });
 
