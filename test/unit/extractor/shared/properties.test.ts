@@ -424,10 +424,7 @@ describe('JSX', () => {
       });
 
       it('handles empty strings (ref: #29)', async () => {
-        const tokens = await tokenizer(
-          '<T keyName ns="" />',
-          FILE_NAME
-        );
+        const tokens = await tokenizer('<T keyName ns="" />', FILE_NAME);
         for (const token of tokens) {
           if (!machine.getSnapshot().done) {
             machine.send(token);

@@ -125,11 +125,11 @@ export default createMachine<PropertiesContext>(
         on: {
           'punctuation.definition.string.end.ts': {
             target: 'idle',
-            actions: [ 'storeEmptyPropertyValue', 'clearPropertyType' ],
+            actions: ['storeEmptyPropertyValue', 'clearPropertyType'],
           },
           'punctuation.definition.string.template.end.ts': {
             target: 'idle',
-            actions: [ 'storeEmptyPropertyValue', 'clearPropertyType' ],
+            actions: ['storeEmptyPropertyValue', 'clearPropertyType'],
           },
           '*': [
             {
@@ -240,8 +240,7 @@ export default createMachine<PropertiesContext>(
             : ctx.keyName,
         defaultValue: (ctx) =>
           ctx.property === 'defaultValue' ? '' : ctx.defaultValue,
-        namespace: (ctx) =>
-          ctx.property === 'ns' ? '' : ctx.namespace,
+        namespace: (ctx) => (ctx.property === 'ns' ? '' : ctx.namespace),
       }),
 
       markPropertyAsDynamic: assign({
