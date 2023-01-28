@@ -648,7 +648,7 @@ export default createMachine<MachineCtx>(
           keyName: ctx.key.keyName || evt.data.keyName,
           defaultValue:
             ctx.key.defaultValue || evt.data.defaultValue || undefined,
-          namespace: evt.data.namespace ?? ctx.key.namespace,
+          namespace: evt.data.namespace === '' ? undefined : evt.data.namespace ?? ctx.key.namespace,
           line: ctx.line,
         }),
         warnings: (ctx, evt) => {
