@@ -38,7 +38,8 @@ function parseConfig(rc: any): TolgeeConfig {
   }
 
   if ('projectId' in rc) {
-    if (typeof rc.projectId !== 'number') {
+    const id = Number(rc.projectId);
+    if (Number.isNaN(id)) {
       throw new Error('Invalid config: projectId is not a number');
     }
 
