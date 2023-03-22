@@ -39,7 +39,7 @@ function parseConfig(rc: any): TolgeeConfig {
 
   if ('projectId' in rc) {
     cfg.projectId = Number(rc.projectId); // Number("") returns 0
-    if (!Number.isInteger(cfg.projectId) || rc.projectId === "") {
+    if (!Number.isInteger(cfg.projectId) || cfg.projectId <= 0) {
       throw new Error('Invalid config: projectId should be an integer representing your project Id');
     }
   }
