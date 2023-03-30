@@ -6,10 +6,17 @@ import { run } from './utils/run';
 const FIXTURES_PATH = join(__dirname, '..', '__fixtures__');
 const CODE_PROJECT = join(FIXTURES_PATH, 'codeProjectReact');
 const CODE_PROJECT_ERR = join(FIXTURES_PATH, 'codeProjectReactWithErr');
+const CODE_PROJECT_DYNAMIC_KEYS = join(FIXTURES_PATH, 'codeProjectDynamicKeys');
 const EXTRACTED_DATA = join(FIXTURES_PATH, 'codeProjectExtracted', 'en.json');
+const CODE_PROJECT_LONG_KEY = join(
+  FIXTURES_PATH,
+  'codeProjectKeyOutside',
+  'Test.tsx'
+);
 
 const CODE_PROJECT_MATCH = `${CODE_PROJECT}/**/*.tsx`;
 const CODE_PROJECT_ERR_MATCH = `${CODE_PROJECT_ERR}/**/*.tsx`;
+const CODE_PROJECT_DYNAMIC_MATCH = `${CODE_PROJECT_DYNAMIC_KEYS}/**/*.tsx`;
 
 let expectedStrings: Record<string, string> = {};
 
@@ -71,3 +78,29 @@ it('spits GitHub Workflow Commands when it detects GH Actions env', async () => 
   expect(out.code).toBe(1);
   expect(out.stdout).toContain('::warning file=');
 }, 60e3);
+
+it('extracts stuff from complex file', async () => {
+  const out = await run(
+    ['extract', 'check', CODE_PROJECT_DYNAMIC_MATCH],
+    undefined,
+    20e3
+  );
+
+  console.log(out.stdout);
+
+  expect(out.stdout).toContain('simple_paginated_list_error_message');
+  expect(out.stdout).toContain('Dynamic key');
+}, 30e3);
+
+it('extracts key outside component', async () => {
+  const out = await run(
+    ['extract', 'print', CODE_PROJECT_LONG_KEY],
+    undefined,
+    20e3
+  );
+
+  console.log(out.stdout);
+
+  expect(out.stdout).toContain('key-in');
+  expect(out.stdout).toContain('key-out');
+}, 30e3);
