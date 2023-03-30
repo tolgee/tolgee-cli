@@ -58,7 +58,7 @@ export function compareKeys(
   // Added keys
   const namespaces = [...Object.keys(local), NullNamespace] as const;
   for (const namespace of namespaces) {
-    if (local[namespace].size) {
+    if (namespace in local && local[namespace].size) {
       for (const [keyName, defaultValue] of local[namespace].entries()) {
         result.added.push({
           keyName: keyName,

@@ -154,6 +154,24 @@ describe('Plain JavaScript', () => {
         expect(snapshot.context.defaultValue).toBeNull();
         expect(snapshot.context.namespace).toBe(false);
       });
+
+      it('handles empty strings (ref: #29)', async () => {
+        const tokens = await tokenizer(
+          'const a = { key: "key", ns: "" }',
+          FILE_NAME
+        );
+        for (const token of tokens) {
+          if (!machine.getSnapshot().done) {
+            machine.send(token);
+          }
+        }
+
+        const snapshot = machine.getSnapshot();
+        expect(snapshot.done).toBe(true);
+        expect(snapshot.context.keyName).toBe('key');
+        expect(snapshot.context.defaultValue).toBeNull();
+        expect(snapshot.context.namespace).toBe('');
+      });
     });
   });
 
@@ -403,6 +421,21 @@ describe('JSX', () => {
         expect(snapshot.context.keyName).toBe(false);
         expect(snapshot.context.defaultValue).toBeNull();
         expect(snapshot.context.namespace).toBe(false);
+      });
+
+      it('handles empty strings (ref: #29)', async () => {
+        const tokens = await tokenizer('<T keyName ns="" />', FILE_NAME);
+        for (const token of tokens) {
+          if (!machine.getSnapshot().done) {
+            machine.send(token);
+          }
+        }
+
+        const snapshot = machine.getSnapshot();
+        expect(snapshot.done).toBe(true);
+        expect(snapshot.context.keyName).toBe(false);
+        expect(snapshot.context.defaultValue).toBeNull();
+        expect(snapshot.context.namespace).toBe('');
       });
     });
   });

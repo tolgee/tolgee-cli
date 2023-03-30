@@ -97,11 +97,15 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])(
     });
 
     it('extracts the namespace from props', async () => {
-      const expected = [{ keyName: 'key1', namespace: 'ns1', line: 3 }];
+      const expected = [
+        { keyName: 'key1', namespace: 'ns1', line: 3 },
+        { keyName: 'key2', namespace: undefined, line: 4 },
+      ];
 
       const code = `
         import '@tolgee/react'
         React.createElement(T, { keyName: 'key1', ns: 'ns1' })
+        React.createElement(T, { keyName: 'key2', ns: '' })
       `;
 
       const extracted = await extractKeys(code, FILE_NAME);
@@ -437,13 +441,17 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])('useTranslate (.%s)', (ext) => {
   });
 
   it('overrides the specified namespace if one is passed as parameter', async () => {
-    const expected = [{ keyName: 'key1', namespace: 'ns1', line: 5 }];
+    const expected = [
+      { keyName: 'key1', namespace: 'ns1', line: 5 },
+      { keyName: 'key2', namespace: undefined, line: 6 },
+    ];
 
     const code = `
       import '@tolgee/react'
       function Test () {
         const { t } = useTranslate('namespace')
         t('key1', { ns: 'ns1' })
+        t('key2', { ns: '' })
       }
     `;
 
