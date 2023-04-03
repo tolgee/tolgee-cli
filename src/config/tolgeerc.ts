@@ -38,11 +38,12 @@ function parseConfig(rc: any): TolgeeConfig {
   }
 
   if ('projectId' in rc) {
-    if (typeof rc.projectId !== 'number') {
-      throw new Error('Invalid config: projectId is not a number');
+    cfg.projectId = Number(rc.projectId); // Number("") returns 0
+    if (!Number.isInteger(cfg.projectId) || cfg.projectId <= 0) {
+      throw new Error(
+        'Invalid config: projectId should be an integer representing your project Id'
+      );
     }
-
-    cfg.projectId = rc.projectId;
   }
 
   if ('sdk' in rc) {
