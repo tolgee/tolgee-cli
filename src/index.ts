@@ -30,43 +30,34 @@ function topLevelName(command: Command): string {
     : command.name();
 }
 
-async function validateApiKey(cmd: Command) {
+async function loadApiKey(cmd: Command) {
   const opts = cmd.optsWithGlobals();
 
-  if (!opts.apiKey) {
-    // Attempt to load --api-key from config store if not specified
-    // This is not done as part of the init routine or via the mandatory flag, as this is dependent on the API URL.
-    const key = await getApiKey(opts.apiUrl, opts.projectId);
+  // API Key is already loaded
+  if (opts.apiKey) return
 
-    if (!key) {
-      error(
-        'No API key has been provided. You must either provide one via --api-key, or login via `tolgee login`.'
-      );
-      process.exit(1);
+  // Attempt to load --api-key from config store if not specified
+  // This is not done as part of the init routine or via the mandatory flag, as this is dependent on the API URL.
+  const key = await getApiKey(opts.apiUrl, opts.projectId);
+
+  // No key in store, stop here.
+  if (!key) return
+
+  cmd.setOptionValue('apiKey', key);
+  program.setOptionValue('_removeApiKeyFromStore', () => {
+    if (key.startsWith(API_KEY_PAT_PREFIX)) {
+      savePat(opts.apiUrl);
+    } else {
+      savePak(opts.apiUrl, opts.projectId);
     }
-
-    cmd.setOptionValue('apiKey', key);
-    program.setOptionValue('_removeApiKeyFromStore', () => {
-      if (key.startsWith(API_KEY_PAT_PREFIX)) {
-        savePat(opts.apiUrl);
-      } else {
-        savePak(opts.apiUrl, opts.projectId);
-      }
-    });
-  }
+  });
 }
 
-function validateProjectId(cmd: Command) {
+function loadProjectId(cmd: Command) {
   const opts = cmd.optsWithGlobals();
 
-  // Validate --project-id is present when using Project API keys
-  if (opts.projectId === -1 && opts.apiKey.startsWith(API_KEY_PAT_PREFIX)) {
-    error('You must specify a Project ID.');
-    process.exit(1);
-  }
-
   if (opts.apiKey.startsWith(API_KEY_PAK_PREFIX)) {
-    // Parse the key to ensure we can access the specified Project ID
+    // Parse the key and ensure we can access the specified Project ID
     const projectId = RestClient.projectIdFromKey(opts.apiKey);
     program.setOptionValue('projectId', projectId);
 
@@ -85,10 +76,29 @@ function validateProjectId(cmd: Command) {
   }
 }
 
+function validateOptions(cmd: Command) {
+  const opts = cmd.optsWithGlobals();
+  if (opts.projectId === -1) {
+    error('No Project ID have been specified. You must either provide one via --project-ir, or by setting up a `.tolgeerc` file.');
+    info(
+      'Learn more about configuring the CLI here: https://tolgee.io/tolgee-cli/project-configuration'
+    );
+    process.exit(1);
+  }
+
+  if (!opts.apiKey) {
+    error(
+      'No API key has been provided. You must either provide one via --api-key, or login via `tolgee login`.'
+    );
+    process.exit(1);
+  }
+}
+
 async function preHandler(prog: Command, cmd: Command) {
   if (!NO_KEY_COMMANDS.includes(topLevelName(cmd))) {
-    await validateApiKey(cmd);
-    await validateProjectId(cmd);
+    await loadApiKey(cmd);
+    loadProjectId(cmd);
+    validateOptions(cmd);
 
     const opts = cmd.optsWithGlobals();
     const client = new RestClient({
