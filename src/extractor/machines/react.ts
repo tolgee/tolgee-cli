@@ -434,6 +434,30 @@ export default createMachine<MachineCtx>(
                 target: 'idle',
                 actions: ['dynamicChildren', 'pushKey'],
               },
+              'variable.other.object.ts': {
+                target: 'idle',
+                actions: ['dynamicChildren', 'pushKey'],
+              },
+              'entity.name.function.ts': {
+                target: 'idle',
+                actions: ['dynamicChildren', 'pushKey'],
+              },
+              'storage.type.function.ts': {
+                target: 'idle',
+                actions: ['dynamicChildren', 'pushKey'],
+              },
+              'storage.type.class.ts': {
+                target: 'idle',
+                actions: ['dynamicChildren', 'pushKey'],
+              },
+              'keyword.operator.new.ts': {
+                target: 'idle',
+                actions: ['dynamicChildren', 'pushKey'],
+              },
+              'punctuation.definition.block.ts': {
+                target: 'idle',
+                actions: ['dynamicChildren', 'pushKey'],
+              },
               'punctuation.definition.template-expression.begin.ts': {
                 target: 'idle',
                 actions: ['dynamicChildren', 'pushKey'],

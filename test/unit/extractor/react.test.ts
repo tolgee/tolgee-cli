@@ -915,9 +915,11 @@ describe.each(['jsx', 'tsx'])('<T> (.%s)', (ext) => {
         { warning: 'W_DYNAMIC_KEY', line: 4 },
         { warning: 'W_DYNAMIC_KEY', line: 5 },
         { warning: 'W_DYNAMIC_KEY', line: 6 },
-        { warning: 'W_DYNAMIC_KEY', line: 8 },
+        { warning: 'W_DYNAMIC_KEY', line: 7 },
         { warning: 'W_DYNAMIC_KEY', line: 9 },
         { warning: 'W_DYNAMIC_KEY', line: 10 },
+        { warning: 'W_DYNAMIC_KEY', line: 11 },
+        { warning: 'W_DYNAMIC_KEY', line: 12 },
       ];
 
       const code = `
@@ -925,9 +927,11 @@ describe.each(['jsx', 'tsx'])('<T> (.%s)', (ext) => {
         <T keyName={\`dynamic-key-\${i}\`} />
         <T keyName={'dynamic-key-' + i} />
         <T keyName={key} />
+        <T keyName={a.key} />
         <T keyName />
 
         <T>{key}</T>
+        <T>{a.key}</T>
         <T>{'dynamic-' + i}</T>
         <T>{\`dynamic-\${i}\`}</T>
       `;
@@ -943,6 +947,7 @@ describe.each(['jsx', 'tsx'])('<T> (.%s)', (ext) => {
         { warning: 'W_DYNAMIC_NAMESPACE', line: 4 },
         { warning: 'W_DYNAMIC_NAMESPACE', line: 5 },
         { warning: 'W_DYNAMIC_NAMESPACE', line: 6 },
+        { warning: 'W_DYNAMIC_NAMESPACE', line: 7 },
       ];
 
       const code = `
@@ -950,6 +955,7 @@ describe.each(['jsx', 'tsx'])('<T> (.%s)', (ext) => {
         <T keyName='key1' ns={\`dynamic-ns-\${i}\`} />
         <T keyName='key2' ns={'dynamic-ns-' + i} />
         <T keyName='key2' ns={ns} />
+        <T keyName='key2' ns={a.ns} />
         <T keyName='key2' ns/>
       `;
 
@@ -966,6 +972,7 @@ describe.each(['jsx', 'tsx'])('<T> (.%s)', (ext) => {
         { warning: 'W_DYNAMIC_DEFAULT_VALUE', line: 6 },
         { warning: 'W_DYNAMIC_DEFAULT_VALUE', line: 7 },
         { warning: 'W_DYNAMIC_DEFAULT_VALUE', line: 8 },
+        { warning: 'W_DYNAMIC_DEFAULT_VALUE', line: 9 },
       ];
 
       const expectedKeys = [
@@ -975,6 +982,7 @@ describe.each(['jsx', 'tsx'])('<T> (.%s)', (ext) => {
         { keyName: 'key4', defaultValue: undefined, line: 6 },
         { keyName: 'key5', defaultValue: undefined, line: 7 },
         { keyName: 'key6', defaultValue: undefined, line: 8 },
+        { keyName: 'key7', defaultValue: undefined, line: 9 },
       ];
 
       const code = `
@@ -985,6 +993,7 @@ describe.each(['jsx', 'tsx'])('<T> (.%s)', (ext) => {
         <T keyName='key4'>{someValue}</T>
         <T keyName='key5'>{'dynamic-' + i}</T>
         <T keyName='key6'>{\`dynamic-\${i}\`}</T>
+        <T keyName='key7'>{a.someValue}</T>
       `;
 
       const extracted = await extractKeys(code, FILE_NAME);
