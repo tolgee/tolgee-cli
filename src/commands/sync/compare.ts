@@ -42,7 +42,7 @@ async function compareHandler(this: Command, pattern: string) {
     const key = diff.added.length === 1 ? 'key' : 'keys';
     console.log(
       ansi.green.bold(
-        `${diff.added.length} new ${key} found in your code project`
+        `${diff.added.length} new ${key} found`
       )
     );
     for (const key of diff.added) {
@@ -54,10 +54,10 @@ async function compareHandler(this: Command, pattern: string) {
   }
 
   if (diff.removed.length) {
-    const key = diff.added.length === 1 ? 'key' : 'keys';
+    const key = diff.removed.length === 1 ? 'key' : 'keys';
     console.log(
       ansi.red.bold(
-        `${diff.removed.length} ${key} exist on Tolgee but were not found in your code project`
+        `${diff.removed.length} unused ${key}`
       )
     );
     for (const key of diff.removed) {
