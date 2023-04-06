@@ -6,7 +6,7 @@ import { DEFAULT_API_URL } from './constants';
 
 function parseProjectId(v: string) {
   const val = Number(v);
-  if (isNaN(val) || val < 1) {
+  if (!Number.isInteger(val) || val < 1) {
     throw new InvalidArgumentError('Not a valid project ID.');
   }
   return val;

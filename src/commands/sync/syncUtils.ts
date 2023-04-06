@@ -14,17 +14,17 @@ export type ComparatorResult = {
  * Prints information about a key, with coloring and formatting.
  *
  * @param key The key to print.
- * @param type Whether this is an addition or a removal.
+ * @param deletion True if the key is about to be deleted.
  */
-export function printKey(key: PartialKey, type: 'added' | 'removed') {
+export function printKey(key: PartialKey, deletion: boolean) {
   const namespace = key.namespace
     ? ` ${ansi.italic(`(namespace: ${key.namespace})`)}`
     : '';
 
-  if (type === 'added') {
-    console.log(`${ansi.green(`+ ${key.keyName}`)}${namespace}`);
-  } else {
+  if (deletion) {
     console.log(`${ansi.red(`- ${key.keyName}`)}${namespace}`);
+  } else {
+    console.log(`${ansi.green(`+ ${key.keyName}`)}${namespace}`);
   }
 }
 
@@ -56,18 +56,36 @@ export function compareKeys(
   }
 
   // Added keys
-  const namespaces = [...Object.keys(local), NullNamespace] as const;
+  const namespaces = [NullNamespace, ...Object.keys(local).sort()] as const;
   for (const namespace of namespaces) {
     if (namespace in local && local[namespace].size) {
-      for (const [keyName, defaultValue] of local[namespace].entries()) {
+      const keys = local[namespace];
+      const keyNames = Array.from(local[namespace].keys()).sort();
+      for (const keyName of keyNames) {
         result.added.push({
           keyName: keyName,
           namespace: namespace === NullNamespace ? undefined : namespace,
-          defaultValue: defaultValue || undefined,
+          defaultValue: keys.get(keyName) || undefined,
         });
       }
     }
   }
+
+  // Sort keys
+  // This is only necessary for unused keys, because the added keys are sorted directly as they're added.
+  result.removed.sort((a, b) => {
+    if (a.namespace === b.namespace) {
+      return a.keyName > b.keyName ? 1 : a.keyName < b.keyName ? -1 : 0;
+    }
+
+    if (!a.namespace && b.namespace) return -1;
+    if (a.namespace && !b.namespace) return 1;
+    return a.namespace! > b.namespace!
+      ? 1
+      : a.namespace! < b.namespace!
+      ? -1
+      : 0;
+  });
 
   return result;
 }

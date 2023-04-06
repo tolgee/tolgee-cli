@@ -37,7 +37,7 @@ async function backup(client: Client, dest: string) {
 
 async function askForConfirmation(
   keys: PartialKey[],
-  operation: 'added' | 'removed'
+  operation: 'created' | 'deleted'
 ) {
   if (!process.stdout.isTTY) {
     error(
@@ -48,9 +48,9 @@ async function askForConfirmation(
 
   const str = `The following keys will be ${operation}:`;
   console.log(
-    operation === 'added' ? ansi.bold.green(str) : ansi.bold.red(str)
+    operation === 'created' ? ansi.bold.green(str) : ansi.bold.red(str)
   );
-  keys.forEach((k) => printKey(k, operation));
+  keys.forEach((k) => printKey(k, operation === 'deleted'));
 
   const shouldContinue = await askBoolean('Does this look correct?', true);
   if (!shouldContinue) {
@@ -105,7 +105,7 @@ async function syncHandler(this: Command, pattern: string) {
   // Create new keys
   if (diff.added.length) {
     if (!opts.yes) {
-      await askForConfirmation(diff.added, 'added');
+      await askForConfirmation(diff.added, 'created');
     }
 
     const keys = diff.added.map((key) => ({
@@ -126,7 +126,7 @@ async function syncHandler(this: Command, pattern: string) {
     // Delete unused keys.
     if (diff.removed.length) {
       if (!opts.yes) {
-        await askForConfirmation(diff.removed, 'removed');
+        await askForConfirmation(diff.removed, 'deleted');
       }
 
       const ids = await diff.removed.map((k) => k.id);
