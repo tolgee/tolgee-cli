@@ -59,8 +59,8 @@ export function compareKeys(
   const namespaces = [NullNamespace, ...Object.keys(local).sort()] as const;
   for (const namespace of namespaces) {
     if (namespace in local && local[namespace].size) {
-      const keys = local[namespace]
-      const keyNames = Array.from(local[namespace].keys()).sort()
+      const keys = local[namespace];
+      const keyNames = Array.from(local[namespace].keys()).sort();
       for (const keyName of keyNames) {
         result.added.push({
           keyName: keyName,
@@ -75,21 +75,17 @@ export function compareKeys(
   // This is only necessary for unused keys, because the added keys are sorted directly as they're added.
   result.removed.sort((a, b) => {
     if (a.namespace === b.namespace) {
-      return a.keyName > b.keyName
-        ? 1
-        : a.keyName < b.keyName
-          ? -1
-          : 0
+      return a.keyName > b.keyName ? 1 : a.keyName < b.keyName ? -1 : 0;
     }
 
-    if (!a.namespace && b.namespace) return -1
-    if (a.namespace && !b.namespace) return 1
+    if (!a.namespace && b.namespace) return -1;
+    if (a.namespace && !b.namespace) return 1;
     return a.namespace! > b.namespace!
-        ? 1
-        : a.namespace! < b.namespace!
-          ? -1
-          : 0
-  })
+      ? 1
+      : a.namespace! < b.namespace!
+      ? -1
+      : 0;
+  });
 
   return result;
 }

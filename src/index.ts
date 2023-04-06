@@ -34,14 +34,14 @@ async function loadApiKey(cmd: Command) {
   const opts = cmd.optsWithGlobals();
 
   // API Key is already loaded
-  if (opts.apiKey) return
+  if (opts.apiKey) return;
 
   // Attempt to load --api-key from config store if not specified
   // This is not done as part of the init routine or via the mandatory flag, as this is dependent on the API URL.
   const key = await getApiKey(opts.apiUrl, opts.projectId);
 
   // No key in store, stop here.
-  if (!key) return
+  if (!key) return;
 
   cmd.setOptionValue('apiKey', key);
   program.setOptionValue('_removeApiKeyFromStore', () => {
@@ -79,7 +79,9 @@ function loadProjectId(cmd: Command) {
 function validateOptions(cmd: Command) {
   const opts = cmd.optsWithGlobals();
   if (opts.projectId === -1) {
-    error('No Project ID have been specified. You must either provide one via --project-ir, or by setting up a `.tolgeerc` file.');
+    error(
+      'No Project ID have been specified. You must either provide one via --project-ir, or by setting up a `.tolgeerc` file.'
+    );
     info(
       'Learn more about configuring the CLI here: https://tolgee.io/tolgee-cli/project-configuration'
     );
