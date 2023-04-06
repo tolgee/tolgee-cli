@@ -1,11 +1,11 @@
 # Tolgee CLI 🐁
 
-An experimental 🧪 command line tool to interact with Tolgee directly from your terminal.
+A CLI tool to interact with Tolgee directly from your terminal.
 
-The CLI lets you pull strings from the Tolgee platform into your projects, push local strings to the Tolgee platform,
+The Tolgee CLI lets you pull strings from the Tolgee platform into your projects, push local strings to the Tolgee platform,
 extract strings from your code, and much more!
 
-- Pull requests welcome! 🤩
+![Tolgee CLI screenshot](tolgee-cli-screenshot.png)
 
 ## Installation
 The Tolgee CLI is published as a NPM package. You simply need to install it, and you're good to go!
@@ -13,10 +13,10 @@ The Tolgee CLI is published as a NPM package. You simply need to install it, and
 npm i --global @tolgee/cli
 ```
 
-> **Warning**: The Tolgee CLI is currently experimental and subject to bugs. Breaking changes may happen before stable release!
->
-> Help us reach stable version faster by reporting any bug you encounter on the [issue tracker](https://github.com/tolgee/tolgee-cli/issues/new?labels=bug).
-> Feedback is also greatly appreciated!
+or if you are using Yarn:
+```sh
+yarn global add @tolgee/cli
+```
 
 See our [documentation](https://tolgee.io/tolgee-cli/installation) for more information.
 
