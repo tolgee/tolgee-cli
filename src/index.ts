@@ -78,7 +78,7 @@ function validateProjectId(cmd: Command) {
         `The API key you specified is tied to project #${projectId}, you tried to perform operations on project #${opts.projectId}.`
       );
       info(
-        'Learn more about how API keys in Tolgee work here: https://tolgee.io/docs/platform/api-keys-and-pat-tokens'
+        'Learn more about how API keys in Tolgee work here: https://tolgee.io/platform/account_settings/api_keys_and_pat_tokens'
       );
       process.exit(1);
     }

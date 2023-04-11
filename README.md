@@ -9,13 +9,16 @@ extract strings from your code, and much more!
 
 ## Installation
 The Tolgee CLI is published as a NPM package. You simply need to install it, and you're good to go!
-```sh
-npm i --global @tolgee/cli
-```
 
-or if you are using Yarn:
 ```sh
+# npm
+npm i --global @tolgee/cli
+
+# Yarn
 yarn global add @tolgee/cli
+
+# pnpm
+pnpm add --global @tolgee/cli
 ```
 
 See our [documentation](https://tolgee.io/tolgee-cli/installation) for more information.
