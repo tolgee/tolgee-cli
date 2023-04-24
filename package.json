@@ -10,7 +10,7 @@
     "build": "rimraf dist dist-types && tsc && cp dist-types/extractor/index.d.ts extractor.d.ts",
     "test": "npm run test:unit && npm run test:e2e && npm run test:package",
     "test:unit": "jest -c jest.unit.config.ts",
-    "pretest:e2e": "npm run tolgee:start",
+    "pretest:e2e": "npm run build && npm run tolgee:start",
     "posttest:e2e": "npm run tolgee:stop",
     "test:e2e": "jest -c jest.e2e.config.ts --runInBand",
     "test:e2e-run": "jest -c jest.e2e.config.ts --runInBand",

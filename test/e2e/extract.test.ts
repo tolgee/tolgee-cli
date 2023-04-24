@@ -81,7 +81,6 @@ it('extracts from files with only magic comments', async () => {
     50e3
   );
 
-  console.log(out);
   expect(out.code).toBe(0);
   expect(out.stdout).toContain('Total unique keys found: 1');
   expect(out.stdout).toContain('uwu');

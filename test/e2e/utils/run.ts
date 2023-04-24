@@ -3,9 +3,9 @@ import type { ChildProcessWithoutNullStreams } from 'child_process';
 import { join } from 'path';
 import { spawn as spawnProcess } from 'child_process';
 
-const TTY_PRELOAD = join(__dirname, '..', '__internal__', 'tty.ts');
-const PRELOAD = join(__dirname, '..', '__internal__', 'preload.ts');
-const CLI_INDEX = join(__dirname, '..', '..', '..', 'src', 'index.ts');
+const TTY_PRELOAD = join(__dirname, '..', '__internal__', 'tty.js');
+const PRELOAD = join(__dirname, '..', '__internal__', 'preload.js');
+const CLI_INDEX = join(__dirname, '..', '..', '..', 'dist', 'index.js');
 const DEBUG_ENABLED = process.env.RUNNER_DEBUG === '1';
 
 export type RunResult = {
@@ -23,8 +23,6 @@ export function spawn(
   return spawnProcess(
     process.argv0,
     [
-      '--require',
-      'ts-node/register',
       '--require',
       PRELOAD,
       stdin && '--require',

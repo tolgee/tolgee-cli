@@ -37,7 +37,7 @@ it('detects new keys in code projects', async () => {
 
   expect(out.code).toBe(0);
   expect(out.stdout).toContain('out of sync');
-  expect(out.stdout).toContain('2 new keys found in your code project');
+  expect(out.stdout).toContain('2 new keys found');
   // Matching \n is important to ensure it properly understood it is not a namespaced string
   expect(out.stdout).toContain('+ mouse-name\n');
   expect(out.stdout).toContain('+ mouse-sound\n');
@@ -52,9 +52,7 @@ it('detects keys that no longer exist', async () => {
 
   expect(out.code).toBe(0);
   expect(out.stdout).toContain('out of sync');
-  expect(out.stdout).toContain(
-    '2 keys exist on Tolgee but were not found in your code project'
-  );
+  expect(out.stdout).toContain('2 unused keys');
   // Matching \n is important to ensure it properly understood it is not a namespaced string
   expect(out.stdout).toContain('- bird-name\n');
   expect(out.stdout).toContain('- bird-sound\n');
@@ -69,10 +67,8 @@ it('handles namespaces properly', async () => {
 
   expect(out.code).toBe(0);
   expect(out.stdout).toContain('out of sync');
-  expect(out.stdout).toContain('4 new keys found in your code project');
-  expect(out.stdout).toContain(
-    '3 keys exist on Tolgee but were not found in your code project'
-  );
+  expect(out.stdout).toContain('4 new keys found');
+  expect(out.stdout).toContain('3 unused keys');
   expect(out.stdout).toContain('+ cookies (namespace: food)');
   expect(out.stdout).toContain('- soda (namespace: drinks)');
   expect(out.stdout).toContain('+ table (namespace: furniture)');
@@ -90,7 +86,7 @@ it('logs emitted warnings to stderr', async () => {
   expect(out.stderr).toContain('Warnings were emitted');
 }, 30e3);
 
-it.only('prints keys sorted in alphabetical order', async () => {
+it('prints keys sorted in alphabetical order', async () => {
   const out = await run(
     ['compare', '--api-key', PROJECT_PAK_2, CODE_UNORDERED],
     undefined,
@@ -98,7 +94,6 @@ it.only('prints keys sorted in alphabetical order', async () => {
   );
 
   expect(out.code).toBe(0);
-  console.log(out.stdout);
 
   // Test all added keys
   expect(out.stdout).toContain('section-content');
