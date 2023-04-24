@@ -3,7 +3,7 @@ import { Worker, isMainThread, parentPort } from 'worker_threads';
 import { readFile } from 'fs/promises';
 
 // TODO: this solution won't handle new integrations and it will need a slight tweaking before adding new ones
-import internalExtractor from './presets/react';
+import internalExtractor from './extractor';
 import { loadModule } from '../utils/moduleLoader';
 import { type Deferred, createDeferred } from '../utils/deferred';
 

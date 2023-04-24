@@ -241,7 +241,8 @@ export default createMachine<MachineCtx>(
             on: {
               'punctuation.definition.variable.svelte': {
                 target: 'dollar',
-                cond: (ctx, evt) => ctx.useTranslate !== null && evt.token === '$',
+                cond: (ctx, evt) =>
+                  ctx.useTranslate !== null && evt.token === '$',
               },
             },
           },
@@ -253,7 +254,7 @@ export default createMachine<MachineCtx>(
                 actions: 'storeLine',
                 cond: (_ctx, evt) => evt.token === 't',
               },
-            }
+            },
           },
           func: {
             on: {
@@ -462,9 +463,7 @@ export default createMachine<MachineCtx>(
       storeKeyCurrentNamespace: assign({
         key: (ctx, _evt) => ({
           ...ctx.key,
-          namespace: ctx.useTranslate !== null
-            ? ctx.useTranslate
-            : undefined,
+          namespace: ctx.useTranslate !== null ? ctx.useTranslate : undefined,
         }),
       }),
 
@@ -505,9 +504,10 @@ export default createMachine<MachineCtx>(
             ...ctx.keys,
             {
               keyName: ctx.key.keyName.trim(),
-              namespace: ctx.key.namespace === ''
-                ? undefined
-                : ctx.key.namespace?.trim(),
+              namespace:
+                ctx.key.namespace === ''
+                  ? undefined
+                  : ctx.key.namespace?.trim(),
               defaultValue: ctx.key.defaultValue?.trim().replace(/\s+/g, ' '),
               line: ctx.line,
             },
