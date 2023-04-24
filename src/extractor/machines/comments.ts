@@ -28,7 +28,7 @@ export default createMachine<MachineCtx>(
           cond: (_ctx, evt) => evt.kind === 'ignore',
         },
         {
-          actions: 'pushImmediateKey',
+          actions: 'pushKey',
           cond: (_ctx, evt) => evt.kind === 'key',
         },
       ],
@@ -74,7 +74,7 @@ export default createMachine<MachineCtx>(
       warnUnusedIgnore: assign({
         warnings: (ctx, evt) => [
           ...ctx.warnings,
-          { warning: 'W_UNUSED_IGNORE', line: evt.line - 1 },
+          { warning: 'W_UNUSED_IGNORE', line: evt.line },
         ],
       }),
       pushKey: assign({

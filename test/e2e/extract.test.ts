@@ -6,10 +6,12 @@ import { run } from './utils/run';
 const FIXTURES_PATH = join(__dirname, '..', '__fixtures__');
 const CODE_PROJECT = join(FIXTURES_PATH, 'codeProjectReact');
 const CODE_PROJECT_ERR = join(FIXTURES_PATH, 'codeProjectReactWithErr');
+const CODE_PROJECT_COMMENT = join(FIXTURES_PATH, 'codeProjectCommentOnly');
 const EXTRACTED_DATA = join(FIXTURES_PATH, 'codeProjectExtracted', 'en.json');
 
 const CODE_PROJECT_MATCH = `${CODE_PROJECT}/**/*.tsx`;
 const CODE_PROJECT_ERR_MATCH = `${CODE_PROJECT_ERR}/**/*.tsx`;
+const CODE_PROJECT_COMMENT_MATCH = `${CODE_PROJECT_COMMENT}/**/*.ts`;
 
 let expectedStrings: Record<string, string> = {};
 
@@ -71,3 +73,16 @@ it('spits GitHub Workflow Commands when it detects GH Actions env', async () => 
   expect(out.code).toBe(1);
   expect(out.stdout).toContain('::warning file=');
 }, 60e3);
+
+it('extracts from files with only magic comments', async () => {
+  const out = await run(
+    ['extract', 'print', CODE_PROJECT_COMMENT_MATCH],
+    undefined,
+    50e3
+  );
+
+  console.log(out);
+  expect(out.code).toBe(0);
+  expect(out.stdout).toContain('Total unique keys found: 1');
+  expect(out.stdout).toContain('uwu');
+});
