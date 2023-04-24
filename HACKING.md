@@ -67,7 +67,6 @@ steps:
    - Add new cases in the `extnameToGrammar` function
 
 ----
-Feel free to join the [Slack channel](https://join.slack.com/t/tolgeecommunity/shared_invite/zt-195isb5u8-_RcSRgVJfvgsPpOBIok~IQ)
-if you have questions!
+Feel free to join the [Slack channel](https://tolg.ee/slack) if you have questions!
 
 Happy hacking 🐀

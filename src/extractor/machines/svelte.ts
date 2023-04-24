@@ -4,19 +4,16 @@ import { createMachine, assign, send, forwardTo } from 'xstate';
 import propertiesMachine from './shared/properties';
 import commentsService from './shared/comments';
 
-type HookVisibility = { depth: number; namespace?: string | false };
-
 type KeyWithDynamicNs = Omit<ExtractedKey, 'namespace'> & {
   namespace?: ExtractedKey['namespace'] | false;
 };
 
 type MachineCtx = {
-  blockDepth: number;
   children: string;
   line: number;
 
   key: KeyWithDynamicNs;
-  hooks: HookVisibility[];
+  useTranslate: string | null | false;
   ignore: null | { type: 'key' | 'ignore'; line: number };
 
   keys: ExtractedKey[];
@@ -28,15 +25,14 @@ const VOID_KEY = { keyName: '', line: -1 };
 export default createMachine<MachineCtx>(
   {
     predictableActionArguments: true,
-    id: 'reactExtractor',
+    id: 'svelteExtractor',
     type: 'parallel',
     context: {
-      blockDepth: 0,
       children: '',
       line: 0,
 
       key: VOID_KEY,
-      hooks: [],
+      useTranslate: null,
       ignore: null,
 
       keys: [],
@@ -76,6 +72,16 @@ export default createMachine<MachineCtx>(
             ),
           },
           'comment.block.ts': {
+            actions: send(
+              (_ctx, evt) => ({
+                type: 'COMMENT',
+                data: evt.token,
+                line: evt.line,
+              }),
+              { to: 'comments' }
+            ),
+          },
+          'comment.block.svelte': {
             actions: send(
               (_ctx, evt) => ({
                 type: 'COMMENT',
@@ -132,12 +138,12 @@ export default createMachine<MachineCtx>(
               'punctuation.definition.string.template.begin.ts': 'namespace',
               'variable.other.readwrite.ts': {
                 target: 'idle',
-                actions: ['pushHook', 'markHookAsDynamic'],
+                actions: ['storeUseTranslate', 'markUseTranslateAsDynamic'],
               },
               'meta.brace.round.ts': {
                 target: 'idle',
                 cond: (_ctx, evt) => evt.token === ')',
-                actions: 'pushHook',
+                actions: 'storeUseTranslate',
               },
             },
           },
@@ -145,7 +151,7 @@ export default createMachine<MachineCtx>(
             on: {
               '*': {
                 target: 'namespace_end',
-                actions: 'pushNamespacedHook',
+                actions: 'storeNamespacedUseTranslate',
               },
             },
           },
@@ -155,206 +161,22 @@ export default createMachine<MachineCtx>(
               'meta.brace.round.ts': 'idle',
               'punctuation.definition.template-expression.begin.ts': {
                 target: 'idle',
-                actions: 'markHookAsDynamic',
+                actions: 'markUseTranslateAsDynamic',
               },
               'keyword.operator.arithmetic.ts': {
                 target: 'idle',
-                actions: 'markHookAsDynamic',
-              },
-            },
-          },
-        },
-        on: {
-          'punctuation.definition.block.ts': [
-            {
-              cond: (_ctx, evt) => evt.token === '{',
-              actions: 'incrementDepth',
-            },
-            {
-              cond: (_ctx, evt) => evt.token === '}',
-              actions: 'decrementDepth',
-            },
-          ],
-        },
-      },
-
-      createElement: {
-        initial: 'idle',
-        states: {
-          idle: {
-            on: {
-              'variable.other.object.ts': {
-                target: 'func1',
-                actions: 'storeLine',
-                cond: (_ctx, evt) => evt.token === 'React',
-              },
-            },
-          },
-          func1: {
-            on: {
-              '*': 'idle',
-              newline: undefined,
-              'meta.function-call.ts': undefined,
-              'punctuation.accessor.ts': {
-                target: 'func2',
-                cond: (_ctx, evt) => evt.token === '.',
-              },
-            },
-          },
-          func2: {
-            on: {
-              '*': 'idle',
-              newline: undefined,
-              'meta.function-call.ts': undefined,
-              'support.function.dom.ts': {
-                target: 'func3',
-                cond: (_ctx, evt) => evt.token === 'createElement',
-              },
-            },
-          },
-          func3: {
-            on: {
-              '*': 'idle',
-              newline: undefined,
-              'meta.function-call.ts': undefined,
-              'meta.brace.round.ts': {
-                target: 'call',
-                cond: (_ctx, evt) => evt.token === '(',
-              },
-            },
-          },
-          call: {
-            on: {
-              '*': 'idle',
-              newline: undefined,
-              'variable.other.constant.ts': [
-                {
-                  target: 'idle',
-                  actions: 'consumeIgnoredLine',
-                  cond: (ctx, evt) =>
-                    ctx.ignore?.line === ctx.line && evt.token === 'T',
-                },
-                {
-                  target: 'props',
-                  cond: (_ctx, evt) => evt.token === 'T',
-                },
-              ],
-            },
-          },
-          props: {
-            on: {
-              'constant.language.null.ts': 'children',
-              'punctuation.definition.block.ts': {
-                target: 'props_object',
-                cond: (_ctx, evt) => evt.token === '{',
-              },
-            },
-          },
-          props_object: {
-            invoke: {
-              id: 'propertiesMachine',
-              src: propertiesMachine,
-              data: {
-                depth: 1,
-              },
-              onDone: [
-                {
-                  target: 'idle',
-                  actions: 'emitWarningFromParameters',
-                  cond: 'isPropertiesDataDynamic',
-                },
-                {
-                  target: 'children',
-                  actions: 'consumeParameters',
-                  cond: (ctx, evt) =>
-                    (!ctx.key.keyName && !evt.data.keyName) ||
-                    (!ctx.key.defaultValue && !evt.data.defaultValue),
-                },
-                {
-                  target: 'idle',
-                  actions: ['consumeParameters', 'pushKey'],
-                },
-              ],
-            },
-            on: {
-              '*': {
-                actions: forwardTo('propertiesMachine'),
-              },
-            },
-          },
-          children: {
-            on: {
-              '*': [
-                {
-                  target: 'idle',
-                  actions: 'pushKey',
-                  cond: (ctx) => !!ctx.key.keyName,
-                },
-                {
-                  target: 'idle',
-                },
-              ],
-
-              'variable.other.readwrite.ts': {
-                target: 'idle',
-                actions: ['dynamicKeyDefault', 'pushKey'],
-              },
-
-              // Void & punctuation
-              newline: undefined,
-              'meta.objectliteral.ts': undefined,
-              'punctuation.separator.comma.ts': undefined,
-
-              // String
-              'punctuation.definition.string.begin.ts': 'children_string',
-              'punctuation.definition.string.template.begin.ts':
-                'children_string',
-            },
-          },
-          children_string: {
-            on: {
-              '*': [
-                {
-                  target: 'children_end',
-                  actions: 'storeKeyName',
-                  cond: (ctx) => !ctx.key.keyName,
-                },
-                {
-                  target: 'children_end',
-                  actions: 'storeKeyDefault',
-                  cond: (ctx) => !!ctx.key.keyName,
-                },
-              ],
-            },
-          },
-          children_end: {
-            on: {
-              'punctuation.separator.comma.ts': {
-                target: 'idle',
-                actions: 'pushKey',
-              },
-              'meta.brace.round.ts': {
-                target: 'idle',
-                actions: 'pushKey',
-              },
-              'punctuation.definition.template-expression.begin.ts': {
-                target: 'idle',
-                actions: ['dynamicKeyDefault', 'pushKey'],
-              },
-              'keyword.operator.arithmetic.ts': {
-                target: 'idle',
-                actions: ['dynamicKeyDefault', 'pushKey'],
+                actions: 'markUseTranslateAsDynamic',
               },
             },
           },
         },
       },
-      jsx: {
+      component: {
         initial: 'idle',
         states: {
           idle: {
             on: {
-              'punctuation.definition.tag.begin.tsx': {
+              'punctuation.definition.tag.begin.svelte': {
                 target: 'tag',
                 actions: 'storeLine',
                 cond: (_ctx, evt) => evt.token === '<',
@@ -365,8 +187,8 @@ export default createMachine<MachineCtx>(
             on: {
               '*': 'idle',
               newline: undefined,
-              'meta.tag.ts': undefined,
-              'support.class.component.tsx': [
+              'meta.tag.start.svelte': undefined,
+              'support.class.component.svelte': [
                 {
                   target: 'idle',
                   actions: 'consumeIgnoredLine',
@@ -391,8 +213,8 @@ export default createMachine<MachineCtx>(
                   cond: 'isPropertiesDataDynamic',
                 },
                 {
-                  target: 'children',
-                  actions: 'consumeParameters',
+                  target: 'idle',
+                  actions: ['consumeParameters', 'pushKey'],
                   cond: (ctx, evt) =>
                     evt.data.lastEvent.token !== '/>' &&
                     ((!ctx.key.keyName && !evt.data.keyName) ||
@@ -410,64 +232,6 @@ export default createMachine<MachineCtx>(
               },
             },
           },
-          children: {
-            on: {
-              'punctuation.definition.tag.begin.tsx': {
-                target: 'idle',
-                actions: ['consumeChildren', 'pushKey'],
-              },
-
-              'meta.jsx.children.tsx': {
-                actions: 'appendChildren',
-              },
-              'string.quoted.single.ts': {
-                actions: 'appendChildren',
-              },
-              'string.quoted.double.ts': {
-                actions: 'appendChildren',
-              },
-              'string.template.ts': {
-                actions: 'appendChildren',
-              },
-
-              'variable.other.readwrite.ts': {
-                target: 'idle',
-                actions: ['dynamicChildren', 'pushKey'],
-              },
-              'variable.other.object.ts': {
-                target: 'idle',
-                actions: ['dynamicChildren', 'pushKey'],
-              },
-              'entity.name.function.ts': {
-                target: 'idle',
-                actions: ['dynamicChildren', 'pushKey'],
-              },
-              'storage.type.function.ts': {
-                target: 'idle',
-                actions: ['dynamicChildren', 'pushKey'],
-              },
-              'storage.type.class.ts': {
-                target: 'idle',
-                actions: ['dynamicChildren', 'pushKey'],
-              },
-              'keyword.operator.new.ts': {
-                target: 'idle',
-                actions: ['dynamicChildren', 'pushKey'],
-              },
-              'punctuation.definition.block.ts': {
-                target: 'idle',
-                actions: ['dynamicChildren', 'pushKey'],
-              },
-              'punctuation.definition.template-expression.begin.ts': {
-                target: 'idle',
-                actions: ['dynamicChildren', 'pushKey'],
-              },
-              'keyword.operator.arithmetic.ts': {
-                target: 'idle',
-                actions: ['dynamicChildren', 'pushKey'],
-              },
-            },
-          },
         },
       },
       t: {
@@ -475,19 +239,27 @@ export default createMachine<MachineCtx>(
         states: {
           idle: {
             on: {
+              'punctuation.definition.variable.svelte': {
+                target: 'dollar',
+                cond: (ctx, evt) => ctx.useTranslate !== null && evt.token === '$',
+              },
+            },
+          },
+          dollar: {
+            on: {
+              '*': 'idle',
               'entity.name.function.ts': {
                 target: 'func',
                 actions: 'storeLine',
-                cond: (ctx, evt) => !!ctx.hooks.length && evt.token === 't',
+                cond: (_ctx, evt) => evt.token === 't',
               },
-            },
+            }
           },
           func: {
             on: {
               '*': 'idle',
               newline: undefined,
-              'meta.block.ts': undefined,
-              'meta.var.expr.ts': undefined,
+              'source.ts': undefined,
               'meta.brace.round.ts': [
                 {
                   target: 'idle',
@@ -621,17 +393,9 @@ export default createMachine<MachineCtx>(
         evt.data.keyName === false || evt.data.namespace === false,
     },
     actions: {
-      incrementDepth: assign({
-        blockDepth: (ctx) => ctx.blockDepth + 1,
-      }),
-      decrementDepth: assign({
-        blockDepth: (ctx) => ctx.blockDepth - 1,
-        hooks: (ctx) => ctx.hooks.filter((n) => n.depth !== ctx.blockDepth),
-      }),
       storeLine: assign({
         line: (_ctx, evt) => evt.line,
       }),
-
       ignoreNextLine: assign({
         ignore: (_ctx, evt) => ({ type: 'ignore', line: evt.line + 1 }),
       }),
@@ -645,20 +409,14 @@ export default createMachine<MachineCtx>(
         ],
       }),
 
-      pushHook: assign({
-        hooks: (ctx) => [...ctx.hooks, { depth: ctx.blockDepth }],
+      storeUseTranslate: assign({
+        useTranslate: (_ctx, _evt) => '',
       }),
-      pushNamespacedHook: assign({
-        hooks: (ctx, evt) => [
-          ...ctx.hooks,
-          { namespace: evt.token, depth: ctx.blockDepth },
-        ],
+      storeNamespacedUseTranslate: assign({
+        useTranslate: (_ctx, evt) => evt.token,
       }),
-      markHookAsDynamic: assign({
-        hooks: (ctx, _evt) => [
-          ...ctx.hooks.slice(0, -1),
-          { namespace: false, depth: ctx.blockDepth },
-        ],
+      markUseTranslateAsDynamic: assign({
+        useTranslate: (_ctx, _evt) => false,
         warnings: (ctx, _evt) => [
           ...ctx.warnings,
           { warning: 'W_DYNAMIC_NAMESPACE', line: ctx.line },
@@ -667,15 +425,10 @@ export default createMachine<MachineCtx>(
 
       consumeParameters: assign({
         key: (ctx, evt) => ({
-          // We don't want the key and default value to be overridable
-          // But we DO want the namespace to be overridable
           keyName: ctx.key.keyName || evt.data.keyName,
           defaultValue:
             ctx.key.defaultValue || evt.data.defaultValue || undefined,
-          namespace:
-            evt.data.namespace === ''
-              ? undefined
-              : evt.data.namespace ?? ctx.key.namespace,
+          namespace: evt.data.namespace ?? ctx.key.namespace,
           line: ctx.line,
         }),
         warnings: (ctx, evt) => {
@@ -700,18 +453,6 @@ export default createMachine<MachineCtx>(
         key: (_ctx, _evt) => VOID_KEY,
       }),
 
-      appendChildren: assign({
-        children: (ctx, evt) => (ctx.children ?? '') + evt.token,
-      }),
-      consumeChildren: assign({
-        key: (ctx, _evt) => ({
-          ...ctx.key,
-          keyName: ctx.key.keyName ? ctx.key.keyName : ctx.children,
-          defaultValue: !ctx.key.keyName ? ctx.key.defaultValue : ctx.children,
-        }),
-        children: (_ctx, _evt) => '',
-      }),
-
       storeKeyName: assign({
         key: (ctx, evt) => ({ ...ctx.key, keyName: evt.token }),
       }),
@@ -721,8 +462,8 @@ export default createMachine<MachineCtx>(
       storeKeyCurrentNamespace: assign({
         key: (ctx, _evt) => ({
           ...ctx.key,
-          namespace: ctx.hooks.length
-            ? ctx.hooks[ctx.hooks.length - 1].namespace
+          namespace: ctx.useTranslate !== null
+            ? ctx.useTranslate
             : undefined,
         }),
       }),
@@ -748,19 +489,6 @@ export default createMachine<MachineCtx>(
           { warning: 'W_DYNAMIC_OPTIONS', line: ctx.line },
         ],
       }),
-      dynamicChildren: assign({
-        key: (ctx, _evt) =>
-          ctx.key.keyName ? { ...ctx.key, defaultValue: undefined } : VOID_KEY,
-        warnings: (ctx, _evt) => [
-          ...ctx.warnings,
-          {
-            warning: ctx.key.keyName
-              ? 'W_DYNAMIC_DEFAULT_VALUE'
-              : 'W_DYNAMIC_KEY',
-            line: ctx.line,
-          },
-        ],
-      }),
 
       pushKey: assign({
         warnings: (ctx, _evt) => {
@@ -777,7 +505,9 @@ export default createMachine<MachineCtx>(
             ...ctx.keys,
             {
               keyName: ctx.key.keyName.trim(),
-              namespace: ctx.key.namespace?.trim(),
+              namespace: ctx.key.namespace === ''
+                ? undefined
+                : ctx.key.namespace?.trim(),
               defaultValue: ctx.key.defaultValue?.trim().replace(/\s+/g, ' '),
               line: ctx.line,
             },

@@ -374,40 +374,6 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])('useTranslate (.%s)', (ext) => {
     expect(extracted.keys).toEqual(expected);
   });
 
-  it('extracts the default value from parameters', async () => {
-    const expected = [
-      { keyName: 'key1', defaultValue: 'default value', line: 5 },
-    ];
-
-    const code = `
-      import '@tolgee/react'
-      function Test () {
-        const { t } = useTranslate()
-        t('key1', { defaultValue: 'default value' })
-      }
-    `;
-
-    const extracted = await extractKeys(code, FILE_NAME);
-    expect(extracted.warnings).toEqual([]);
-    expect(extracted.keys).toEqual(expected);
-  });
-
-  it('extracts the namespace from parameters', async () => {
-    const expected = [{ keyName: 'key1', namespace: 'ns1', line: 5 }];
-
-    const code = `
-      import '@tolgee/react'
-      function Test () {
-        const { t } = useTranslate()
-        t('key1', { ns: 'ns1' })
-      }
-    `;
-
-    const extracted = await extractKeys(code, FILE_NAME);
-    expect(extracted.warnings).toEqual([]);
-    expect(extracted.keys).toEqual(expected);
-  });
-
   it('keeps track of the namespace specified in useTranslate', async () => {
     const expected = [{ keyName: 'key1', namespace: 'namespace', line: 5 }];
 

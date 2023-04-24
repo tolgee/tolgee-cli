@@ -55,6 +55,14 @@ export default createMachine<PropertiesContext>(
             target: 'value',
             actions: 'markAsStatic',
           },
+
+          // Svelte
+          'entity.other.attribute-name.svelte': {
+            actions: ['markPropertyAsDynamic', 'storePropertyType'],
+          },
+          'punctuation.separator.key-value.svelte': {
+            target: 'value',
+          },
         },
       },
       complex_key: {
@@ -85,6 +93,9 @@ export default createMachine<PropertiesContext>(
           'punctuation.definition.string.begin.ts': 'value_string',
           'punctuation.definition.string.template.begin.ts': 'value_string',
 
+          'punctuation.definition.string.begin.svelte': 'value_string',
+          'punctuation.definition.string.template.begin.svelte': 'value_string',
+
           // Variable
           'variable.other.readwrite.ts': {
             target: 'idle',
@@ -98,6 +109,16 @@ export default createMachine<PropertiesContext>(
           // JSX Expression
           'punctuation.section.embedded.begin.tsx': {
             actions: 'unmarkAsStatic',
+          },
+
+          // Svelte
+          'string.unquoted.svelte': {
+            target: 'idle',
+            actions: [
+              'storePropertyValue',
+              'clearPropertyType',
+              'unmarkAsStatic',
+            ],
           },
 
           // Value end
@@ -131,6 +152,16 @@ export default createMachine<PropertiesContext>(
             target: 'idle',
             actions: ['storeEmptyPropertyValue', 'clearPropertyType'],
           },
+
+          'punctuation.definition.string.end.svelte': {
+            target: 'idle',
+            actions: ['storeEmptyPropertyValue', 'clearPropertyType'],
+          },
+          'punctuation.definition.string.template.end.svelte': {
+            target: 'idle',
+            actions: ['storeEmptyPropertyValue', 'clearPropertyType'],
+          },
+
           '*': [
             {
               target: 'idle',
@@ -169,6 +200,20 @@ export default createMachine<PropertiesContext>(
             target: 'idle',
             actions: 'clearPropertyType',
           },
+
+          // Svelte
+          'punctuation.section.embedded.begin.svelte': {
+            target: 'idle',
+            actions: ['markPropertyAsDynamic', 'clearPropertyType'],
+          },
+          'punctuation.definition.string.end.svelte': {
+            target: 'idle',
+            actions: 'clearPropertyType',
+          },
+          'punctuation.section.embedded.end.svelte': {
+            target: 'idle',
+            actions: 'clearPropertyType',
+          },
         },
       },
       end: {
@@ -200,16 +245,22 @@ export default createMachine<PropertiesContext>(
         target: 'end',
         actions: 'markPropertyAsDynamic',
       },
+      'punctuation.definition.tag.end.svelte': {
+        target: 'end',
+        actions: 'markPropertyAsDynamic',
+      },
     },
   },
   {
     guards: {
       isOpenCurly: (_ctx, evt) =>
         evt.token === '{' &&
-        !evt.scopes.includes('meta.embedded.expression.tsx'),
+        !evt.scopes.includes('meta.embedded.expression.tsx') &&
+        !evt.scopes.includes('meta.embedded.expression.svelte'),
       isCloseCurly: (_ctx, evt) =>
         evt.token === '}' &&
-        !evt.scopes.includes('meta.embedded.expression.tsx'),
+        !evt.scopes.includes('meta.embedded.expression.tsx') &&
+        !evt.scopes.includes('meta.embedded.expression.svelte'),
       isFinalCloseCurly: (ctx, evt) => evt.token === '}' && ctx.depth === 1,
       isOpenSquare: (_ctx, evt) => evt.token === '[',
       isCloseSquare: (_ctx, evt) => evt.token === ']',
