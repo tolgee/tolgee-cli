@@ -58,6 +58,8 @@ jobs:
           key: cache-node-modules-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
       - name: Install dependencies
         run: npm ci
+      - name: Build CLI
+        run: npm run build
 
       - name: Start Tolgee Container
         run: npm run tolgee:start
