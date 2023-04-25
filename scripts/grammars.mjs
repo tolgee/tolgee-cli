@@ -2,11 +2,15 @@
 // See HACKING.md for more details about what's in this file
 // ---
 
+import { load } from 'js-yaml';
+
 export const Grammars = {
   TypeScript:
     'https://raw.githubusercontent.com/microsoft/TypeScript-TmLanguage/master/TypeScript.tmLanguage',
   TypeScriptReact:
     'https://raw.githubusercontent.com/microsoft/TypeScript-TmLanguage/master/TypeScriptReact.tmLanguage',
+  Svelte:
+    'https://raw.githubusercontent.com/sveltejs/language-tools/master/packages/svelte-vscode/syntaxes/svelte.tmLanguage.src.yaml',
 };
 
 export const Licenses = [
@@ -14,6 +18,11 @@ export const Licenses = [
     grammars: ['TypeScript', 'TypeScriptReact'],
     license:
       'https://raw.githubusercontent.com/microsoft/TypeScript-TmLanguage/master/LICENSE.txt',
+  },
+  {
+    grammars: ['Svelte'],
+    license:
+      'https://raw.githubusercontent.com/sveltejs/language-tools/master/LICENSE',
   },
 ];
 
@@ -42,5 +51,11 @@ export const Transformers = {
     });
 
     return `${TypeScriptReactComment}\n${transformed}`;
+  },
+  Svelte: (self) => {
+    return JSON.stringify(load(self), null, 2).replaceAll(
+      '"source.js"',
+      '"source.ts"'
+    );
   },
 };

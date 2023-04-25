@@ -3,6 +3,7 @@ import type { Service } from 'ts-node';
 
 let tsService: Service;
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function realImport(file: string) {
   return eval('import(file)');
 }

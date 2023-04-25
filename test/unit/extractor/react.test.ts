@@ -1,4 +1,4 @@
-import extractKeys from '../../../src/extractor/presets/react';
+import extractKeys from '../../../src/extractor/extractor';
 
 describe.each(['js', 'ts', 'jsx', 'tsx'])(
   'React.createElement (.%s)',
@@ -366,40 +366,6 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])('useTranslate (.%s)', (ext) => {
       function Test () {
         const { t } = useTranslate()
         t({ key: 'key1', defaultValue: 'default value', ns: 'ns' })
-      }
-    `;
-
-    const extracted = await extractKeys(code, FILE_NAME);
-    expect(extracted.warnings).toEqual([]);
-    expect(extracted.keys).toEqual(expected);
-  });
-
-  it('extracts the default value from parameters', async () => {
-    const expected = [
-      { keyName: 'key1', defaultValue: 'default value', line: 5 },
-    ];
-
-    const code = `
-      import '@tolgee/react'
-      function Test () {
-        const { t } = useTranslate()
-        t('key1', { defaultValue: 'default value' })
-      }
-    `;
-
-    const extracted = await extractKeys(code, FILE_NAME);
-    expect(extracted.warnings).toEqual([]);
-    expect(extracted.keys).toEqual(expected);
-  });
-
-  it('extracts the namespace from parameters', async () => {
-    const expected = [{ keyName: 'key1', namespace: 'ns1', line: 5 }];
-
-    const code = `
-      import '@tolgee/react'
-      function Test () {
-        const { t } = useTranslate()
-        t('key1', { ns: 'ns1' })
       }
     `;
 

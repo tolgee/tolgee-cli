@@ -3,9 +3,9 @@ import type { ChildProcessWithoutNullStreams } from 'child_process';
 import { join } from 'path';
 import { spawn as spawnProcess } from 'child_process';
 
-const TTY_PRELOAD = join(__dirname, '..', '__internal__', 'tty.ts');
-const PRELOAD = join(__dirname, '..', '__internal__', 'preload.ts');
-const CLI_INDEX = join(__dirname, '..', '..', '..', 'src', 'index.ts');
+const TTY_PRELOAD = join(__dirname, '..', '__internal__', 'tty.js');
+const PRELOAD = join(__dirname, '..', '__internal__', 'preload.js');
+const CLI_INDEX = join(__dirname, '..', '..', '..', 'dist', 'index.js');
 const DEBUG_ENABLED = process.env.RUNNER_DEBUG === '1';
 
 export type RunResult = {
@@ -23,8 +23,6 @@ export function spawn(
   return spawnProcess(
     process.argv0,
     [
-      '--require',
-      'ts-node/register',
       '--require',
       PRELOAD,
       stdin && '--require',
@@ -82,7 +80,7 @@ export async function runWithStdin(
   args: string[],
   stdin: string,
   env?: Record<string, string>,
-  timeout: number = 10e3
+  timeout = 10e3
 ) {
   const cliProcess = spawn(args, true, env);
   cliProcess.stdin.write(`${stdin}\n`);
@@ -93,7 +91,7 @@ export async function runWithStdin(
 export async function run(
   args: string[],
   env?: Record<string, string>,
-  timeout: number = 10e3
+  timeout = 10e3
 ) {
   const cliProcess = spawn(args, false, env);
   return runProcess(cliProcess, timeout);
