@@ -1,10 +1,7 @@
 import type { ExtractionResults } from '.';
-import { glob as globCb } from 'glob';
+import { glob } from 'glob';
 
 import { callWorker } from './worker';
-
-import { promisify } from 'util';
-const glob = promisify(globCb);
 
 export const NullNamespace = Symbol('namespace.null');
 
