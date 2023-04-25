@@ -16,7 +16,7 @@ export async function askString(question: string): Promise<string> {
 
 export async function askBoolean(
   question: string,
-  def: boolean = false
+  def = false
 ): Promise<boolean> {
   const yn = def === true ? '[Y/n]' : '[y/N]';
   let res = def;

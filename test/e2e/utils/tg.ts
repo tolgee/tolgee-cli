@@ -76,6 +76,7 @@ export async function setBackendProperty(name: string, value: any) {
 
   // Undici doesn't like unread bodies
   if (res.body) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     for await (const _ of res.body);
   }
 }

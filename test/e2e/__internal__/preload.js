@@ -12,5 +12,7 @@ const constants = require('../../../dist/constants');
 constants.CONFIG_PATH = join(tmpdir(), '.tolgee-e2e');
 Object.defineProperty(ansi, 'enabled', {
   get: () => false,
-  set: () => undefined,
+  set: () => {
+    /* noop */
+  },
 });

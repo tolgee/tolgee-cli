@@ -15,10 +15,7 @@ type PushOptions = BaseOptions & {
   forceMode: 'KEEP' | 'OVERRIDE' | 'NO';
 };
 
-async function readDirectory(
-  directory: string,
-  base: string = ''
-): Promise<File[]> {
+async function readDirectory(directory: string, base = ''): Promise<File[]> {
   const files: File[] = [];
 
   const dir = await readdir(directory);

@@ -482,7 +482,7 @@ export default createMachine<MachineCtx>(
         ],
       }),
       dynamicOptions: assign({
-        key: (ctx, _evt) => VOID_KEY,
+        key: (_ctx, _evt) => VOID_KEY,
         warnings: (ctx, _evt) => [
           ...ctx.warnings,
           { warning: 'W_DYNAMIC_OPTIONS', line: ctx.line },

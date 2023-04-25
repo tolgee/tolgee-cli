@@ -1,3 +1,4 @@
+import type { Extractor } from './index';
 import { resolve, extname } from 'path';
 import { Worker, isMainThread, parentPort } from 'worker_threads';
 import { readFile } from 'fs/promises';
@@ -13,7 +14,7 @@ const IS_TS_NODE = extname(__filename) === '.ts';
 // --- Worker functions
 
 let loadedExtractor: string | undefined | symbol = Symbol('unloaded');
-let extractor: Function;
+let extractor: Extractor;
 
 async function handleJob(args: WorkerParams) {
   if (loadedExtractor !== args.extractor) {

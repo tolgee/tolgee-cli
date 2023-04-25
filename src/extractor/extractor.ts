@@ -1,4 +1,3 @@
-import type { StateMachine } from 'xstate';
 import { extname } from 'path';
 import { interpret } from 'xstate';
 import reactExtractorMachine from './machines/react';

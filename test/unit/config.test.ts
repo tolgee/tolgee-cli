@@ -179,16 +179,16 @@ describe('.tolgeerc', () => {
 
   it('rejects invalid API url', async () => {
     cwd.mockReturnValueOnce(join(FIXTURES_PATH, 'invalidTolgeeRcApi'));
-    expect(loadTolgeeRc()).rejects.toThrow('apiUrl');
+    return expect(loadTolgeeRc()).rejects.toThrow('apiUrl');
   });
 
   it('rejects invalid project ID', async () => {
     cwd.mockReturnValueOnce(join(FIXTURES_PATH, 'invalidTolgeeRcProject'));
-    expect(loadTolgeeRc()).rejects.toThrow('projectId');
+    return expect(loadTolgeeRc()).rejects.toThrow('projectId');
   });
 
   it('rejects invalid SDK', async () => {
     cwd.mockReturnValueOnce(join(FIXTURES_PATH, 'invalidTolgeeRcSdk'));
-    expect(loadTolgeeRc()).rejects.toThrow('sdk');
+    return expect(loadTolgeeRc()).rejects.toThrow('sdk');
   });
 });

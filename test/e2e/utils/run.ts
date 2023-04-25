@@ -80,7 +80,7 @@ export async function runWithStdin(
   args: string[],
   stdin: string,
   env?: Record<string, string>,
-  timeout: number = 10e3
+  timeout = 10e3
 ) {
   const cliProcess = spawn(args, true, env);
   cliProcess.stdin.write(`${stdin}\n`);
@@ -91,7 +91,7 @@ export async function runWithStdin(
 export async function run(
   args: string[],
   env?: Record<string, string>,
-  timeout: number = 10e3
+  timeout = 10e3
 ) {
   const cliProcess = spawn(args, false, env);
   return runProcess(cliProcess, timeout);

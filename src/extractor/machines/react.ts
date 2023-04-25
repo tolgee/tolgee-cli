@@ -621,7 +621,7 @@ export default createMachine<MachineCtx>(
         evt.data.keyName === false || evt.data.namespace === false,
     },
     actions: {
-      incrementDepth: assign({
+      incrementDepth: assign<MachineCtx>({
         blockDepth: (ctx) => ctx.blockDepth + 1,
       }),
       decrementDepth: assign({

@@ -1,8 +1,8 @@
 import commentsService from '../../../../src/extractor/machines/shared/comments';
 
 let callback: jest.Mock;
-let send: Function;
-let cleanup: Function | void;
+let send: (...args: any) => any;
+let cleanup: ((...args: any) => any) | void;
 
 beforeEach(() => {
   callback = jest.fn();
