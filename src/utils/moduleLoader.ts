@@ -3,15 +3,10 @@ import type { Service } from 'ts-node';
 
 let tsService: Service;
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function realImport(file: string) {
-  return eval('import(file)');
-}
-
 async function registerTsNode() {
   if (!tsService) {
     try {
-      const tsNode = require('ts-node');
+      const tsNode = await import('ts-node');
       tsService = tsNode.register({ compilerOptions: { module: 'CommonJS' } });
     } catch (e: any) {
       if (e.code === 'ERR_MODULE_NOT_FOUND') {
@@ -23,14 +18,14 @@ async function registerTsNode() {
 }
 
 async function importTypeScript(file: string) {
-  if (extname(__filename) === '.ts') {
-    return require(file);
+  if (extname(import.meta.url) === '.ts') {
+    return import(file);
   }
 
   await registerTsNode();
 
   tsService.enabled(true);
-  const mdl = await realImport(file);
+  const mdl = await import(file);
   tsService.enabled(false);
 
   return mdl;
@@ -41,7 +36,7 @@ export async function loadModule(module: string) {
     return importTypeScript(module);
   }
 
-  const mdl = await realImport(module);
+  const mdl = await import(module);
   if (mdl.default?.default) {
     return mdl.default;
   }

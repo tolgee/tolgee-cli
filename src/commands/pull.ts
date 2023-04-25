@@ -1,11 +1,11 @@
 import type { Blob } from 'buffer';
-import type { BaseOptions } from '../options';
+import type { BaseOptions } from '../options.js';
 
 import { Command, Option } from 'commander';
 
-import { unzipBuffer } from '../utils/zip';
-import { overwriteDir } from '../utils/overwriteDir';
-import { loading, success } from '../utils/logger';
+import { unzipBuffer } from '../utils/zip.js';
+import { overwriteDir } from '../utils/overwriteDir.js';
+import { loading, success } from '../utils/logger.js';
 
 type PullOptions = BaseOptions & {
   format: 'JSON' | 'XLIFF';

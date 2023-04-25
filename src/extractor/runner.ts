@@ -1,7 +1,7 @@
-import type { ExtractionResults } from '.';
+import type { ExtractionResults } from './index.js';
 import { glob } from 'glob';
 
-import { callWorker } from './worker';
+import { callWorker } from './worker.js';
 
 export const NullNamespace = Symbol('namespace.null');
 

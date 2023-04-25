@@ -1,15 +1,15 @@
-import type { BaseOptions } from '../../options';
+import type { BaseOptions } from '../../options.js';
 import { Command } from 'commander';
 import ansi from 'ansi-colors';
 
-import { compareKeys, printKey } from './syncUtils';
+import { compareKeys, printKey } from './syncUtils.js';
 import {
   extractKeysOfFiles,
   filterExtractionResult,
-} from '../../extractor/runner';
-import { dumpWarnings } from '../../extractor/warnings';
-import { EXTRACTOR } from '../../options';
-import { loading } from '../../utils/logger';
+} from '../../extractor/runner.js';
+import { dumpWarnings } from '../../extractor/warnings.js';
+import { EXTRACTOR } from '../../options.js';
+import { loading } from '../../utils/logger.js';
 
 type Options = BaseOptions & {
   extractor: string;

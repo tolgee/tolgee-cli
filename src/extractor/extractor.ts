@@ -1,9 +1,9 @@
 import { extname } from 'path';
 import { interpret } from 'xstate';
-import reactExtractorMachine from './machines/react';
-import svelteExtractorMachine from './machines/svelte';
-import commentsExtractorMachine from './machines/comments';
-import tokenizer from './tokenizer';
+import reactExtractorMachine from './machines/react.js';
+import svelteExtractorMachine from './machines/svelte.js';
+import commentsExtractorMachine from './machines/comments.js';
+import tokenizer from './tokenizer.js';
 
 const REACT_EXTS = [
   '.js',

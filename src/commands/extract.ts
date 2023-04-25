@@ -1,8 +1,8 @@
 import { Command } from 'commander';
 
-import extractPrint from './extract/print';
-import extractCheck from './extract/check';
-import { EXTRACTOR } from '../options';
+import extractPrint from './extract/print.js';
+import extractCheck from './extract/check.js';
+import { EXTRACTOR } from '../options.js';
 
 export type BaseExtractOptions = {
   extractor: string;

@@ -1,8 +1,8 @@
-import type { BodyOf, QueryOf, ResponseOf } from './internal/schema.utils';
+import type { BodyOf, QueryOf, ResponseOf } from './internal/schema.utils.js';
 
 import FormData from 'form-data';
-import Requester from './internal/requester';
-import { HttpError } from './errors';
+import Requester from './internal/requester.js';
+import { HttpError } from './errors.js';
 
 type ImportRequest = BodyOf<'/v2/projects/{projectId}/import', 'post'>;
 

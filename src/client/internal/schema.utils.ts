@@ -1,4 +1,4 @@
-import { paths } from './schema.generated';
+import type { paths } from './schema.generated.js';
 
 type ValueOf<T extends Record<any, any>> = T[keyof T];
 

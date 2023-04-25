@@ -1,7 +1,7 @@
 import { resolve } from 'path';
 import { stat, rm, mkdir } from 'fs/promises';
-import { askBoolean } from './ask';
-import { warn, error } from './logger';
+import { askBoolean } from './ask.js';
+import { warn, error } from './logger.js';
 
 export async function overwriteDir(path: string, overwrite?: boolean) {
   try {

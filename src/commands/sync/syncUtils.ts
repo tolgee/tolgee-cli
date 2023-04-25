@@ -1,6 +1,6 @@
-import type { AllKeys } from '../../client/project';
-import type { Key } from '../../extractor';
-import { type FilteredKeys, NullNamespace } from '../../extractor/runner';
+import type { AllKeys } from '../../client/project.js';
+import type { Key } from '../../extractor/index.js';
+import { type FilteredKeys, NullNamespace } from '../../extractor/runner.js';
 import ansi from 'ansi-colors';
 
 export type PartialKey = { keyName: string; namespace?: string };

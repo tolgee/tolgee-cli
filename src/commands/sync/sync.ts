@@ -1,21 +1,21 @@
-import type { BaseOptions } from '../../options';
-import type Client from '../../client';
+import type { BaseOptions } from '../../options.js';
+import type Client from '../../client/index.js';
 import { Command } from 'commander';
 import ansi from 'ansi-colors';
 
 import {
   extractKeysOfFiles,
   filterExtractionResult,
-} from '../../extractor/runner';
-import { dumpWarnings } from '../../extractor/warnings';
-import { type PartialKey, compareKeys, printKey } from './syncUtils';
+} from '../../extractor/runner.js';
+import { dumpWarnings } from '../../extractor/warnings.js';
+import { type PartialKey, compareKeys, printKey } from './syncUtils.js';
 
-import { overwriteDir } from '../../utils/overwriteDir';
-import { unzipBuffer } from '../../utils/zip';
-import { askBoolean } from '../../utils/ask';
-import { loading, error } from '../../utils/logger';
+import { overwriteDir } from '../../utils/overwriteDir.js';
+import { unzipBuffer } from '../../utils/zip.js';
+import { askBoolean } from '../../utils/ask.js';
+import { loading, error } from '../../utils/logger.js';
 
-import { EXTRACTOR } from '../../options';
+import { EXTRACTOR } from '../../options.js';
 
 type Options = BaseOptions & {
   extractor: string;

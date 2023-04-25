@@ -1,10 +1,13 @@
-import type { BaseExtractOptions } from '../extract';
+import type { BaseExtractOptions } from '../extract.js';
 import { relative } from 'path';
 import { Command } from 'commander';
 
-import { extractKeysOfFiles } from '../../extractor/runner';
-import { WarningMessages, emitGitHubWarning } from '../../extractor/warnings';
-import { loading } from '../../utils/logger';
+import { extractKeysOfFiles } from '../../extractor/runner.js';
+import {
+  WarningMessages,
+  emitGitHubWarning,
+} from '../../extractor/warnings.js';
+import { loading } from '../../utils/logger.js';
 
 type ExtractLintOptions = BaseExtractOptions;
 

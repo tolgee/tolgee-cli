@@ -1,13 +1,14 @@
-import { join } from 'path';
 import { readFile } from 'fs/promises';
+import { run } from './utils/run.js';
 
-import { run } from './utils/run';
-
-const FIXTURES_PATH = join(__dirname, '..', '__fixtures__');
-const CODE_PROJECT = join(FIXTURES_PATH, 'codeProjectReact');
-const CODE_PROJECT_ERR = join(FIXTURES_PATH, 'codeProjectReactWithErr');
-const CODE_PROJECT_COMMENT = join(FIXTURES_PATH, 'codeProjectCommentOnly');
-const EXTRACTED_DATA = join(FIXTURES_PATH, 'codeProjectExtracted', 'en.json');
+const FIXTURES_PATH = new URL('../__fixtures__/', import.meta.url);
+const CODE_PROJECT = new URL('./codeProjectReact', FIXTURES_PATH).pathname;
+const CODE_PROJECT_ERR = new URL('./codeProjectReactWithErr', FIXTURES_PATH)
+  .pathname;
+const CODE_PROJECT_COMMENT = new URL('./codeProjectCommentOnly', FIXTURES_PATH)
+  .pathname;
+const EXTRACTED_DATA = new URL('./codeProjectExtracted/en.json', FIXTURES_PATH)
+  .pathname;
 
 const CODE_PROJECT_MATCH = `${CODE_PROJECT}/**/*.tsx`;
 const CODE_PROJECT_ERR_MATCH = `${CODE_PROJECT_ERR}/**/*.tsx`;

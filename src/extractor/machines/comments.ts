@@ -1,7 +1,7 @@
 import type { ExtractedKey, Warning } from '../index.js';
 
 import { createMachine, assign, send } from 'xstate';
-import commentsService from './shared/comments';
+import commentsService from './shared/comments.js';
 
 type MachineCtx = {
   keys: ExtractedKey[];

@@ -1,11 +1,14 @@
 import type { ChildProcessWithoutNullStreams } from 'child_process';
 
 import { join } from 'path';
+import { tmpdir } from 'os';
 import { spawn as spawnProcess } from 'child_process';
 
-const TTY_PRELOAD = join(__dirname, '..', '__internal__', 'tty.js');
-const PRELOAD = join(__dirname, '..', '__internal__', 'preload.js');
-const CLI_INDEX = join(__dirname, '..', '..', '..', 'dist', 'index.js');
+const TTY_PRELOAD = new URL('../__internal__/tty.cjs', import.meta.url)
+  .pathname;
+const PRELOAD = new URL('../__internal__/preload.cjs', import.meta.url)
+  .pathname;
+const CLI_INDEX = new URL('../../../dist/index.js', import.meta.url).pathname;
 const DEBUG_ENABLED = process.env.RUNNER_DEBUG === '1';
 
 export type RunResult = {
@@ -37,6 +40,7 @@ export function spawn(
       env: {
         ...userEnv,
         PATH: process.env.PATH!,
+        TOLGEE_CLI_CONFIG_PATH: join(tmpdir(), '.tolgee-e2e'),
       },
     }
   );

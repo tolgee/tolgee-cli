@@ -1,7 +1,7 @@
 import type { Blob } from 'buffer';
-import type { BodyOf } from './internal/schema.utils';
+import type { BodyOf } from './internal/schema.utils.js';
 
-import Requester from './internal/requester';
+import Requester from './internal/requester.js';
 
 export type ExportRequest = Omit<
   BodyOf<'/v2/projects/{projectId}/export', 'post'>,

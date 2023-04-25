@@ -1,15 +1,15 @@
-import type { File, AddFileResponse } from '../client/import';
-import type Client from '../client';
-import type { BaseOptions } from '../options';
+import type { File, AddFileResponse } from '../client/import.js';
+import type Client from '../client/index.js';
+import type { BaseOptions } from '../options.js';
 
 import { join } from 'path';
 import { readdir, readFile, stat } from 'fs/promises';
 import { Command, Option } from 'commander';
 
-import { HttpError } from '../client/errors';
+import { HttpError } from '../client/errors.js';
 
-import { askString } from '../utils/ask';
-import { loading, success, warn, error } from '../utils/logger';
+import { askString } from '../utils/ask.js';
+import { loading, success, warn, error } from '../utils/logger.js';
 
 type PushOptions = BaseOptions & {
   forceMode: 'KEEP' | 'OVERRIDE' | 'NO';

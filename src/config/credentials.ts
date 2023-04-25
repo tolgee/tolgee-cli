@@ -1,10 +1,10 @@
-import type { ApiKeyInfo } from '../client';
+import type { ApiKeyInfo } from '../client/index.js';
 
 import { join, dirname } from 'path';
 import { mkdir, readFile, writeFile } from 'fs/promises';
 
-import { warn } from '../utils/logger';
-import { CONFIG_PATH } from '../constants';
+import { warn } from '../utils/logger.js';
+import { CONFIG_PATH } from '../constants.js';
 
 type Token = { token: string; expires: number };
 
@@ -16,7 +16,7 @@ type Store = {
   };
 };
 
-export const API_TOKENS_FILE = join(CONFIG_PATH, 'authentication.json');
+const API_TOKENS_FILE = join(CONFIG_PATH, 'authentication.json');
 
 async function ensureConfigPath() {
   try {

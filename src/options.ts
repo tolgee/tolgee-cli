@@ -1,8 +1,8 @@
-import type Client from './client';
+import type Client from './client/index.js';
 import { existsSync } from 'fs';
 import { resolve } from 'path';
 import { Option, InvalidArgumentError } from 'commander';
-import { DEFAULT_API_URL } from './constants';
+import { DEFAULT_API_URL } from './constants.js';
 
 function parseProjectId(v: string) {
   const val = Number(v);
