@@ -40,13 +40,8 @@
     "yauzl": "^2.10.0"
   },
   "devDependencies": {
-    "@jest/types": "^29.5.0",
     "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/git": "^10.0.1",
-    "@tsconfig/esm": "^1.0.3",
-    "@tsconfig/node-lts": "^18.12.1",
-    "@tsconfig/recommended": "^1.0.2",
-    "@types/glob": "^8.1.0",
     "@types/jest": "^29.5.1",
     "@types/node": "^18.16.0",
     "@types/yauzl": "^2.10.0",
