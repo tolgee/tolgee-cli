@@ -18,12 +18,14 @@ export type Token = {
 const enum Grammar {
   TYPESCRIPT = 'source.ts',
   TYPESCRIPT_TSX = 'source.tsx',
+  SVELTE = 'source.svelte',
 }
 
 const GRAMMAR_PATH = join(__dirname, '..', '..', 'textmate');
 const GrammarFiles: Record<Grammar, string> = {
   [Grammar.TYPESCRIPT]: join(GRAMMAR_PATH, 'TypeScript.tmLanguage'),
   [Grammar.TYPESCRIPT_TSX]: join(GRAMMAR_PATH, 'TypeScriptReact.tmLanguage'),
+  [Grammar.SVELTE]: join(GRAMMAR_PATH, 'Svelte.tmLanguage'),
 };
 
 let oniguruma: Promise<IOnigLib>;
@@ -48,7 +50,9 @@ async function loadGrammar(scope: Grammar) {
   if (!file) return null;
 
   const grammar = await readFile(file, 'utf8');
-  return parseRawGrammar(grammar);
+  return grammar.startsWith('{')
+    ? JSON.parse(grammar)
+    : parseRawGrammar(grammar);
 }
 
 function extnameToGrammar(extname: string) {
@@ -63,6 +67,8 @@ function extnameToGrammar(extname: string) {
     case '.jsx':
     case '.tsx':
       return Grammar.TYPESCRIPT_TSX;
+    case '.svelte':
+      return Grammar.SVELTE;
   }
 }
 

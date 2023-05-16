@@ -6,7 +6,7 @@ on:
 
 jobs:
   lint:
-    name: Prettier
+    name: Eslint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -21,7 +21,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run prettier
+      - name: Run eslint
         run: npm run lint
 
   test-unit:
@@ -58,6 +58,8 @@ jobs:
           key: cache-node-modules-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
       - name: Install dependencies
         run: npm ci
+      - name: Build CLI
+        run: npm run build
 
       - name: Start Tolgee Container
         run: npm run tolgee:start

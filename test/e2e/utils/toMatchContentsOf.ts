@@ -2,7 +2,7 @@ import { join, extname } from 'path';
 import { createHash } from 'crypto';
 import { readdir, stat, readFile } from 'fs/promises';
 
-async function recursiveReaddir(path: string, base: string = '') {
+async function recursiveReaddir(path: string, base = '') {
   const files: Record<string, string> = {};
 
   for (const file of await readdir(path)) {

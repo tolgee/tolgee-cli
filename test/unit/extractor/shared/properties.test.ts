@@ -442,5 +442,202 @@ describe('JSX', () => {
 
   // There is nothing to test for TSX specifically;
   // Leaving this so the person who'll stumble across a TSX quirk can laugh at me via `git blame` (and write tests :p)
+  // eslint-disable-next-line jest/no-commented-out-tests
   // describe('TSX', () => {})
+});
+
+describe('Svelte', () => {
+  beforeEach(() => machine.start());
+  afterEach(() => machine.stop());
+
+  it('extracts simple HTML props', async () => {
+    const tokens = await tokenizer('<T keyName="key1"/>', 'App.svelte');
+    for (const token of tokens) {
+      if (!machine.getSnapshot().done) {
+        machine.send(token);
+      }
+    }
+
+    const snapshot = machine.getSnapshot();
+    expect(snapshot.done).toBe(true);
+    expect(snapshot.context.keyName).toBe('key1');
+    expect(snapshot.context.defaultValue).toBeNull();
+    expect(snapshot.context.namespace).toBeNull();
+  });
+
+  it('extracts simple unquoted HTML props', async () => {
+    const tokens = await tokenizer('<T keyName=key1/>', 'App.svelte');
+    for (const token of tokens) {
+      if (!machine.getSnapshot().done) {
+        machine.send(token);
+      }
+    }
+
+    const snapshot = machine.getSnapshot();
+    expect(snapshot.done).toBe(true);
+    expect(snapshot.context.keyName).toBe('key1');
+    expect(snapshot.context.defaultValue).toBeNull();
+    expect(snapshot.context.namespace).toBeNull();
+  });
+
+  it('extracts HTML props written as static JS expressions', async () => {
+    const tokens = await tokenizer('<T keyName={"key1"}/>', 'App.svelte');
+    for (const token of tokens) {
+      if (!machine.getSnapshot().done) {
+        machine.send(token);
+      }
+    }
+
+    const snapshot = machine.getSnapshot();
+    expect(snapshot.done).toBe(true);
+    expect(snapshot.context.keyName).toBe('key1');
+    expect(snapshot.context.defaultValue).toBeNull();
+    expect(snapshot.context.namespace).toBeNull();
+  });
+
+  it('is undisturbed by objects within properties', async () => {
+    const tokens = await tokenizer(
+      '<T properties={{ a: "b" }} keyName={"key1"}/>',
+      'App.svelte'
+    );
+    for (const token of tokens) {
+      if (!machine.getSnapshot().done) {
+        machine.send(token);
+      }
+    }
+
+    const snapshot = machine.getSnapshot();
+    expect(snapshot.done).toBe(true);
+    expect(snapshot.context.keyName).toBe('key1');
+    expect(snapshot.context.defaultValue).toBeNull();
+    expect(snapshot.context.namespace).toBeNull();
+  });
+
+  it('reaches completion if there are no properties', async () => {
+    const tokens = await tokenizer('<T></T>', 'App.svelte');
+    for (const token of tokens) {
+      if (!machine.getSnapshot().done) {
+        machine.send(token);
+      }
+    }
+
+    const snapshot = machine.getSnapshot();
+    expect(snapshot.done).toBe(true);
+  });
+
+  it('reaches completion if there are no props (shorthand)', async () => {
+    const tokens = await tokenizer('<T/>', 'App.svelte');
+    for (const token of tokens) {
+      if (!machine.getSnapshot().done) {
+        machine.send(token);
+      }
+    }
+
+    const snapshot = machine.getSnapshot();
+    expect(snapshot.done).toBe(true);
+  });
+
+  describe('dynamic data', () => {
+    it('marks templates with ${} chunks as dynamic', async () => {
+      const tokens = await tokenizer(
+        '<T keyName={`dynamic-${i}`}/>',
+        'App.svelte'
+      );
+      for (const token of tokens) {
+        if (!machine.getSnapshot().done) {
+          machine.send(token);
+        }
+      }
+
+      const snapshot = machine.getSnapshot();
+      expect(snapshot.done).toBe(true);
+      expect(snapshot.context.keyName).toBe(false);
+      expect(snapshot.context.defaultValue).toBeNull();
+      expect(snapshot.context.namespace).toBeNull();
+    });
+
+    it('marks HTML properties with inline expressions as dynamic', async () => {
+      const tokens = await tokenizer(
+        '<T keyName="dynamic-{i}"/>',
+        'App.svelte'
+      );
+      for (const token of tokens) {
+        if (!machine.getSnapshot().done) {
+          machine.send(token);
+        }
+      }
+
+      const snapshot = machine.getSnapshot();
+      expect(snapshot.done).toBe(true);
+      expect(snapshot.context.keyName).toBe(false);
+      expect(snapshot.context.defaultValue).toBeNull();
+      expect(snapshot.context.namespace).toBeNull();
+    });
+
+    it('marks strings with concatenations as dynamic', async () => {
+      const tokens = await tokenizer(
+        '<T ns="heh" keyName={"dynamic-" + i}/>',
+        'App.svelte'
+      );
+      for (const token of tokens) {
+        if (!machine.getSnapshot().done) {
+          machine.send(token);
+        }
+      }
+
+      const snapshot = machine.getSnapshot();
+      expect(snapshot.done).toBe(true);
+      expect(snapshot.context.keyName).toBe(false);
+      expect(snapshot.context.defaultValue).toBeNull();
+      expect(snapshot.context.namespace).toBe('heh');
+    });
+
+    it('marks plain variables as dynamic', async () => {
+      const tokens = await tokenizer('<T keyName={key}/>', 'App.svelte');
+      for (const token of tokens) {
+        if (!machine.getSnapshot().done) {
+          machine.send(token);
+        }
+      }
+
+      const snapshot = machine.getSnapshot();
+      expect(snapshot.done).toBe(true);
+      expect(snapshot.context.keyName).toBe(false);
+      expect(snapshot.context.defaultValue).toBeNull();
+      expect(snapshot.context.namespace).toBeNull();
+    });
+
+    it('marks declaration shorthand as dynamic', async () => {
+      const tokens = await tokenizer(
+        '<T keyName someValue={"key1"} ns/>',
+        'App.svelte'
+      );
+      for (const token of tokens) {
+        if (!machine.getSnapshot().done) {
+          machine.send(token);
+        }
+      }
+
+      const snapshot = machine.getSnapshot();
+      expect(snapshot.done).toBe(true);
+      expect(snapshot.context.keyName).toBe(false);
+      expect(snapshot.context.defaultValue).toBeNull();
+      expect(snapshot.context.namespace).toBe(false);
+    });
+
+    it('handles empty strings (ref: #29)', async () => {
+      const tokens = await tokenizer('<T keyName ns="" />', 'App.svelte');
+      for (const token of tokens) {
+        if (!machine.getSnapshot().done) {
+          machine.send(token);
+        }
+      }
+
+      const snapshot = machine.getSnapshot();
+      expect(snapshot.done).toBe(true);
+      expect(snapshot.context.keyName).toBe(false);
+      expect(snapshot.context.defaultValue).toBeNull();
+      expect(snapshot.context.namespace).toBe('');
+    });
+  });
 });

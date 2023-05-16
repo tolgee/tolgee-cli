@@ -85,8 +85,6 @@ export function dumpWarnings(extractionResult: ExtractionResults) {
   return warningCount;
 }
 
-// TODO: Revisit this function and turn it into an actual GitHub Action Annotation?
-// https://docs.github.com/en/rest/checks/runs?apiVersion=2022-11-28#update-a-check-run
 export function emitGitHubWarning(warning: string, file: string, line: number) {
   if (!process.env.GITHUB_ACTIONS) return;
 

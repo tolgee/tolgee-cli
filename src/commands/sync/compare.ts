@@ -39,9 +39,10 @@ async function compareHandler(this: Command, pattern: string) {
 
   console.log('Your code project and Tolgee project are out of sync.');
   if (diff.added.length) {
-    console.log(ansi.green.bold(`${diff.added.length} new strings`));
+    const key = diff.added.length === 1 ? 'key' : 'keys';
+    console.log(ansi.green.bold(`${diff.added.length} new ${key} found`));
     for (const key of diff.added) {
-      printKey(key, 'added');
+      printKey(key, false);
     }
 
     // Line break
@@ -49,9 +50,10 @@ async function compareHandler(this: Command, pattern: string) {
   }
 
   if (diff.removed.length) {
-    console.log(ansi.red.bold(`${diff.removed.length} removed strings`));
+    const key = diff.removed.length === 1 ? 'key' : 'keys';
+    console.log(ansi.red.bold(`${diff.removed.length} unused ${key}`));
     for (const key of diff.removed) {
-      printKey(key, 'removed');
+      printKey(key, true);
     }
 
     // Line break
