@@ -5,7 +5,7 @@
   "description": "A tool to interact with the Tolgee Platform through CLI",
   "repository": {
     "type": "git",
-    "url": "https://github.com/tolgee/tolgee-cli"
+    "url": "https://github.com/tolgee/tolgee-cli.git"
   },
   "bin": {
     "tolgee": "./dist/index.js"
