@@ -1,13 +1,13 @@
 import { Request, Response } from 'undici';
 import type { Blob } from 'buffer';
-import type { components } from './schema.generated';
+import type { components } from './schema.generated.js';
 
 import { fetch } from 'undici';
 import FormData from 'form-data';
 
-import { HttpError } from '../errors';
-import { debug } from '../../utils/logger';
-import { USER_AGENT } from '../../constants';
+import { HttpError } from '../errors.js';
+import { debug } from '../../utils/logger.js';
+import { USER_AGENT } from '../../constants.js';
 
 export type RequesterParams =
   | { apiUrl: string | URL; apiKey: `tgpat_${string}`; projectId: number }

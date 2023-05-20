@@ -51,7 +51,7 @@ parse source code files, and then uses states machines powered by [XState](https
 perform the actual extraction.
 
 #### Adding new TextMate grammars
-To add new TextMate grammars, **do not do it manually**! Modify the `scripts/grammars.mjs` file following these
+To add new TextMate grammars, **do not do it manually**! Modify the `scripts/grammars.js` file following these
 steps:
 
  - Add the URL to the grammar file to the `Grammars` dictionary.

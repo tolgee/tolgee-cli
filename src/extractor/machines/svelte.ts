@@ -1,8 +1,8 @@
 import type { ExtractedKey, Warning } from '../index.js';
 
 import { createMachine, assign, send, forwardTo } from 'xstate';
-import propertiesMachine from './shared/properties';
-import commentsService from './shared/comments';
+import propertiesMachine from './shared/properties.js';
+import commentsService from './shared/comments.js';
 
 type KeyWithDynamicNs = Omit<ExtractedKey, 'namespace'> & {
   namespace?: ExtractedKey['namespace'] | false;

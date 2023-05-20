@@ -1,4 +1,4 @@
-import extractKeys from '../../../src/extractor/extractor';
+import extractKeys from '../../../src/extractor/extractor.js';
 
 describe('useTranslate', () => {
   it('extracts from the t call with signature t(string))', async () => {

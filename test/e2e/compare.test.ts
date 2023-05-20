@@ -1,21 +1,21 @@
-import { join } from 'path';
+import { PROJECT_PAK_2, PROJECT_PAK_3 } from './utils/tg.js';
+import { run } from './utils/run.js';
 
-import { PROJECT_PAK_2, PROJECT_PAK_3 } from './utils/tg';
-import { run } from './utils/run';
+const FIXTURES_PATH = new URL('../__fixtures__/', import.meta.url);
+const CODE_PATH = new URL('./testProjectCode/', FIXTURES_PATH);
 
-const FIXTURES_PATH = join(__dirname, '..', '__fixtures__');
-const CODE_PATH = join(FIXTURES_PATH, 'testProjectCode');
-
-const CODE_PROJECT_2_COMPLETE = join(CODE_PATH, 'Test2Complete.tsx');
-const CODE_PROJECT_2_ADDED = join(CODE_PATH, 'Test2New.tsx');
-const CODE_PROJECT_2_DELETED = join(CODE_PATH, 'Test2Incomplete.tsx');
-const CODE_PROJECT_2_WARNING = join(CODE_PATH, 'Test2Warning.tsx');
-const CODE_PROJECT_3 = join(CODE_PATH, 'Test3Mixed.tsx');
-const CODE_UNORDERED = join(
-  FIXTURES_PATH,
-  'codeProjectReactUnordered',
-  'App.tsx'
-);
+const CODE_PROJECT_2_COMPLETE = new URL('./Test2Complete.tsx', CODE_PATH)
+  .pathname;
+const CODE_PROJECT_2_ADDED = new URL('./Test2New.tsx', CODE_PATH).pathname;
+const CODE_PROJECT_2_DELETED = new URL('./Test2Incomplete.tsx', CODE_PATH)
+  .pathname;
+const CODE_PROJECT_2_WARNING = new URL('./Test2Warning.tsx', CODE_PATH)
+  .pathname;
+const CODE_PROJECT_3 = new URL('./Test3Mixed.tsx', CODE_PATH).pathname;
+const CODE_UNORDERED = new URL(
+  './codeProjectReactUnordered/App.tsx',
+  FIXTURES_PATH
+).pathname;
 
 it('says projects are in sync when they do match', async () => {
   const out = await run(

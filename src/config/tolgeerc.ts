@@ -1,7 +1,7 @@
 import { cosmiconfig, defaultLoaders } from 'cosmiconfig';
 import { resolve } from 'path';
 import { existsSync } from 'fs';
-import { SDKS } from '../constants';
+import { SDKS } from '../constants.js';
 
 export type ProjectSdk = (typeof SDKS)[number];
 

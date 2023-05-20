@@ -1,5 +1,5 @@
 import type { Sender, Receiver } from 'xstate';
-import { parse } from 'json5';
+import JSON5 from 'json5';
 
 export type MagicIgnoreComment = {
   kind: 'ignore';
@@ -78,7 +78,7 @@ export default function (
       // Data is a json5 struct
       if (data.startsWith('{')) {
         try {
-          const key = parse(data);
+          const key = JSON5.parse(data);
           if (!isValidKeyOverride(key)) {
             // No key in the struct; invalid override
             callback({

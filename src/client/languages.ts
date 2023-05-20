@@ -1,7 +1,7 @@
-import type { QueryOf, ResponseOf } from './internal/schema.utils';
-import type { PaginatedView } from './internal/requester';
+import type { QueryOf, ResponseOf } from './internal/schema.utils.js';
+import type { PaginatedView } from './internal/requester.js';
 
-import Requester from './internal/requester';
+import Requester from './internal/requester.js';
 
 export type GetLanguagesRequest = QueryOf<
   '/v2/projects/{projectId}/languages',

@@ -1,6 +1,6 @@
-import type { ResponseOf, BodyOf } from './internal/schema.utils';
+import type { ResponseOf, BodyOf } from './internal/schema.utils.js';
 
-import Requester from './internal/requester';
+import Requester from './internal/requester.js';
 
 type ResponseAllKeys = ResponseOf<
   '/v2/projects/{projectId}/all-keys',

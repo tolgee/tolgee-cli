@@ -1,15 +1,15 @@
-import type { RequesterParams } from './internal/requester';
-import type { components } from './internal/schema.generated';
+import type { RequesterParams } from './internal/requester.js';
+import type { components } from './internal/schema.generated.js';
 
 import base32Decode from 'base32-decode';
-import Requester from './internal/requester';
+import Requester from './internal/requester.js';
 
-import ProjectClient from './project';
-import LanguagesClient from './languages';
-import ImportClient from './import';
-import ExportClient from './export';
+import ProjectClient from './project.js';
+import LanguagesClient from './languages.js';
+import ImportClient from './import.js';
+import ExportClient from './export.js';
 
-import { API_KEY_PAK_PREFIX } from '../constants';
+import { API_KEY_PAK_PREFIX } from '../constants.js';
 
 type ProjectApiKeyInfo = components['schemas']['ApiKeyWithLanguagesModel'];
 

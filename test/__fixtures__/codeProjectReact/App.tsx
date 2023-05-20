@@ -3,7 +3,7 @@
 import React, { useMemo } from 'react';
 import { T } from '@tolgee/react';
 
-import HelloWorld from './HelloWorld';
+import HelloWorld from './HelloWorld.js';
 
 export default function App() {
   const luckyNumber = useMemo(() => Math.floor(Math.random() * 10), []);

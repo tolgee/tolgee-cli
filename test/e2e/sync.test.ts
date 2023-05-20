@@ -1,21 +1,20 @@
-import { join } from 'path';
-
-import { TMP_FOLDER, setupTemporaryFolder } from './utils/tmp';
+import { TMP_FOLDER, setupTemporaryFolder } from './utils/tmp.js';
 import {
   PROJECT_PAK_2,
   PROJECT_PAK_3,
   requestGet,
   requestPost,
   requestDelete,
-} from './utils/tg';
-import { tolgeeDataToDict } from './utils/data';
-import { run } from './utils/run';
+} from './utils/tg.js';
+import { tolgeeDataToDict } from './utils/data.js';
+import { run } from './utils/run.js';
 import './utils/toMatchContentsOf';
 
-const FIXTURES_PATH = join(__dirname, '..', '__fixtures__');
-const CODE_PATH = join(FIXTURES_PATH, 'testProjectCode');
+const FIXTURES_PATH = new URL('../__fixtures__/', import.meta.url);
+const CODE_PATH = new URL('./testProjectCode', FIXTURES_PATH).pathname;
 
-const PROJECT_2_DATA = join(FIXTURES_PATH, 'tolgeeImportData', 'test2');
+const PROJECT_2_DATA = new URL('./tolgeeImportData/test2', FIXTURES_PATH)
+  .pathname;
 const CODE_PROJECT_2_COMPLETE = `${CODE_PATH}/Test2Complete.tsx`;
 const CODE_PROJECT_2_ADDED = `${CODE_PATH}/Test2New.tsx`;
 const CODE_PROJECT_2_DELETED = `${CODE_PATH}/Test2Incomplete.tsx`;

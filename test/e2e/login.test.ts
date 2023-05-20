@@ -1,8 +1,8 @@
 import { tmpdir } from 'os';
 import { join } from 'path';
 import { rm, readFile } from 'fs/promises';
-import { run } from './utils/run';
-import { getUserPat, PROJECT_PAK_1 } from './utils/tg';
+import { run } from './utils/run.js';
+import { getUserPat, PROJECT_PAK_1 } from './utils/tg.js';
 
 const AUTH_FILE_PATH = join(tmpdir(), '.tolgee-e2e', 'authentication.json');
 

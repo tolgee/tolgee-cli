@@ -1,4 +1,6 @@
-import commentsService from '../../../../src/extractor/machines/shared/comments';
+import { jest } from '@jest/globals';
+
+import commentsService from '../../../../src/extractor/machines/shared/comments.js';
 
 let callback: jest.Mock;
 let send: (...args: any) => any;

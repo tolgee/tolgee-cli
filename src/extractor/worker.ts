@@ -1,15 +1,15 @@
-import type { Extractor } from './index';
+import type { Extractor } from './index.js';
 import { resolve, extname } from 'path';
 import { Worker, isMainThread, parentPort } from 'worker_threads';
 import { readFile } from 'fs/promises';
 
-import internalExtractor from './extractor';
-import { loadModule } from '../utils/moduleLoader';
-import { type Deferred, createDeferred } from '../utils/deferred';
+import internalExtractor from './extractor.js';
+import { loadModule } from '../utils/moduleLoader.js';
+import { type Deferred, createDeferred } from '../utils/deferred.js';
 
 export type WorkerParams = { extractor?: string; file: string };
 
-const IS_TS_NODE = extname(__filename) === '.ts';
+const IS_TS_NODE = extname(import.meta.url) === '.ts';
 
 // --- Worker functions
 
@@ -45,10 +45,12 @@ let worker: Worker;
 const jobQueue: Array<[WorkerParams, Deferred]> = [];
 
 function createWorker() {
-  const worker = new Worker(__filename, {
-    // ts-node workaround
-    execArgv: IS_TS_NODE ? ['--require', 'ts-node/register'] : undefined,
-  });
+  const worker = IS_TS_NODE
+    ? new Worker(new URL(import.meta.url).pathname.replace('.ts', '.js'), {
+        // ts-node workaround
+        execArgv: ['--require', 'ts-node/register'],
+      })
+    : new Worker(new URL(import.meta.url).pathname);
 
   let timeout: NodeJS.Timeout;
   let currentDeferred: Deferred;

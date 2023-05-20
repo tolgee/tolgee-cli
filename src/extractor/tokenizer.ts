@@ -1,10 +1,11 @@
 import type { IOnigLib, IGrammar } from 'vscode-textmate';
 
-import { join, extname } from 'path';
+import { extname } from 'path';
 import { readFile } from 'fs/promises';
+import { createRequire } from 'module';
 
-import { Registry, parseRawGrammar, INITIAL } from 'vscode-textmate';
-import { loadWASM, OnigScanner, OnigString } from 'vscode-oniguruma';
+import TextMate from 'vscode-textmate';
+import Oniguruma from 'vscode-oniguruma';
 
 export type Token = {
   type: string;
@@ -21,27 +22,28 @@ const enum Grammar {
   SVELTE = 'source.svelte',
 }
 
-const GRAMMAR_PATH = join(__dirname, '..', '..', 'textmate');
-const GrammarFiles: Record<Grammar, string> = {
-  [Grammar.TYPESCRIPT]: join(GRAMMAR_PATH, 'TypeScript.tmLanguage'),
-  [Grammar.TYPESCRIPT_TSX]: join(GRAMMAR_PATH, 'TypeScriptReact.tmLanguage'),
-  [Grammar.SVELTE]: join(GRAMMAR_PATH, 'Svelte.tmLanguage'),
+const GRAMMAR_PATH = new URL('../../textmate/', import.meta.url);
+const GrammarFiles: Record<Grammar, URL> = {
+  [Grammar.TYPESCRIPT]: new URL('TypeScript.tmLanguage', GRAMMAR_PATH),
+  [Grammar.TYPESCRIPT_TSX]: new URL('TypeScriptReact.tmLanguage', GRAMMAR_PATH),
+  [Grammar.SVELTE]: new URL('Svelte.tmLanguage', GRAMMAR_PATH),
 };
 
 let oniguruma: Promise<IOnigLib>;
-let registry: Registry;
+let registry: TextMate.Registry;
 
-async function initializeOniguruma() {
+async function initializeOniguruma(): Promise<IOnigLib> {
+  const require = createRequire(import.meta.url);
   const wasmBlobPath = require
     .resolve('vscode-oniguruma')
     .replace('main.js', 'onig.wasm');
 
   const wasmBlob = await readFile(wasmBlobPath);
-  await loadWASM(wasmBlob);
+  await Oniguruma.loadWASM(wasmBlob);
 
-  return <IOnigLib>{
-    createOnigScanner: (patterns) => new OnigScanner(patterns),
-    createOnigString: (s) => new OnigString(s),
+  return {
+    createOnigScanner: (patterns) => new Oniguruma.OnigScanner(patterns),
+    createOnigString: (s) => new Oniguruma.OnigString(s),
   };
 }
 
@@ -52,7 +54,7 @@ async function loadGrammar(scope: Grammar) {
   const grammar = await readFile(file, 'utf8');
   return grammar.startsWith('{')
     ? JSON.parse(grammar)
-    : parseRawGrammar(grammar);
+    : TextMate.parseRawGrammar(grammar);
 }
 
 function extnameToGrammar(extname: string) {
@@ -73,7 +75,7 @@ function extnameToGrammar(extname: string) {
 }
 
 function tokenize(code: string, grammar: IGrammar) {
-  let stack = INITIAL;
+  let stack = TextMate.INITIAL;
   let linePtr = 0;
   const lines = code.split('\n');
   const tokens: Token[] = [];
@@ -121,7 +123,7 @@ export default async function (code: string, fileName: string) {
   if (!oniguruma) {
     // Lazily initialize the WebAssembly runtime
     oniguruma = initializeOniguruma();
-    registry = new Registry({
+    registry = new TextMate.Registry({
       onigLib: oniguruma,
       loadGrammar: loadGrammar,
     });

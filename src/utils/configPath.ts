@@ -2,6 +2,10 @@ import { homedir } from 'os';
 import { resolve } from 'path';
 
 export default function getConfigPath() {
+  if (process.env.TOLGEE_CLI_CONFIG_PATH) {
+    return process.env.TOLGEE_CLI_CONFIG_PATH;
+  }
+
   switch (process.platform) {
     case 'win32':
       return resolve(process.env.APPDATA!, 'tolgee');

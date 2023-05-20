@@ -1,11 +1,13 @@
+import { jest } from '@jest/globals';
 import { tmpdir } from 'os';
+
 import { join } from 'path';
 import { rm, readFile } from 'fs/promises';
-import { saveApiKey, getApiKey } from '../../src/config/credentials';
-import loadTolgeeRc from '../../src/config/tolgeerc';
+import { saveApiKey, getApiKey } from '../../src/config/credentials.js';
+import loadTolgeeRc from '../../src/config/tolgeerc.js';
 
-const FIXTURES_PATH = join(__dirname, '..', '__fixtures__');
-const AUTH_FILE = join(tmpdir(), 'auth.json');
+const FIXTURES_PATH = new URL('../__fixtures__/', import.meta.url);
+const AUTH_FILE = join(tmpdir(), 'authentication.json');
 const TG_1 = new URL('https://app.tolgee.io');
 const TG_2 = new URL('https://meow.local');
 const TG_3 = new URL('https://nya.local');
@@ -56,13 +58,6 @@ const PAK_3 = <const>{
 };
 
 describe('credentials', () => {
-  beforeAll(async () => {
-    // Override auth store file
-    await import('../../src/config/credentials').then((m: any) => {
-      m.API_TOKENS_FILE = AUTH_FILE;
-    });
-  });
-
   describe('store', () => {
     afterEach(async () => {
       await rm(AUTH_FILE);
@@ -153,21 +148,23 @@ describe('credentials', () => {
 });
 
 describe('.tolgeerc', () => {
-  let cwd: jest.SpyInstance;
+  let cwd: jest.SpiedFunction<typeof process.cwd>;
 
   beforeAll(() => {
     cwd = jest.spyOn(process, 'cwd');
   });
 
   it('loads nothing', async () => {
-    cwd.mockReturnValueOnce(join(FIXTURES_PATH, 'emptyFolder'));
+    const testWd = new URL('./emptyFolder', FIXTURES_PATH).pathname;
+    cwd.mockReturnValueOnce(testWd);
 
     const cfg = await loadTolgeeRc();
     expect(cfg).toBeNull();
   });
 
   it('loads valid tolgeerc', async () => {
-    cwd.mockReturnValueOnce(join(FIXTURES_PATH, 'validTolgeeRc'));
+    const testWd = new URL('./validTolgeeRc', FIXTURES_PATH).pathname;
+    cwd.mockReturnValueOnce(testWd);
 
     const cfg = await loadTolgeeRc();
     expect(cfg).toEqual({
@@ -178,17 +175,20 @@ describe('.tolgeerc', () => {
   });
 
   it('rejects invalid API url', async () => {
-    cwd.mockReturnValueOnce(join(FIXTURES_PATH, 'invalidTolgeeRcApi'));
+    const testWd = new URL('./invalidTolgeeRcApi', FIXTURES_PATH).pathname;
+    cwd.mockReturnValueOnce(testWd);
     return expect(loadTolgeeRc()).rejects.toThrow('apiUrl');
   });
 
   it('rejects invalid project ID', async () => {
-    cwd.mockReturnValueOnce(join(FIXTURES_PATH, 'invalidTolgeeRcProject'));
+    const testWd = new URL('./invalidTolgeeRcProject', FIXTURES_PATH).pathname;
+    cwd.mockReturnValueOnce(testWd);
     return expect(loadTolgeeRc()).rejects.toThrow('projectId');
   });
 
   it('rejects invalid SDK', async () => {
-    cwd.mockReturnValueOnce(join(FIXTURES_PATH, 'invalidTolgeeRcSdk'));
+    const testWd = new URL('./invalidTolgeeRcSdk', FIXTURES_PATH).pathname;
+    cwd.mockReturnValueOnce(testWd);
     return expect(loadTolgeeRc()).rejects.toThrow('sdk');
   });
 });

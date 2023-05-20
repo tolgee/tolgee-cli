@@ -1,5 +1,3 @@
-import { join } from 'path';
-
 import {
   PROJECT_PAK_1,
   PROJECT_PAK_2,
@@ -7,14 +5,17 @@ import {
   requestGet,
   requestPut,
   requestDelete,
-} from './utils/tg';
-import { tolgeeDataToDict } from './utils/data';
-import { run } from './utils/run';
+} from './utils/tg.js';
+import { tolgeeDataToDict } from './utils/data.js';
+import { run } from './utils/run.js';
 
-const FIXTURES_PATH = join(__dirname, '..', '__fixtures__');
-const PROJECT_1_UPDATE = join(FIXTURES_PATH, 'updatedProject1');
-const PROJECT_2_UPDATE = join(FIXTURES_PATH, 'updatedProject2WithConflicts');
-const PROJECT_3_UPDATE = join(FIXTURES_PATH, 'updatedProject3');
+const FIXTURES_PATH = new URL('../__fixtures__/', import.meta.url);
+const PROJECT_1_UPDATE = new URL('./updatedProject1', FIXTURES_PATH).pathname;
+const PROJECT_2_UPDATE = new URL(
+  './updatedProject2WithConflicts',
+  FIXTURES_PATH
+).pathname;
+const PROJECT_3_UPDATE = new URL('./updatedProject3', FIXTURES_PATH).pathname;
 
 async function cleanupProjectState() {
   // Project 1: delete wired & wireless

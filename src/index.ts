@@ -3,22 +3,32 @@
 import { Command } from 'commander';
 import ansi from 'ansi-colors';
 
-import { getApiKey, savePak, savePat } from './config/credentials';
-import loadTolgeeRc from './config/tolgeerc';
+import { getApiKey, savePak, savePat } from './config/credentials.js';
+import loadTolgeeRc from './config/tolgeerc.js';
 
-import RestClient from './client';
-import { HttpError } from './client/errors';
-import { setDebug, isDebugEnabled, debug, info, error } from './utils/logger';
+import RestClient from './client/index.js';
+import { HttpError } from './client/errors.js';
+import {
+  setDebug,
+  isDebugEnabled,
+  debug,
+  info,
+  error,
+} from './utils/logger.js';
 
-import { API_KEY_OPT, API_URL_OPT, PROJECT_ID_OPT } from './options';
-import { API_KEY_PAK_PREFIX, API_KEY_PAT_PREFIX, VERSION } from './constants';
+import { API_KEY_OPT, API_URL_OPT, PROJECT_ID_OPT } from './options.js';
+import {
+  API_KEY_PAK_PREFIX,
+  API_KEY_PAT_PREFIX,
+  VERSION,
+} from './constants.js';
 
-import { Login, Logout } from './commands/login';
-import PushCommand from './commands/push';
-import PullCommand from './commands/pull';
-import ExtractCommand from './commands/extract';
-import CompareCommand from './commands/sync/compare';
-import SyncCommand from './commands/sync/sync';
+import { Login, Logout } from './commands/login.js';
+import PushCommand from './commands/push.js';
+import PullCommand from './commands/pull.js';
+import ExtractCommand from './commands/extract.js';
+import CompareCommand from './commands/sync/compare.js';
+import SyncCommand from './commands/sync/sync.js';
 
 const NO_KEY_COMMANDS = ['login', 'logout', 'extract'];
 

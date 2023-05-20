@@ -1,14 +1,14 @@
-import type { ApiKeyInfo } from '../client';
+import type { ApiKeyInfo } from '../client/index.js';
 import { Command } from 'commander';
-import RestClient from '../client';
+import RestClient from '../client/index.js';
 
-import { HttpError } from '../client/errors';
+import { HttpError } from '../client/errors.js';
 import {
   saveApiKey,
   removeApiKeys,
   clearAuthStore,
-} from '../config/credentials';
-import { success, error } from '../utils/logger';
+} from '../config/credentials.js';
+import { success, error } from '../utils/logger.js';
 
 type Options = {
   apiUrl: URL;

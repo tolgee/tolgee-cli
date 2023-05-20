@@ -1,9 +1,9 @@
 // ---
-// Downloads TextMate grammars (& licenses) specified in grammars.mjs
+// Downloads TextMate grammars (& licenses) specified in grammars.js
 // ---
 
 import { writeFile } from 'fs/promises';
-import { Grammars, Licenses, Transformers } from './grammars.mjs';
+import { Grammars, Licenses, Transformers } from './grammars.js';
 
 const TARGET_PATH = new URL('../textmate/', import.meta.url);
 
