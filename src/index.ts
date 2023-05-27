@@ -66,7 +66,7 @@ async function loadApiKey(cmd: Command) {
 function loadProjectId(cmd: Command) {
   const opts = cmd.optsWithGlobals();
 
-  if (opts.apiKey.startsWith(API_KEY_PAK_PREFIX)) {
+  if (opts.apiKey?.startsWith(API_KEY_PAK_PREFIX)) {
     // Parse the key and ensure we can access the specified Project ID
     const projectId = RestClient.projectIdFromKey(opts.apiKey);
     program.setOptionValue('projectId', projectId);
@@ -90,7 +90,7 @@ function validateOptions(cmd: Command) {
   const opts = cmd.optsWithGlobals();
   if (opts.projectId === -1) {
     error(
-      'No Project ID have been specified. You must either provide one via --project-ir, or by setting up a `.tolgeerc` file.'
+      'No Project ID have been specified. You must either provide one via --project-id, or by setting up a `.tolgeerc` file.'
     );
     info(
       'Learn more about configuring the CLI here: https://tolgee.io/tolgee-cli/project-configuration'
