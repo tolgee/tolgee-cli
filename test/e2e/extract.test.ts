@@ -1,14 +1,20 @@
+import { fileURLToPathSlash } from './utils/toFilePath.js';
 import { readFile } from 'fs/promises';
 import { run } from './utils/run.js';
 
 const FIXTURES_PATH = new URL('../__fixtures__/', import.meta.url);
-const CODE_PROJECT = new URL('./codeProjectReact', FIXTURES_PATH).pathname;
-const CODE_PROJECT_ERR = new URL('./codeProjectReactWithErr', FIXTURES_PATH)
-  .pathname;
-const CODE_PROJECT_COMMENT = new URL('./codeProjectCommentOnly', FIXTURES_PATH)
-  .pathname;
-const EXTRACTED_DATA = new URL('./codeProjectExtracted/en.json', FIXTURES_PATH)
-  .pathname;
+const CODE_PROJECT = fileURLToPathSlash(
+  new URL('./codeProjectReact', FIXTURES_PATH)
+);
+const CODE_PROJECT_ERR = fileURLToPathSlash(
+  new URL('./codeProjectReactWithErr', FIXTURES_PATH)
+);
+const CODE_PROJECT_COMMENT = fileURLToPathSlash(
+  new URL('./codeProjectCommentOnly', FIXTURES_PATH)
+);
+const EXTRACTED_DATA = fileURLToPathSlash(
+  new URL('./codeProjectExtracted/en.json', FIXTURES_PATH)
+);
 
 const CODE_PROJECT_MATCH = `${CODE_PROJECT}/**/*.tsx`;
 const CODE_PROJECT_ERR_MATCH = `${CODE_PROJECT_ERR}/**/*.tsx`;

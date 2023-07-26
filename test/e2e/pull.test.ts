@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'url';
 import { mkdir } from 'fs/promises';
 import { TMP_FOLDER, setupTemporaryFolder } from './utils/tmp.js';
 import { PROJECT_PAK_1, PROJECT_PAK_3 } from './utils/tg.js';
@@ -5,10 +6,12 @@ import { run, runWithStdin } from './utils/run.js';
 import './utils/toMatchContentsOf.js';
 
 const FIXTURES_PATH = new URL('../__fixtures__/', import.meta.url);
-const PROJECT_1_DATA = new URL('./tolgeeImportData/test1', FIXTURES_PATH)
-  .pathname;
-const PROJECT_3_DATA = new URL('./tolgeeImportData/test3', FIXTURES_PATH)
-  .pathname;
+const PROJECT_1_DATA = fileURLToPath(
+  new URL('./tolgeeImportData/test1', FIXTURES_PATH)
+);
+const PROJECT_3_DATA = fileURLToPath(
+  new URL('./tolgeeImportData/test3', FIXTURES_PATH)
+);
 
 setupTemporaryFolder();
 

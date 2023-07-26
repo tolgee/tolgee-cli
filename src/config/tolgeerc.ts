@@ -84,8 +84,6 @@ function parseConfig(rc: any): TolgeeConfig {
 
 export default async function loadTolgeeRc(): Promise<TolgeeConfig | null> {
   const res = await explorer.search();
-  console.log(process.cwd());
-  console.log(res);
   if (!res || res.isEmpty) return null;
 
   return parseConfig(res.config);

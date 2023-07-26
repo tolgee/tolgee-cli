@@ -1,4 +1,5 @@
 import { jest } from '@jest/globals';
+import { fileURLToPath } from 'url';
 import { tmpdir } from 'os';
 
 import { join } from 'path';
@@ -155,16 +156,16 @@ describe('.tolgeerc', () => {
   });
 
   it('loads nothing', async () => {
-    const testWd = new URL('./emptyFolder', FIXTURES_PATH).pathname;
-    cwd.mockReturnValueOnce(testWd);
+    const testWd = fileURLToPath(new URL('./emptyFolder', FIXTURES_PATH));
+    cwd.mockReturnValue(testWd);
 
     const cfg = await loadTolgeeRc();
     expect(cfg).toBeNull();
   });
 
   it('loads valid tolgeerc', async () => {
-    const testWd = new URL('./validTolgeeRc', FIXTURES_PATH).pathname;
-    cwd.mockReturnValueOnce(testWd);
+    const testWd = fileURLToPath(new URL('./validTolgeeRc', FIXTURES_PATH));
+    cwd.mockReturnValue(testWd);
 
     const cfg = await loadTolgeeRc();
     expect(cfg).toEqual({
@@ -175,20 +176,27 @@ describe('.tolgeerc', () => {
   });
 
   it('rejects invalid API url', async () => {
-    const testWd = new URL('./invalidTolgeeRcApi', FIXTURES_PATH).pathname;
-    cwd.mockReturnValueOnce(testWd);
+    const testWd = fileURLToPath(
+      new URL('./invalidTolgeeRcApi', FIXTURES_PATH)
+    );
+    cwd.mockReturnValue(testWd);
+
     return expect(loadTolgeeRc()).rejects.toThrow('apiUrl');
   });
 
   it('rejects invalid project ID', async () => {
-    const testWd = new URL('./invalidTolgeeRcProject', FIXTURES_PATH).pathname;
-    cwd.mockReturnValueOnce(testWd);
+    const testWd = fileURLToPath(
+      new URL('./invalidTolgeeRcProject', FIXTURES_PATH)
+    );
+    cwd.mockReturnValue(testWd);
     return expect(loadTolgeeRc()).rejects.toThrow('projectId');
   });
 
   it('rejects invalid SDK', async () => {
-    const testWd = new URL('./invalidTolgeeRcSdk', FIXTURES_PATH).pathname;
-    cwd.mockReturnValueOnce(testWd);
+    const testWd = fileURLToPath(
+      new URL('./invalidTolgeeRcSdk', FIXTURES_PATH)
+    );
+    cwd.mockReturnValue(testWd);
     return expect(loadTolgeeRc()).rejects.toThrow('sdk');
   });
 });
