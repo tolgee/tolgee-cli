@@ -20,6 +20,7 @@ const enum Grammar {
   TYPESCRIPT = 'source.ts',
   TYPESCRIPT_TSX = 'source.tsx',
   SVELTE = 'source.svelte',
+  VUE = 'source.vue',
 }
 
 const GRAMMAR_PATH = new URL('../../textmate/', import.meta.url);
@@ -27,6 +28,7 @@ const GrammarFiles: Record<Grammar, URL> = {
   [Grammar.TYPESCRIPT]: new URL('TypeScript.tmLanguage', GRAMMAR_PATH),
   [Grammar.TYPESCRIPT_TSX]: new URL('TypeScriptReact.tmLanguage', GRAMMAR_PATH),
   [Grammar.SVELTE]: new URL('Svelte.tmLanguage', GRAMMAR_PATH),
+  [Grammar.VUE]: new URL('Vue.tmLanguage', GRAMMAR_PATH),
 };
 
 let oniguruma: Promise<IOnigLib>;
