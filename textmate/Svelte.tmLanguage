@@ -1,4 +1,5 @@
 {
+  "//": "Modified grammar from https://raw.githubusercontent.com/sveltejs/language-tools/master/packages/svelte-vscode/syntaxes/svelte.tmLanguage.src.yaml",
   "name": "Svelte Component",
   "scopeName": "source.svelte",
   "fileTypes": [

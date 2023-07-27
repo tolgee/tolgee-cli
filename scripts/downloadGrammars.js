@@ -5,6 +5,8 @@
 import { writeFile } from 'fs/promises';
 import { Grammars, Licenses, Transformers } from './grammars.js';
 
+import TextMate from 'vscode-textmate';
+
 const TARGET_PATH = new URL('../textmate/', import.meta.url);
 
 const downloaded = {};
@@ -26,6 +28,17 @@ for (const grammarName in downloaded) {
     if (grammarName in Transformers) {
       grammar = Transformers[grammarName](grammar, downloaded);
     }
+
+    // Convert to json is necessary
+    if (!grammar.startsWith('{')) {
+      grammar = JSON.stringify(TextMate.parseRawGrammar(grammar), null, 2);
+    }
+
+    // Add comment
+    grammar = grammar.replace(
+      '{',
+      `{\n  "//": "Modified grammar from ${Grammars[grammarName]}",`
+    );
 
     await writeFile(new URL(`${grammarName}.tmLanguage`, TARGET_PATH), grammar);
   }

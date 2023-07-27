@@ -31,16 +31,6 @@ export const Licenses = [
   },
 ];
 
-const TypeScriptReactComment = `
-<!--
-  This TextMate grammar has been modified from the original one.
-  '.tsx' tokens have been transformed into '.ts' to simplify use within the tolgee-cli project.
-
-  You may find the original TextMate definition here:
-  https://github.com/microsoft/TypeScript-TmLanguage/blob/master/TypeScriptReact.tmLanguage
--->
-`.trim();
-
 // Transformers receive the grammar and a Record<keyof Grammars, string>, where the value is the downloaded TM grammar.
 export const Transformers = {
   TypeScriptReact: (self, grammars) => {
@@ -55,7 +45,7 @@ export const Transformers = {
         : tokenType;
     });
 
-    return `${TypeScriptReactComment}\n${transformed}`;
+    return transformed;
   },
   Svelte: (self) => {
     return JSON.stringify(load(self), null, 2).replaceAll(

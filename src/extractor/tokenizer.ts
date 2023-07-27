@@ -21,6 +21,7 @@ const enum Grammar {
   TYPESCRIPT_TSX = 'source.tsx',
   SVELTE = 'source.svelte',
   VUE = 'source.vue',
+  HTML = 'text.html.derivative',
 }
 
 const GRAMMAR_PATH = new URL('../../textmate/', import.meta.url);
@@ -29,6 +30,7 @@ const GrammarFiles: Record<Grammar, URL> = {
   [Grammar.TYPESCRIPT_TSX]: new URL('TypeScriptReact.tmLanguage', GRAMMAR_PATH),
   [Grammar.SVELTE]: new URL('Svelte.tmLanguage', GRAMMAR_PATH),
   [Grammar.VUE]: new URL('Vue.tmLanguage', GRAMMAR_PATH),
+  [Grammar.HTML]: new URL('HTML.tmLanguage', GRAMMAR_PATH),
 };
 
 let oniguruma: Promise<IOnigLib>;
@@ -54,9 +56,7 @@ async function loadGrammar(scope: Grammar) {
   if (!file) return null;
 
   const grammar = await readFile(file, 'utf8');
-  return grammar.startsWith('{')
-    ? JSON.parse(grammar)
-    : TextMate.parseRawGrammar(grammar);
+  return JSON.parse(grammar);
 }
 
 function extnameToGrammar(extname: string) {
@@ -71,8 +71,12 @@ function extnameToGrammar(extname: string) {
     case '.jsx':
     case '.tsx':
       return Grammar.TYPESCRIPT_TSX;
+    case '.vue':
+      return Grammar.VUE;
     case '.svelte':
       return Grammar.SVELTE;
+    case '.html':
+      return Grammar.HTML;
   }
 }
 
@@ -86,14 +90,14 @@ function tokenize(code: string, grammar: IGrammar) {
     const res = grammar.tokenizeLine(line, stack);
 
     for (const token of res.tokens) {
-      // Opinionated take: if a token is scope-less, chances are we don't care about it.
-      // Ditching it allows us to reduce complexity from the state machine's POV.
-      if (token.scopes.length !== 1) {
-        const codeToken = code.slice(
-          linePtr + token.startIndex,
-          linePtr + token.endIndex
-        );
+      const codeToken = code.slice(
+        linePtr + token.startIndex,
+        linePtr + token.endIndex
+      );
 
+      // Opinionated take: if a token is scope-less and void, chances are we don't care about it.
+      // Ditching it allows us to reduce complexity from the state machine's POV.
+      if (token.scopes.length !== 1 || codeToken.trim()) {
         tokens.push({
           type: token.scopes[token.scopes.length - 1],
           token: codeToken,

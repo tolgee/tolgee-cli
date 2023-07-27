@@ -1,4 +1,5 @@
 {
+  "//": "Modified grammar from https://raw.githubusercontent.com/vuejs/vetur/master/syntaxes/vue.tmLanguage.json",
   "name": "Vue",
   "scopeName": "source.vue",
   "fileTypes": [

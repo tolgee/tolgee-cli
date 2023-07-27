@@ -1,6 +1,7 @@
 import { extname } from 'path';
 import { interpret } from 'xstate';
 import reactExtractorMachine from './machines/react.js';
+import vueSfcProcessor from './processors/vueSfc.js';
 import svelteExtractorMachine from './machines/svelte.js';
 import commentsExtractorMachine from './machines/comments.js';
 import tokenizer from './tokenizer.js';
@@ -27,9 +28,7 @@ const ALL_EXTS = [
   '.svelte',
 ];
 
-function pickMachine(code: string, fileName: string) {
-  const ext = extname(fileName);
-
+function pickMachine(code: string, ext: string) {
   if (REACT_EXTS.includes(ext) && code.includes('@tolgee/react')) {
     return reactExtractorMachine;
   }
@@ -49,7 +48,19 @@ function pickMachine(code: string, fileName: string) {
 }
 
 export default async function extractor(code: string, fileName: string) {
-  const machineSpec = pickMachine(code, fileName);
+  const ext = extname(fileName);
+
+  if (
+    ext === '.vue' &&
+    (code.includes('$t') ||
+      code.includes('@tolgee/vue') ||
+      code.includes('@tolgee-key') ||
+      code.includes('@tolgee-ignore'))
+  ) {
+    return vueSfcProcessor(code, fileName);
+  }
+
+  const machineSpec = pickMachine(code, ext);
   if (!machineSpec) {
     return { warnings: [], keys: [] };
   }
