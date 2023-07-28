@@ -21,7 +21,7 @@ const enum Grammar {
   TYPESCRIPT_TSX = 'source.tsx',
   SVELTE = 'source.svelte',
   VUE = 'source.vue',
-  HTML = 'text.html.derivative',
+  HTML = 'text.html.basic',
 }
 
 const GRAMMAR_PATH = new URL('../../textmate/', import.meta.url);
