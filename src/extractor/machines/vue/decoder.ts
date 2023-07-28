@@ -4,7 +4,9 @@
 //  - The scripts (excluding setup)
 //  - The template
 //
-// It can request tokens from other files to the callee.
+// Property of the machine: will always include an
+// extra token for all categories. Consumers must be
+// aware of this!
 
 import type { Token } from '../../tokenizer.js';
 import { createMachine, assign } from 'xstate';
@@ -15,8 +17,6 @@ type VueDecoderContext = {
   template: Token[];
 
   scriptSetupConsumed: boolean;
-  scriptProvenance: string | null;
-  templateProvenance: string | null;
   invalidSetup: number | null;
 
   depth: number;
@@ -34,8 +34,6 @@ export default createMachine<VueDecoderContext, Token>(
       script: [],
       template: [],
       scriptSetupConsumed: false, // <script setup>
-      scriptProvenance: null,
-      templateProvenance: null,
       invalidSetup: null,
       depth: 0,
       memoizedDepth: 0,
