@@ -8,6 +8,8 @@ type PropertiesContext = {
   keyName: string | false | null;
   defaultValue: string | false | null;
   namespace: string | false | null;
+
+  VUE_bound: boolean;
 };
 
 // This state machine is responsible for extracting translation key properties from an object/props
@@ -24,6 +26,8 @@ export default createMachine<PropertiesContext>(
       keyName: null,
       defaultValue: null,
       namespace: null,
+
+      VUE_bound: false,
     },
     states: {
       idle: {
@@ -63,6 +67,25 @@ export default createMachine<PropertiesContext>(
           'punctuation.separator.key-value.svelte': {
             target: 'value',
           },
+
+          // Vue
+          'entity.other.attribute-name.html': [
+            {
+              cond: (_, evt) =>
+                evt.token.startsWith('v-bind:') || evt.token.startsWith(':'),
+              actions: ['VUE_storePropertyTypeVBind'],
+            },
+            {
+              cond: (_, evt) => evt.token.startsWith('@'),
+              actions: ['VUE_markImmediatePropertyHandler'],
+            },
+            {
+              actions: ['markPropertyAsDynamic', 'storePropertyType'],
+            },
+          ],
+          'punctuation.separator.key-value.html': {
+            target: 'value',
+          },
         },
       },
       complex_key: {
@@ -96,6 +119,14 @@ export default createMachine<PropertiesContext>(
           'punctuation.definition.string.begin.svelte': 'value_string',
           'punctuation.definition.string.template.begin.svelte': 'value_string',
 
+          'punctuation.definition.string.begin.html': [
+            {
+              cond: (ctx) => ctx.VUE_bound,
+              target: 'VUE_value_string_bound',
+            },
+            { target: 'value_string' },
+          ],
+
           // Variable
           'variable.other.readwrite.ts': {
             target: 'idle',
@@ -113,6 +144,16 @@ export default createMachine<PropertiesContext>(
 
           // Svelte
           'string.unquoted.svelte': {
+            target: 'idle',
+            actions: [
+              'storePropertyValue',
+              'clearPropertyType',
+              'unmarkAsStatic',
+            ],
+          },
+
+          // Vue
+          'string.unquoted.html': {
             target: 'idle',
             actions: [
               'storePropertyValue',
@@ -162,6 +203,11 @@ export default createMachine<PropertiesContext>(
             actions: ['storeEmptyPropertyValue', 'clearPropertyType'],
           },
 
+          'punctuation.definition.string.end.html': {
+            target: 'idle',
+            actions: ['storeEmptyPropertyValue', 'clearPropertyType'],
+          },
+
           '*': [
             {
               target: 'idle',
@@ -177,6 +223,19 @@ export default createMachine<PropertiesContext>(
               actions: 'storePropertyValue',
             },
           ],
+        },
+      },
+      VUE_value_string_bound: {
+        on: {
+          'string.quoted.double.html': {
+            cond: 'VUE_isPlainString',
+            target: 'string_end',
+            actions: ['VUE_clearBound', 'VUE_storePropertyValueBoundString'],
+          },
+          '*': {
+            target: 'string_end',
+            actions: ['VUE_clearBound', 'markPropertyAsDynamic'],
+          },
         },
       },
 
@@ -211,6 +270,12 @@ export default createMachine<PropertiesContext>(
             actions: 'clearPropertyType',
           },
           'punctuation.section.embedded.end.svelte': {
+            target: 'idle',
+            actions: 'clearPropertyType',
+          },
+
+          // Vue
+          'punctuation.definition.string.end.html': {
             target: 'idle',
             actions: 'clearPropertyType',
           },
@@ -249,6 +314,10 @@ export default createMachine<PropertiesContext>(
         target: 'end',
         actions: 'markPropertyAsDynamic',
       },
+      'punctuation.definition.tag.end.html': {
+        target: 'end',
+        actions: 'markPropertyAsDynamic',
+      },
     },
   },
   {
@@ -265,6 +334,21 @@ export default createMachine<PropertiesContext>(
       isOpenSquare: (_ctx, evt) => evt.token === '[',
       isCloseSquare: (_ctx, evt) => evt.token === ']',
       isRootLevel: (ctx) => ctx.depth === 1,
+
+      VUE_isPlainString: (_, evt) => {
+        const isTemplate = evt.token[0] === '`';
+        if (!isTemplate && evt.token[0] !== '"' && evt.token[0] !== "'") {
+          return false;
+        }
+        if (!evt.token.endsWith(evt.token[0])) {
+          return false;
+        }
+        if (isTemplate && evt.token.includes('${')) {
+          return false;
+        }
+
+        return true;
+      },
     },
     actions: {
       storePropertyType: assign({
@@ -324,6 +408,31 @@ export default createMachine<PropertiesContext>(
       }),
       unmarkAsStatic: assign({
         static: (_ctx, _evt) => false,
+      }),
+
+      // Vue
+      VUE_clearBound: assign({
+        VUE_bound: () => false,
+      }),
+      VUE_storePropertyTypeVBind: assign({
+        property: (_, evt) => evt.token.split(':')[1],
+        VUE_bound: () => true,
+      }),
+      VUE_markImmediatePropertyHandler: assign({
+        keyName: (ctx, evt) => (evt.token === '@keyName' ? false : ctx.keyName),
+        defaultValue: (ctx, evt) =>
+          evt.token === '@defaultValue' ? false : ctx.defaultValue,
+        namespace: (ctx, evt) => (evt.token === '@ns' ? false : ctx.namespace),
+      }),
+      VUE_storePropertyValueBoundString: assign({
+        keyName: (ctx, evt) =>
+          ctx.property === 'keyName' ? evt.token.slice(1, -1) : ctx.keyName,
+        defaultValue: (ctx, evt) =>
+          ctx.property === 'defaultValue'
+            ? evt.token.slice(1, -1)
+            : ctx.defaultValue,
+        namespace: (ctx, evt) =>
+          ctx.property === 'ns' ? evt.token.slice(1, -1) : ctx.namespace,
       }),
     },
   }

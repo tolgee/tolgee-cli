@@ -41,13 +41,13 @@ export default createMachine<VueDecoderContext, Token>(
     states: {
       idle: {
         on: {
-          'punctuation.definition.tag.begin.html': 'beginTag',
+          'punctuation.definition.tag.begin.html.vue': 'beginTag',
         },
       },
       beginTag: {
         on: {
-          'entity.name.tag.script.html': 'scriptTag',
-          'entity.name.tag.template.html': {
+          'entity.name.tag.script.html.vue': 'scriptTag',
+          'entity.name.tag.template.html.vue': {
             cond: (_, evt) => evt.token === 'template',
             target: 'templateTag',
           },
@@ -63,27 +63,24 @@ export default createMachine<VueDecoderContext, Token>(
               target: 'scriptSetupTag',
             },
           ],
-          'punctuation.definition.tag.end.html': 'script',
+          'punctuation.definition.tag.end.html.vue': 'script',
         },
       },
       scriptSetupTag: {
         on: {
-          'punctuation.definition.tag.end.html': 'setup',
+          'punctuation.definition.tag.end.html.vue': 'setup',
         },
       },
       templateTag: {
         on: {
-          'source.vue': {
-            cond: (_, evt) => evt.token[0] === '>',
-            target: 'template',
-          },
+          'punctuation.definition.tag.end.html.vue': 'template',
         },
       },
 
       setup: {
         on: {
           '*': { actions: ['consumeSetupToken'] },
-          'entity.name.tag.script.html': 'idle',
+          'entity.name.tag.script.html.vue': 'idle',
         },
       },
       script: {
@@ -93,7 +90,7 @@ export default createMachine<VueDecoderContext, Token>(
             actions: ['resetDepth'],
             target: 'scriptExport',
           },
-          'entity.name.tag.script.html': 'idle',
+          'entity.name.tag.script.html.vue': 'idle',
         },
       },
       scriptExport: {
@@ -118,7 +115,7 @@ export default createMachine<VueDecoderContext, Token>(
             cond: (_, evt) => evt.token === 'setup',
             actions: ['markBadSetupUse'],
           },
-          'entity.name.tag.script.html': 'idle',
+          'entity.name.tag.script.html.vue': 'idle',
         },
       },
       scriptSetup: {
@@ -148,7 +145,7 @@ export default createMachine<VueDecoderContext, Token>(
       template: {
         on: {
           '*': { actions: ['consumeTemplateToken'] },
-          'entity.other.attribute-name.html': {
+          'entity.name.tag.template.html.vue': {
             cond: (_, evt) => evt.token === 'template',
             target: 'idle',
           },
