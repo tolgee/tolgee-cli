@@ -4,12 +4,11 @@ type PropertiesContext = {
   property: string | null;
   depth: number;
   static: boolean;
+  nextDynamic: boolean;
 
   keyName: string | false | null;
   defaultValue: string | false | null;
   namespace: string | false | null;
-
-  VUE_bound: boolean;
 };
 
 // This state machine is responsible for extracting translation key properties from an object/props
@@ -22,12 +21,11 @@ export default createMachine<PropertiesContext>(
       property: null,
       depth: 0,
       static: false,
+      nextDynamic: false,
 
       keyName: null,
       defaultValue: null,
       namespace: null,
-
-      VUE_bound: false,
     },
     states: {
       idle: {
@@ -69,16 +67,29 @@ export default createMachine<PropertiesContext>(
           },
 
           // Vue
+          'punctuation.attribute-shorthand.event.html.vue': [
+            {
+              cond: (_, evt) => evt.token === '@',
+              actions: ['markPropertyAsDynamic', 'markNextPropertyAsDynamic'],
+            },
+          ],
+          'entity.other.attribute-name.html.vue': [
+            {
+              cond: (ctx) => ctx.nextDynamic,
+              actions: 'markImmediatePropertyAsDynamic',
+            },
+            {
+              actions: [
+                'markPropertyAsDynamic',
+                'unmarkAsStatic',
+                'storePropertyType',
+              ],
+            },
+          ],
+          'punctuation.separator.key-value.html.vue': {
+            target: 'value',
+          },
           'entity.other.attribute-name.html': [
-            {
-              cond: (_, evt) =>
-                evt.token.startsWith('v-bind:') || evt.token.startsWith(':'),
-              actions: ['VUE_storePropertyTypeVBind'],
-            },
-            {
-              cond: (_, evt) => evt.token.startsWith('@'),
-              actions: ['VUE_markImmediatePropertyHandler'],
-            },
             {
               actions: ['markPropertyAsDynamic', 'storePropertyType'],
             },
@@ -119,13 +130,7 @@ export default createMachine<PropertiesContext>(
           'punctuation.definition.string.begin.svelte': 'value_string',
           'punctuation.definition.string.template.begin.svelte': 'value_string',
 
-          'punctuation.definition.string.begin.html': [
-            {
-              cond: (ctx) => ctx.VUE_bound,
-              target: 'VUE_value_string_bound',
-            },
-            { target: 'value_string' },
-          ],
+          'punctuation.definition.string.begin.html': 'value_string',
 
           // Variable
           'variable.other.readwrite.ts': {
@@ -225,19 +230,6 @@ export default createMachine<PropertiesContext>(
           ],
         },
       },
-      VUE_value_string_bound: {
-        on: {
-          'string.quoted.double.html': {
-            cond: 'VUE_isPlainString',
-            target: 'string_end',
-            actions: ['VUE_clearBound', 'VUE_storePropertyValueBoundString'],
-          },
-          '*': {
-            target: 'string_end',
-            actions: ['VUE_clearBound', 'markPropertyAsDynamic'],
-          },
-        },
-      },
 
       string_end: {
         on: {
@@ -275,6 +267,10 @@ export default createMachine<PropertiesContext>(
           },
 
           // Vue
+          'punctuation.definition.string.end.html.vue': {
+            target: 'idle',
+            actions: 'clearPropertyType',
+          },
           'punctuation.definition.string.end.html': {
             target: 'idle',
             actions: 'clearPropertyType',
@@ -314,6 +310,10 @@ export default createMachine<PropertiesContext>(
         target: 'end',
         actions: 'markPropertyAsDynamic',
       },
+      'punctuation.definition.tag.end.html.vue': {
+        target: 'end',
+        actions: 'markPropertyAsDynamic',
+      },
       'punctuation.definition.tag.end.html': {
         target: 'end',
         actions: 'markPropertyAsDynamic',
@@ -325,30 +325,17 @@ export default createMachine<PropertiesContext>(
       isOpenCurly: (_ctx, evt) =>
         evt.token === '{' &&
         !evt.scopes.includes('meta.embedded.expression.tsx') &&
-        !evt.scopes.includes('meta.embedded.expression.svelte'),
+        !evt.scopes.includes('meta.embedded.expression.svelte') &&
+        !evt.scopes.includes('source.ts.embedded.html.vue'),
       isCloseCurly: (_ctx, evt) =>
         evt.token === '}' &&
         !evt.scopes.includes('meta.embedded.expression.tsx') &&
-        !evt.scopes.includes('meta.embedded.expression.svelte'),
+        !evt.scopes.includes('meta.embedded.expression.svelte') &&
+        !evt.scopes.includes('source.ts.embedded.html.vue'),
       isFinalCloseCurly: (ctx, evt) => evt.token === '}' && ctx.depth === 1,
       isOpenSquare: (_ctx, evt) => evt.token === '[',
       isCloseSquare: (_ctx, evt) => evt.token === ']',
       isRootLevel: (ctx) => ctx.depth === 1,
-
-      VUE_isPlainString: (_, evt) => {
-        const isTemplate = evt.token[0] === '`';
-        if (!isTemplate && evt.token[0] !== '"' && evt.token[0] !== "'") {
-          return false;
-        }
-        if (!evt.token.endsWith(evt.token[0])) {
-          return false;
-        }
-        if (isTemplate && evt.token.includes('${')) {
-          return false;
-        }
-
-        return true;
-      },
     },
     actions: {
       storePropertyType: assign({
@@ -378,7 +365,11 @@ export default createMachine<PropertiesContext>(
         namespace: (ctx) => (ctx.property === 'ns' ? '' : ctx.namespace),
       }),
 
+      markNextPropertyAsDynamic: assign({
+        nextDynamic: true,
+      }),
       markPropertyAsDynamic: assign({
+        nextDynamic: false,
         keyName: (ctx, _evt) =>
           ctx.property === 'key' || ctx.property === 'keyName'
             ? false
@@ -389,6 +380,7 @@ export default createMachine<PropertiesContext>(
           ctx.property === 'ns' ? false : ctx.namespace,
       }),
       markImmediatePropertyAsDynamic: assign({
+        nextDynamic: false,
         keyName: (ctx, evt) =>
           evt.token === 'key' || evt.token === 'keyName' ? false : ctx.keyName,
         defaultValue: (ctx, evt) =>
@@ -404,35 +396,10 @@ export default createMachine<PropertiesContext>(
       }),
 
       markAsStatic: assign({
-        static: (_ctx, _evt) => true,
+        static: true,
       }),
       unmarkAsStatic: assign({
-        static: (_ctx, _evt) => false,
-      }),
-
-      // Vue
-      VUE_clearBound: assign({
-        VUE_bound: () => false,
-      }),
-      VUE_storePropertyTypeVBind: assign({
-        property: (_, evt) => evt.token.split(':')[1],
-        VUE_bound: () => true,
-      }),
-      VUE_markImmediatePropertyHandler: assign({
-        keyName: (ctx, evt) => (evt.token === '@keyName' ? false : ctx.keyName),
-        defaultValue: (ctx, evt) =>
-          evt.token === '@defaultValue' ? false : ctx.defaultValue,
-        namespace: (ctx, evt) => (evt.token === '@ns' ? false : ctx.namespace),
-      }),
-      VUE_storePropertyValueBoundString: assign({
-        keyName: (ctx, evt) =>
-          ctx.property === 'keyName' ? evt.token.slice(1, -1) : ctx.keyName,
-        defaultValue: (ctx, evt) =>
-          ctx.property === 'defaultValue'
-            ? evt.token.slice(1, -1)
-            : ctx.defaultValue,
-        namespace: (ctx, evt) =>
-          ctx.property === 'ns' ? evt.token.slice(1, -1) : ctx.namespace,
+        static: false,
       }),
     },
   }

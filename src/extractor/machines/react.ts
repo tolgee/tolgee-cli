@@ -664,7 +664,7 @@ export default createMachine<MachineCtx>(
             line: ctx.line,
           },
         ],
-        key: (_ctx, _evt) => VOID_KEY,
+        key: VOID_KEY,
       }),
 
       appendChildren: assign({
@@ -691,14 +691,14 @@ export default createMachine<MachineCtx>(
           ...ctx.warnings,
           { warning: 'W_DYNAMIC_KEY', line: ctx.line },
         ],
-        key: (_ctx, _evt) => VOID_KEY,
+        key: VOID_KEY,
       }),
       dynamicNamespace: assign({
         warnings: (ctx, _evt) => [
           ...ctx.warnings,
           { warning: 'W_DYNAMIC_NAMESPACE', line: ctx.line },
         ],
-        key: (_ctx, _evt) => VOID_KEY,
+        key: VOID_KEY,
       }),
       dynamicKeyDefault: assign({
         key: (ctx, _evt) => ({ ...ctx.key, defaultValue: undefined }),
@@ -708,7 +708,7 @@ export default createMachine<MachineCtx>(
         ],
       }),
       dynamicOptions: assign({
-        key: (_, _evt) => VOID_KEY,
+        key: VOID_KEY,
         warnings: (ctx, _evt) => [
           ...ctx.warnings,
           { warning: 'W_DYNAMIC_OPTIONS', line: ctx.line },

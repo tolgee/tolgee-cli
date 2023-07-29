@@ -57,6 +57,42 @@ export const Transformers = {
     );
   },
   Vue: (self) => {
-    return self.replaceAll('"source.js"', '"source.ts"');
+    self = self.replaceAll('"source.js"', '"source.ts"');
+    self = self.replaceAll('"source.js.jsx"', '"source.tsx"');
+    const parsed = JSON.parse(self);
+
+    // Hot-fix to make sure Vue interpolations are correctly tokenized as well as v-bind attributes.
+    // For interpolations, this means they'll be looked up also beyond just the "template" section
+    // but this isn't a huge deal. It won't affect JS and we skip other blocks anyways.
+    // For tags, we only enable checking within an HTML tag (with a loose begin/end) check, which also
+    // means it'll be looked up throughout the file even beyond the template block. We don't care for
+    // the aforementioned reasons.
+    //
+    // Another point is we assume the CLI will consume valid/sane data and is not meant to parse
+    // an invalid Vue file. An invalid Vue file would yield bad results anyways, so it's an acceptable
+    // tradeoff based on our constrains and needs.
+    parsed.repository['html-stuff'].patterns.unshift({
+      include: '#vue-interpolations',
+    });
+    parsed.repository['html-stuff'].patterns.unshift({
+      begin: '(<)([a-zA-Z0-9:-]+)',
+      beginCaptures: {
+        1: {
+          name: 'punctuation.definition.tag.begin.html',
+        },
+        2: {
+          name: 'entity.name.tag.$2.html.vue',
+        },
+      },
+      end: '(/?>)',
+      endCaptures: {
+        1: {
+          name: 'punctuation.definition.tag.end.html',
+        },
+      },
+      patterns: [{ include: '#tag-stuff' }, { include: '#html-stuff' }],
+    });
+
+    return JSON.stringify(parsed, null, 2);
   },
 };

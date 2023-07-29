@@ -42,6 +42,11 @@ export const WarningMessages: Record<string, WarningMessage> = {
     description:
       'The `key` must be present, and the `key`, `ns`, and `defaultValue` must be strings.',
   },
+  W_VUE_SETUP_IS_A_REFERENCE: {
+    name: 'Vue setup function is a reference',
+    description:
+      'The setup function must be directly defined on-site, and not be a reference to a previously defined function.',
+  },
 };
 
 /**

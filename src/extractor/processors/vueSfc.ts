@@ -8,9 +8,12 @@
 import { interpret } from 'xstate';
 import tokenizer, { type Token } from '../tokenizer.js';
 import vueSfcDecoderMachine from '../machines/vue/decoder.js';
+import vueSfcExtractorMachine from '../machines/vue/extract.js';
 
 function extractSfcTokens(tokens: Token[]) {
   const machine = interpret(vueSfcDecoderMachine);
+
+  machine.start();
   for (let i = 0; i < tokens.length; i++) {
     machine.send(tokens[i]);
   }
@@ -19,8 +22,52 @@ function extractSfcTokens(tokens: Token[]) {
   return snapshot.context;
 }
 
+function sort(a: { line: number }, b: { line: number }) {
+  if (a.line === b.line) return 0;
+  if (a.line > b.line) return 1;
+  return -1;
+}
+
 export default async function handleVueSfc(code: string, fileName: string) {
   const tokens = await tokenizer(code, fileName);
   const decoded = extractSfcTokens(tokens);
-  return { warnings: [], keys: [] };
+
+  const machine = interpret(vueSfcExtractorMachine);
+  machine.start();
+
+  for (let i = 0; i < decoded.setup.length; i++) {
+    machine.send(decoded.setup[i]);
+
+    // console.log(decoded.setup[i]);
+    // console.log(machine.getSnapshot().value);
+  }
+
+  machine.send({ type: 'SCRIPT' });
+  for (let i = 0; i < decoded.script.length; i++) {
+    machine.send(decoded.script[i]);
+
+    // console.log(decoded.script[i]);
+    // console.log(machine.getSnapshot().value);
+  }
+
+  machine.send({ type: 'TEMPLATE' });
+  for (let i = 0; i < decoded.template.length; i++) {
+    machine.send(decoded.template[i]);
+
+    // console.log(decoded.template[i]);
+    // console.log(machine.getSnapshot().value);
+  }
+
+  const snapshot = machine.getSnapshot();
+  const warnings = decoded.invalidSetup
+    ? [
+        ...snapshot.context.warnings,
+        { warning: 'W_VUE_SETUP_IS_A_REFERENCE', line: decoded.invalidSetup },
+      ]
+    : snapshot.context.warnings;
+
+  return {
+    warnings: warnings.sort(sort),
+    keys: snapshot.context.keys.sort(sort),
+  };
 }
