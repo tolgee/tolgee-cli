@@ -13,7 +13,7 @@ type MachineCtx = {
   line: number;
 
   key: KeyWithDynamicNs;
-  useTranslate: string | null | false;
+  getTranslate: string | null | false;
   ignore: null | { type: 'key' | 'ignore'; line: number };
 
   keys: ExtractedKey[];
@@ -32,7 +32,7 @@ export default createMachine<MachineCtx>(
       line: 0,
 
       key: VOID_KEY,
-      useTranslate: null,
+      getTranslate: null,
       ignore: null,
 
       keys: [],
@@ -98,7 +98,7 @@ export default createMachine<MachineCtx>(
           },
         },
       },
-      useTranslate: {
+      getTranslate: {
         initial: 'idle',
         states: {
           idle: {
@@ -106,7 +106,7 @@ export default createMachine<MachineCtx>(
               'entity.name.function.ts': {
                 target: 'func',
                 actions: 'storeLine',
-                cond: (_ctx, evt) => evt.token === 'useTranslate',
+                cond: (_ctx, evt) => evt.token === 'getTranslate',
               },
             },
           },
@@ -138,12 +138,12 @@ export default createMachine<MachineCtx>(
               'punctuation.definition.string.template.begin.ts': 'namespace',
               'variable.other.readwrite.ts': {
                 target: 'idle',
-                actions: ['storeUseTranslate', 'markUseTranslateAsDynamic'],
+                actions: ['storeGetTranslate', 'markGetTranslateAsDynamic'],
               },
               'meta.brace.round.ts': {
                 target: 'idle',
                 cond: (_ctx, evt) => evt.token === ')',
-                actions: 'storeUseTranslate',
+                actions: 'storeGetTranslate',
               },
             },
           },
@@ -151,7 +151,7 @@ export default createMachine<MachineCtx>(
             on: {
               '*': {
                 target: 'namespace_end',
-                actions: 'storeNamespacedUseTranslate',
+                actions: 'storeNamespacedGetTranslate',
               },
             },
           },
@@ -161,11 +161,11 @@ export default createMachine<MachineCtx>(
               'meta.brace.round.ts': 'idle',
               'punctuation.definition.template-expression.begin.ts': {
                 target: 'idle',
-                actions: 'markUseTranslateAsDynamic',
+                actions: 'markGetTranslateAsDynamic',
               },
               'keyword.operator.arithmetic.ts': {
                 target: 'idle',
-                actions: 'markUseTranslateAsDynamic',
+                actions: 'markGetTranslateAsDynamic',
               },
             },
           },
@@ -242,7 +242,7 @@ export default createMachine<MachineCtx>(
               'punctuation.definition.variable.svelte': {
                 target: 'dollar',
                 cond: (ctx, evt) =>
-                  ctx.useTranslate !== null && evt.token === '$',
+                  ctx.getTranslate !== null && evt.token === '$',
               },
             },
           },
@@ -410,14 +410,14 @@ export default createMachine<MachineCtx>(
         ],
       }),
 
-      storeUseTranslate: assign({
-        useTranslate: (_ctx, _evt) => '',
+      storeGetTranslate: assign({
+        getTranslate: (_ctx, _evt) => '',
       }),
-      storeNamespacedUseTranslate: assign({
-        useTranslate: (_ctx, evt) => evt.token,
+      storeNamespacedGetTranslate: assign({
+        getTranslate: (_ctx, evt) => evt.token,
       }),
-      markUseTranslateAsDynamic: assign({
-        useTranslate: (_ctx, _evt) => false,
+      markGetTranslateAsDynamic: assign({
+        getTranslate: (_ctx, _evt) => false,
         warnings: (ctx, _evt) => [
           ...ctx.warnings,
           { warning: 'W_DYNAMIC_NAMESPACE', line: ctx.line },
@@ -463,7 +463,7 @@ export default createMachine<MachineCtx>(
       storeKeyCurrentNamespace: assign({
         key: (ctx, _evt) => ({
           ...ctx.key,
-          namespace: ctx.useTranslate !== null ? ctx.useTranslate : undefined,
+          namespace: ctx.getTranslate !== null ? ctx.getTranslate : undefined,
         }),
       }),
 
