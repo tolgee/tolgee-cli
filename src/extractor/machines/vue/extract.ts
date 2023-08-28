@@ -10,6 +10,7 @@ type KeyWithDynamicNs = Omit<ExtractedKey, 'namespace'> & {
 };
 
 const enum State {
+  EXTERNAL,
   SETUP,
   SCRIPT,
   TEMPLATE,
@@ -42,7 +43,7 @@ export default createMachine<MachineCtx>(
       useTranslate: null,
       ignore: null,
 
-      currentState: State.SETUP,
+      currentState: State.EXTERNAL,
 
       keys: [],
       warnings: [],
@@ -117,7 +118,8 @@ export default createMachine<MachineCtx>(
                 target: 'func',
                 actions: 'storeLine',
                 cond: (ctx, evt) =>
-                  ctx.currentState === State.SETUP &&
+                  (ctx.currentState === State.SETUP ||
+                    ctx.currentState === State.EXTERNAL) &&
                   evt.token === 'useTranslate',
               },
             },
@@ -190,12 +192,21 @@ export default createMachine<MachineCtx>(
         states: {
           idle: {
             on: {
+              'variable.other.object.ts': {
+                target: 'tRef',
+                actions: 'storeLine',
+                cond: (ctx, evt) =>
+                  ctx.currentState !== State.SCRIPT &&
+                  ctx.currentState !== State.TEMPLATE &&
+                  ctx.useTranslate !== null &&
+                  evt.token === 't',
+              },
               'entity.name.function.ts': [
                 {
                   target: 'func',
                   actions: 'storeLine',
                   cond: (ctx, evt) =>
-                    ctx.currentState !== State.SCRIPT &&
+                    ctx.currentState === State.TEMPLATE &&
                     ctx.useTranslate !== null &&
                     evt.token === 't',
                 },
@@ -207,7 +218,9 @@ export default createMachine<MachineCtx>(
                 },
               ],
               'variable.language.this.ts': {
-                cond: (ctx) => ctx.currentState !== State.TEMPLATE,
+                cond: (ctx) =>
+                  ctx.currentState !== State.TEMPLATE &&
+                  ctx.currentState !== State.EXTERNAL,
                 actions: 'storeLine',
                 target: 'this',
               },
@@ -225,6 +238,23 @@ export default createMachine<MachineCtx>(
               'meta.function-call.ts': undefined,
               'entity.name.function.ts': {
                 cond: (_, evt) => evt.token === '$t',
+                target: 'func',
+              },
+            },
+          },
+
+          tRef: {
+            on: {
+              'meta.function-call.ts': undefined,
+              'punctuation.accessor.ts': 'tRefDot',
+              '*': 'idle',
+            },
+          },
+          tRefDot: {
+            on: {
+              'meta.function-call.ts': undefined,
+              'entity.name.function.ts': {
+                cond: (_, evt) => evt.token === 'value',
                 target: 'func',
               },
             },
@@ -350,6 +380,7 @@ export default createMachine<MachineCtx>(
       },
     },
     on: {
+      SETUP: { actions: 'markAsInSetup' },
       SCRIPT: { actions: 'markAsInScript' },
       TEMPLATE: { actions: 'markAsInTemplate' },
     },
@@ -510,6 +541,9 @@ export default createMachine<MachineCtx>(
         ],
       }),
 
+      markAsInSetup: assign({
+        currentState: State.SETUP,
+      }),
       markAsInScript: assign({
         currentState: State.SCRIPT,
       }),

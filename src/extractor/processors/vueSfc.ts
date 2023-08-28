@@ -35,27 +35,19 @@ export default async function handleVueSfc(code: string, fileName: string) {
   const machine = interpret(vueSfcExtractorMachine);
   machine.start();
 
+  machine.send({ type: 'SETUP' });
   for (let i = 0; i < decoded.setup.length; i++) {
     machine.send(decoded.setup[i]);
-
-    // console.log(decoded.setup[i]);
-    // console.log(machine.getSnapshot().value);
   }
 
   machine.send({ type: 'SCRIPT' });
   for (let i = 0; i < decoded.script.length; i++) {
     machine.send(decoded.script[i]);
-
-    // console.log(decoded.script[i]);
-    // console.log(machine.getSnapshot().value);
   }
 
   machine.send({ type: 'TEMPLATE' });
   for (let i = 0; i < decoded.template.length; i++) {
     machine.send(decoded.template[i]);
-
-    // console.log(decoded.template[i]);
-    // console.log(machine.getSnapshot().value);
   }
 
   const snapshot = machine.getSnapshot();

@@ -180,13 +180,79 @@ describe('$t', () => {
   });
 
   describe('dynamic data', () => {
-    it('emits a warning on dynamic key', async () => {});
+    it('emits a warning on dynamic key', async () => {
+      const code = `
+        <template>
+          {{ $t(\`dynamic-key-\${i}\`) }}
+          {{ $t('dynamic-key-' + i) }}
+          {{ $t(key) }}
+        </template>
+      `;
 
-    it('emits a warning on dynamic namespace', async () => {});
+      const extracted = await extractKeys(code, 'App.vue');
+      expect(extracted.warnings).toEqual([
+        { warning: 'W_DYNAMIC_KEY', line: 3 },
+        { warning: 'W_DYNAMIC_KEY', line: 4 },
+        { warning: 'W_DYNAMIC_KEY', line: 5 },
+      ]);
+      expect(extracted.keys).toEqual([]);
+    });
 
-    it('emits a warning on dynamic default value but keeps the key', async () => {});
+    it('emits a warning on dynamic namespace', async () => {
+      const code = `
+        <template>
+          {{ $t('key1', { ns: \`dynamic-ns-\${i}\` }) }}
+          {{ $t('key2', { ns: 'dynamic-ns-' + i }) }}
+          {{ $t('key2', { ns: ns }) }}
+          {{ $t('key2', { ns }) }}
+        </template>
+      `;
 
-    it('emits a warning on dynamic options', async () => {});
+      const extracted = await extractKeys(code, 'App.vue');
+      expect(extracted.warnings).toEqual([
+        { warning: 'W_DYNAMIC_NAMESPACE', line: 3 },
+        { warning: 'W_DYNAMIC_NAMESPACE', line: 4 },
+        { warning: 'W_DYNAMIC_NAMESPACE', line: 5 },
+        { warning: 'W_DYNAMIC_NAMESPACE', line: 6 },
+      ]);
+      expect(extracted.keys).toEqual([]);
+    });
+
+    it('emits a warning on dynamic default value but keeps the key', async () => {
+      const code = `
+        <template>
+          {{ $t('key1', 'dynamic-' + i) }}
+          {{ $t('key2', \`dynamic-\${i}\`) }}
+        </template>
+      `;
+
+      const extracted = await extractKeys(code, 'App.vue');
+      expect(extracted.warnings).toEqual([
+        { warning: 'W_DYNAMIC_DEFAULT_VALUE', line: 3 },
+        { warning: 'W_DYNAMIC_DEFAULT_VALUE', line: 4 },
+      ]);
+      expect(extracted.keys).toEqual([
+        { keyName: 'key1', defaultValue: undefined, line: 3 },
+        { keyName: 'key2', defaultValue: undefined, line: 4 },
+      ]);
+    });
+
+    it('emits a warning on dynamic options', async () => {
+      const code = `
+        <template>
+          {{ $t('key1', someValue) }}
+        </template>
+      `;
+
+      const extracted = await extractKeys(code, 'App.vue');
+      expect(extracted.warnings).toEqual([
+        {
+          warning: 'W_DYNAMIC_OPTIONS',
+          line: 3,
+        },
+      ]);
+      expect(extracted.keys).toEqual([]);
+    });
   });
 });
 
@@ -240,7 +306,8 @@ describe('useTranslate', () => {
     const code = `
       <script setup> // @tolgee/vue
         const { t } = useTranslate()
-        alert(t('key1'))
+        alert(t.value('key1'))
+        alert(t('key2'))
       </script>
     `;
 
@@ -255,7 +322,8 @@ describe('useTranslate', () => {
         export default {
           setup () {
             const { t } = useTranslate()
-            alert(t('key1'))
+            alert(t.value('key1'))
+            alert(t('key2'))
             return { t }
           }
         }
@@ -434,6 +502,24 @@ describe('useTranslate', () => {
         line: 6,
       },
     ]);
+  });
+
+  it('extracts calls to t in non-SFC files', async () => {
+    const code = `
+      import { useTranslate } from '@tolgee/vue'
+
+      export default function useSomething () {
+        const { t } = useTranslate()
+
+        return [
+          t.value('key1'),
+        ]
+      }
+    `;
+
+    const extracted = await extractKeys(code, 'useSomething.ts');
+    expect(extracted.warnings).toEqual([]);
+    expect(extracted.keys).toEqual([{ keyName: 'key1', line: 8 }]);
   });
 
   describe('dynamic data', () => {
