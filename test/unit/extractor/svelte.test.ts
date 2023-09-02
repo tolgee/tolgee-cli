@@ -1,13 +1,13 @@
 import extractKeys from '../../../src/extractor/extractor.js';
 
-describe('useTranslate', () => {
+describe('getTranslate', () => {
   it('extracts from the t call with signature t(string))', async () => {
     const expected = [{ keyName: 'key1', line: 6 }];
 
     const code = `
       <script>import '@tolgee/svelte';</script>
       <script>
-        const { t } = useTranslate()
+        const { t } = getTranslate()
       </script>
       {$t('key1')}
     `;
@@ -25,7 +25,7 @@ describe('useTranslate', () => {
     const code = `
       <script>import '@tolgee/svelte';</script>
       <script>
-        const { t } = useTranslate()
+        const { t } = getTranslate()
       </script>
       {$t('key1', 'default value')}
     `;
@@ -48,7 +48,7 @@ describe('useTranslate', () => {
     const code = `
       <script>import '@tolgee/svelte';</script>
       <script>
-        const { t } = useTranslate()
+        const { t } = getTranslate()
       </script>
       {$t('key1', 'default value', { ns: 'ns', defaultValue: 'ignored' })}
     `;
@@ -71,7 +71,7 @@ describe('useTranslate', () => {
     const code = `
       <script>import '@tolgee/svelte';</script>
       <script>
-        const { t } = useTranslate()
+        const { t } = getTranslate()
       </script>
       {$t('key1', { defaultValue: 'default value', ns: 'ns' })}
     `;
@@ -94,7 +94,7 @@ describe('useTranslate', () => {
     const code = `
       <script>import '@tolgee/svelte';</script>
       <script>
-        const { t } = useTranslate()
+        const { t } = getTranslate()
       </script>
       {$t({ key: 'key1', defaultValue: 'default value', ns: 'ns' })}
     `;
@@ -104,13 +104,13 @@ describe('useTranslate', () => {
     expect(extracted.keys).toEqual(expected);
   });
 
-  it('keeps track of the namespace specified in useTranslate', async () => {
+  it('keeps track of the namespace specified in getTranslate', async () => {
     const expected = [{ keyName: 'key1', namespace: 'namespace', line: 6 }];
 
     const code = `
       <script>import '@tolgee/svelte';</script>
       <script>
-        const { t } = useTranslate('namespace')
+        const { t } = getTranslate('namespace')
       </script>
       {$t('key1')}
     `;
@@ -120,13 +120,13 @@ describe('useTranslate', () => {
     expect(extracted.keys).toEqual(expected);
   });
 
-  it('keeps track of the namespace specified in useTranslate (array)', async () => {
+  it('keeps track of the namespace specified in getTranslate (array)', async () => {
     const expected = [{ keyName: 'key1', namespace: 'namespace1', line: 6 }];
 
     const code = `
       <script>import '@tolgee/svelte';</script>
       <script>
-        const { t } = useTranslate([ 'namespace1', 'namespace2' ])
+        const { t } = getTranslate([ 'namespace1', 'namespace2' ])
       </script>
       {$t('key1')}
     `;
@@ -145,7 +145,7 @@ describe('useTranslate', () => {
     const code = `
       <script>import '@tolgee/svelte';</script>
       <script>
-        const { t } = useTranslate('namespace')
+        const { t } = getTranslate('namespace')
       </script>
       {$t('key1', { ns: 'ns1' })}
       {$t('key2', { ns: '' })}
@@ -156,7 +156,7 @@ describe('useTranslate', () => {
     expect(extracted.keys).toEqual(expected);
   });
 
-  it('does not extract if there was no useTranslate call', async () => {
+  it('does not extract if there was no getTranslate call', async () => {
     const code = `
       <script>import '@tolgee/svelte';</script>
       <script>
@@ -176,7 +176,7 @@ describe('useTranslate', () => {
     const code = `
       <script>import '@tolgee/svelte';</script>
       <script>
-        const { t } = useTranslate(
+        const { t } = getTranslate(
           'namespace'
         )
       </script>
@@ -198,7 +198,7 @@ describe('useTranslate', () => {
     const code = `
       <script>import '@tolgee/svelte';</script>
       <script>
-        const { t } = useTranslate         (   'namespace')
+        const { t } = getTranslate         (   'namespace')
       </script>
       {$t     (      'key1')}
     `;
@@ -219,7 +219,7 @@ describe('useTranslate', () => {
       const code = `
         <script>import '@tolgee/svelte';</script>
         <script>
-          const { t } = useTranslate('namespace')
+          const { t } = getTranslate('namespace')
         </script>
         {$t(\`dynamic-key-\${i}\`)}
         {$t('dynamic-key-' + i)}
@@ -242,7 +242,7 @@ describe('useTranslate', () => {
       const code = `
         <script>import '@tolgee/svelte';</script>
         <script>
-          const { t } = useTranslate('namespace')
+          const { t } = getTranslate('namespace')
         </script>
         {$t('key1', { ns: \`dynamic-ns-\${i}\` })}
         {$t('key2', { ns: 'dynamic-ns-' + i })}
@@ -255,7 +255,7 @@ describe('useTranslate', () => {
       expect(extracted.keys).toEqual([]);
     });
 
-    it('emits warnings on dynamic namespace (within useTranslate) and skips', async () => {
+    it('emits warnings on dynamic namespace (within getTranslate) and skips', async () => {
       const expected = [
         { warning: 'W_DYNAMIC_NAMESPACE', line: 4 },
         { warning: 'W_UNRESOLVABLE_NAMESPACE', line: 6 },
@@ -264,21 +264,21 @@ describe('useTranslate', () => {
       const templateCode = `
         <script>import '@tolgee/svelte';</script>
         <script>
-          const { t } = useTranslate(\`dynamic-ns-\${i}\`)
+          const { t } = getTranslate(\`dynamic-ns-\${i}\`)
         </script>
         {$t('key1')}
       `;
       const concatCode = `
         <script>import '@tolgee/svelte';</script>
         <script>
-          const { t } = useTranslate('dynamic-ns-' + i)
+          const { t } = getTranslate('dynamic-ns-' + i)
         </script>
         {$t('key1')}
       `;
       const variableCode = `
         <script>import '@tolgee/svelte';</script>
         <script>
-          const { t } = useTranslate(ns)
+          const { t } = getTranslate(ns)
         </script>
         {$t('key1')}
       `;
@@ -294,7 +294,7 @@ describe('useTranslate', () => {
       expect(extracted3.keys).toEqual([]);
     });
 
-    it('extracts if useTranslate is dynamic but a static override is specified', async () => {
+    it('extracts if getTranslate is dynamic but a static override is specified', async () => {
       const expectedWarnings = [
         { warning: 'W_DYNAMIC_NAMESPACE', line: 4 },
         { warning: 'W_UNRESOLVABLE_NAMESPACE', line: 6 },
@@ -307,7 +307,7 @@ describe('useTranslate', () => {
       const code = `
         <script>import '@tolgee/svelte';</script>
         <script>
-          const { t } = useTranslate(ns)
+          const { t } = getTranslate(ns)
         </script>
         {$t('key1')}
         {$t('key2', { ns: 'static-ns' })}
@@ -324,7 +324,7 @@ describe('useTranslate', () => {
       const code = `
         <script>import '@tolgee/svelte';</script>
         <script>
-          const { t } = useTranslate()
+          const { t } = getTranslate()
         </script>
         {$t('key1', someValue)}
       `;
@@ -352,7 +352,7 @@ describe('useTranslate', () => {
       const code = `
         <script>import '@tolgee/svelte';</script>
         <script>
-          const { t } = useTranslate()
+          const { t } = getTranslate()
         </script>
         {$t('key1', 'dynamic-' + i)}
         {$t('key2', \`dynamic-\${i}\`)}
@@ -557,12 +557,12 @@ describe('<T>', () => {
 
 describe('magic comments', () => {
   describe('@tolgee-ignore', () => {
-    it('ignores useTranslate', async () => {
+    it('ignores getTranslate', async () => {
       const code = `
         <script>import '@tolgee/svelte';</script>
         <script>
           // @tolgee-ignore
-          const { t } = useTranslate()
+          const { t } = getTranslate()
         </script>
         {$t('uwu')}
       `;
@@ -576,7 +576,7 @@ describe('magic comments', () => {
       const code = `
         <script>import '@tolgee/svelte';</script>
         <script>
-          const { t } = useTranslate()
+          const { t } = getTranslate()
         </script>
         <!-- @tolgee-ignore -->
         {$t('uwu')}
@@ -624,7 +624,7 @@ describe('magic comments', () => {
       const code = `
         <script>import '@tolgee/svelte';</script>
         <script>
-          const { t } = useTranslate()
+          const { t } = getTranslate()
         </script>
         <!-- @tolgee-ignore -->
         {$t(\`dynamic-key-\${i}\`)}
@@ -639,12 +639,12 @@ describe('magic comments', () => {
       expect(extracted.keys).toEqual([]);
     });
 
-    it("suppresses warnings of ignored useTranslate's $t", async () => {
+    it("suppresses warnings of ignored getTranslate's $t", async () => {
       const code = `
         <script>import '@tolgee/svelte';</script>
         <script>
           // @tolgee-ignore
-          const { t } = useTranslate()
+          const { t } = getTranslate()
         </script>
         {$t(\`dynamic-key-\${i}\`)}
         {$t('key1', { ns: \`dynamic-ns-\${i}\` })}
@@ -656,12 +656,12 @@ describe('magic comments', () => {
       expect(extracted.keys).toEqual([]);
     });
 
-    it("suppresses warnings related to useTranslate's subsequent resolve failures", async () => {
+    it("suppresses warnings related to getTranslate's subsequent resolve failures", async () => {
       const code = `
         <script>import '@tolgee/svelte';</script>
         <script>
           // @tolgee-ignore
-          const { t } = useTranslate(\`dynamic-ns-\${i}\`)
+          const { t } = getTranslate(\`dynamic-ns-\${i}\`)
         </script>
         {$t('key1')}
       `;
@@ -677,7 +677,7 @@ describe('magic comments', () => {
       const code = `
         <script>import '@tolgee/svelte';</script>
         <script>
-          const { t } = useTranslate(\`dynamic-ns-\${i}\`)
+          const { t } = getTranslate(\`dynamic-ns-\${i}\`)
         </script>
         <!-- @tolgee-ignore -->
         {$t('key1')}
@@ -738,7 +738,7 @@ describe('magic comments', () => {
       const code = `
         <script>import '@tolgee/svelte';</script>
         <script>
-          const { t } = useTranslate('namespace')
+          const { t } = getTranslate('namespace')
         </script>
         <!-- @tolgee-key key-override-1 -->
         <T keyName='key-props-1' />
@@ -769,7 +769,7 @@ describe('magic comments', () => {
       const code = `
         <script>import '@tolgee/svelte';</script>
         <script>
-          const { t } = useTranslate()
+          const { t } = getTranslate()
         </script>
         <!-- @tolgee-key override-1 -->
         {$t(\`dynamic-key-\${i}\`)}
@@ -789,7 +789,7 @@ describe('magic comments', () => {
       const code = `
         <script>import '@tolgee/svelte';</script>
         <script>
-          const { t } = useTranslate(\`dynamic-ns-\${i}\`)
+          const { t } = getTranslate(\`dynamic-ns-\${i}\`)
         </script>
         <!-- @tolgee-key override-1 -->
         {$t('key1')}
