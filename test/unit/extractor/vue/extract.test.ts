@@ -179,6 +179,22 @@ describe('$t', () => {
     ]);
   });
 
+  it('is not confused by parameters', async () => {
+    const code = `
+      <template>
+        {{ $t('key1', { params: { key: 'not_key1' } }) }}
+        {{ $t({ key: 'key2', params: { key: 'not_key2' } }) }}
+      </template>
+    `;
+
+    const extracted = await extractKeys(code, 'App.vue');
+    expect(extracted.warnings).toEqual([]);
+    expect(extracted.keys).toEqual([
+      { keyName: 'key1', line: 3 },
+      { keyName: 'key2', line: 4 },
+    ]);
+  });
+
   describe('dynamic data', () => {
     it('emits a warning on dynamic key', async () => {
       const code = `

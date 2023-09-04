@@ -326,12 +326,14 @@ export default createMachine<PropertiesContext>(
         evt.token === '{' &&
         !evt.scopes.includes('meta.embedded.expression.tsx') &&
         !evt.scopes.includes('meta.embedded.expression.svelte') &&
-        !evt.scopes.includes('source.ts.embedded.html.vue'),
+        (!evt.scopes.includes('source.ts.embedded.html.vue') ||
+          evt.scopes.includes('expression.embedded.vue')),
       isCloseCurly: (_ctx, evt) =>
         evt.token === '}' &&
         !evt.scopes.includes('meta.embedded.expression.tsx') &&
         !evt.scopes.includes('meta.embedded.expression.svelte') &&
-        !evt.scopes.includes('source.ts.embedded.html.vue'),
+        (!evt.scopes.includes('source.ts.embedded.html.vue') ||
+          evt.scopes.includes('expression.embedded.vue')),
       isFinalCloseCurly: (ctx, evt) => evt.token === '}' && ctx.depth === 1,
       isOpenSquare: (_ctx, evt) => evt.token === '[',
       isCloseSquare: (_ctx, evt) => evt.token === ']',

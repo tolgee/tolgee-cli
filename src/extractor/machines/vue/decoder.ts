@@ -49,6 +49,7 @@ export default createMachine<VueDecoderContext, Token>(
           'entity.name.tag.script.html.vue': 'scriptTag',
           'entity.name.tag.template.html.vue': {
             cond: (_, evt) => evt.token === 'template',
+            actions: 'incrementDepth',
             target: 'templateTag',
           },
           '*': 'idle',
@@ -145,10 +146,35 @@ export default createMachine<VueDecoderContext, Token>(
       template: {
         on: {
           '*': { actions: ['consumeTemplateToken'] },
-          'entity.name.tag.template.html.vue': {
-            cond: (_, evt) => evt.token === 'template',
-            target: 'idle',
+          'punctuation.definition.tag.begin.html.vue': {
+            cond: (_, evt) => evt.token === '<',
+            target: 'nestedTemplateTag',
           },
+          'entity.name.tag.template.html.vue': [
+            {
+              cond: (ctx, evt) => evt.token === 'template' && ctx.depth === 1,
+              actions: 'decrementDepth',
+              target: 'idle',
+            },
+            {
+              cond: (_, evt) => evt.token === 'template',
+              actions: 'decrementDepth',
+            },
+          ],
+        },
+      },
+      nestedTemplateTag: {
+        on: {
+          'entity.name.tag.template.html.vue': [
+            {
+              cond: (_, evt) => evt.token === 'template',
+              actions: 'incrementDepth',
+              target: 'template',
+            },
+            {
+              target: 'template',
+            },
+          ],
         },
       },
     },

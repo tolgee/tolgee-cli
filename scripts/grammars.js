@@ -71,10 +71,11 @@ export const Transformers = {
     // Another point is we assume the CLI will consume valid/sane data and is not meant to parse
     // an invalid Vue file. An invalid Vue file would yield bad results anyways, so it's an acceptable
     // tradeoff based on our constrains and needs.
-    parsed.repository['html-stuff'].patterns.unshift({
+    parsed.repository['html-stuff'].patterns.splice(1, 0, {
       include: '#vue-interpolations',
     });
-    parsed.repository['html-stuff'].patterns.unshift({
+
+    parsed.repository['html-stuff'].patterns.splice(1, 0, {
       begin: '(<)([a-zA-Z0-9:-]+)',
       beginCaptures: {
         1: {
@@ -84,13 +85,13 @@ export const Transformers = {
           name: 'entity.name.tag.$2.html.vue',
         },
       },
-      end: '(/?>)',
+      end: '((/>)|(?<=>))',
       endCaptures: {
         1: {
           name: 'punctuation.definition.tag.end.html',
         },
       },
-      patterns: [{ include: '#tag-stuff' }, { include: '#html-stuff' }],
+      patterns: [{ include: '#tag-stuff' }],
     });
 
     return JSON.stringify(parsed, null, 2);

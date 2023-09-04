@@ -48,7 +48,7 @@ describe('Plain JavaScript', () => {
 
     it('does not extract information from nested objects', async () => {
       const tokens = await tokenizer(
-        'const a = { key: "key1", test: { defaultValue: "def value1" } }',
+        'const a = { key: "key1", test: { key: "not key1", defaultValue: "def value1" }, defaultValue: "def" }',
         FILE_NAME
       );
       for (const token of tokens) {
@@ -60,7 +60,7 @@ describe('Plain JavaScript', () => {
       const snapshot = machine.getSnapshot();
       expect(snapshot.done).toBe(true);
       expect(snapshot.context.keyName).toBe('key1');
-      expect(snapshot.context.defaultValue).toBeNull();
+      expect(snapshot.context.defaultValue).toBe('def');
       expect(snapshot.context.namespace).toBeNull();
     });
 
@@ -316,6 +316,7 @@ describe('JSX', () => {
         '<T properties={{ a: "b" }} keyName={"key1"}/>',
         FILE_NAME
       );
+
       for (const token of tokens) {
         if (!machine.getSnapshot().done) {
           machine.send(token);
@@ -715,6 +716,7 @@ describe('Vue', () => {
     const tokens = await tokenizerVue(
       '<T :properties="{ a: "b" }" keyName="key1"/>'
     );
+
     for (const token of tokens) {
       if (!machine.getSnapshot().done) {
         machine.send(token);
@@ -841,6 +843,24 @@ describe('Vue', () => {
       expect(snapshot.context.keyName).toBe(false);
       expect(snapshot.context.defaultValue).toBeNull();
       expect(snapshot.context.namespace).toBe('');
+    });
+
+    it('handles embedded scripts', async () => {
+      const tokens = await tokenizerVue(
+        '<template>{{ t({ key: "key1", params: { key: "not_key1" } }) }}</template>'
+      );
+
+      for (const token of tokens.slice(7, -4)) {
+        if (!machine.getSnapshot().done) {
+          machine.send(token);
+        }
+      }
+
+      const snapshot = machine.getSnapshot();
+      expect(snapshot.done).toBe(true);
+      expect(snapshot.context.keyName).toBe('key1');
+      expect(snapshot.context.defaultValue).toBeNull();
+      expect(snapshot.context.namespace).toBeNull();
     });
   });
 });

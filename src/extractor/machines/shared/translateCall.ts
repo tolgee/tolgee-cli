@@ -2,7 +2,7 @@
 // calls to `t`. It is shared across multiple machines since
 // all t functions share the same signature.
 
-import { createMachine, send, assign, forwardTo } from 'xstate';
+import { createMachine, assign, forwardTo } from 'xstate';
 import propertiesMachine from './properties.js';
 
 type TranslateCallContext = {

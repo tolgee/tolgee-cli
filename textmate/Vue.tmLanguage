@@ -909,6 +909,9 @@
     "html-stuff": {
       "patterns": [
         {
+          "include": "#template-tag"
+        },
+        {
           "begin": "(<)([a-zA-Z0-9:-]+)",
           "beginCaptures": {
             "1": {
@@ -918,7 +921,7 @@
               "name": "entity.name.tag.$2.html.vue"
             }
           },
-          "end": "(/?>)",
+          "end": "((/>)|(?<=>))",
           "endCaptures": {
             "1": {
               "name": "punctuation.definition.tag.end.html"
@@ -927,17 +930,11 @@
           "patterns": [
             {
               "include": "#tag-stuff"
-            },
-            {
-              "include": "#html-stuff"
             }
           ]
         },
         {
           "include": "#vue-interpolations"
-        },
-        {
-          "include": "#template-tag"
         },
         {
           "include": "text.html.derivative"

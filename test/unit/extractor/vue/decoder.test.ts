@@ -39,6 +39,46 @@ it('decodes a simple SFC', async () => {
   expect(meowToken).not.toBeUndefined();
 });
 
+it('decodes a simple SFC (reversed)', async () => {
+  const testSfc = `
+    <template>
+      <p>meow</p>
+    </template>
+    <script setup>
+      console.log('owo')
+    </script>
+  `;
+
+  const snapshot = await runMachine(testSfc);
+  const owoToken = snapshot.context.setup.find((t) => t.token === 'owo');
+  const meowToken = snapshot.context.template.find((t) => t.token === 'meow');
+
+  expect(snapshot.context.scriptSetupConsumed).toBe(true);
+  expect(snapshot.context.script.length).toBe(0);
+  expect(owoToken).not.toBeUndefined();
+  expect(meowToken).not.toBeUndefined();
+});
+
+it('decodes SFCs with v- directives', async () => {
+  const testSfc = `
+    <template>
+      <div v-if="isCat">{{ t('meow') }}</div>
+    </template>
+    <script setup>
+      console.log('owo')
+    </script>
+  `;
+
+  const snapshot = await runMachine(testSfc);
+  const meowToken = snapshot.context.template.find((t) => t.token === 'meow');
+  const owoToken = snapshot.context.setup.find((t) => t.token === 'owo');
+
+  expect(meowToken).not.toBeUndefined();
+  expect(owoToken).not.toBeUndefined();
+  expect(meowToken?.type).toBe('string.quoted.single.ts');
+  expect(owoToken?.type).toBe('string.quoted.single.ts');
+});
+
 it('decodes a SFC using a plain script', async () => {
   const testSfc = `
     <script>
@@ -261,4 +301,28 @@ it('reports bad use of setup when assigned a variable/reference', async () => {
 
   const snapshot = await runMachine(testSfc);
   expect(snapshot.context.invalidSetup).not.toBeNull();
+});
+
+it('is not disturbed by nested templates', async () => {
+  const testSfc = `
+    <template>
+      <div>
+        <template>
+          <p>meow</p>
+        </template>
+      </div>
+    </template>
+    <script setup>
+      console.log('owo')
+    </script>
+  `;
+
+  const snapshot = await runMachine(testSfc);
+  const owoToken = snapshot.context.setup.find((t) => t.token === 'owo');
+  const meowToken = snapshot.context.template.find((t) => t.token === 'meow');
+
+  expect(snapshot.context.scriptSetupConsumed).toBe(true);
+  expect(snapshot.context.script.length).toBe(0);
+  expect(owoToken).not.toBeUndefined();
+  expect(meowToken).not.toBeUndefined();
 });
