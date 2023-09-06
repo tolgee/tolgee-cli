@@ -4,6 +4,7 @@ type PropertiesContext = {
   property: string | null;
   depth: number;
   static: boolean;
+  nextDynamic: boolean;
 
   keyName: string | false | null;
   defaultValue: string | false | null;
@@ -20,6 +21,7 @@ export default createMachine<PropertiesContext>(
       property: null,
       depth: 0,
       static: false,
+      nextDynamic: false,
 
       keyName: null,
       defaultValue: null,
@@ -63,6 +65,38 @@ export default createMachine<PropertiesContext>(
           'punctuation.separator.key-value.svelte': {
             target: 'value',
           },
+
+          // Vue
+          'punctuation.attribute-shorthand.event.html.vue': [
+            {
+              cond: (_, evt) => evt.token === '@',
+              actions: ['markPropertyAsDynamic', 'markNextPropertyAsDynamic'],
+            },
+          ],
+          'entity.other.attribute-name.html.vue': [
+            {
+              cond: (ctx) => ctx.nextDynamic,
+              actions: 'markImmediatePropertyAsDynamic',
+            },
+            {
+              actions: [
+                'markPropertyAsDynamic',
+                'unmarkAsStatic',
+                'storePropertyType',
+              ],
+            },
+          ],
+          'punctuation.separator.key-value.html.vue': {
+            target: 'value',
+          },
+          'entity.other.attribute-name.html': [
+            {
+              actions: ['markPropertyAsDynamic', 'storePropertyType'],
+            },
+          ],
+          'punctuation.separator.key-value.html': {
+            target: 'value',
+          },
         },
       },
       complex_key: {
@@ -96,6 +130,8 @@ export default createMachine<PropertiesContext>(
           'punctuation.definition.string.begin.svelte': 'value_string',
           'punctuation.definition.string.template.begin.svelte': 'value_string',
 
+          'punctuation.definition.string.begin.html': 'value_string',
+
           // Variable
           'variable.other.readwrite.ts': {
             target: 'idle',
@@ -113,6 +149,16 @@ export default createMachine<PropertiesContext>(
 
           // Svelte
           'string.unquoted.svelte': {
+            target: 'idle',
+            actions: [
+              'storePropertyValue',
+              'clearPropertyType',
+              'unmarkAsStatic',
+            ],
+          },
+
+          // Vue
+          'string.unquoted.html': {
             target: 'idle',
             actions: [
               'storePropertyValue',
@@ -158,6 +204,11 @@ export default createMachine<PropertiesContext>(
             actions: ['storeEmptyPropertyValue', 'clearPropertyType'],
           },
           'punctuation.definition.string.template.end.svelte': {
+            target: 'idle',
+            actions: ['storeEmptyPropertyValue', 'clearPropertyType'],
+          },
+
+          'punctuation.definition.string.end.html': {
             target: 'idle',
             actions: ['storeEmptyPropertyValue', 'clearPropertyType'],
           },
@@ -214,6 +265,16 @@ export default createMachine<PropertiesContext>(
             target: 'idle',
             actions: 'clearPropertyType',
           },
+
+          // Vue
+          'punctuation.definition.string.end.html.vue': {
+            target: 'idle',
+            actions: 'clearPropertyType',
+          },
+          'punctuation.definition.string.end.html': {
+            target: 'idle',
+            actions: 'clearPropertyType',
+          },
         },
       },
       end: {
@@ -249,6 +310,14 @@ export default createMachine<PropertiesContext>(
         target: 'end',
         actions: 'markPropertyAsDynamic',
       },
+      'punctuation.definition.tag.end.html.vue': {
+        target: 'end',
+        actions: 'markPropertyAsDynamic',
+      },
+      'punctuation.definition.tag.end.html': {
+        target: 'end',
+        actions: 'markPropertyAsDynamic',
+      },
     },
   },
   {
@@ -256,11 +325,15 @@ export default createMachine<PropertiesContext>(
       isOpenCurly: (_ctx, evt) =>
         evt.token === '{' &&
         !evt.scopes.includes('meta.embedded.expression.tsx') &&
-        !evt.scopes.includes('meta.embedded.expression.svelte'),
+        !evt.scopes.includes('meta.embedded.expression.svelte') &&
+        (!evt.scopes.includes('source.ts.embedded.html.vue') ||
+          evt.scopes.includes('expression.embedded.vue')),
       isCloseCurly: (_ctx, evt) =>
         evt.token === '}' &&
         !evt.scopes.includes('meta.embedded.expression.tsx') &&
-        !evt.scopes.includes('meta.embedded.expression.svelte'),
+        !evt.scopes.includes('meta.embedded.expression.svelte') &&
+        (!evt.scopes.includes('source.ts.embedded.html.vue') ||
+          evt.scopes.includes('expression.embedded.vue')),
       isFinalCloseCurly: (ctx, evt) => evt.token === '}' && ctx.depth === 1,
       isOpenSquare: (_ctx, evt) => evt.token === '[',
       isCloseSquare: (_ctx, evt) => evt.token === ']',
@@ -294,7 +367,11 @@ export default createMachine<PropertiesContext>(
         namespace: (ctx) => (ctx.property === 'ns' ? '' : ctx.namespace),
       }),
 
+      markNextPropertyAsDynamic: assign({
+        nextDynamic: true,
+      }),
       markPropertyAsDynamic: assign({
+        nextDynamic: false,
         keyName: (ctx, _evt) =>
           ctx.property === 'key' || ctx.property === 'keyName'
             ? false
@@ -305,6 +382,7 @@ export default createMachine<PropertiesContext>(
           ctx.property === 'ns' ? false : ctx.namespace,
       }),
       markImmediatePropertyAsDynamic: assign({
+        nextDynamic: false,
         keyName: (ctx, evt) =>
           evt.token === 'key' || evt.token === 'keyName' ? false : ctx.keyName,
         defaultValue: (ctx, evt) =>
@@ -320,10 +398,10 @@ export default createMachine<PropertiesContext>(
       }),
 
       markAsStatic: assign({
-        static: (_ctx, _evt) => true,
+        static: true,
       }),
       unmarkAsStatic: assign({
-        static: (_ctx, _evt) => false,
+        static: false,
       }),
     },
   }

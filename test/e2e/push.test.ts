@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'url';
 import {
   PROJECT_PAK_1,
   PROJECT_PAK_2,
@@ -10,12 +11,15 @@ import { tolgeeDataToDict } from './utils/data.js';
 import { run } from './utils/run.js';
 
 const FIXTURES_PATH = new URL('../__fixtures__/', import.meta.url);
-const PROJECT_1_UPDATE = new URL('./updatedProject1', FIXTURES_PATH).pathname;
-const PROJECT_2_UPDATE = new URL(
-  './updatedProject2WithConflicts',
-  FIXTURES_PATH
-).pathname;
-const PROJECT_3_UPDATE = new URL('./updatedProject3', FIXTURES_PATH).pathname;
+const PROJECT_1_UPDATE = fileURLToPath(
+  new URL('./updatedProject1', FIXTURES_PATH)
+);
+const PROJECT_2_UPDATE = fileURLToPath(
+  new URL('./updatedProject2WithConflicts', FIXTURES_PATH)
+);
+const PROJECT_3_UPDATE = fileURLToPath(
+  new URL('./updatedProject3', FIXTURES_PATH)
+);
 
 async function cleanupProjectState() {
   // Project 1: delete wired & wireless

@@ -1,14 +1,19 @@
 import type { ChildProcessWithoutNullStreams } from 'child_process';
 
+import { fileURLToPath } from 'url';
 import { join } from 'path';
 import { tmpdir } from 'os';
 import { spawn as spawnProcess } from 'child_process';
 
-const TTY_PRELOAD = new URL('../__internal__/tty.cjs', import.meta.url)
-  .pathname;
-const PRELOAD = new URL('../__internal__/preload.cjs', import.meta.url)
-  .pathname;
-const CLI_INDEX = new URL('../../../dist/index.js', import.meta.url).pathname;
+const TTY_PRELOAD = fileURLToPath(
+  new URL('../__internal__/tty.cjs', import.meta.url)
+);
+const PRELOAD = fileURLToPath(
+  new URL('../__internal__/preload.cjs', import.meta.url)
+);
+const CLI_INDEX = fileURLToPath(
+  new URL('../../../dist/index.js', import.meta.url)
+);
 const DEBUG_ENABLED = process.env.RUNNER_DEBUG === '1';
 
 export type RunResult = {

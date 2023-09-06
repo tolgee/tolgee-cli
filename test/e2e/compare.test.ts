@@ -1,21 +1,28 @@
+import { fileURLToPathSlash } from './utils/toFilePath.js';
 import { PROJECT_PAK_2, PROJECT_PAK_3 } from './utils/tg.js';
 import { run } from './utils/run.js';
 
 const FIXTURES_PATH = new URL('../__fixtures__/', import.meta.url);
 const CODE_PATH = new URL('./testProjectCode/', FIXTURES_PATH);
 
-const CODE_PROJECT_2_COMPLETE = new URL('./Test2Complete.tsx', CODE_PATH)
-  .pathname;
-const CODE_PROJECT_2_ADDED = new URL('./Test2New.tsx', CODE_PATH).pathname;
-const CODE_PROJECT_2_DELETED = new URL('./Test2Incomplete.tsx', CODE_PATH)
-  .pathname;
-const CODE_PROJECT_2_WARNING = new URL('./Test2Warning.tsx', CODE_PATH)
-  .pathname;
-const CODE_PROJECT_3 = new URL('./Test3Mixed.tsx', CODE_PATH).pathname;
-const CODE_UNORDERED = new URL(
-  './codeProjectReactUnordered/App.tsx',
-  FIXTURES_PATH
-).pathname;
+const CODE_PROJECT_2_COMPLETE = fileURLToPathSlash(
+  new URL('./Test2Complete.tsx', CODE_PATH)
+);
+const CODE_PROJECT_2_ADDED = fileURLToPathSlash(
+  new URL('./Test2New.tsx', CODE_PATH)
+);
+const CODE_PROJECT_2_DELETED = fileURLToPathSlash(
+  new URL('./Test2Incomplete.tsx', CODE_PATH)
+);
+const CODE_PROJECT_2_WARNING = fileURLToPathSlash(
+  new URL('./Test2Warning.tsx', CODE_PATH)
+);
+const CODE_PROJECT_3 = fileURLToPathSlash(
+  new URL('./Test3Mixed.tsx', CODE_PATH)
+);
+const CODE_UNORDERED = fileURLToPathSlash(
+  new URL('./codeProjectReactUnordered/App.tsx', FIXTURES_PATH)
+);
 
 it('says projects are in sync when they do match', async () => {
   const out = await run(

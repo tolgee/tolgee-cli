@@ -1,4 +1,5 @@
 import type { Extractor } from './index.js';
+import { fileURLToPath } from 'url';
 import { resolve, extname } from 'path';
 import { Worker, isMainThread, parentPort } from 'worker_threads';
 import { readFile } from 'fs/promises';
@@ -46,11 +47,14 @@ const jobQueue: Array<[WorkerParams, Deferred]> = [];
 
 function createWorker() {
   const worker = IS_TS_NODE
-    ? new Worker(new URL(import.meta.url).pathname.replace('.ts', '.js'), {
-        // ts-node workaround
-        execArgv: ['--require', 'ts-node/register'],
-      })
-    : new Worker(new URL(import.meta.url).pathname);
+    ? new Worker(
+        fileURLToPath(new URL(import.meta.url)).replace('.ts', '.js'),
+        {
+          // ts-node workaround
+          execArgv: ['--require', 'ts-node/register'],
+        }
+      )
+    : new Worker(fileURLToPath(new URL(import.meta.url)));
 
   let timeout: NodeJS.Timeout;
   let currentDeferred: Deferred;

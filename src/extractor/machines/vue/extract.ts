@@ -1,21 +1,29 @@
-import type { ExtractedKey, Warning } from '../index.js';
+import type { ExtractedKey, Warning } from '../../index.js';
 
 import { createMachine, assign, send, forwardTo } from 'xstate';
-import translateCallMachine from './shared/translateCall.js';
-import propertiesMachine from './shared/properties.js';
-import commentsService from './shared/comments.js';
+import translateCallMachine from '../shared/translateCall.js';
+import propertiesMachine from '../shared/properties.js';
+import commentsService from '../shared/comments.js';
 
 type KeyWithDynamicNs = Omit<ExtractedKey, 'namespace'> & {
   namespace?: ExtractedKey['namespace'] | false;
 };
 
+const enum State {
+  EXTERNAL,
+  SETUP,
+  SCRIPT,
+  TEMPLATE,
+}
+
 type MachineCtx = {
-  children: string;
   line: number;
 
   key: KeyWithDynamicNs;
-  getTranslate: string | null | false;
+  useTranslate: string | null | false;
   ignore: null | { type: 'key' | 'ignore'; line: number };
+
+  currentState: State;
 
   keys: ExtractedKey[];
   warnings: Warning[];
@@ -26,15 +34,16 @@ const VOID_KEY = { keyName: '', line: -1 };
 export default createMachine<MachineCtx>(
   {
     predictableActionArguments: true,
-    id: 'svelteExtractor',
+    id: 'vueExtractor',
     type: 'parallel',
     context: {
-      children: '',
       line: 0,
 
       key: VOID_KEY,
-      getTranslate: null,
+      useTranslate: null,
       ignore: null,
+
+      currentState: State.EXTERNAL,
 
       keys: [],
       warnings: [],
@@ -82,7 +91,7 @@ export default createMachine<MachineCtx>(
               { to: 'comments' }
             ),
           },
-          'comment.block.svelte': {
+          'comment.block.html': {
             actions: send(
               (_ctx, evt) => ({
                 type: 'COMMENT',
@@ -99,7 +108,8 @@ export default createMachine<MachineCtx>(
           },
         },
       },
-      getTranslate: {
+
+      useTranslate: {
         initial: 'idle',
         states: {
           idle: {
@@ -107,7 +117,10 @@ export default createMachine<MachineCtx>(
               'entity.name.function.ts': {
                 target: 'func',
                 actions: 'storeLine',
-                cond: (_ctx, evt) => evt.token === 'getTranslate',
+                cond: (ctx, evt) =>
+                  (ctx.currentState === State.SETUP ||
+                    ctx.currentState === State.EXTERNAL) &&
+                  evt.token === 'useTranslate',
               },
             },
           },
@@ -139,12 +152,12 @@ export default createMachine<MachineCtx>(
               'punctuation.definition.string.template.begin.ts': 'namespace',
               'variable.other.readwrite.ts': {
                 target: 'idle',
-                actions: ['storeGetTranslate', 'markGetTranslateAsDynamic'],
+                actions: ['storeUseTranslate', 'markUseTranslateAsDynamic'],
               },
               'meta.brace.round.ts': {
                 target: 'idle',
                 cond: (_ctx, evt) => evt.token === ')',
-                actions: 'storeGetTranslate',
+                actions: 'storeUseTranslate',
               },
             },
           },
@@ -152,7 +165,7 @@ export default createMachine<MachineCtx>(
             on: {
               '*': {
                 target: 'namespace_end',
-                actions: 'storeNamespacedGetTranslate',
+                actions: 'storeNamespacedUseTranslate',
               },
             },
           },
@@ -162,106 +175,97 @@ export default createMachine<MachineCtx>(
               'meta.brace.round.ts': 'idle',
               'punctuation.definition.template-expression.begin.ts': {
                 target: 'idle',
-                actions: 'markGetTranslateAsDynamic',
+                actions: 'markUseTranslateAsDynamic',
               },
               'keyword.operator.arithmetic.ts': {
                 target: 'idle',
-                actions: 'markGetTranslateAsDynamic',
+                actions: 'markUseTranslateAsDynamic',
               },
             },
           },
+          done: { type: 'final' },
         },
       },
-      component: {
-        initial: 'idle',
-        states: {
-          idle: {
-            on: {
-              'punctuation.definition.tag.begin.svelte': {
-                target: 'tag',
-                actions: 'storeLine',
-                cond: (_ctx, evt) => evt.token === '<',
-              },
-            },
-          },
-          tag: {
-            on: {
-              '*': 'idle',
-              newline: undefined,
-              'meta.tag.start.svelte': undefined,
-              'support.class.component.svelte': [
-                {
-                  target: 'idle',
-                  actions: 'consumeIgnoredLine',
-                  cond: (ctx, evt) =>
-                    ctx.ignore?.line === ctx.line && evt.token === 'T',
-                },
-                {
-                  target: 'props',
-                  cond: (_ctx, evt) => evt.token === 'T',
-                },
-              ],
-            },
-          },
-          props: {
-            invoke: {
-              id: 'propertiesMachine',
-              src: propertiesMachine,
-              onDone: [
-                {
-                  target: 'idle',
-                  actions: 'emitWarningFromParameters',
-                  cond: 'isPropertiesDataDynamic',
-                },
-                {
-                  target: 'idle',
-                  actions: ['consumeParameters', 'pushKey'],
-                  cond: (ctx, evt) =>
-                    evt.data.lastEvent.token !== '/>' &&
-                    ((!ctx.key.keyName && !evt.data.keyName) ||
-                      (!ctx.key.defaultValue && !evt.data.defaultValue)),
-                },
-                {
-                  target: 'idle',
-                  actions: ['consumeParameters', 'pushKey'],
-                },
-              ],
-            },
-            on: {
-              '*': {
-                actions: forwardTo('propertiesMachine'),
-              },
-            },
-          },
-        },
-      },
+
       t: {
         initial: 'idle',
         states: {
           idle: {
             on: {
-              'punctuation.definition.variable.svelte': {
-                target: 'dollar',
-                cond: (ctx, evt) =>
-                  ctx.getTranslate !== null && evt.token === '$',
-              },
-            },
-          },
-          dollar: {
-            on: {
-              '*': 'idle',
-              'entity.name.function.ts': {
-                target: 'func',
+              'variable.other.object.ts': {
+                target: 'tRef',
                 actions: 'storeLine',
-                cond: (_ctx, evt) => evt.token === 't',
+                cond: (ctx, evt) =>
+                  ctx.currentState !== State.SCRIPT &&
+                  ctx.currentState !== State.TEMPLATE &&
+                  ctx.useTranslate !== null &&
+                  evt.token === 't',
+              },
+              'entity.name.function.ts': [
+                {
+                  target: 'func',
+                  actions: 'storeLine',
+                  cond: (ctx, evt) =>
+                    ctx.currentState === State.TEMPLATE &&
+                    ctx.useTranslate !== null &&
+                    evt.token === 't',
+                },
+                {
+                  target: 'func',
+                  actions: 'storeLine',
+                  cond: (ctx, evt) =>
+                    ctx.currentState === State.TEMPLATE && evt.token === '$t',
+                },
+              ],
+              'variable.language.this.ts': {
+                cond: (ctx) =>
+                  ctx.currentState !== State.TEMPLATE &&
+                  ctx.currentState !== State.EXTERNAL,
+                actions: 'storeLine',
+                target: 'this',
               },
             },
           },
+          this: {
+            on: {
+              'meta.function-call.ts': undefined,
+              'punctuation.accessor.ts': 'thisDot',
+              '*': 'idle',
+            },
+          },
+          thisDot: {
+            on: {
+              'meta.function-call.ts': undefined,
+              'entity.name.function.ts': {
+                cond: (_, evt) => evt.token === '$t',
+                target: 'func',
+              },
+            },
+          },
+
+          tRef: {
+            on: {
+              'meta.function-call.ts': undefined,
+              'punctuation.accessor.ts': 'tRefDot',
+              '*': 'idle',
+            },
+          },
+          tRefDot: {
+            on: {
+              'meta.function-call.ts': undefined,
+              'entity.name.function.ts': {
+                cond: (_, evt) => evt.token === 'value',
+                target: 'func',
+              },
+            },
+          },
+
           func: {
             on: {
               '*': 'idle',
               newline: undefined,
               'source.ts': undefined,
+              'source.ts.embedded.html.vue': undefined,
               'meta.brace.round.ts': [
                 {
                   target: 'idle',
@@ -314,6 +318,71 @@ export default createMachine<MachineCtx>(
           },
         },
       },
+      component: {
+        initial: 'idle',
+        states: {
+          idle: {
+            on: {
+              'punctuation.definition.tag.begin.html': {
+                target: 'tag',
+                actions: 'storeLine',
+              },
+            },
+          },
+          tag: {
+            on: {
+              '*': 'idle',
+              newline: undefined,
+              'text.html.derivative': undefined,
+              'entity.name.tag.T.html.vue': [
+                {
+                  target: 'idle',
+                  actions: 'consumeIgnoredLine',
+                  cond: (ctx) => ctx.ignore?.line === ctx.line,
+                },
+                {
+                  target: 'props',
+                },
+              ],
+            },
+          },
+          props: {
+            invoke: {
+              id: 'propertiesMachine',
+              src: propertiesMachine,
+              onDone: [
+                {
+                  target: 'idle',
+                  actions: 'emitWarningFromParameters',
+                  cond: 'isPropertiesDataDynamic',
+                },
+                {
+                  target: 'idle',
+                  actions: ['consumeParameters', 'pushKey'],
+                  cond: (ctx, evt) =>
+                    evt.data.lastEvent.token !== '/>' &&
+                    ((!ctx.key.keyName && !evt.data.keyName) ||
+                      (!ctx.key.defaultValue && !evt.data.defaultValue)),
+                },
+                {
+                  target: 'idle',
+                  actions: ['consumeParameters', 'pushKey'],
+                },
+              ],
+            },
+            on: {
+              '*': {
+                actions: forwardTo('propertiesMachine'),
+              },
+            },
+          },
+        },
+      },
+    },
+    on: {
+      SETUP: { actions: 'markAsInSetup' },
+      SCRIPT: { actions: 'markAsInScript' },
+      TEMPLATE: { actions: 'markAsInTemplate' },
     },
   },
   {
@@ -338,14 +407,14 @@ export default createMachine<MachineCtx>(
         ],
       }),
 
-      storeGetTranslate: assign({
-        getTranslate: (_ctx, _evt) => '',
+      storeUseTranslate: assign({
+        useTranslate: (_ctx, _evt) => '',
       }),
-      storeNamespacedGetTranslate: assign({
-        getTranslate: (_ctx, evt) => evt.token,
+      storeNamespacedUseTranslate: assign({
+        useTranslate: (_ctx, evt) => evt.token,
       }),
-      markGetTranslateAsDynamic: assign({
-        getTranslate: (_ctx, _evt) => false,
+      markUseTranslateAsDynamic: assign({
+        useTranslate: (_ctx, _evt) => false,
         warnings: (ctx, _evt) => [
           ...ctx.warnings,
           { warning: 'W_DYNAMIC_NAMESPACE', line: ctx.line },
@@ -354,7 +423,7 @@ export default createMachine<MachineCtx>(
 
       consumeTranslateCall: assign({
         warnings: (ctx, evt) => {
-          if (!evt.data.namespace && ctx.getTranslate === false) {
+          if (!evt.data.namespace && ctx.useTranslate === false) {
             return [
               ...ctx.warnings,
               { warning: 'W_UNRESOLVABLE_NAMESPACE', line: ctx.line },
@@ -370,7 +439,7 @@ export default createMachine<MachineCtx>(
         },
         keys: (ctx, evt) => {
           const ns =
-            evt.data.namespace === null ? ctx.getTranslate : evt.data.namespace;
+            evt.data.namespace === null ? ctx.useTranslate : evt.data.namespace;
           if (!evt.data.keyName || ns === false) return ctx.keys;
           return [
             ...ctx.keys,
@@ -470,6 +539,16 @@ export default createMachine<MachineCtx>(
           ...ctx.warnings,
           { warning: evt.kind, line: evt.line },
         ],
+      }),
+
+      markAsInSetup: assign({
+        currentState: State.SETUP,
+      }),
+      markAsInScript: assign({
+        currentState: State.SCRIPT,
+      }),
+      markAsInTemplate: assign({
+        currentState: State.TEMPLATE,
       }),
     },
   }

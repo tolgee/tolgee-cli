@@ -48,7 +48,7 @@ describe('Plain JavaScript', () => {
 
     it('does not extract information from nested objects', async () => {
       const tokens = await tokenizer(
-        'const a = { key: "key1", test: { defaultValue: "def value1" } }',
+        'const a = { key: "key1", test: { key: "not key1", defaultValue: "def value1" }, defaultValue: "def" }',
         FILE_NAME
       );
       for (const token of tokens) {
@@ -60,7 +60,7 @@ describe('Plain JavaScript', () => {
       const snapshot = machine.getSnapshot();
       expect(snapshot.done).toBe(true);
       expect(snapshot.context.keyName).toBe('key1');
-      expect(snapshot.context.defaultValue).toBeNull();
+      expect(snapshot.context.defaultValue).toBe('def');
       expect(snapshot.context.namespace).toBeNull();
     });
 
@@ -316,6 +316,7 @@ describe('JSX', () => {
         '<T properties={{ a: "b" }} keyName={"key1"}/>',
         FILE_NAME
       );
+
       for (const token of tokens) {
         if (!machine.getSnapshot().done) {
           machine.send(token);
@@ -638,6 +639,228 @@ describe('Svelte', () => {
       expect(snapshot.context.keyName).toBe(false);
       expect(snapshot.context.defaultValue).toBeNull();
       expect(snapshot.context.namespace).toBe('');
+    });
+  });
+});
+
+describe('Vue', () => {
+  async function tokenizerVue(code: string) {
+    const tokens = await tokenizer(`<template>${code}</template>`, 'App.vue');
+    return tokens.slice(3, -4);
+  }
+
+  beforeEach(() => machine.start());
+  afterEach(() => machine.stop());
+
+  it('extracts simple HTML props', async () => {
+    const tokens = await tokenizerVue('<T keyName="key1"/>');
+    for (const token of tokens) {
+      if (!machine.getSnapshot().done) {
+        machine.send(token);
+      }
+    }
+
+    const snapshot = machine.getSnapshot();
+    expect(snapshot.done).toBe(true);
+    expect(snapshot.context.keyName).toBe('key1');
+    expect(snapshot.context.defaultValue).toBeNull();
+    expect(snapshot.context.namespace).toBeNull();
+  });
+
+  it('extracts simple unquoted HTML props', async () => {
+    const tokens = await tokenizerVue('<T keyName=key1/>');
+    for (const token of tokens) {
+      if (!machine.getSnapshot().done) {
+        machine.send(token);
+      }
+    }
+
+    const snapshot = machine.getSnapshot();
+    expect(snapshot.done).toBe(true);
+    expect(snapshot.context.keyName).toBe('key1');
+    expect(snapshot.context.defaultValue).toBeNull();
+    expect(snapshot.context.namespace).toBeNull();
+  });
+
+  it('extracts HTML props written as static v-bind expressions', async () => {
+    const tokens = await tokenizerVue('<T v-bind:keyName="`key1`"/>');
+    for (const token of tokens) {
+      if (!machine.getSnapshot().done) {
+        machine.send(token);
+      }
+    }
+
+    const snapshot = machine.getSnapshot();
+    expect(snapshot.done).toBe(true);
+    expect(snapshot.context.keyName).toBe('key1');
+    expect(snapshot.context.defaultValue).toBeNull();
+    expect(snapshot.context.namespace).toBeNull();
+  });
+
+  it('extracts HTML props written as static v-bind (shorthand) expressions', async () => {
+    const tokens = await tokenizerVue('<T :keyName="\'key1\'"/>');
+    for (const token of tokens) {
+      if (!machine.getSnapshot().done) {
+        machine.send(token);
+      }
+    }
+
+    const snapshot = machine.getSnapshot();
+    expect(snapshot.done).toBe(true);
+    expect(snapshot.context.keyName).toBe('key1');
+    expect(snapshot.context.defaultValue).toBeNull();
+    expect(snapshot.context.namespace).toBeNull();
+  });
+
+  it('is undisturbed by objects within properties', async () => {
+    const tokens = await tokenizerVue(
+      '<T :properties="{ a: "b" }" keyName="key1"/>'
+    );
+
+    for (const token of tokens) {
+      if (!machine.getSnapshot().done) {
+        machine.send(token);
+      }
+    }
+
+    const snapshot = machine.getSnapshot();
+    expect(snapshot.done).toBe(true);
+    expect(snapshot.context.keyName).toBe('key1');
+    expect(snapshot.context.defaultValue).toBeNull();
+    expect(snapshot.context.namespace).toBeNull();
+  });
+
+  it('reaches completion if there are no properties', async () => {
+    const tokens = await tokenizerVue('<T></T>');
+    for (const token of tokens) {
+      if (!machine.getSnapshot().done) {
+        machine.send(token);
+      }
+    }
+
+    const snapshot = machine.getSnapshot();
+    expect(snapshot.done).toBe(true);
+  });
+
+  it('reaches completion if there are no props (shorthand)', async () => {
+    const tokens = await tokenizerVue('<T/>');
+    for (const token of tokens) {
+      if (!machine.getSnapshot().done) {
+        machine.send(token);
+      }
+    }
+
+    const snapshot = machine.getSnapshot();
+    expect(snapshot.done).toBe(true);
+  });
+
+  describe('dynamic data', () => {
+    it('marks templates with ${} chunks as dynamic', async () => {
+      const tokens = await tokenizerVue('<T :keyName="`dynamic-${i}`"/>');
+      for (const token of tokens) {
+        if (!machine.getSnapshot().done) {
+          machine.send(token);
+        }
+      }
+
+      const snapshot = machine.getSnapshot();
+      expect(snapshot.done).toBe(true);
+      expect(snapshot.context.keyName).toBe(false);
+      expect(snapshot.context.defaultValue).toBeNull();
+      expect(snapshot.context.namespace).toBeNull();
+    });
+
+    it('marks strings with concatenations as dynamic', async () => {
+      const tokens = await tokenizerVue(
+        '<T ns="heh" :keyName="\'dynamic-\' + i"/>'
+      );
+      for (const token of tokens) {
+        if (!machine.getSnapshot().done) {
+          machine.send(token);
+        }
+      }
+
+      const snapshot = machine.getSnapshot();
+      expect(snapshot.done).toBe(true);
+      expect(snapshot.context.keyName).toBe(false);
+      expect(snapshot.context.defaultValue).toBeNull();
+      expect(snapshot.context.namespace).toBe('heh');
+    });
+
+    it('marks plain variables as dynamic', async () => {
+      const tokens = await tokenizerVue('<T :keyName="key"/>');
+      for (const token of tokens) {
+        if (!machine.getSnapshot().done) {
+          machine.send(token);
+        }
+      }
+
+      const snapshot = machine.getSnapshot();
+      expect(snapshot.done).toBe(true);
+      expect(snapshot.context.keyName).toBe(false);
+      expect(snapshot.context.defaultValue).toBeNull();
+      expect(snapshot.context.namespace).toBeNull();
+    });
+
+    it('marks declaration shorthand as dynamic', async () => {
+      const tokens = await tokenizerVue('<T keyName someValue="key1" ns/>');
+      for (const token of tokens) {
+        if (!machine.getSnapshot().done) {
+          machine.send(token);
+        }
+      }
+
+      const snapshot = machine.getSnapshot();
+      expect(snapshot.done).toBe(true);
+      expect(snapshot.context.keyName).toBe(false);
+      expect(snapshot.context.defaultValue).toBeNull();
+      expect(snapshot.context.namespace).toBe(false);
+    });
+
+    it('considers event handler syntax dynamic', async () => {
+      const tokens = await tokenizerVue('<T @keyName="key1"/>');
+      for (const token of tokens) {
+        if (!machine.getSnapshot().done) {
+          machine.send(token);
+        }
+      }
+
+      const snapshot = machine.getSnapshot();
+      expect(snapshot.done).toBe(true);
+      expect(snapshot.context.keyName).toBe(false);
+    });
+
+    it('handles empty strings (ref: #29)', async () => {
+      const tokens = await tokenizerVue('<T keyName ns="" />');
+      for (const token of tokens) {
+        if (!machine.getSnapshot().done) {
+          machine.send(token);
+        }
+      }
+
+      const snapshot = machine.getSnapshot();
+      expect(snapshot.done).toBe(true);
+      expect(snapshot.context.keyName).toBe(false);
+      expect(snapshot.context.defaultValue).toBeNull();
+      expect(snapshot.context.namespace).toBe('');
+    });
+
+    it('handles embedded scripts', async () => {
+      const tokens = await tokenizerVue(
+        '<template>{{ t({ key: "key1", params: { key: "not_key1" } }) }}</template>'
+      );
+
+      for (const token of tokens.slice(7, -4)) {
+        if (!machine.getSnapshot().done) {
+          machine.send(token);
+        }
+      }
+
+      const snapshot = machine.getSnapshot();
+      expect(snapshot.done).toBe(true);
+      expect(snapshot.context.keyName).toBe('key1');
+      expect(snapshot.context.defaultValue).toBeNull();
+      expect(snapshot.context.namespace).toBeNull();
     });
   });
 });

@@ -245,12 +245,18 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])(
           { warning: 'W_DYNAMIC_DEFAULT_VALUE', line: 3 },
           { warning: 'W_DYNAMIC_DEFAULT_VALUE', line: 4 },
           { warning: 'W_DYNAMIC_DEFAULT_VALUE', line: 5 },
+          { warning: 'W_DYNAMIC_DEFAULT_VALUE', line: 6 },
+          { warning: 'W_DYNAMIC_DEFAULT_VALUE', line: 7 },
+          { warning: 'W_DYNAMIC_DEFAULT_VALUE', line: 8 },
         ];
 
         const expectedKeys = [
           { keyName: 'key1', defaultValue: undefined, line: 3 },
           { keyName: 'key2', defaultValue: undefined, line: 4 },
           { keyName: 'key3', defaultValue: undefined, line: 5 },
+          { keyName: 'key4', defaultValue: undefined, line: 6 },
+          { keyName: 'key5', defaultValue: undefined, line: 7 },
+          { keyName: 'key6', defaultValue: undefined, line: 8 },
         ];
 
         const code = `
@@ -258,6 +264,9 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])(
           React.createElement(T, { keyName:'key1' }, someValue)
           React.createElement(T, { keyName:'key2' }, 'dynamic-' + i)
           React.createElement(T, { keyName:'key3' }, \`dynamic-\${i}\`)
+          React.createElement(T, { keyName:'key4', defaultValue: someValue })
+          React.createElement(T, { keyName:'key5', defaultValue: 'dynamic-' + i })
+          React.createElement(T, { keyName:'key6', defaultValue: \`dynamic-\${i}\` })
         `;
 
         const extracted = await extractKeys(code, FILE_NAME);
@@ -660,11 +669,15 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])('useTranslate (.%s)', (ext) => {
       const expectedWarnings = [
         { warning: 'W_DYNAMIC_DEFAULT_VALUE', line: 5 },
         { warning: 'W_DYNAMIC_DEFAULT_VALUE', line: 6 },
+        { warning: 'W_DYNAMIC_DEFAULT_VALUE', line: 7 },
+        { warning: 'W_DYNAMIC_DEFAULT_VALUE', line: 8 },
       ];
 
       const expectedKeys = [
         { keyName: 'key1', defaultValue: undefined, line: 5 },
         { keyName: 'key2', defaultValue: undefined, line: 6 },
+        { keyName: 'key3', defaultValue: undefined, line: 7 },
+        { keyName: 'key4', defaultValue: undefined, line: 8 },
       ];
 
       const code = `
@@ -673,6 +686,8 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])('useTranslate (.%s)', (ext) => {
           const { t } = useTranslate()
           t('key1', 'dynamic-' + i)
           t('key2', \`dynamic-\${i}\`)
+          t('key3', { defaultValue: 'dynamic-' + i })
+          t('key4', { defaultValue: \`dynamic-\${i}\` })
         }
       `;
 

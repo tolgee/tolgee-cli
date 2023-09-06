@@ -1,3 +1,5 @@
+import { fileURLToPath } from 'url';
+import { fileURLToPathSlash } from './utils/toFilePath.js';
 import { TMP_FOLDER, setupTemporaryFolder } from './utils/tmp.js';
 import {
   PROJECT_PAK_2,
@@ -11,10 +13,13 @@ import { run } from './utils/run.js';
 import './utils/toMatchContentsOf';
 
 const FIXTURES_PATH = new URL('../__fixtures__/', import.meta.url);
-const CODE_PATH = new URL('./testProjectCode', FIXTURES_PATH).pathname;
+const CODE_PATH = fileURLToPathSlash(
+  new URL('./testProjectCode', FIXTURES_PATH)
+);
 
-const PROJECT_2_DATA = new URL('./tolgeeImportData/test2', FIXTURES_PATH)
-  .pathname;
+const PROJECT_2_DATA = fileURLToPath(
+  new URL('./tolgeeImportData/test2', FIXTURES_PATH)
+);
 const CODE_PROJECT_2_COMPLETE = `${CODE_PATH}/Test2Complete.tsx`;
 const CODE_PROJECT_2_ADDED = `${CODE_PATH}/Test2New.tsx`;
 const CODE_PROJECT_2_DELETED = `${CODE_PATH}/Test2Incomplete.tsx`;

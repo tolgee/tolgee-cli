@@ -2,17 +2,17 @@
 // Starts a tolgee/tolgee:latest container and waits for it to be ready
 // ---
 
+import { fileURLToPath } from 'url';
 import { spawn } from 'child_process';
 
 console.log('Starting Tolgee test container...');
 
 let stderr = '';
 
-const ENV_FILE = new URL('./tolgee.env', import.meta.url).pathname;
-const TG_IMPORT_FOLDER = new URL(
-  '../test/__fixtures__/tolgeeImportData',
-  import.meta.url
-).pathname;
+const ENV_FILE = fileURLToPath(new URL('./tolgee.env', import.meta.url));
+const TG_IMPORT_FOLDER = fileURLToPath(
+  new URL('../test/__fixtures__/tolgeeImportData', import.meta.url)
+);
 
 const ARGS = [
   'run',

@@ -338,11 +338,15 @@ describe('getTranslate', () => {
       const expectedWarnings = [
         { warning: 'W_DYNAMIC_DEFAULT_VALUE', line: 6 },
         { warning: 'W_DYNAMIC_DEFAULT_VALUE', line: 7 },
+        { warning: 'W_DYNAMIC_DEFAULT_VALUE', line: 8 },
+        { warning: 'W_DYNAMIC_DEFAULT_VALUE', line: 9 },
       ];
 
       const expectedKeys = [
         { keyName: 'key1', defaultValue: undefined, line: 6 },
         { keyName: 'key2', defaultValue: undefined, line: 7 },
+        { keyName: 'key3', defaultValue: undefined, line: 8 },
+        { keyName: 'key4', defaultValue: undefined, line: 9 },
       ];
 
       const code = `
@@ -352,6 +356,8 @@ describe('getTranslate', () => {
         </script>
         {$t('key1', 'dynamic-' + i)}
         {$t('key2', \`dynamic-\${i}\`)}
+        {$t('key3', { defaultValue: 'dynamic-' + i })}
+        {$t('key4', { defaultValue: \`dynamic-\${i}\` })}
       `;
 
       const extracted = await extractKeys(code, 'App.svelte');

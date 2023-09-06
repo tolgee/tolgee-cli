@@ -1,6 +1,7 @@
 import type { ExtractedKey, Warning } from '../index.js';
 
 import { createMachine, assign, send, forwardTo } from 'xstate';
+import translateCallMachine from './shared/translateCall.js';
 import propertiesMachine from './shared/properties.js';
 import commentsService from './shared/comments.js';
 
@@ -503,111 +504,38 @@ export default createMachine<MachineCtx>(
             },
           },
           call: {
-            on: {
-              'punctuation.definition.string.begin.ts': 'param_string',
-              'punctuation.definition.string.template.begin.ts': 'param_string',
-              'variable.other.readwrite.ts': [
-                {
-                  target: 'idle',
-                  actions: 'dynamicOptions',
-                  cond: (ctx) => !!ctx.key.keyName,
-                },
-                {
-                  target: 'idle',
-                  actions: 'dynamicKeyName',
-                },
-              ],
-              'punctuation.definition.block.ts': {
-                target: 'param_object',
-                cond: (_ctx, evt) => evt.token === '{',
-              },
-              'meta.brace.round.ts': {
-                target: 'idle',
-                cond: (_ctx, evt) => evt.token === ')',
-                actions: 'pushKey',
-              },
-            },
-          },
-          param_string: {
-            on: {
-              '*': [
-                {
-                  target: 'param_end',
-                  actions: ['storeKeyName', 'storeKeyCurrentNamespace'],
-                  cond: (ctx) => !ctx.key.keyName,
-                },
-                {
-                  target: 'param_end',
-                  actions: ['storeKeyDefault', 'storeKeyCurrentNamespace'],
-                  cond: (ctx) => !!ctx.key.keyName,
-                },
-              ],
-            },
-          },
-          param_end: {
-            on: {
-              'punctuation.separator.comma.ts': 'call',
-              'punctuation.definition.template-expression.begin.ts': [
-                {
-                  target: 'param_end_warn',
-                  actions: 'dynamicKeyDefault',
-                  cond: (ctx) => !!ctx.key.defaultValue,
-                },
-                {
-                  target: 'idle',
-                  actions: 'dynamicKeyName',
-                },
-              ],
-              'keyword.operator.arithmetic.ts': [
-                {
-                  target: 'param_end_warn',
-                  actions: 'dynamicKeyDefault',
-                  cond: (ctx) => !!ctx.key.defaultValue,
-                },
-                {
-                  target: 'idle',
-                  actions: 'dynamicKeyName',
-                },
-              ],
-              'meta.brace.round.ts': {
-                target: 'idle',
-                cond: (_ctx, evt) => evt.token === ')',
-                actions: 'pushKey',
-              },
-            },
-          },
-          param_end_warn: {
-            on: {
-              'punctuation.separator.comma.ts': 'call',
-              'meta.brace.round.ts': {
-                target: 'idle',
-                cond: (_ctx, evt) => evt.token === ')',
-                actions: 'pushKey',
-              },
-            },
-          },
-          param_object: {
             invoke: {
-              id: 'propertiesMachine',
-              src: propertiesMachine,
-              data: {
-                depth: 1,
-              },
+              id: 'tCall',
+              src: translateCallMachine,
               onDone: [
                 {
                   target: 'idle',
-                  actions: 'emitWarningFromParameters',
-                  cond: 'isPropertiesDataDynamic',
+                  actions: 'dynamicKeyName',
+                  cond: (_, evt) => evt.data.keyName === false,
                 },
                 {
                   target: 'idle',
-                  actions: ['consumeParameters', 'pushKey'],
+                  actions: 'dynamicNamespace',
+                  cond: (_, evt) => evt.data.namespace === false,
+                },
+                {
+                  target: 'idle',
+                  actions: 'dynamicOptions',
+                  cond: (_, evt) => evt.data.dynamicOptions,
+                },
+                {
+                  target: 'idle',
+                  cond: (_, evt) => !evt.data.keyName,
+                },
+                {
+                  target: 'idle',
+                  actions: 'consumeTranslateCall',
                 },
               ],
             },
             on: {
               '*': {
-                actions: forwardTo('propertiesMachine'),
+                actions: forwardTo('tCall'),
               },
             },
           },
@@ -665,6 +593,45 @@ export default createMachine<MachineCtx>(
         ],
       }),
 
+      consumeTranslateCall: assign({
+        warnings: (ctx, evt) => {
+          const utNamespace = ctx.hooks.length
+            ? ctx.hooks[ctx.hooks.length - 1].namespace
+            : undefined;
+
+          if (!evt.data.namespace && utNamespace === false) {
+            return [
+              ...ctx.warnings,
+              { warning: 'W_UNRESOLVABLE_NAMESPACE', line: ctx.line },
+            ];
+          }
+          if (evt.data.defaultValue === false) {
+            return [
+              ...ctx.warnings,
+              { warning: 'W_DYNAMIC_DEFAULT_VALUE', line: ctx.line },
+            ];
+          }
+          return ctx.warnings;
+        },
+        keys: (ctx, evt) => {
+          const utNamespace = ctx.hooks.length
+            ? ctx.hooks[ctx.hooks.length - 1].namespace
+            : undefined;
+
+          const ns =
+            evt.data.namespace === null ? utNamespace : evt.data.namespace;
+          if (!evt.data.keyName || ns === false) return ctx.keys;
+          return [
+            ...ctx.keys,
+            {
+              keyName: evt.data.keyName,
+              namespace: ns || undefined,
+              defaultValue: evt.data.defaultValue || undefined,
+              line: ctx.line,
+            },
+          ];
+        },
+      }),
       consumeParameters: assign({
         key: (ctx, evt) => ({
           // We don't want the key and default value to be overridable
@@ -697,7 +664,7 @@ export default createMachine<MachineCtx>(
             line: ctx.line,
           },
         ],
-        key: (_ctx, _evt) => VOID_KEY,
+        key: VOID_KEY,
       }),
 
       appendChildren: assign({
@@ -718,21 +685,20 @@ export default createMachine<MachineCtx>(
       storeKeyDefault: assign({
         key: (ctx, evt) => ({ ...ctx.key, defaultValue: evt.token }),
       }),
-      storeKeyCurrentNamespace: assign({
-        key: (ctx, _evt) => ({
-          ...ctx.key,
-          namespace: ctx.hooks.length
-            ? ctx.hooks[ctx.hooks.length - 1].namespace
-            : undefined,
-        }),
-      }),
 
       dynamicKeyName: assign({
         warnings: (ctx, _evt) => [
           ...ctx.warnings,
           { warning: 'W_DYNAMIC_KEY', line: ctx.line },
         ],
-        key: (_ctx, _evt) => VOID_KEY,
+        key: VOID_KEY,
+      }),
+      dynamicNamespace: assign({
+        warnings: (ctx, _evt) => [
+          ...ctx.warnings,
+          { warning: 'W_DYNAMIC_NAMESPACE', line: ctx.line },
+        ],
+        key: VOID_KEY,
       }),
       dynamicKeyDefault: assign({
         key: (ctx, _evt) => ({ ...ctx.key, defaultValue: undefined }),
@@ -742,7 +708,7 @@ export default createMachine<MachineCtx>(
         ],
       }),
       dynamicOptions: assign({
-        key: (ctx, _evt) => VOID_KEY,
+        key: VOID_KEY,
         warnings: (ctx, _evt) => [
           ...ctx.warnings,
           { warning: 'W_DYNAMIC_OPTIONS', line: ctx.line },
@@ -763,14 +729,6 @@ export default createMachine<MachineCtx>(
       }),
 
       pushKey: assign({
-        warnings: (ctx, _evt) => {
-          if (!ctx.key.keyName || ctx.key.namespace !== false)
-            return ctx.warnings;
-          return [
-            ...ctx.warnings,
-            { warning: 'W_UNRESOLVABLE_NAMESPACE', line: ctx.line },
-          ];
-        },
         keys: (ctx, _evt) => {
           if (!ctx.key.keyName || ctx.key.namespace === false) return ctx.keys;
           return [
