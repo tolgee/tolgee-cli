@@ -16,7 +16,6 @@ type PullOptions = BaseOptions & {
 };
 
 async function fetchZipBlob(opts: PullOptions): Promise<Blob> {
-  console.log(opts);
   return opts.client.export.export({
     format: opts.format,
     languages: opts.languages,
@@ -77,7 +76,7 @@ export default new Command()
   .addOption(
     new Option(
       '-n, --namespace <namespace...>',
-      'List of namespace, pull only keys from specified namespaces. Defaults all namespaces'
+      'Namespace, pull keys from specified namespaces. Defaults all namespaces'
     ).argParser((v, a: string[]) => [v, ...(a || [])])
   )
   .option(
