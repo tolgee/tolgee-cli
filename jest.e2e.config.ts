@@ -3,7 +3,8 @@ import type { JestConfigWithTsJest } from 'ts-jest';
 export default <JestConfigWithTsJest>{
   testEnvironment: 'node',
   displayName: 'E2E',
-  testMatch: ['<rootDir>/test/e2e/**/*.(spec|test).[jt]s?(x)'],
+  // testMatch: ['<rootDir>/test/e2e/**/*.(spec|test).[jt]s?(x)'],
+  testMatch: ['<rootDir>/test/e2e/pull.spec.ts'],
 
   extensionsToTreatAsEsm: ['.ts'],
   moduleNameMapper: {

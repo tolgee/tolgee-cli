@@ -34,6 +34,7 @@ export type BaseOptions = {
   apiKey: string;
   projectId: number;
   client: Client;
+  namespace?: string[];
 };
 
 export const API_KEY_OPT = new Option(

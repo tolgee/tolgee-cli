@@ -16,11 +16,13 @@ type PullOptions = BaseOptions & {
 };
 
 async function fetchZipBlob(opts: PullOptions): Promise<Blob> {
+  console.log(opts);
   return opts.client.export.export({
     format: opts.format,
     languages: opts.languages,
     filterState: opts.states,
     structureDelimiter: opts.delimiter,
+    filterNamespace: opts.namespace,
   });
 }
 
@@ -45,6 +47,7 @@ export default new Command()
     '<path>',
     'Destination path where translation files will be stored in'
   )
+
   .addOption(
     new Option('-f, --format <format>', 'Format of the exported files')
       .choices(['JSON', 'XLIFF'])
@@ -70,6 +73,12 @@ export default new Command()
     )
       .default('.')
       .argParser((v) => v || '')
+  )
+  .addOption(
+    new Option(
+      '-n, --namespace <namespace...>',
+      'List of namespace, pull only keys from specified namespaces. Defaults all namespaces'
+    ).argParser((v, a: string[]) => [v, ...(a || [])])
   )
   .option(
     '-o, --overwrite',

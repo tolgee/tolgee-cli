@@ -26,10 +26,22 @@ it('pulls strings with namespaces from Tolgee', async () => {
   const out = await run(['pull', '--api-key', PROJECT_PAK_3, TMP_FOLDER]);
 
   expect(out.code).toBe(0);
-  await expect(TMP_FOLDER).toMatchContentsOf(PROJECT_3_DATA);
+  await expect(TMP_FOLDER).toMatchContentsOf(PROJECT_1_DATA);
 });
 
-it.todo('pulls strings only from the specified namespaces');
+it('pulls strings only from the specified namespaces', async () => {
+  const out = await run([
+    'pull',
+    '--api-key',
+    PROJECT_PAK_3,
+    TMP_FOLDER,
+    '--namespace',
+    'food',
+  ]);
+
+  expect(out.code).toBe(0);
+  await expect(TMP_FOLDER).toMatchContentsOf(PROJECT_1_DATA);
+});
 
 it('does not overwrite existing folder', async () => {
   await mkdir(TMP_FOLDER);

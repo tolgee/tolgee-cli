@@ -17,7 +17,6 @@
     "pretest:e2e": "npm run build && npm run tolgee:start",
     "posttest:e2e": "npm run tolgee:stop",
     "test:e2e": "cross-env NODE_OPTIONS=\"--experimental-vm-modules\" jest -c jest.e2e.config.ts --runInBand",
-    "test:e2e-run": "cross-env NODE_OPTIONS=\"--experimental-vm-modules\" jest -c jest.e2e.config.ts --runInBand",
     "test:package": "node scripts/validatePackage.js",
     "tolgee:start": "node scripts/startDocker.js",
     "tolgee:stop": "docker stop tolgee_cli_e2e",
