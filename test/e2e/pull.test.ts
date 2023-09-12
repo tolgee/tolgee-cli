@@ -12,6 +12,9 @@ const PROJECT_1_DATA = fileURLToPath(
 const PROJECT_3_DATA = fileURLToPath(
   new URL('./tolgeeImportData/test3', FIXTURES_PATH)
 );
+const PROJECT_3_DATA_ONLY_FOOD = fileURLToPath(
+  new URL('./tolgeeImportData/test3-only-food', FIXTURES_PATH)
+);
 
 setupTemporaryFolder();
 
@@ -22,25 +25,26 @@ it('pulls strings from Tolgee', async () => {
   await expect(TMP_FOLDER).toMatchContentsOf(PROJECT_1_DATA);
 });
 
-it('pulls strings with namespaces from Tolgee', async () => {
+it('pulls strings with all namespaces from Tolgee', async () => {
   const out = await run(['pull', '--api-key', PROJECT_PAK_3, TMP_FOLDER]);
 
   expect(out.code).toBe(0);
-  await expect(TMP_FOLDER).toMatchContentsOf(PROJECT_1_DATA);
+  await expect(TMP_FOLDER).toMatchContentsOf(PROJECT_3_DATA);
 });
 
 it('pulls strings only from the specified namespaces', async () => {
+  const namespaceFolder = 'food';
   const out = await run([
     'pull',
     '--api-key',
     PROJECT_PAK_3,
     TMP_FOLDER,
     '--namespace',
-    'food',
+    namespaceFolder,
   ]);
 
   expect(out.code).toBe(0);
-  await expect(TMP_FOLDER).toMatchContentsOf(PROJECT_1_DATA);
+  await expect(TMP_FOLDER).toMatchContentsOf(PROJECT_3_DATA_ONLY_FOOD);
 });
 
 it('does not overwrite existing folder', async () => {
