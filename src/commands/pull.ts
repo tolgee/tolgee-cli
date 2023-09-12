@@ -13,6 +13,7 @@ type PullOptions = BaseOptions & {
   states?: Array<'UNTRANSLATED' | 'TRANSLATED' | 'REVIEWED'>;
   delimiter?: string;
   overwrite?: boolean;
+  namespace?: string[];
 };
 
 async function fetchZipBlob(opts: PullOptions): Promise<Blob> {
@@ -46,7 +47,6 @@ export default new Command()
     '<path>',
     'Destination path where translation files will be stored in'
   )
-
   .addOption(
     new Option('-f, --format <format>', 'Format of the exported files')
       .choices(['JSON', 'XLIFF'])
@@ -75,9 +75,9 @@ export default new Command()
   )
   .addOption(
     new Option(
-      '-n, --namespace <namespace...>',
-      'Namespace, pull keys from specified namespaces. Defaults all namespaces'
-    ).argParser((v, a: string[]) => [v, ...(a || [])])
+      '-n, --namespaces <namespaces...>',
+      'List of namespaces to pull. Defaults to all namespaces'
+    )
   )
   .option(
     '-o, --overwrite',
