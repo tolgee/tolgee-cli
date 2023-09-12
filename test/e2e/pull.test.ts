@@ -39,7 +39,7 @@ it('pulls strings only from the specified namespaces', async () => {
     '--api-key',
     PROJECT_PAK_3,
     TMP_FOLDER,
-    '--namespace',
+    '--namespaces',
     namespaceFolder,
   ]);
 

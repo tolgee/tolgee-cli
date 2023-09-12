@@ -13,7 +13,7 @@ type PullOptions = BaseOptions & {
   states?: Array<'UNTRANSLATED' | 'TRANSLATED' | 'REVIEWED'>;
   delimiter?: string;
   overwrite?: boolean;
-  namespace?: string[];
+  namespaces?: string[];
 };
 
 async function fetchZipBlob(opts: PullOptions): Promise<Blob> {
@@ -22,7 +22,7 @@ async function fetchZipBlob(opts: PullOptions): Promise<Blob> {
     languages: opts.languages,
     filterState: opts.states,
     structureDelimiter: opts.delimiter,
-    filterNamespace: opts.namespace,
+    filterNamespace: opts.namespaces,
   });
 }
 
