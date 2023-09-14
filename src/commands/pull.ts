@@ -5,7 +5,8 @@ import { Command, Option } from 'commander';
 
 import { unzipBuffer } from '../utils/zip.js';
 import { overwriteDir } from '../utils/overwriteDir.js';
-import { loading, success } from '../utils/logger.js';
+import { error, loading, success } from '../utils/logger.js';
+import { HttpError } from '../client/errors.js';
 
 type PullOptions = BaseOptions & {
   format: 'JSON' | 'XLIFF';
@@ -30,14 +31,21 @@ async function pullHandler(this: Command, path: string) {
   const opts: PullOptions = this.optsWithGlobals();
 
   await overwriteDir(path, opts.overwrite);
-
-  const zipBlob = await loading(
-    'Fetching strings from Tolgee...',
-    fetchZipBlob(opts)
-  );
-
-  await loading('Extracting strings...', unzipBuffer(zipBlob, path));
-  success('Done!');
+  try {
+    const zipBlob = await loading(
+      'Fetching strings from Tolgee...',
+      fetchZipBlob(opts)
+    );
+    await loading('Extracting strings...', unzipBuffer(zipBlob, path));
+    success('Done!');
+  } catch (e) {
+    if (e instanceof HttpError && e.response.status === 400) {
+      const res = await e.response.text();
+      error(res);
+      return;
+    }
+    throw e;
+  }
 }
 
 export default new Command()
