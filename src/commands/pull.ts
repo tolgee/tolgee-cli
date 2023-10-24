@@ -5,7 +5,8 @@ import { Command, Option } from 'commander';
 
 import { unzipBuffer } from '../utils/zip.js';
 import { overwriteDir } from '../utils/overwriteDir.js';
-import { loading, success } from '../utils/logger.js';
+import { error, loading, success } from '../utils/logger.js';
+import { HttpError } from '../client/errors.js';
 
 type PullOptions = BaseOptions & {
   format: 'JSON' | 'XLIFF';
@@ -13,6 +14,7 @@ type PullOptions = BaseOptions & {
   states?: Array<'UNTRANSLATED' | 'TRANSLATED' | 'REVIEWED'>;
   delimiter?: string;
   overwrite?: boolean;
+  namespaces?: string[];
 };
 
 async function fetchZipBlob(opts: PullOptions): Promise<Blob> {
@@ -21,6 +23,7 @@ async function fetchZipBlob(opts: PullOptions): Promise<Blob> {
     languages: opts.languages,
     filterState: opts.states,
     structureDelimiter: opts.delimiter,
+    filterNamespace: opts.namespaces,
   });
 }
 
@@ -28,14 +31,23 @@ async function pullHandler(this: Command, path: string) {
   const opts: PullOptions = this.optsWithGlobals();
 
   await overwriteDir(path, opts.overwrite);
-
-  const zipBlob = await loading(
-    'Fetching strings from Tolgee...',
-    fetchZipBlob(opts)
-  );
-
-  await loading('Extracting strings...', unzipBuffer(zipBlob, path));
-  success('Done!');
+  try {
+    const zipBlob = await loading(
+      'Fetching strings from Tolgee...',
+      fetchZipBlob(opts)
+    );
+    await loading('Extracting strings...', unzipBuffer(zipBlob, path));
+    success('Done!');
+  } catch (e) {
+    if (e instanceof HttpError && e.response.status === 400) {
+      const res: any = await e.response.json();
+      error(
+        `Please check if your parameters, including namespaces, are configured correctly. Tolgee responded with: ${res.code}`
+      );
+      return;
+    }
+    throw e;
+  }
 }
 
 export default new Command()
@@ -70,6 +82,12 @@ export default new Command()
     )
       .default('.')
       .argParser((v) => v || '')
+  )
+  .addOption(
+    new Option(
+      '-n, --namespaces <namespaces...>',
+      'List of namespaces to pull. Defaults to all namespaces'
+    )
   )
   .option(
     '-o, --overwrite',
