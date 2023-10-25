@@ -76,7 +76,7 @@ function parseConfig(rc: any): TolgeeConfig {
       throw new Error('Invalid config: delimiter is not a string');
     }
 
-    cfg.delimiter = rc.delimiter || void 0;
+    cfg.delimiter = rc.delimiter || '';
   }
 
   return cfg;
