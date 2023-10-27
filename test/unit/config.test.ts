@@ -171,7 +171,7 @@ describe('.tolgeerc', () => {
     expect(cfg).toEqual({
       apiUrl: new URL('https://app.tolgee.io'),
       projectId: 1337,
-      sdk: 'react',
+      delimiter: '',
     });
   });
 

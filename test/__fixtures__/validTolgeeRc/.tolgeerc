@@ -1,5 +1,5 @@
 {
   "apiUrl": "https://app.tolgee.io",
   "projectId": 1337,
-  "sdk": "react"
+  "delimiter": null
 }
