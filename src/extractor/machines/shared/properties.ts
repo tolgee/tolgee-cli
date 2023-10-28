@@ -3,6 +3,7 @@ import { createMachine, send, assign } from 'xstate';
 type PropertiesContext = {
   property: string | null;
   depth: number;
+  jsxDepth: number;
   static: boolean;
   nextDynamic: boolean;
 
@@ -20,6 +21,7 @@ export default createMachine<PropertiesContext>(
     context: {
       property: null,
       depth: 0,
+      jsxDepth: 0,
       static: false,
       nextDynamic: false,
 
@@ -302,10 +304,20 @@ export default createMachine<PropertiesContext>(
           cond: 'isCloseCurly',
         },
       ],
-      'punctuation.definition.tag.end.tsx': {
-        target: 'end',
-        actions: 'markPropertyAsDynamic',
+      'punctuation.definition.tag.begin.tsx': {
+        actions: 'incrementJsxDepth',
+        cond: (_ctx, evt) => evt.token === '<',
       },
+      'punctuation.definition.tag.end.tsx': [
+        {
+          target: 'end',
+          actions: 'markPropertyAsDynamic',
+          cond: (ctx) => ctx.jsxDepth === 0,
+        },
+        {
+          actions: 'decrementJsxDepth',
+        },
+      ],
       'punctuation.definition.tag.end.svelte': {
         target: 'end',
         actions: 'markPropertyAsDynamic',
@@ -395,6 +407,13 @@ export default createMachine<PropertiesContext>(
       }),
       decrementDepth: assign({
         depth: (ctx, _evt) => ctx.depth - 1,
+      }),
+
+      incrementJsxDepth: assign({
+        jsxDepth: (ctx, _evt) => ctx.jsxDepth + 2,
+      }),
+      decrementJsxDepth: assign({
+        jsxDepth: (ctx, _evt) => ctx.jsxDepth - 1,
       }),
 
       markAsStatic: assign({

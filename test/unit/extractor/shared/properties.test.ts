@@ -268,6 +268,7 @@ describe('JSX', () => {
         'const a = { key: "key1", test: 22 }',
         FILE_NAME
       );
+
       for (const token of tokens) {
         if (!machine.getSnapshot().done) {
           machine.send(token);
@@ -283,7 +284,9 @@ describe('JSX', () => {
 
     it('extracts simple JSX props', async () => {
       const tokens = await tokenizer('<T keyName="key1"/>', FILE_NAME);
-      for (const token of tokens) {
+
+      const valuableTokens = tokens.slice(2);
+      for (const token of valuableTokens) {
         if (!machine.getSnapshot().done) {
           machine.send(token);
         }
@@ -298,7 +301,9 @@ describe('JSX', () => {
 
     it('extracts JSX props written as dynamic', async () => {
       const tokens = await tokenizer('<T keyName={"key1"}/>', FILE_NAME);
-      for (const token of tokens) {
+
+      const valuableTokens = tokens.slice(2);
+      for (const token of valuableTokens) {
         if (!machine.getSnapshot().done) {
           machine.send(token);
         }
@@ -317,7 +322,8 @@ describe('JSX', () => {
         FILE_NAME
       );
 
-      for (const token of tokens) {
+      const valuableTokens = tokens.slice(2);
+      for (const token of valuableTokens) {
         if (!machine.getSnapshot().done) {
           machine.send(token);
         }
@@ -332,7 +338,9 @@ describe('JSX', () => {
 
     it('reaches completion if there are no properties', async () => {
       const tokens = await tokenizer('<T></T>', FILE_NAME);
-      for (const token of tokens) {
+
+      const valuableTokens = tokens.slice(2);
+      for (const token of valuableTokens) {
         if (!machine.getSnapshot().done) {
           machine.send(token);
         }
@@ -344,7 +352,9 @@ describe('JSX', () => {
 
     it('reaches completion if there are no props (shorthand)', async () => {
       const tokens = await tokenizer('<T/>', FILE_NAME);
-      for (const token of tokens) {
+
+      const valuableTokens = tokens.slice(2);
+      for (const token of valuableTokens) {
         if (!machine.getSnapshot().done) {
           machine.send(token);
         }
@@ -354,13 +364,35 @@ describe('JSX', () => {
       expect(snapshot.done).toBe(true);
     });
 
+    it('extracts all the properties when encountering embedded JSX', async () => {
+      const tokens = await tokenizer(
+        '<T keyName="owo" props={{ b: <b>{b}</b> }} ns="uwu" />',
+        'App.jsx'
+      );
+
+      const valuableTokens = tokens.slice(2);
+      for (const token of valuableTokens) {
+        if (!machine.getSnapshot().done) {
+          machine.send(token);
+        }
+      }
+
+      const snapshot = machine.getSnapshot();
+      expect(snapshot.done).toBe(true);
+      expect(snapshot.context.keyName).toBe('owo');
+      expect(snapshot.context.defaultValue).toBeNull();
+      expect(snapshot.context.namespace).toBe('uwu');
+    });
+
     describe('dynamic data', () => {
       it('marks templates with ${} chunks as dynamic', async () => {
         const tokens = await tokenizer(
           '<T keyName={`dynamic-${i}`}/>',
           FILE_NAME
         );
-        for (const token of tokens) {
+
+        const valuableTokens = tokens.slice(2);
+        for (const token of valuableTokens) {
           if (!machine.getSnapshot().done) {
             machine.send(token);
           }
@@ -378,7 +410,9 @@ describe('JSX', () => {
           '<T ns="heh" keyName={"dynamic-" + i}/>',
           FILE_NAME
         );
-        for (const token of tokens) {
+
+        const valuableTokens = tokens.slice(2);
+        for (const token of valuableTokens) {
           if (!machine.getSnapshot().done) {
             machine.send(token);
           }
@@ -393,7 +427,9 @@ describe('JSX', () => {
 
       it('marks plain variables as dynamic', async () => {
         const tokens = await tokenizer('<T keyName={key}/>', FILE_NAME);
-        for (const token of tokens) {
+
+        const valuableTokens = tokens.slice(2);
+        for (const token of valuableTokens) {
           if (!machine.getSnapshot().done) {
             machine.send(token);
           }
@@ -411,7 +447,9 @@ describe('JSX', () => {
           '<T keyName someValue={"key1"} ns/>',
           FILE_NAME
         );
-        for (const token of tokens) {
+
+        const valuableTokens = tokens.slice(2);
+        for (const token of valuableTokens) {
           if (!machine.getSnapshot().done) {
             machine.send(token);
           }
@@ -426,7 +464,9 @@ describe('JSX', () => {
 
       it('handles empty strings (ref: #29)', async () => {
         const tokens = await tokenizer('<T keyName ns="" />', FILE_NAME);
-        for (const token of tokens) {
+
+        const valuableTokens = tokens.slice(2);
+        for (const token of valuableTokens) {
           if (!machine.getSnapshot().done) {
             machine.send(token);
           }

@@ -889,6 +889,22 @@ describe.each(['jsx', 'tsx'])('<T> (.%s)', (ext) => {
     expect(extracted.keys).toEqual(expected);
   });
 
+  it('does not get confused by tags interpolation', async () => {
+    const expected = [{ keyName: 'key1', line: 3 }];
+
+    const code = `
+      import '@tolgee/react'
+      <T
+        keyName='key1'
+        params={{ strong: <strong>{something}</strong> }}
+      />
+    `;
+
+    const extracted = await extractKeys(code, FILE_NAME);
+    expect(extracted.warnings).toEqual([]);
+    expect(extracted.keys).toEqual(expected);
+  });
+
   describe('dynamic data', () => {
     it('emits warning on dynamic keys and skips', async () => {
       const expected = [
