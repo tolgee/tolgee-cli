@@ -20,6 +20,8 @@ export default class ExportClient {
       method: 'POST',
       path: `${this.requester.projectUrl}/export`,
       body: { ...req, zip: true },
+      headersTimeout: 300,
+      bodyTimeout: 300,
     });
   }
 
@@ -30,6 +32,8 @@ export default class ExportClient {
       method: 'POST',
       path: `${this.requester.projectUrl}/export`,
       body: { ...req, zip: false },
+      headersTimeout: 300,
+      bodyTimeout: 300,
     });
   }
 }

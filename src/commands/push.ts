@@ -114,7 +114,7 @@ async function applyImport(client: Client) {
   try {
     await loading('Applying changes...', client.import.applyImport());
   } catch (e) {
-    if (e instanceof HttpError && e.response.status === 400) {
+    if (e instanceof HttpError && e.response.statusCode === 400) {
       error(
         "Some of the imported languages weren't recognized. Please create a language with corresponding tag in the Tolgee Platform."
       );

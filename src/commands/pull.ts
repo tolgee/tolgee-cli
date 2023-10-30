@@ -39,8 +39,8 @@ async function pullHandler(this: Command, path: string) {
     await loading('Extracting strings...', unzipBuffer(zipBlob, path));
     success('Done!');
   } catch (e) {
-    if (e instanceof HttpError && e.response.status === 400) {
-      const res: any = await e.response.json();
+    if (e instanceof HttpError && e.response.statusCode === 400) {
+      const res: any = await e.response.body.json();
       error(
         `Please check if your parameters, including namespaces, are configured correctly. Tolgee responded with: ${res.code}`
       );

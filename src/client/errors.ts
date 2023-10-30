@@ -1,40 +1,50 @@
-import type { Request, Response } from 'undici';
+import type { RequestData } from './internal/requester.js';
+import type { Dispatcher } from 'undici';
+import { STATUS_CODES } from 'http';
 
 export class HttpError extends Error {
   constructor(
-    public request: Request,
-    public response: Response,
+    public request: RequestData,
+    public response: Dispatcher.ResponseData,
     options?: ErrorOptions
   ) {
-    super(response.statusText, options);
+    super(
+      `HTTP Error ${response.statusCode} ${STATUS_CODES[response.statusCode]}`,
+      options
+    );
   }
 
   getErrorText() {
     // Unauthorized
-    if (this.response.status === 400) {
+    if (this.response.statusCode === 400) {
       return 'Invalid request data.';
     }
 
     // Unauthorized
-    if (this.response.status === 401) {
+    if (this.response.statusCode === 401) {
       return 'Missing or invalid authentication token.';
     }
 
     // Forbidden
-    if (this.response.status === 403) {
+    if (this.response.statusCode === 403) {
       return 'You are not allowed to perform this operation.';
     }
 
+    // Rate limited
+    if (this.response.statusCode === 429) {
+      return "You've been rate limited. Please try again later.";
+    }
+
     // Service Unavailable
-    if (this.response.status === 503) {
+    if (this.response.statusCode === 503) {
       return 'API is temporarily unavailable. Please try again later.';
     }
 
     // Server error
-    if (this.response.status >= 500) {
-      return `API reported a server error (${this.response.status}). Please try again later.`;
+    if (this.response.statusCode >= 500) {
+      return `API reported a server error (${this.response.statusCode}). Please try again later.`;
     }
 
-    return `Unknown error (HTTP ${this.response.status})`;
+    return `Unknown error (HTTP ${this.response.statusCode})`;
   }
 }

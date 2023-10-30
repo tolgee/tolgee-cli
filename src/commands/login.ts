@@ -21,7 +21,7 @@ async function loginHandler(this: Command, key: string) {
   try {
     keyInfo = await RestClient.getApiKeyInformation(opts.apiUrl, key);
   } catch (e) {
-    if (e instanceof HttpError && e.response.status === 401) {
+    if (e instanceof HttpError && e.response.statusCode === 401) {
       error("Couldn't log in: the API key you provided is invalid.");
       process.exit(1);
     }
