@@ -55,8 +55,6 @@ export default class ImportClient {
       method: 'PUT',
       path: `${this.requester.projectUrl}/import/apply`,
       query: { forceMode: req?.forceMode },
-      headersTimeout: 300,
-      bodyTimeout: 300,
     });
   }
 
