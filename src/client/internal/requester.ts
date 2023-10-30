@@ -1,8 +1,9 @@
-import { Request, Response } from 'undici';
+import type { Dispatcher } from 'undici';
 import type { Blob } from 'buffer';
 import type { components } from './schema.generated.js';
 
-import { fetch } from 'undici';
+import { STATUS_CODES } from 'http';
+import { request } from 'undici';
 import FormData from 'form-data';
 
 import { HttpError } from '../errors.js';
@@ -23,6 +24,8 @@ export type RequestData = {
   body?: any;
   query?: Record<string, Primitive | Primitive[] | undefined>;
   headers?: Record<string, string>;
+  headersTimeout?: number;
+  bodyTimeout?: number;
 };
 
 export type PaginatedView<T> = {
@@ -56,7 +59,7 @@ export default class Requester {
    * @param req Request data
    * @returns The response
    */
-  async request(req: RequestData): Promise<Response> {
+  async request(req: RequestData): Promise<Dispatcher.ResponseData> {
     const url = new URL(req.path, this.params.apiUrl);
 
     if (req.query) {
@@ -95,19 +98,23 @@ export default class Requester {
       }
     }
 
-    const request = new Request(url, {
+    debug(`[HTTP] Requesting: ${req.method} ${url}`);
+
+    const response = await request(url, {
       method: req.method,
       headers: headers,
       body: body,
+      headersTimeout: req.headersTimeout,
+      bodyTimeout: req.bodyTimeout,
     });
 
-    debug(`[HTTP] Requesting: ${request.method} ${request.url}`);
-    const response = await fetch(request);
-
     debug(
-      `[HTTP] ${request.method} ${request.url} -> ${response.status} ${response.statusText}`
+      `[HTTP] ${req.method} ${url} -> ${response.statusCode} ${
+        STATUS_CODES[response.statusCode]
+      }`
     );
-    if (!response.ok) throw new HttpError(request, response);
+
+    if (response.statusCode >= 400) throw new HttpError(req, response);
     return response;
   }
 
@@ -118,7 +125,7 @@ export default class Requester {
    * @returns The response data
    */
   async requestJson<T = unknown>(req: RequestData): Promise<T> {
-    return <Promise<T>>this.request(req).then((r) => r.json());
+    return <Promise<T>>this.request(req).then((r) => r.body.json());
   }
 
   /**
@@ -128,20 +135,14 @@ export default class Requester {
    * @returns The response blob
    */
   async requestBlob(req: RequestData): Promise<Blob> {
-    return this.request(req).then((r) => r.blob());
+    return this.request(req).then((r) => r.body.blob());
   }
 
   /**
-   * Performs an HTTP request to the API and forces the consumption of the body, according to recommendations by Undici
-   *
-   * @see https://github.com/nodejs/undici#garbage-collection
-   * @param req Request data
+   * Performs an HTTP request to the API.
    */
   async requestVoid(req: RequestData): Promise<void> {
-    const res = await this.request(req);
-    if (res.body) {
-      for await (const _chunk of res.body);
-    }
+    await this.request(req);
   }
 
   /**

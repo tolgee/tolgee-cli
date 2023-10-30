@@ -158,11 +158,11 @@ async function loadConfig() {
 
 async function handleHttpError(e: HttpError) {
   error('An error occurred while requesting the API.');
-  error(`${e.request.method} ${e.request.url}`);
+  error(`${e.request.method} ${e.request.path}`);
   error(e.getErrorText());
 
   // Remove token from store if necessary
-  if (e.response.status === 401) {
+  if (e.response.statusCode === 401) {
     const removeFn = program.getOptionValue('_removeApiKeyFromStore');
     if (removeFn) {
       info('Removing the API key from the authentication store.');
@@ -177,7 +177,7 @@ async function handleHttpError(e: HttpError) {
     // catastrophic failure) which means the output is completely unpredictable. While some errors are
     // formatted by the Tolgee server, reality is there's a huge chance the 5xx error hasn't been raised
     // by Tolgee's error handler.
-    const res = await e.response.text();
+    const res = await e.response.body.text();
     debug(`Server response:\n\n---\n${res}\n---`);
   }
 }

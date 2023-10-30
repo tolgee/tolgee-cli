@@ -55,6 +55,8 @@ export default class ImportClient {
       method: 'PUT',
       path: `${this.requester.projectUrl}/import/apply`,
       query: { forceMode: req?.forceMode },
+      headersTimeout: 300,
+      bodyTimeout: 300,
     });
   }
 
@@ -71,7 +73,7 @@ export default class ImportClient {
     try {
       await this.deleteImport();
     } catch (e) {
-      if (e instanceof HttpError && e.response.status === 404) return;
+      if (e instanceof HttpError && e.response.statusCode === 404) return;
       throw e;
     }
   }
