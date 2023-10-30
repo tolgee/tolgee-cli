@@ -104,8 +104,8 @@ export default class Requester {
       method: req.method,
       headers: headers,
       body: body,
-      headersTimeout: req.headersTimeout,
-      bodyTimeout: req.bodyTimeout,
+      headersTimeout: req.headersTimeout ?? 300_000,
+      bodyTimeout: req.bodyTimeout ?? 300_000,
     });
 
     debug(
