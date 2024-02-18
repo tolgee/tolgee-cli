@@ -18,10 +18,10 @@ export async function extractKeysFromFile(file: string, extractor?: string) {
 }
 
 export async function extractKeysOfFiles(
-  filesPattern: string,
+  filesPatterns: string[],
   extractor: string
 ) {
-  const files = await glob(filesPattern, { nodir: true });
+  const files = await glob(filesPatterns, { nodir: true });
   const result: ExtractionResults = new Map();
 
   await Promise.all(
