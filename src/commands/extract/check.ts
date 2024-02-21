@@ -8,14 +8,15 @@ import {
   emitGitHubWarning,
 } from '../../extractor/warnings.js';
 import { loading } from '../../utils/logger.js';
+import { FILE_PATTERNS } from '../../arguments.js';
 
 type ExtractLintOptions = BaseExtractOptions;
 
-async function lintHandler(this: Command, filesPattern: string) {
+async function lintHandler(this: Command, filesPatterns: string[]) {
   const opts: ExtractLintOptions = this.optsWithGlobals();
   const extracted = await loading(
     'Analyzing code...',
-    extractKeysOfFiles(filesPattern, opts.extractor)
+    extractKeysOfFiles(filesPatterns, opts.extractor)
   );
 
   let warningCount = 0;
@@ -59,8 +60,5 @@ export default new Command('check')
   .description(
     'Checks if the keys can be extracted automatically, and reports problems if any'
   )
-  .argument(
-    '<pattern>',
-    'File pattern to include (hint: make sure to escape it in quotes, or your shell might attempt to unroll some tokens like *)'
-  )
+  .addArgument(FILE_PATTERNS)
   .action(lintHandler);

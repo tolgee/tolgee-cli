@@ -5,14 +5,15 @@ import { Command } from 'commander';
 import { extractKeysOfFiles } from '../../extractor/runner.js';
 import { WarningMessages } from '../../extractor/warnings.js';
 import { loading } from '../../utils/logger.js';
+import { FILE_PATTERNS } from '../../arguments.js';
 
 type ExtractPrintOptions = BaseExtractOptions;
 
-async function printHandler(this: Command, filesPattern: string) {
+async function printHandler(this: Command, filesPatterns: string[]) {
   const opts: ExtractPrintOptions = this.optsWithGlobals();
   const extracted = await loading(
     'Analyzing code...',
-    extractKeysOfFiles(filesPattern, opts.extractor)
+    extractKeysOfFiles(filesPatterns, opts.extractor)
   );
 
   let warningCount = 0;
@@ -67,8 +68,5 @@ async function printHandler(this: Command, filesPattern: string) {
 
 export default new Command('print')
   .description('Prints extracted data to the console')
-  .argument(
-    '<pattern>',
-    'File glob pattern to include (hint: make sure to escape it in quotes, or your shell might attempt to unroll some tokens like *)'
-  )
+  .addArgument(FILE_PATTERNS)
   .action(printHandler);

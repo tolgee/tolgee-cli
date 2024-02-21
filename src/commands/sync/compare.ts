@@ -10,17 +10,18 @@ import {
 import { dumpWarnings } from '../../extractor/warnings.js';
 import { EXTRACTOR } from '../../options.js';
 import { loading } from '../../utils/logger.js';
+import { FILE_PATTERNS } from '../../arguments.js';
 
 type Options = BaseOptions & {
   extractor: string;
 };
 
-async function compareHandler(this: Command, pattern: string) {
+async function compareHandler(this: Command, filesPatterns: string[]) {
   const opts: Options = this.optsWithGlobals();
 
   const rawKeys = await loading(
     'Analyzing code...',
-    extractKeysOfFiles(pattern, opts.extractor)
+    extractKeysOfFiles(filesPatterns, opts.extractor)
   );
   dumpWarnings(rawKeys);
 
@@ -68,9 +69,6 @@ export default new Command()
   .description(
     'Compares the keys in your code project and in the Tolgee project.'
   )
-  .argument(
-    '<pattern>',
-    'File pattern to include (hint: make sure to escape it in quotes, or your shell might attempt to unroll some tokens like *)'
-  )
+  .addArgument(FILE_PATTERNS)
   .addOption(EXTRACTOR)
   .action(compareHandler);

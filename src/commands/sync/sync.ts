@@ -16,6 +16,7 @@ import { askBoolean } from '../../utils/ask.js';
 import { loading, error } from '../../utils/logger.js';
 
 import { EXTRACTOR } from '../../options.js';
+import { FILE_PATTERNS } from '../../arguments.js';
 
 type Options = BaseOptions & {
   extractor: string;
@@ -59,12 +60,12 @@ async function askForConfirmation(
   }
 }
 
-async function syncHandler(this: Command, pattern: string) {
+async function syncHandler(this: Command, filesPatterns: string[]) {
   const opts: Options = this.optsWithGlobals();
 
   const rawKeys = await loading(
     'Analyzing code...',
-    extractKeysOfFiles(pattern, opts.extractor)
+    extractKeysOfFiles(filesPatterns, opts.extractor)
   );
   const warnCount = dumpWarnings(rawKeys);
   if (!opts.continueOnWarning && warnCount) {
@@ -174,10 +175,7 @@ export default new Command()
   .description(
     'Synchronizes the keys in your code project and in the Tolgee project, by creating missing keys and optionally deleting unused ones. For a dry-run, use `tolgee compare`.'
   )
-  .argument(
-    '<pattern>',
-    'File pattern to include (hint: make sure to escape it in quotes, or your shell might attempt to unroll some tokens like *)'
-  )
+  .addArgument(FILE_PATTERNS)
   .addOption(EXTRACTOR)
   .option(
     '-B, --backup <path>',
