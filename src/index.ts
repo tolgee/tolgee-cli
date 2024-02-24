@@ -16,7 +16,15 @@ import {
   error,
 } from './utils/logger.js';
 
-import { API_KEY_OPT, API_URL_OPT, PROJECT_ID_OPT } from './options.js';
+import {
+  API_KEY_OPT,
+  API_URL_OPT,
+  BaseOptions,
+  ENV_OPT,
+  PROJECT_ID_OPT,
+  parseProjectId,
+  parseUrlArgument,
+} from './options.js';
 import {
   API_KEY_PAK_PREFIX,
   API_KEY_PAT_PREFIX,
@@ -29,8 +37,9 @@ import PullCommand from './commands/pull.js';
 import ExtractCommand from './commands/extract.js';
 import CompareCommand from './commands/sync/compare.js';
 import SyncCommand from './commands/sync/sync.js';
-
-const NO_KEY_COMMANDS = ['login', 'logout', 'extract'];
+import path from 'path';
+import fs from 'fs';
+import dotenv from 'dotenv';
 
 ansi.enabled = process.stdout.isTTY;
 
@@ -107,6 +116,8 @@ function validateOptions(cmd: Command) {
 }
 
 async function preHandler(prog: Command, cmd: Command) {
+  const NO_KEY_COMMANDS = ['login', 'logout', 'extract'];
+
   if (!NO_KEY_COMMANDS.includes(topLevelName(cmd))) {
     await loadApiKey(cmd);
     loadProjectId(cmd);
@@ -126,14 +137,42 @@ async function preHandler(prog: Command, cmd: Command) {
   setDebug(prog.opts().verbose);
 }
 
+function loadEnvironmentalVariables(program: Command) {
+  const options: BaseOptions = program.optsWithGlobals();
+  const envFilePath = path.resolve(process.cwd(), options.env);
+
+  if (fs.existsSync(envFilePath)) {
+    dotenv.config({ path: envFilePath });
+
+    if (process.env.TOLGEE_API_KEY) {
+      program.setOptionValue('apiKey', process.env.TOLGEE_API_KEY);
+    }
+    if (process.env.TOLGEE_API_URL) {
+      program.setOptionValue(
+        'apiUrl',
+        parseUrlArgument(process.env.TOLGEE_API_URL)
+      );
+    }
+    if (process.env.TOLGEE_PROJECT_ID) {
+      program.setOptionValue(
+        'projectId',
+        parseProjectId(process.env.TOLGEE_PROJECT_ID)
+      );
+    }
+  }
+}
+
 const program = new Command('tolgee')
   .version(VERSION)
   .configureOutput({ writeErr: error })
   .description('Command Line Interface to interact with the Tolgee Platform')
   .option('-v, --verbose', 'Enable verbose logging.')
+  .hook('preAction', loadEnvironmentalVariables)
+  .hook('preAction', loadConfig)
   .hook('preAction', preHandler);
 
 // Global options
+program.addOption(ENV_OPT);
 program.addOption(API_URL_OPT);
 program.addOption(API_KEY_OPT);
 program.addOption(PROJECT_ID_OPT);
@@ -147,7 +186,7 @@ program.addCommand(ExtractCommand);
 program.addCommand(CompareCommand);
 program.addCommand(SyncCommand);
 
-async function loadConfig() {
+async function loadConfig(program: Command) {
   const tgConfig = await loadTolgeeRc();
   if (tgConfig) {
     for (const [key, value] of Object.entries(tgConfig)) {
@@ -184,7 +223,6 @@ async function handleHttpError(e: HttpError) {
 
 async function run() {
   try {
-    await loadConfig();
     await program.parseAsync();
   } catch (e: any) {
     if (e instanceof HttpError) {
