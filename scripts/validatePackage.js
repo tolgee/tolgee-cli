@@ -37,7 +37,8 @@ execOrError('npm run build');
 // Create a tarball, and move it to a known path (drop the version from the pkg name)
 console.log('PREP: packaging');
 execOrError(`npm pack --pack-destination ${JSON.stringify(WORK_DIRECTORY)}`);
-execOrError('mv *.tgz tolgee-cli.tgz', { cwd: WORK_DIRECTORY });
+const moveCommand = process.platform === 'win32' ? 'move' : 'mv';
+execOrError(`${moveCommand} *.tgz tolgee-cli.tgz`, { cwd: WORK_DIRECTORY });
 
 // Create a test npm project and install CLI from tarball
 console.log('PREP: preparing test package');

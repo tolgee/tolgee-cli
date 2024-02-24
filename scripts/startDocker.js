@@ -3,9 +3,18 @@
 // ---
 
 import { fileURLToPath } from 'url';
-import { spawn } from 'child_process';
+import { spawn, execSync } from 'child_process';
 
-console.log('Starting Tolgee test container...');
+try {
+  execSync('docker info', { stdio: 'ignore' });
+} catch {
+  console.error(
+    "This script uses docker, and it isn't running - please start docker and try again!"
+  );
+  process.exit(1);
+}
+
+console.log('Starting Tolgee test container. This might take a while...');
 
 let stderr = '';
 
