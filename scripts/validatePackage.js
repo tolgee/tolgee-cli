@@ -2,13 +2,17 @@ import { tmpdir } from 'os';
 import { join } from 'path';
 import { rmSync } from 'fs';
 import { mkdir, writeFile, rm } from 'fs/promises';
+import { readFileSync } from 'fs';
 import { randomUUID } from 'crypto';
 import { execSync } from 'child_process';
 import { ok } from 'assert';
 
+const PACKAGE_JSON_PATH = new URL('../package.json', import.meta.url);
+const PACKAGE_JSON = readFileSync(PACKAGE_JSON_PATH, 'utf8');
+const VERSION = JSON.parse(PACKAGE_JSON).version;
 const WORK_DIRECTORY = join(tmpdir(), randomUUID());
 const PACKAGE_DEST = join(WORK_DIRECTORY, 'package');
-const TARBALL_DEST = join(WORK_DIRECTORY, 'tolgee-cli.tgz');
+const TARBALL_DEST = join(WORK_DIRECTORY, `tolgee-cli-${VERSION}.tgz`);
 
 function execOrError(cmd, opts) {
   try {
@@ -34,11 +38,9 @@ await mkdir(PACKAGE_DEST, { recursive: true });
 console.log('PREP: building the package');
 execOrError('npm run build');
 
-// Create a tarball, and move it to a known path (drop the version from the pkg name)
+// Create a tarball
 console.log('PREP: packaging');
 execOrError(`npm pack --pack-destination ${JSON.stringify(WORK_DIRECTORY)}`);
-const moveCommand = process.platform === 'win32' ? 'move' : 'mv';
-execOrError(`${moveCommand} *.tgz tolgee-cli.tgz`, { cwd: WORK_DIRECTORY });
 
 // Create a test npm project and install CLI from tarball
 console.log('PREP: preparing test package');
