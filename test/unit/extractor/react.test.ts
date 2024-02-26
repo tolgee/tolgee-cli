@@ -296,6 +296,22 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])('useTranslate (.%s)', (ext) => {
     expect(extracted.keys).toEqual(expected);
   });
 
+  it('extracts from the t call with await signature t(string))', async () => {
+    const expected = [{ keyName: 'key1', line: 5 }];
+
+    const code = `
+      import '@tolgee/react'
+      function Test () {
+        const { t } = await useTranslate()
+        t('key1')
+      }
+    `;
+
+    const extracted = await extractKeys(code, FILE_NAME);
+    expect(extracted.warnings).toEqual([]);
+    expect(extracted.keys).toEqual(expected);
+  });
+
   it('extracts from the t call with signature t(string, string)', async () => {
     const expected = [
       { keyName: 'key1', defaultValue: 'default value', line: 5 },
@@ -390,6 +406,22 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])('useTranslate (.%s)', (ext) => {
       import '@tolgee/react'
       function Test () {
         const { t } = useTranslate('namespace')
+        t('key1')
+      }
+    `;
+
+    const extracted = await extractKeys(code, FILE_NAME);
+    expect(extracted.warnings).toEqual([]);
+    expect(extracted.keys).toEqual(expected);
+  });
+
+  it('keeps track of the namespace specified in useTranslate with await', async () => {
+    const expected = [{ keyName: 'key1', namespace: 'namespace', line: 5 }];
+
+    const code = `
+      import '@tolgee/react'
+      function Test () {
+        const { t } = await useTranslate('namespace')
         t('key1')
       }
     `;
