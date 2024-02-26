@@ -6,6 +6,9 @@ import { join } from 'path';
 import { rm, readFile } from 'fs/promises';
 import { saveApiKey, getApiKey } from '../../src/config/credentials.js';
 import loadTolgeeRc from '../../src/config/tolgeerc.js';
+import { loadConfig, loadEnvironmentalVariables } from '../../src/program.js';
+import { Command } from 'commander';
+import { API_URL_OPT, ENV_OPT } from '../../src/options.js';
 
 const FIXTURES_PATH = new URL('../__fixtures__/', import.meta.url);
 const AUTH_FILE = join(tmpdir(), 'authentication.json');
@@ -72,7 +75,7 @@ describe('credentials', () => {
       expect(saved).toContain(PAT_1.key);
     });
 
-    it('stores can store different tokens for different instances', async () => {
+    it('can store different tokens for different instances', async () => {
       await saveApiKey(TG_1, PAT_1);
       await saveApiKey(TG_2, PAT_2);
       const saved1 = await readFile(AUTH_FILE, 'utf8');
@@ -198,5 +201,66 @@ describe('.tolgeerc', () => {
     );
     cwd.mockReturnValue(testWd);
     return expect(loadTolgeeRc()).rejects.toThrow('sdk');
+  });
+});
+
+describe('dotenv files', () => {
+  const ORIGINAL_ENV = process.env;
+  let cwd: jest.SpiedFunction<typeof process.cwd>;
+  let program: Command;
+
+  beforeEach(() => {
+    process.env = { ...ORIGINAL_ENV };
+    cwd = jest.spyOn(process, 'cwd');
+    program = new Command('test')
+      .addOption(ENV_OPT)
+      .addOption(API_URL_OPT)
+      .hook('preAction', loadEnvironmentalVariables)
+      .hook('preAction', loadConfig)
+      .addCommand(new Command('test').action(() => {}));
+  });
+
+  afterAll(() => {
+    process.env = ORIGINAL_ENV;
+  });
+
+  it('loads env variables from the `.env` file by default', async () => {
+    const testWd = fileURLToPath(new URL('./dotenvFiles', FIXTURES_PATH));
+    cwd.mockReturnValue(testWd);
+
+    await program.parseAsync(['test'], { from: 'user' });
+    const options = program.optsWithGlobals();
+
+    expect(options.env).toEqual('.env');
+    expect(options.apiKey).toEqual('test');
+    expect(options.apiUrl.toString()).toEqual('https://test.tolgee.io/');
+    expect(options.projectId).toEqual(99);
+  });
+
+  it('can load env variables from custom dotenv file', async () => {
+    const testWd = fileURLToPath(new URL('./dotenvFiles', FIXTURES_PATH));
+    cwd.mockReturnValue(testWd);
+
+    await program.parseAsync(['test', '--env', '.env.test'], { from: 'user' });
+    const options = program.optsWithGlobals();
+
+    expect(options.env).toEqual('.env.test');
+    expect(options.apiKey).toEqual('test2');
+    expect(options.apiUrl.toString()).toEqual('https://test2.tolgee.io/');
+    expect(options.projectId).toEqual(992);
+  });
+
+  it('prioritizes configuration from the `.tolgeerc` over env variables', async () => {
+    const testWd = fileURLToPath(
+      new URL('./dotenvFileWithTolgeerc', FIXTURES_PATH)
+    );
+    cwd.mockReturnValue(testWd);
+
+    await program.parseAsync(['test'], { from: 'user' });
+    const options = program.optsWithGlobals();
+
+    expect(options.apiKey).toEqual('test');
+    expect(options.apiUrl.toString()).toEqual('https://app.tolgee.io/');
+    expect(options.projectId).toEqual(1337);
   });
 });
