@@ -11,7 +11,7 @@
     "tolgee": "./dist/index.js"
   },
   "scripts": {
-    "build": "rimraf dist dist-types && tsc && cp dist-types/extractor/index.d.ts extractor.d.ts",
+    "build": "rimraf dist dist-types && tsc && node scripts/copyExtractorTypes.mjs",
     "test": "npm run test:unit && npm run test:e2e && npm run test:package",
     "test:unit": "cross-env NODE_OPTIONS=\"--experimental-vm-modules\" jest -c jest.unit.config.ts",
     "pretest:e2e": "npm run build && npm run tolgee:start",
