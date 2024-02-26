@@ -132,17 +132,21 @@ export function loadEnvironmentalVariables(program: Command) {
   if (fs.existsSync(envFilePath)) {
     dotenv.config({ path: envFilePath });
 
+    /** Sets the option value if it was not specified by the user. */
+    const setOptionValue = (key: string, value: unknown) => {
+      if (program.getOptionValueSourceWithGlobals(key) !== 'cli') {
+        program.setOptionValue(key, value);
+      }
+    };
+
     if (process.env.TOLGEE_API_KEY) {
-      program.setOptionValue('apiKey', process.env.TOLGEE_API_KEY);
+      setOptionValue('apiKey', process.env.TOLGEE_API_KEY);
     }
     if (process.env.TOLGEE_API_URL) {
-      program.setOptionValue(
-        'apiUrl',
-        parseUrlArgument(process.env.TOLGEE_API_URL)
-      );
+      setOptionValue('apiUrl', parseUrlArgument(process.env.TOLGEE_API_URL));
     }
     if (process.env.TOLGEE_PROJECT_ID) {
-      program.setOptionValue(
+      setOptionValue(
         'projectId',
         parseProjectId(process.env.TOLGEE_PROJECT_ID)
       );
@@ -182,7 +186,9 @@ export async function loadConfig(program: Command) {
   const tgConfig = await loadTolgeeRc();
   if (tgConfig) {
     for (const [key, value] of Object.entries(tgConfig)) {
-      program.setOptionValue(key, value);
+      if (program.getOptionValueSourceWithGlobals(key) !== 'cli') {
+        program.setOptionValue(key, value);
+      }
     }
   }
 }

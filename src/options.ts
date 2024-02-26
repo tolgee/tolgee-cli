@@ -2,7 +2,11 @@ import type Client from './client/index.js';
 import { existsSync } from 'fs';
 import { resolve } from 'path';
 import { Option, InvalidArgumentError } from 'commander';
-import { DEFAULT_API_URL } from './constants.js';
+import {
+  DEFAULT_API_URL,
+  DEFAULT_ENV_FILE,
+  DEFAULT_PROJECT_ID,
+} from './constants.js';
 
 export function parseProjectId(v: string) {
   const val = Number(v);
@@ -47,7 +51,7 @@ export const PROJECT_ID_OPT = new Option(
   'Project ID. Only required when using a Personal Access Token.'
 )
   .env('TOLGEE_PROJECT_ID')
-  .default(-1)
+  .default(DEFAULT_PROJECT_ID)
   .argParser(parseProjectId);
 
 export const API_URL_OPT = new Option(
@@ -61,7 +65,7 @@ export const API_URL_OPT = new Option(
 export const ENV_OPT = new Option(
   '--env <filename>',
   `Environment file to load variable from.`
-).default('.env');
+).default(DEFAULT_ENV_FILE);
 
 export const EXTRACTOR = new Option(
   '-e, --extractor <extractor>',

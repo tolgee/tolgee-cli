@@ -212,6 +212,7 @@ describe('dotenv files', () => {
   beforeEach(() => {
     process.env = { ...ORIGINAL_ENV };
     cwd = jest.spyOn(process, 'cwd');
+
     program = new Command('test')
       .addOption(ENV_OPT)
       .addOption(API_URL_OPT)
@@ -261,6 +262,23 @@ describe('dotenv files', () => {
 
     expect(options.apiKey).toEqual('test');
     expect(options.apiUrl.toString()).toEqual('https://app.tolgee.io/');
+    expect(options.projectId).toEqual(1337);
+  });
+
+  it('prioritizes user-defined options over env variables', async () => {
+    const testWd = fileURLToPath(
+      new URL('./dotenvFileWithTolgeerc', FIXTURES_PATH)
+    );
+    cwd.mockReturnValue(testWd);
+
+    await program.parseAsync(
+      ['test', '--api-url', 'https://from-user.tolgee.io/'],
+      { from: 'user' }
+    );
+    const options = program.optsWithGlobals();
+
+    expect(options.apiKey).toEqual('test');
+    expect(options.apiUrl.toString()).toEqual('https://from-user.tolgee.io/');
     expect(options.projectId).toEqual(1337);
   });
 });
