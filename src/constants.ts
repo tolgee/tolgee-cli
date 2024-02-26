@@ -10,6 +10,8 @@ export const VERSION = JSON.parse(pkg).version;
 export const USER_AGENT = `Tolgee-CLI/${VERSION} (+https://github.com/tolgee/tolgee-cli)`;
 
 export const DEFAULT_API_URL = new URL('https://app.tolgee.io');
+export const DEFAULT_PROJECT_ID = -1;
+export const DEFAULT_ENV_FILE = '.env';
 
 export const API_KEY_PAT_PREFIX = 'tgpat_';
 export const API_KEY_PAK_PREFIX = 'tgpak_';
