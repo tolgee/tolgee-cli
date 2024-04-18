@@ -169,7 +169,7 @@ describe('.tolgeerc', () => {
 
     const cfg = await loadTolgeeRc();
     expect(cfg).toEqual({
-      apiUrl: new URL('https://app.tolgee.io'),
+      apiUrl: 'https://app.tolgee.io',
       projectId: 1337,
       delimiter: '',
     });

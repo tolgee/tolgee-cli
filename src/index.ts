@@ -16,7 +16,12 @@ import {
   error,
 } from './utils/logger.js';
 
-import { API_KEY_OPT, API_URL_OPT, PROJECT_ID_OPT } from './options.js';
+import {
+  API_KEY_OPT,
+  API_URL_OPT,
+  CONFIG_OPT,
+  PROJECT_ID_OPT,
+} from './options.js';
 import {
   API_KEY_PAK_PREFIX,
   API_KEY_PAT_PREFIX,
@@ -29,6 +34,7 @@ import PullCommand from './commands/pull.js';
 import ExtractCommand from './commands/extract.js';
 import CompareCommand from './commands/sync/compare.js';
 import SyncCommand from './commands/sync/sync.js';
+import { getSingleOption } from './utils/getSingleOption.js';
 
 const NO_KEY_COMMANDS = ['login', 'logout', 'extract'];
 
@@ -133,7 +139,11 @@ const program = new Command('tolgee')
   .option('-v, --verbose', 'Enable verbose logging.')
   .hook('preAction', preHandler);
 
+// get config path to update defaults
+const configPath = getSingleOption(CONFIG_OPT, process.argv);
+
 // Global options
+program.addOption(CONFIG_OPT);
 program.addOption(API_URL_OPT);
 program.addOption(API_KEY_OPT);
 program.addOption(PROJECT_ID_OPT);
@@ -148,11 +158,20 @@ program.addCommand(CompareCommand);
 program.addCommand(SyncCommand);
 
 async function loadConfig() {
-  const tgConfig = await loadTolgeeRc();
+  const tgConfig = await loadTolgeeRc(configPath);
   if (tgConfig) {
-    for (const [key, value] of Object.entries(tgConfig)) {
-      program.setOptionValue(key, value);
-    }
+    [program, ...program.commands].forEach((cmd) =>
+      cmd.options.forEach((opt) => {
+        const key = opt.attributeName();
+        const value = (tgConfig as any)[key];
+        if (value) {
+          const parsedValue = opt.parseArg
+            ? opt.parseArg(value, undefined)
+            : value;
+          cmd.setOptionValueWithSource(key, parsedValue, 'config');
+        }
+      })
+    );
   }
 }
 

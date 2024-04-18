@@ -1,0 +1,47 @@
+{
+  "type": "object",
+  "properties": {
+    "apiUrl": {
+      "type": "string"
+    },
+    "apiKey": {
+      "type": "string"
+    },
+    "projectId": {
+      "type": ["number", "string"]
+    },
+    "path": {
+      "type": "string"
+    },
+    "format": {
+      "type": "string"
+    },
+    "languages": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "states": {
+      "type": "array",
+      "items": {
+        "enum": ["UNTRANSLATED", "TRANSLATED", "REVIEWED"]
+      }
+    },
+    "delimiter": {
+      "type": ["string", "null"]
+    },
+    "namespaces": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "extractor": {
+      "type": "string"
+    },
+    "sdk": {
+      "enum": ["react", "vue", "svelte"]
+    }
+  }
+}

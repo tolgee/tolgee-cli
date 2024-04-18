@@ -27,8 +27,14 @@ async function fetchZipBlob(opts: PullOptions): Promise<Blob> {
   });
 }
 
-async function pullHandler(this: Command, path: string) {
+async function pullHandler(this: Command, argPath: string | undefined) {
   const opts: PullOptions = this.optsWithGlobals();
+
+  const path = this.getOptionValue('path') || argPath;
+
+  if (!path) {
+    throw new Error("Missing option '--path' or argument <path>");
+  }
 
   await overwriteDir(path, opts.overwrite);
   try {
@@ -54,8 +60,14 @@ export default new Command()
   .name('pull')
   .description('Pulls translations to Tolgee')
   .argument(
-    '<path>',
+    '[path]',
     'Destination path where translation files will be stored in'
+  )
+  .addOption(
+    new Option(
+      '-p, --path [path]',
+      'Destination path where translation files will be stored in'
+    ).argParser((v) => v.toLowerCase())
   )
   .addOption(
     new Option('-f, --format <format>', 'Format of the exported files')

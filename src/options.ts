@@ -59,3 +59,8 @@ export const EXTRACTOR = new Option(
   '-e, --extractor <extractor>',
   `A path to a custom extractor to use instead of the default one.`
 ).argParser(parsePath);
+
+export const CONFIG_OPT = new Option(
+  '-c, --config [config]',
+  'A path to tolgeerc config file.'
+).argParser(parsePath);

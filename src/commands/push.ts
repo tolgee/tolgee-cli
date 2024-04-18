@@ -166,7 +166,10 @@ async function pushHandler(this: Command, path: string) {
 export default new Command()
   .name('push')
   .description('Pushes translations to Tolgee')
-  .argument('<path>', 'Path to the files to push to Tolgee')
+  .argument('[path]', 'Path to the files to push to Tolgee')
+  .addOption(
+    new Option('-p, --path [path]', 'Path to the files to push to Tolgee')
+  )
   .addOption(
     new Option(
       '-f, --force-mode <mode>',
