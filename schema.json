@@ -25,34 +25,37 @@
       }
     },
     "path": {
+      "description": "Path to folder with localization files for push/pull commands.",
       "type": "string"
     },
     "format": {
+      "description": "Format of the exported files.",
       "type": "string"
     },
     "languages": {
+      "description": "List of languages to pull. Leave unspecified to export them all.",
       "type": "array",
       "items": {
         "type": "string"
       }
     },
     "states": {
+      "description": "List of translation states to include. Defaults all except untranslated.",
       "type": "array",
       "items": {
         "enum": ["UNTRANSLATED", "TRANSLATED", "REVIEWED"]
       }
     },
     "delimiter": {
+      "description": "Structure delimiter to use. By default, Tolgee interprets `.` as a nested structure. You can change the delimiter, or disable structure formatting by not specifying any value to the option.",
       "type": ["string", "null"]
     },
     "namespaces": {
+      "description": "List of namespaces to pull. Defaults to all namespaces.",
       "type": "array",
       "items": {
         "type": "string"
       }
-    },
-    "sdk": {
-      "enum": ["react", "vue", "svelte"]
     }
   }
 }

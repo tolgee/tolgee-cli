@@ -191,12 +191,4 @@ describe('.tolgeerc', () => {
     cwd.mockReturnValue(testWd);
     return expect(loadTolgeeRc()).rejects.toThrow('projectId');
   });
-
-  it('rejects invalid SDK', async () => {
-    const testWd = fileURLToPath(
-      new URL('./invalidTolgeeRcSdk', FIXTURES_PATH)
-    );
-    cwd.mockReturnValue(testWd);
-    return expect(loadTolgeeRc()).rejects.toThrow('sdk');
-  });
 });

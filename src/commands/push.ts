@@ -176,9 +176,6 @@ export default (config: Schema) =>
     .description('Pushes translations to Tolgee')
     .argument('[path]', 'Path to the files to push to Tolgee')
     .addOption(
-      new Option('-p, --path [path]', 'Path to the files to push to Tolgee')
-    )
-    .addOption(
       new Option(
         '-f, --force-mode <mode>',
         'What should we do with possible conflicts? If unspecified, the user will be prompted interactively, or the command will fail when in non-interactive'

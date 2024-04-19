@@ -26,12 +26,29 @@ export interface Schema {
    * File glob patterns to include
    */
   patterns?: string[];
+  /**
+   * Path to folder with localization files for push/pull commands.
+   */
   path?: string;
+  /**
+   * Format of the exported files.
+   */
   format?: string;
+  /**
+   * List of languages to pull. Leave unspecified to export them all.
+   */
   languages?: string[];
+  /**
+   * List of translation states to include. Defaults all except untranslated.
+   */
   states?: ("UNTRANSLATED" | "TRANSLATED" | "REVIEWED")[];
+  /**
+   * Structure delimiter to use. By default, Tolgee interprets `.` as a nested structure. You can change the delimiter, or disable structure formatting by not specifying any value to the option.
+   */
   delimiter?: string | null;
+  /**
+   * List of namespaces to pull. Defaults to all namespaces.
+   */
   namespaces?: string[];
-  sdk?: "react" | "vue" | "svelte";
   [k: string]: unknown;
 }
