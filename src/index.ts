@@ -148,15 +148,6 @@ program.addOption(API_URL_OPT);
 program.addOption(API_KEY_OPT);
 program.addOption(PROJECT_ID_OPT);
 
-// Register commands
-program.addCommand(Login);
-program.addCommand(Logout);
-program.addCommand(PushCommand);
-program.addCommand(PullCommand);
-program.addCommand(ExtractCommand);
-program.addCommand(CompareCommand);
-program.addCommand(SyncCommand);
-
 async function loadConfig() {
   const tgConfig = await loadTolgeeRc(configPath);
   if (tgConfig) {
@@ -173,6 +164,7 @@ async function loadConfig() {
       })
     );
   }
+  return tgConfig ?? {};
 }
 
 async function handleHttpError(e: HttpError) {
@@ -203,7 +195,17 @@ async function handleHttpError(e: HttpError) {
 
 async function run() {
   try {
-    await loadConfig();
+    const config = await loadConfig();
+
+    // Register commands
+    program.addCommand(Login);
+    program.addCommand(Logout);
+    program.addCommand(PushCommand(config));
+    program.addCommand(PullCommand(config));
+    program.addCommand(ExtractCommand(config));
+    program.addCommand(CompareCommand(config));
+    program.addCommand(SyncCommand(config));
+
     await program.parseAsync();
   } catch (e: any) {
     if (e instanceof HttpError) {

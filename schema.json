@@ -2,13 +2,27 @@
   "type": "object",
   "properties": {
     "apiUrl": {
+      "description": "The url of Tolgee API.",
       "type": "string"
     },
     "apiKey": {
+      "description": "Tolgee API Key. Can be a Project API Key or a Personal Access Token.",
       "type": "string"
     },
     "projectId": {
+      "description": "Project ID. Only required when using a Personal Access Token.",
       "type": ["number", "string"]
+    },
+    "extractor": {
+      "description": "A path to a custom extractor to use instead of the default one.",
+      "type": "string"
+    },
+    "patterns": {
+      "description": "File glob patterns to include",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
     },
     "path": {
       "type": "string"
@@ -36,9 +50,6 @@
       "items": {
         "type": "string"
       }
-    },
-    "extractor": {
-      "type": "string"
     },
     "sdk": {
       "enum": ["react", "vue", "svelte"]

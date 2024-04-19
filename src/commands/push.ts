@@ -10,6 +10,7 @@ import { HttpError } from '../client/errors.js';
 
 import { askString } from '../utils/ask.js';
 import { loading, success, warn, error } from '../utils/logger.js';
+import { Schema } from '../schema.js';
 
 type PushOptions = BaseOptions & {
   forceMode: 'KEEP' | 'OVERRIDE' | 'NO';
@@ -125,57 +126,64 @@ async function applyImport(client: Client) {
   }
 }
 
-async function pushHandler(this: Command, path: string) {
-  const opts: PushOptions = this.optsWithGlobals();
+const pushHandler = (config: Schema) =>
+  async function (this: Command, pathArg: string) {
+    const opts: PushOptions = this.optsWithGlobals();
+    const path = pathArg ?? config.path;
 
-  try {
-    const stats = await stat(path);
-    if (!stats.isDirectory()) {
-      error('The specified path is not a directory.');
-      process.exit(1);
-    }
-  } catch (e: any) {
-    if (e.code === 'ENOENT') {
-      error('The specified path does not exist.');
-      process.exit(1);
+    if (!path) {
+      throw new Error('Missing or argument <path>');
     }
 
-    throw e;
-  }
+    try {
+      const stats = await stat(path);
+      if (!stats.isDirectory()) {
+        error('The specified path is not a directory.');
+        process.exit(1);
+      }
+    } catch (e: any) {
+      if (e.code === 'ENOENT') {
+        error('The specified path does not exist.');
+        process.exit(1);
+      }
 
-  const files = await loading('Reading files...', readDirectory(path));
-  if (files.length === 0) {
-    error('Nothing to import.');
-    return;
-  }
+      throw e;
+    }
 
-  const result = await prepareImport(opts.client, files);
-  const conflicts = getConflictingLanguages(result);
-  if (conflicts.length) {
-    const resolveMethod = await promptConflicts(opts);
-    await loading(
-      'Resolving conflicts...',
-      resolveConflicts(opts.client, conflicts, resolveMethod)
-    );
-  }
+    const files = await loading('Reading files...', readDirectory(path));
+    if (files.length === 0) {
+      error('Nothing to import.');
+      return;
+    }
 
-  await applyImport(opts.client);
-  success('Done!');
-}
+    const result = await prepareImport(opts.client, files);
+    const conflicts = getConflictingLanguages(result);
+    if (conflicts.length) {
+      const resolveMethod = await promptConflicts(opts);
+      await loading(
+        'Resolving conflicts...',
+        resolveConflicts(opts.client, conflicts, resolveMethod)
+      );
+    }
 
-export default new Command()
-  .name('push')
-  .description('Pushes translations to Tolgee')
-  .argument('[path]', 'Path to the files to push to Tolgee')
-  .addOption(
-    new Option('-p, --path [path]', 'Path to the files to push to Tolgee')
-  )
-  .addOption(
-    new Option(
-      '-f, --force-mode <mode>',
-      'What should we do with possible conflicts? If unspecified, the user will be prompted interactively, or the command will fail when in non-interactive'
+    await applyImport(opts.client);
+    success('Done!');
+  };
+
+export default (config: Schema) =>
+  new Command()
+    .name('push')
+    .description('Pushes translations to Tolgee')
+    .argument('[path]', 'Path to the files to push to Tolgee')
+    .addOption(
+      new Option('-p, --path [path]', 'Path to the files to push to Tolgee')
     )
-      .choices(['OVERRIDE', 'KEEP', 'NO'])
-      .argParser((v) => v.toUpperCase())
-  )
-  .action(pushHandler);
+    .addOption(
+      new Option(
+        '-f, --force-mode <mode>',
+        'What should we do with possible conflicts? If unspecified, the user will be prompted interactively, or the command will fail when in non-interactive'
+      )
+        .choices(['OVERRIDE', 'KEEP', 'NO'])
+        .argParser((v) => v.toUpperCase())
+    )
+    .action(pushHandler(config));
