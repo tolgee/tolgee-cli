@@ -25,6 +25,7 @@ import {
 import {
   API_KEY_PAK_PREFIX,
   API_KEY_PAT_PREFIX,
+  DEFAULT_API_URL,
   VERSION,
 } from './constants.js';
 
@@ -179,9 +180,9 @@ async function run() {
 
     // Global options
     program.addOption(CONFIG_OPT);
-    program.addOption(API_URL_OPT.default(config.apiUrl));
+    program.addOption(API_URL_OPT.default(config.apiUrl ?? DEFAULT_API_URL));
     program.addOption(API_KEY_OPT.default(config.apiKey));
-    program.addOption(PROJECT_ID_OPT.default(config.projectId));
+    program.addOption(PROJECT_ID_OPT.default(config.projectId ?? -1));
 
     // Register commands
     program.addCommand(Login);

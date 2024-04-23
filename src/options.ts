@@ -2,7 +2,6 @@ import type Client from './client/index.js';
 import { existsSync } from 'fs';
 import { resolve } from 'path';
 import { Option, InvalidArgumentError } from 'commander';
-import { DEFAULT_API_URL } from './constants.js';
 
 function parseProjectId(v: string) {
   const val = Number(v);
@@ -44,16 +43,12 @@ export const API_KEY_OPT = new Option(
 export const PROJECT_ID_OPT = new Option(
   '-p, --project-id <id>',
   'Project ID. Only required when using a Personal Access Token.'
-)
-  .default(-1)
-  .argParser(parseProjectId);
+).argParser(parseProjectId);
 
 export const API_URL_OPT = new Option(
   '-au, --api-url <url>',
   'The url of Tolgee API.'
-)
-  .default(DEFAULT_API_URL)
-  .argParser(parseUrlArgument);
+).argParser(parseUrlArgument);
 
 export const EXTRACTOR = new Option(
   '-e, --extractor <extractor>',
