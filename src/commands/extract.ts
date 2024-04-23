@@ -12,6 +12,6 @@ export type BaseExtractOptions = {
 export default (config: Schema) =>
   new Command('extract')
     .description('Extracts strings from your projects')
-    .addOption(EXTRACTOR)
+    .addOption(EXTRACTOR.default(config.extractor))
     .addCommand(extractPrint(config))
     .addCommand(extractCheck(config));

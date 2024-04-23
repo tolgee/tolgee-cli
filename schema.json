@@ -18,44 +18,85 @@
       "type": "string"
     },
     "patterns": {
-      "description": "File glob patterns to include",
+      "description": "File glob patterns to your source code, used for keys extraction.",
       "type": "array",
       "items": {
         "type": "string"
       }
-    },
-    "path": {
-      "description": "Path to folder with localization files for push/pull commands.",
-      "type": "string"
     },
     "format": {
-      "description": "Format of the exported files.",
-      "type": "string"
+      "description": "Format for push and pull operations.",
+      "enum": [
+        "JSON",
+        "JSON_TOLGEE",
+        "XLIFF",
+        "PO",
+        "APPLE_STRINGS_STRINGSDICT",
+        "APPLE_XLIFF",
+        "ANDROID_XML",
+        "FLUTTER_ARB",
+        "PROPERTIES",
+        "YAML_RUBY",
+        "YAML"
+      ]
     },
-    "languages": {
-      "description": "List of languages to pull. Leave unspecified to export them all.",
-      "type": "array",
-      "items": {
-        "type": "string"
+    "push": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "description": "File glob specifying which files to include.",
+          "type": "string"
+        },
+        "records": { "type": "array", "items": { "$ref": "#/$defs/record" } }
       }
     },
-    "states": {
-      "description": "List of translation states to include. Defaults all except untranslated.",
-      "type": "array",
-      "items": {
-        "enum": ["UNTRANSLATED", "TRANSLATED", "REVIEWED"]
+    "pull": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "description": "File ",
+          "type": "string"
+        },
+        "languages": {
+          "description": "List of languages to pull. Leave unspecified to export them all.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "states": {
+          "description": "List of translation states to include. Defaults all except untranslated.",
+          "type": "array",
+          "items": {
+            "enum": ["UNTRANSLATED", "TRANSLATED", "REVIEWED"]
+          }
+        },
+        "namespaces": {
+          "description": "List of namespaces to pull. Defaults to all namespaces.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
       }
     },
     "delimiter": {
       "description": "Structure delimiter to use. By default, Tolgee interprets `.` as a nested structure. You can change the delimiter, or disable structure formatting by not specifying any value to the option.",
       "type": ["string", "null"]
-    },
-    "namespaces": {
-      "description": "List of namespaces to pull. Defaults to all namespaces.",
-      "type": "array",
-      "items": {
-        "type": "string"
+    }
+  },
+  "$defs": {
+    "record": {
+      "type": "object",
+      "properties": {
+        "path": { "$ref": "#/$defs/path" },
+        "language": { "type": "string" },
+        "namespace": { "type": "string" }
       }
+    },
+    "path": {
+      "description": "File glob specifying which files to include.",
+      "type": "string"
     }
   }
 }

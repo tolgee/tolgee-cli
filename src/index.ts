@@ -142,28 +142,8 @@ const program = new Command('tolgee')
 // get config path to update defaults
 const configPath = getSingleOption(CONFIG_OPT, process.argv);
 
-// Global options
-program.addOption(CONFIG_OPT);
-program.addOption(API_URL_OPT);
-program.addOption(API_KEY_OPT);
-program.addOption(PROJECT_ID_OPT);
-
 async function loadConfig() {
   const tgConfig = await loadTolgeeRc(configPath);
-  if (tgConfig) {
-    [program, ...program.commands].forEach((cmd) =>
-      cmd.options.forEach((opt) => {
-        const key = opt.attributeName();
-        const value = (tgConfig as any)[key];
-        if (value) {
-          const parsedValue = opt.parseArg
-            ? opt.parseArg(value, undefined)
-            : value;
-          cmd.setOptionValueWithSource(key, parsedValue, 'config');
-        }
-      })
-    );
-  }
   return tgConfig ?? {};
 }
 
@@ -197,14 +177,30 @@ async function run() {
   try {
     const config = await loadConfig();
 
+    // Global options
+    program.addOption(CONFIG_OPT);
+    program.addOption(API_URL_OPT.default(config.apiUrl));
+    program.addOption(API_KEY_OPT.default(config.apiKey));
+    program.addOption(PROJECT_ID_OPT.default(config.projectId));
+
     // Register commands
     program.addCommand(Login);
     program.addCommand(Logout);
-    program.addCommand(PushCommand(config));
-    program.addCommand(PullCommand(config));
-    program.addCommand(ExtractCommand(config));
-    program.addCommand(CompareCommand(config));
-    program.addCommand(SyncCommand(config));
+    program.addCommand(
+      PushCommand(config).configureHelp({ showGlobalOptions: true })
+    );
+    program.addCommand(
+      PullCommand(config).configureHelp({ showGlobalOptions: true })
+    );
+    program.addCommand(
+      ExtractCommand(config).configureHelp({ showGlobalOptions: true })
+    );
+    program.addCommand(
+      CompareCommand(config).configureHelp({ showGlobalOptions: true })
+    );
+    program.addCommand(
+      SyncCommand(config).configureHelp({ showGlobalOptions: true })
+    );
 
     await program.parseAsync();
   } catch (e: any) {

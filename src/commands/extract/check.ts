@@ -70,5 +70,5 @@ export default (config: Schema) =>
     .description(
       'Checks if the keys can be extracted automatically, and reports problems if any'
     )
-    .addArgument(FILE_PATTERNS)
+    .addArgument(FILE_PATTERNS.default(config.patterns))
     .action(lintHandler(config));

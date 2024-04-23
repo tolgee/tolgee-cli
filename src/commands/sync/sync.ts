@@ -188,8 +188,8 @@ export default (config: Schema) =>
     .description(
       'Synchronizes the keys in your code project and in the Tolgee project, by creating missing keys and optionally deleting unused ones. For a dry-run, use `tolgee compare`.'
     )
-    .addArgument(FILE_PATTERNS)
-    .addOption(EXTRACTOR)
+    .addArgument(FILE_PATTERNS.default(config.patterns))
+    .addOption(EXTRACTOR.default(config.extractor))
     .option(
       '-B, --backup <path>',
       'Path where a backup should be downloaded before performing the sync. If something goes wrong, the backup can be used to restore the project to its previous state.'

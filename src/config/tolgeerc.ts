@@ -44,18 +44,25 @@ function parseConfig(input: Schema, configDir: string): Schema {
     }
   }
 
-  if (rc.path !== undefined) {
-    rc.path = resolve(configDir, rc.path);
+  if (rc.delimiter !== undefined) {
+    rc.delimiter = rc.delimiter || '';
+  }
+
+  // convert relative paths in config to absolute
+  // so it's always relative to config location
+
+  if (rc.push?.path !== undefined) {
+    rc.push.path = resolve(configDir, rc.push.path);
+  }
+
+  if (rc.pull?.path !== undefined) {
+    rc.pull.path = resolve(configDir, rc.pull.path);
   }
 
   if (rc.patterns !== undefined) {
     rc.patterns = rc.patterns.map((pattern: string) =>
       resolve(configDir, pattern)
     );
-  }
-
-  if (rc.delimiter !== undefined) {
-    rc.delimiter = rc.delimiter || '';
   }
 
   return rc;

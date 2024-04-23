@@ -28,10 +28,9 @@ async function fetchZipBlob(opts: PullOptions): Promise<Blob> {
   });
 }
 
-const pullHandler = (config: Schema) =>
-  async function (this: Command, argPath: string | undefined) {
+const pullHandler = () =>
+  async function (this: Command, path: string | undefined) {
     const opts: PullOptions = this.optsWithGlobals();
-    const path = argPath ?? config.path;
 
     if (!path) {
       throw new Error('Missing or argument <path>');
@@ -63,12 +62,13 @@ export default (config: Schema) =>
     .description('Pulls translations to Tolgee')
     .argument(
       '[path]',
-      'Destination path where translation files will be stored in'
+      'Destination path where translation files will be stored in',
+      config.pull?.path
     )
     .addOption(
       new Option('-f, --format <format>', 'Format of the exported files')
         .choices(['JSON', 'XLIFF'])
-        .default('JSON')
+        .default(config.format ?? 'JSON')
         .argParser((v) => v.toUpperCase())
     )
     .option(
@@ -80,6 +80,7 @@ export default (config: Schema) =>
         '-s, --states <states...>',
         'List of translation states to include. Defaults all except untranslated'
       )
+        .default(config.pull?.languages)
         .choices(['UNTRANSLATED', 'TRANSLATED', 'REVIEWED'])
         .argParser((v, a: string[]) => [v.toUpperCase(), ...(a || [])])
     )
@@ -88,17 +89,17 @@ export default (config: Schema) =>
         '-d, --delimiter',
         'Structure delimiter to use. By default, Tolgee interprets `.` as a nested structure. You can change the delimiter, or disable structure formatting by not specifying any value to the option'
       )
-        .default('.')
+        .default(config.delimiter ?? '.')
         .argParser((v) => v || '')
     )
     .addOption(
       new Option(
         '-n, --namespaces <namespaces...>',
         'List of namespaces to pull. Defaults to all namespaces'
-      )
+      ).default(config.pull?.namespaces)
     )
     .option(
       '-o, --overwrite',
       'Whether to automatically overwrite existing files. BE CAREFUL, THIS WILL WIPE *ALL* THE CONTENTS OF THE TARGET FOLDER. If unspecified, the user will be prompted interactively, or the command will fail when in non-interactive'
     )
-    .action(pullHandler(config));
+    .action(pullHandler());

@@ -5,6 +5,11 @@
  * and run json-schema-to-typescript to regenerate this file.
  */
 
+/**
+ * File glob specifying which files to include.
+ */
+export type Path = string;
+
 export interface Schema {
   /**
    * The url of Tolgee API.
@@ -23,32 +28,60 @@ export interface Schema {
    */
   extractor?: string;
   /**
-   * File glob patterns to include
+   * File glob patterns to your source code, used for keys extraction.
    */
   patterns?: string[];
   /**
-   * Path to folder with localization files for push/pull commands.
+   * Format for push and pull operations.
    */
-  path?: string;
-  /**
-   * Format of the exported files.
-   */
-  format?: string;
-  /**
-   * List of languages to pull. Leave unspecified to export them all.
-   */
-  languages?: string[];
-  /**
-   * List of translation states to include. Defaults all except untranslated.
-   */
-  states?: ("UNTRANSLATED" | "TRANSLATED" | "REVIEWED")[];
+  format?:
+    | "JSON"
+    | "JSON_TOLGEE"
+    | "XLIFF"
+    | "PO"
+    | "APPLE_STRINGS_STRINGSDICT"
+    | "APPLE_XLIFF"
+    | "ANDROID_XML"
+    | "FLUTTER_ARB"
+    | "PROPERTIES"
+    | "YAML_RUBY"
+    | "YAML";
+  push?: {
+    /**
+     * File glob specifying which files to include.
+     */
+    path?: string;
+    records?: Record[];
+    [k: string]: unknown;
+  };
+  pull?: {
+    /**
+     * File
+     */
+    path?: string;
+    /**
+     * List of languages to pull. Leave unspecified to export them all.
+     */
+    languages?: string[];
+    /**
+     * List of translation states to include. Defaults all except untranslated.
+     */
+    states?: ("UNTRANSLATED" | "TRANSLATED" | "REVIEWED")[];
+    /**
+     * List of namespaces to pull. Defaults to all namespaces.
+     */
+    namespaces?: string[];
+    [k: string]: unknown;
+  };
   /**
    * Structure delimiter to use. By default, Tolgee interprets `.` as a nested structure. You can change the delimiter, or disable structure formatting by not specifying any value to the option.
    */
   delimiter?: string | null;
-  /**
-   * List of namespaces to pull. Defaults to all namespaces.
-   */
-  namespaces?: string[];
+  [k: string]: unknown;
+}
+export interface Record {
+  path?: Path;
+  language?: string;
+  namespace?: string;
   [k: string]: unknown;
 }

@@ -17,11 +17,9 @@ type Options = BaseOptions & {
   extractor: string;
 };
 
-const asyncHandler = (config: Schema) =>
-  async function (this: Command, filesPatterns: string[]) {
+const asyncHandler = () =>
+  async function (this: Command, patterns: string[]) {
     const opts: Options = this.optsWithGlobals();
-
-    const patterns = filesPatterns.length ? filesPatterns : config.patterns;
 
     if (!patterns?.length) {
       error('Missing argument <patterns>');
@@ -81,6 +79,6 @@ export default (config: Schema) =>
     .description(
       'Compares the keys in your code project and in the Tolgee project.'
     )
-    .addArgument(FILE_PATTERNS)
-    .addOption(EXTRACTOR)
-    .action(asyncHandler(config));
+    .addArgument(FILE_PATTERNS.default(config.patterns))
+    .addOption(EXTRACTOR.default(config.extractor))
+    .action(asyncHandler());

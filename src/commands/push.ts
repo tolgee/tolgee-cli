@@ -126,10 +126,9 @@ async function applyImport(client: Client) {
   }
 }
 
-const pushHandler = (config: Schema) =>
-  async function (this: Command, pathArg: string) {
+const pushHandler = () =>
+  async function (this: Command, path: string) {
     const opts: PushOptions = this.optsWithGlobals();
-    const path = pathArg ?? config.path;
 
     if (!path) {
       throw new Error('Missing or argument <path>');
@@ -174,7 +173,11 @@ export default (config: Schema) =>
   new Command()
     .name('push')
     .description('Pushes translations to Tolgee')
-    .argument('[path]', 'Path to the files to push to Tolgee')
+    .argument(
+      '[path]',
+      'Path to the files to push to Tolgee',
+      config.push?.path
+    )
     .addOption(
       new Option(
         '-f, --force-mode <mode>',
@@ -183,4 +186,4 @@ export default (config: Schema) =>
         .choices(['OVERRIDE', 'KEEP', 'NO'])
         .argParser((v) => v.toUpperCase())
     )
-    .action(pushHandler(config));
+    .action(pushHandler());

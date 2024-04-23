@@ -78,5 +78,5 @@ const printHandler = (config: Schema) =>
 export default (config: Schema) =>
   new Command('print')
     .description('Prints extracted data to the console')
-    .addArgument(FILE_PATTERNS)
+    .addArgument(FILE_PATTERNS.default(config.patterns))
     .action(printHandler(config));
