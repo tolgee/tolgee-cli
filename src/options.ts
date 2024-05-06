@@ -59,3 +59,20 @@ export const CONFIG_OPT = new Option(
   '-c, --config [config]',
   'A path to tolgeerc config file.'
 ).argParser(parsePath);
+
+export const FORMAT_OPT = new Option(
+  '--format <format>',
+  'Localization files format.'
+).choices([
+  'JSON',
+  'JSON_TOLGEE',
+  'XLIFF',
+  'PO',
+  'APPLE_STRINGS_STRINGSDICT',
+  'APPLE_XLIFF',
+  'ANDROID_XML',
+  'FLUTTER_ARB',
+  'PROPERTIES',
+  'YAML_RUBY',
+  'YAML',
+]);

@@ -51,8 +51,11 @@ function parseConfig(input: Schema, configDir: string): Schema {
   // convert relative paths in config to absolute
   // so it's always relative to config location
 
-  if (rc.push?.path !== undefined) {
-    rc.push.path = resolve(configDir, rc.push.path);
+  if (rc.push?.files) {
+    rc.push.files = rc.push.files.map((r) => ({
+      ...r,
+      path: resolve(configDir, r.path),
+    }));
   }
 
   if (rc.pull?.path !== undefined) {
@@ -108,7 +111,8 @@ export default async function loadTolgeeRc(
       'instance.',
       ''
     )}' ${message}`;
-    throw new Error(errMessage);
+    error(errMessage);
+    process.exit(1);
   }
 
   return config;

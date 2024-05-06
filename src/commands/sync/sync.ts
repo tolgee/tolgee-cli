@@ -30,6 +30,7 @@ type Options = BaseOptions & {
 async function backup(client: Client, dest: string) {
   const blob = await client.export.export({
     format: 'JSON',
+    supportArrays: false,
     filterState: ['UNTRANSLATED', 'TRANSLATED', 'REVIEWED'],
     structureDelimiter: '',
   });

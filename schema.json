@@ -25,29 +25,23 @@
       }
     },
     "format": {
-      "description": "Format for push and pull operations.",
-      "enum": [
-        "JSON",
-        "JSON_TOLGEE",
-        "XLIFF",
-        "PO",
-        "APPLE_STRINGS_STRINGSDICT",
-        "APPLE_XLIFF",
-        "ANDROID_XML",
-        "FLUTTER_ARB",
-        "PROPERTIES",
-        "YAML_RUBY",
-        "YAML"
-      ]
+      "$ref": "#/$defs/format"
     },
     "push": {
       "type": "object",
       "properties": {
-        "path": {
-          "description": "File glob specifying which files to include.",
-          "type": "string"
+        "files": { "type": "array", "items": { "$ref": "#/$defs/fileMatch" } },
+        "languages": { "type": "array", "items": { "type": "string" } },
+        "namespaces": { "type": "array", "items": { "type": "string" } },
+        "forceMode": {
+          "$ref": "#/$defs/forceMode"
         },
-        "records": { "type": "array", "items": { "$ref": "#/$defs/record" } }
+        "overrideKeyDescriptions": {
+          "type": "boolean"
+        },
+        "convertPlaceholdersToIcu": {
+          "type": "boolean"
+        }
       }
     },
     "pull": {
@@ -86,17 +80,54 @@
     }
   },
   "$defs": {
-    "record": {
+    "fileMatch": {
       "type": "object",
       "properties": {
         "path": { "$ref": "#/$defs/path" },
         "language": { "type": "string" },
         "namespace": { "type": "string" }
-      }
+      },
+      "required": ["path", "language"]
+    },
+    "forceMode": {
+      "type": "string",
+      "enum": ["OVERRIDE", "KEEP", "NO_FORCE"]
     },
     "path": {
       "description": "File glob specifying which files to include.",
       "type": "string"
+    },
+    "format": {
+      "description": "Format for push and pull operations.",
+      "enum": [
+        "JSON_ICU",
+        "JSON_JAVA",
+        "JSON_PHP",
+        "JSON_RUBY",
+        "JSON_C",
+        "PO_PHP",
+        "PO_C",
+        "PO_JAVA",
+        "PO_ICU",
+        "PO_RUBY",
+        "STRINGS",
+        "STRINGSDICT",
+        "APPLE_XLIFF",
+        "PROPERTIES_ICU",
+        "PROPERTIES_JAVA",
+        "PROPERTIES_UNKNOWN",
+        "ANDROID_XML",
+        "FLUTTER_ARB",
+        "YAML_RUBY",
+        "YAML_JAVA",
+        "YAML_ICU",
+        "YAML_PHP",
+        "YAML_UNKNOWN",
+        "XLIFF_ICU",
+        "XLIFF_JAVA",
+        "XLIFF_PHP",
+        "XLIFF_RUBY"
+      ]
     }
   }
 }

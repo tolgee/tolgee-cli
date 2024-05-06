@@ -1,20 +1,42 @@
-import type { File, AddFileResponse } from '../client/import.js';
+import type { File, ImportProps } from '../client/import.js';
 import type Client from '../client/index.js';
 import type { BaseOptions } from '../options.js';
 
-import { join } from 'path';
+import { join, basename } from 'path';
 import { readdir, readFile, stat } from 'fs/promises';
 import { Command, Option } from 'commander';
+import { glob } from 'glob';
 
-import { HttpError } from '../client/errors.js';
+import { loading, success, error } from '../utils/logger.js';
+import { ForceMode, Format, Schema, FileMatch } from '../schema.js';
 
-import { askString } from '../utils/ask.js';
-import { loading, success, warn, error } from '../utils/logger.js';
-import { Schema } from '../schema.js';
+type FileRecord = File & {
+  language?: string;
+  namespace?: string;
+};
 
 type PushOptions = BaseOptions & {
-  forceMode: 'KEEP' | 'OVERRIDE' | 'NO';
+  forceMode: ForceMode;
+  format: Format;
+  overrideKeyDescriptions: boolean;
+  convertPlaceholdersToIcu: boolean;
+  languages: string[];
+  namespaces: string[];
 };
+
+async function allInPattern(pattern: string) {
+  const files: File[] = [];
+  const items = await glob(pattern);
+  for (const item of items) {
+    if ((await stat(item)).isDirectory()) {
+      files.push(...(await readDirectory(item)));
+    } else {
+      const blob = await readFile(item);
+      files.push({ name: item, data: blob });
+    }
+  }
+  return files;
+}
 
 async function readDirectory(directory: string, base = ''): Promise<File[]> {
   const files: File[] = [];
@@ -36,136 +58,69 @@ async function readDirectory(directory: string, base = ''): Promise<File[]> {
   return files;
 }
 
-function getConflictingLanguages(result: AddFileResponse) {
-  const conflicts = [];
-  const languages = result.result?._embedded?.languages;
-  if (languages) {
-    for (const l of languages) {
-      if (l.conflictCount) {
-        conflicts.push(l.id);
-      }
-    }
-  }
-
-  return conflicts;
+async function importData(client: Client, data: ImportProps) {
+  return loading('Uploading files...', client.import.import(data));
 }
 
-async function promptConflicts(
-  opts: PushOptions
-): Promise<'KEEP' | 'OVERRIDE'> {
-  const projectId = opts.client.getProjectId();
-  const resolveUrl = new URL(`/projects/${projectId}/import`, opts.apiUrl).href;
-
-  if (opts.forceMode === 'NO') {
-    error(
-      `There are conflicts in the import. You can resolve them and complete the import here: ${resolveUrl}.`
-    );
-    process.exit(1);
+async function readRecords(matchers: FileMatch[]) {
+  const result: FileRecord[] = [];
+  for (const matcher of matchers) {
+    const files = await allInPattern(matcher.path);
+    files.forEach((file) => {
+      result.push({
+        ...matcher,
+        data: file.data,
+        name: basename(file.name),
+      });
+    });
   }
-
-  if (opts.forceMode) {
-    return opts.forceMode;
-  }
-
-  if (!process.stdout.isTTY) {
-    error(
-      `There are conflicts in the import. Please specify a --force-mode, or resolve them in your browser at ${resolveUrl}.`
-    );
-    process.exit(1);
-  }
-
-  warn('There are conflicts in the import. What do you want to do?');
-  const resp = await askString(
-    'Type "KEEP" to preserve the version on the server, "OVERRIDE" to use the version from the import, and nothing to abort: '
-  );
-  if (resp !== 'KEEP' && resp !== 'OVERRIDE') {
-    error(
-      `Aborting. You can resolve the conflicts and complete the import here: ${resolveUrl}`
-    );
-    process.exit(1);
-  }
-
-  return resp;
+  return result;
 }
 
-async function prepareImport(client: Client, files: File[]) {
-  return loading(
-    'Deleting import...',
-    client.import.deleteImportIfExists()
-  ).then(() =>
-    loading('Uploading files...', client.import.addFiles({ files: files }))
-  );
-}
-
-async function resolveConflicts(
-  client: Client,
-  locales: number[],
-  method: 'KEEP' | 'OVERRIDE'
-) {
-  for (const locale of locales) {
-    if (method === 'KEEP') {
-      await client.import.conflictsKeepExistingAll(locale);
-    } else {
-      await client.import.conflictsOverrideAll(locale);
-    }
-  }
-}
-
-async function applyImport(client: Client) {
-  try {
-    await loading('Applying changes...', client.import.applyImport());
-  } catch (e) {
-    if (e instanceof HttpError && e.response.statusCode === 400) {
-      error(
-        "Some of the imported languages weren't recognized. Please create a language with corresponding tag in the Tolgee Platform."
-      );
-      return;
-    }
-
-    throw e;
-  }
-}
-
-const pushHandler = () =>
-  async function (this: Command, path: string) {
+const pushHandler = (config: Schema) =>
+  async function (this: Command) {
     const opts: PushOptions = this.optsWithGlobals();
 
-    if (!path) {
-      throw new Error('Missing or argument <path>');
+    if (!config.push?.files) {
+      throw new Error('Missing option `push.files` in configuration file.');
     }
 
-    try {
-      const stats = await stat(path);
-      if (!stats.isDirectory()) {
-        error('The specified path is not a directory.');
-        process.exit(1);
+    const filteredMatchers = config.push.files.filter((r) => {
+      if (opts.languages && !opts.languages.includes(r.language)) {
+        return false;
       }
-    } catch (e: any) {
-      if (e.code === 'ENOENT') {
-        error('The specified path does not exist.');
-        process.exit(1);
+      if (opts.namespaces && !opts.namespaces.includes(r.namespace ?? '')) {
+        return false;
       }
+      return true;
+    });
 
-      throw e;
-    }
+    const files = await loading(
+      'Reading files...',
+      readRecords(filteredMatchers)
+    );
 
-    const files = await loading('Reading files...', readDirectory(path));
     if (files.length === 0) {
       error('Nothing to import.');
       return;
     }
 
-    const result = await prepareImport(opts.client, files);
-    const conflicts = getConflictingLanguages(result);
-    if (conflicts.length) {
-      const resolveMethod = await promptConflicts(opts);
-      await loading(
-        'Resolving conflicts...',
-        resolveConflicts(opts.client, conflicts, resolveMethod)
-      );
-    }
-
-    await applyImport(opts.client);
+    await importData(opts.client, {
+      files,
+      params: {
+        forceMode: opts.forceMode,
+        overrideKeyDescriptions: opts.overrideKeyDescriptions,
+        convertPlaceholdersToIcu: opts.convertPlaceholdersToIcu,
+        fileMappings: files.map((f) => {
+          return {
+            fileName: basename(f.name),
+            format: opts.format,
+            languageTag: f.language,
+            namespace: f.namespace,
+          };
+        }),
+      },
+    });
     success('Done!');
   };
 
@@ -173,17 +128,34 @@ export default (config: Schema) =>
   new Command()
     .name('push')
     .description('Pushes translations to Tolgee')
-    .argument(
-      '[path]',
-      'Path to the files to push to Tolgee',
-      config.push?.path
-    )
     .addOption(
       new Option(
         '-f, --force-mode <mode>',
         'What should we do with possible conflicts? If unspecified, the user will be prompted interactively, or the command will fail when in non-interactive'
       )
-        .choices(['OVERRIDE', 'KEEP', 'NO'])
+        .choices(['OVERRIDE', 'KEEP', 'NO_FORCE'])
         .argParser((v) => v.toUpperCase())
     )
-    .action(pushHandler());
+    .addOption(
+      new Option('--override-key-descriptions').default(
+        config.push?.overrideKeyDescriptions ?? true
+      )
+    )
+    .addOption(new Option('--no-override-key-descriptions').hideHelp())
+    .addOption(
+      new Option('--convert-placeholders-to-icu').default(
+        config.push?.convertPlaceholdersToIcu ?? true
+      )
+    )
+    .addOption(
+      new Option('-l, --languages <languages...>').default(
+        config.push?.languages
+      )
+    )
+    .addOption(
+      new Option('-n, --namespaces <namespaces...>').default(
+        config.push?.namespaces
+      )
+    )
+    .addOption(new Option('--no-convert-placeholders-to-icu').hideHelp())
+    .action(pushHandler(config));

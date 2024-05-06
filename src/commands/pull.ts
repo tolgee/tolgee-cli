@@ -21,6 +21,7 @@ type PullOptions = BaseOptions & {
 async function fetchZipBlob(opts: PullOptions): Promise<Blob> {
   return opts.client.export.export({
     format: opts.format,
+    supportArrays: false,
     languages: opts.languages,
     filterState: opts.states,
     structureDelimiter: opts.delimiter,

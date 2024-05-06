@@ -20,6 +20,7 @@ import {
   API_KEY_OPT,
   API_URL_OPT,
   CONFIG_OPT,
+  FORMAT_OPT,
   PROJECT_ID_OPT,
 } from './options.js';
 import {
@@ -36,6 +37,7 @@ import ExtractCommand from './commands/extract.js';
 import CompareCommand from './commands/sync/compare.js';
 import SyncCommand from './commands/sync/sync.js';
 import { getSingleOption } from './utils/getSingleOption.js';
+import { Schema } from './schema.js';
 
 const NO_KEY_COMMANDS = ['login', 'logout', 'extract'];
 
@@ -113,38 +115,54 @@ function validateOptions(cmd: Command) {
   }
 }
 
-async function preHandler(prog: Command, cmd: Command) {
-  if (!NO_KEY_COMMANDS.includes(topLevelName(cmd))) {
-    await loadApiKey(cmd);
-    loadProjectId(cmd);
-    validateOptions(cmd);
+const preHandler = (config: Schema) =>
+  async function (prog: Command, cmd: Command) {
+    if (!NO_KEY_COMMANDS.includes(topLevelName(cmd))) {
+      await loadApiKey(cmd);
+      loadProjectId(cmd);
+      validateOptions(cmd);
 
-    const opts = cmd.optsWithGlobals();
-    const client = new RestClient({
-      apiUrl: opts.apiUrl,
-      apiKey: opts.apiKey,
-      projectId: opts.projectId,
-    });
+      const opts = cmd.optsWithGlobals();
+      const client = new RestClient({
+        apiUrl: opts.apiUrl ?? config.apiUrl,
+        apiKey: opts.apiKey ?? config.apiKey,
+        projectId: opts.projectId ?? config.projectId,
+      });
 
-    cmd.setOptionValue('client', client);
-  }
+      cmd.setOptionValue('client', client);
+    }
 
-  // Apply verbosity
-  setDebug(prog.opts().verbose);
-}
+    // Apply verbosity
+    setDebug(prog.opts().verbose);
+  };
 
 const program = new Command('tolgee')
   .version(VERSION)
   .configureOutput({ writeErr: error })
   .description('Command Line Interface to interact with the Tolgee Platform')
-  .option('-v, --verbose', 'Enable verbose logging.')
-  .hook('preAction', preHandler);
+  .option('-v, --verbose', 'Enable verbose logging.');
 
 // get config path to update defaults
 const configPath = getSingleOption(CONFIG_OPT, process.argv);
 
-async function loadConfig() {
+async function loadConfig(program: Command) {
   const tgConfig = await loadTolgeeRc(configPath);
+
+  if (tgConfig) {
+    [program, ...program.commands].forEach((cmd) =>
+      cmd.options.forEach((opt) => {
+        const key = opt.attributeName();
+        const value = (tgConfig as any)[key];
+        if (value) {
+          const parsedValue = opt.parseArg
+            ? opt.parseArg(value, undefined)
+            : value;
+          cmd.setOptionValueWithSource(key, parsedValue, 'config');
+        }
+      })
+    );
+  }
+
   return tgConfig ?? {};
 }
 
@@ -176,13 +194,15 @@ async function handleHttpError(e: HttpError) {
 
 async function run() {
   try {
-    const config = await loadConfig();
-
     // Global options
     program.addOption(CONFIG_OPT);
-    program.addOption(API_URL_OPT.default(config.apiUrl ?? DEFAULT_API_URL));
-    program.addOption(API_KEY_OPT.default(config.apiKey));
-    program.addOption(PROJECT_ID_OPT.default(config.projectId ?? -1));
+    program.addOption(API_URL_OPT.default(DEFAULT_API_URL));
+    program.addOption(API_KEY_OPT);
+    program.addOption(PROJECT_ID_OPT.default(-1));
+    program.addOption(FORMAT_OPT);
+
+    const config = await loadConfig(program);
+    program.hook('preAction', preHandler(config));
 
     // Register commands
     program.addCommand(Login);
