@@ -4,14 +4,8 @@
     "es2020": true
   },
   "parser": "@typescript-eslint/parser",
-  "plugins": [
-    "@typescript-eslint",
-    "prettier"
-  ],
-  "extends": [
-    "eslint:recommended",
-    "plugin:@typescript-eslint/recommended"
-  ],
+  "plugins": ["@typescript-eslint", "prettier"],
+  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
   "rules": {
     "prettier/prettier": "error",
     "@typescript-eslint/no-explicit-any": "off",
@@ -31,9 +25,10 @@
   "overrides": [
     {
       "env": { "jest": true },
-      "files": [ "test/**" ],
-      "plugins": [ "jest" ],
-      "extends": [ "plugin:jest/recommended" ]
+      "files": ["test/**"],
+      "plugins": ["jest"],
+      "extends": ["plugin:jest/recommended"]
     }
-  ]
+  ],
+  "ignorePatterns": ["schema.generated.ts"]
 }

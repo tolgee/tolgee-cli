@@ -2,7 +2,7 @@ import type { File, ImportProps } from '../client/import.js';
 import type Client from '../client/index.js';
 import type { BaseOptions } from '../options.js';
 
-import { join, basename } from 'path';
+import { join } from 'path';
 import { readdir, readFile, stat } from 'fs/promises';
 import { Command, Option } from 'commander';
 import { glob } from 'glob';
