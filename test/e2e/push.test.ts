@@ -257,6 +257,38 @@ it('does preserve the remote strings when using KEEP', async () => {
   });
 });
 
+it('asks for confirmation when there are conflicts', async () => {
+  const out = await run([
+    '--config',
+    PROJECT_2_CONFIG,
+    'push',
+    '--api-key',
+    PROJECT_PAK_2,
+  ]);
+
+  expect(out.code).toBe(0);
+
+  const keys = await requestGet(
+    '/v2/projects/2/translations?filterKeyName=cat-name&filterKeyName=fox-name',
+    PROJECT_PAK_2
+  );
+  expect(keys.page.totalElements).toBe(2);
+
+  const stored = tolgeeDataToDict(keys);
+  expect(stored).toEqual({
+    'cat-name': {
+      __ns: null,
+      en: 'Cat',
+      fr: 'Chat',
+    },
+    'fox-name': {
+      __ns: null,
+      en: 'Fox',
+      fr: 'Renard',
+    },
+  });
+});
+
 it('does override the remote strings when using OVERRIDE', async () => {
   const out = await run([
     '--config',
