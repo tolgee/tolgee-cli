@@ -68,8 +68,6 @@ describe('.tolgeerc', () => {
 
     const cfg = (await loadTolgeeRc(path))!;
 
-    console.log(JSON.stringify(cfg, null, 2));
-
     // make sure all paths in the config file are expanded relatively to the config location
     [
       cfg.extractor,
