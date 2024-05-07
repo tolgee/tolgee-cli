@@ -12,7 +12,7 @@ import { run } from './utils/run.js';
 
 const FIXTURES_PATH = new URL('../__fixtures__/', import.meta.url);
 const PROJECT_1_CONFIG = fileURLToPath(
-  new URL('./updatedProject1/.tolgeerc', FIXTURES_PATH)
+  new URL('./updatedProject1/tolgeerc.mjs', FIXTURES_PATH)
 );
 const PROJECT_2_CONFIG = fileURLToPath(
   new URL('./updatedProject2WithConflicts/.tolgeerc', FIXTURES_PATH)
@@ -81,14 +81,7 @@ async function cleanupProjectState() {
 afterEach(cleanupProjectState);
 
 it('pushes updated strings to Tolgee', async () => {
-  const out = await run([
-    '--config',
-    PROJECT_1_CONFIG,
-    'push',
-    '--api-key',
-    PROJECT_PAK_1,
-    '--verbose',
-  ]);
+  const out = await run(['--config', PROJECT_1_CONFIG, 'push', '--verbose']);
 
   expect(out.code).toBe(0);
 
@@ -108,6 +101,30 @@ it('pushes updated strings to Tolgee', async () => {
     wireless: {
       __ns: null,
       en: 'Wireless',
+      fr: 'Sans-fil',
+    },
+  });
+});
+
+it('pushes only selected languages', async () => {
+  const out = await run(['--config', PROJECT_1_CONFIG, 'push', '-l', 'fr']);
+
+  expect(out.code).toBe(0);
+
+  const keys = await requestGet(
+    '/v2/projects/1/translations?search=wire',
+    PROJECT_PAK_1
+  );
+  expect(keys.page.totalElements).toBe(2);
+
+  const stored = tolgeeDataToDict(keys);
+  expect(stored).toEqual({
+    wired: {
+      __ns: null,
+      fr: 'Filaire',
+    },
+    wireless: {
+      __ns: null,
       fr: 'Sans-fil',
     },
   });
@@ -139,6 +156,37 @@ it('pushes to Tolgee with correct namespaces', async () => {
       en: 'Glass',
       fr: 'Verre',
     },
+    water: {
+      __ns: 'drinks',
+      en: 'Dihydrogen monoxide',
+      fr: 'Monoxyde de dihydrogène',
+    },
+  });
+});
+
+it('pushes only selected namespaces and languages', async () => {
+  const out = await run([
+    '--config',
+    PROJECT_3_CONFIG,
+    'push',
+    '--api-key',
+    PROJECT_PAK_3,
+    '--force-mode',
+    'override',
+    '-n',
+    'drinks',
+  ]);
+  expect(out.code).toBe(0);
+
+  const keys = await requestGet(
+    '/v2/projects/3/translations?filterKeyName=water&filterKeyName=glass',
+    PROJECT_PAK_3
+  );
+
+  expect(keys.page.totalElements).toBe(1);
+
+  const stored = tolgeeDataToDict(keys);
+  expect(stored).toEqual({
     water: {
       __ns: 'drinks',
       en: 'Dihydrogen monoxide',
