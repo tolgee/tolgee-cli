@@ -28,8 +28,6 @@ const ARGS = [
   '--rm',
   '--name',
   'tolgee_cli_e2e',
-  '--pull',
-  'always',
   '--publish',
   '22222:8080',
   '--env-file',

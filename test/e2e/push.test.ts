@@ -11,14 +11,14 @@ import { tolgeeDataToDict } from './utils/data.js';
 import { run } from './utils/run.js';
 
 const FIXTURES_PATH = new URL('../__fixtures__/', import.meta.url);
-const PROJECT_1_UPDATE = fileURLToPath(
-  new URL('./updatedProject1', FIXTURES_PATH)
+const PROJECT_1_CONFIG = fileURLToPath(
+  new URL('./updatedProject1/.tolgeerc', FIXTURES_PATH)
 );
-const PROJECT_2_UPDATE = fileURLToPath(
-  new URL('./updatedProject2WithConflicts', FIXTURES_PATH)
+const PROJECT_2_CONFIG = fileURLToPath(
+  new URL('./updatedProject2WithConflicts/.tolgeerc', FIXTURES_PATH)
 );
-const PROJECT_3_UPDATE = fileURLToPath(
-  new URL('./updatedProject3', FIXTURES_PATH)
+const PROJECT_3_CONFIG = fileURLToPath(
+  new URL('./updatedProject3/.tolgeerc', FIXTURES_PATH)
 );
 
 async function cleanupProjectState() {
@@ -81,7 +81,14 @@ async function cleanupProjectState() {
 afterEach(cleanupProjectState);
 
 it('pushes updated strings to Tolgee', async () => {
-  const out = await run(['push', '--api-key', PROJECT_PAK_1, PROJECT_1_UPDATE]);
+  const out = await run([
+    '--config',
+    PROJECT_1_CONFIG,
+    'push',
+    '--api-key',
+    PROJECT_PAK_1,
+    '--verbose',
+  ]);
 
   expect(out.code).toBe(0);
 
@@ -106,14 +113,15 @@ it('pushes updated strings to Tolgee', async () => {
   });
 });
 
-it('pushes updated strings to Tolgee with correct namespaces', async () => {
+it('pushes to Tolgee with correct namespaces', async () => {
   const out = await run([
+    '--config',
+    PROJECT_3_CONFIG,
     'push',
     '--api-key',
     PROJECT_PAK_3,
     '--force-mode',
     'override',
-    PROJECT_3_UPDATE,
   ]);
   expect(out.code).toBe(0);
 
@@ -121,6 +129,7 @@ it('pushes updated strings to Tolgee with correct namespaces', async () => {
     '/v2/projects/3/translations?filterKeyName=water&filterKeyName=glass',
     PROJECT_PAK_3
   );
+
   expect(keys.page.totalElements).toBe(2);
 
   const stored = tolgeeDataToDict(keys);
@@ -139,7 +148,14 @@ it('pushes updated strings to Tolgee with correct namespaces', async () => {
 });
 
 it('does not push strings to Tolgee if there are conflicts', async () => {
-  const out = await run(['push', '--api-key', PROJECT_PAK_2, PROJECT_2_UPDATE]);
+  const out = await run([
+    '--config',
+    PROJECT_2_CONFIG,
+    'push',
+    '--api-key',
+    PROJECT_PAK_2,
+    '--verbose',
+  ]);
 
   expect(out.code).toBe(1);
 
@@ -161,12 +177,13 @@ it('does not push strings to Tolgee if there are conflicts', async () => {
 
 it('does preserve the remote strings when using KEEP', async () => {
   const out = await run([
+    '--config',
+    PROJECT_2_CONFIG,
     'push',
     '--api-key',
     PROJECT_PAK_2,
     '--force-mode',
     'KEEP',
-    PROJECT_2_UPDATE,
   ]);
 
   expect(out.code).toBe(0);
@@ -194,12 +211,13 @@ it('does preserve the remote strings when using KEEP', async () => {
 
 it('does override the remote strings when using OVERRIDE', async () => {
   const out = await run([
+    '--config',
+    PROJECT_2_CONFIG,
     'push',
     '--api-key',
     PROJECT_PAK_2,
     '--force-mode',
     'OVERRIDE',
-    PROJECT_2_UPDATE,
   ]);
 
   expect(out.code).toBe(0);

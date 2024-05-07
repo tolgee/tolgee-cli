@@ -70,7 +70,7 @@ async function readRecords(matchers: FileMatch[]) {
       result.push({
         ...matcher,
         data: file.data,
-        name: basename(file.name),
+        name: file.name,
       });
     });
   }
@@ -113,10 +113,10 @@ const pushHandler = (config: Schema) =>
         convertPlaceholdersToIcu: opts.convertPlaceholdersToIcu,
         fileMappings: files.map((f) => {
           return {
-            fileName: basename(f.name),
+            fileName: f.name,
             format: opts.format,
             languageTag: f.language,
-            namespace: f.namespace,
+            namespace: f.namespace ?? '',
           };
         }),
       },
@@ -134,6 +134,7 @@ export default (config: Schema) =>
         'What should we do with possible conflicts? If unspecified, the user will be prompted interactively, or the command will fail when in non-interactive'
       )
         .choices(['OVERRIDE', 'KEEP', 'NO_FORCE'])
+        .default('NO_FORCE')
         .argParser((v) => v.toUpperCase())
     )
     .addOption(
