@@ -14,6 +14,10 @@ export class HttpError extends Error {
     );
   }
 
+  async getErrorResponse(): Promise<{ code: string }> {
+    return this.response.body.json();
+  }
+
   getErrorText() {
     // Unauthorized
     if (this.response.statusCode === 400) {

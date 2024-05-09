@@ -7,8 +7,10 @@ import { readdir, readFile, stat } from 'fs/promises';
 import { Command, Option } from 'commander';
 import { glob } from 'glob';
 
-import { loading, success, error } from '../utils/logger.js';
+import { loading, success, error, warn } from '../utils/logger.js';
 import { ForceMode, Format, Schema, FileMatch } from '../schema.js';
+import { askString } from '../utils/ask.js';
+import { HttpError } from '../client/errors.js';
 
 type FileRecord = File & {
   language?: string;
@@ -58,6 +60,44 @@ async function readDirectory(directory: string, base = ''): Promise<File[]> {
   return files;
 }
 
+async function promptConflicts(
+  opts: PushOptions
+): Promise<'KEEP' | 'OVERRIDE'> {
+  const projectId = opts.client.getProjectId();
+  const resolveUrl = new URL(`/projects/${projectId}/import`, opts.apiUrl).href;
+
+  if (opts.forceMode === 'NO_FORCE') {
+    error(
+      `There are conflicts in the import. You can resolve them and complete the import here: ${resolveUrl}.`
+    );
+    process.exit(1);
+  }
+
+  if (opts.forceMode) {
+    return opts.forceMode;
+  }
+
+  if (!process.stdout.isTTY) {
+    error(
+      `There are conflicts in the import. Please specify a --force-mode, or resolve them in your browser at ${resolveUrl}.`
+    );
+    process.exit(1);
+  }
+
+  warn('There are conflicts in the import. What do you want to do?');
+  const resp = await askString(
+    'Type "KEEP" to preserve the version on the server, "OVERRIDE" to use the version from the import, and nothing to abort: '
+  );
+  if (resp !== 'KEEP' && resp !== 'OVERRIDE') {
+    error(
+      `Aborting. You can resolve the conflicts and complete the import here: ${resolveUrl}`
+    );
+    process.exit(1);
+  }
+
+  return resp;
+}
+
 async function importData(client: Client, data: ImportProps) {
   return loading('Uploading files...', client.import.import(data));
 }
@@ -105,22 +145,40 @@ const pushHandler = (config: Schema) =>
       return;
     }
 
-    await importData(opts.client, {
-      files,
-      params: {
-        forceMode: opts.forceMode,
-        overrideKeyDescriptions: opts.overrideKeyDescriptions,
-        convertPlaceholdersToIcu: opts.convertPlaceholdersToIcu,
-        fileMappings: files.map((f) => {
-          return {
-            fileName: f.name,
-            format: opts.format,
-            languageTag: f.language,
-            namespace: f.namespace ?? '',
-          };
-        }),
-      },
-    });
+    const params: ImportProps['params'] = {
+      forceMode: opts.forceMode,
+      overrideKeyDescriptions: opts.overrideKeyDescriptions,
+      convertPlaceholdersToIcu: opts.convertPlaceholdersToIcu,
+      fileMappings: files.map((f) => {
+        return {
+          fileName: f.name,
+          format: opts.format,
+          languageTag: f.language,
+          namespace: f.namespace ?? '',
+        };
+      }),
+    };
+
+    try {
+      await importData(opts.client, {
+        files,
+        params,
+      });
+    } catch (e) {
+      console.log(e);
+      if (!(e instanceof HttpError)) {
+        throw e;
+      }
+      const response = await e.getErrorResponse();
+      if (response.code !== 'conflict_is_not_resolved') {
+        throw e;
+      }
+      const forceMode = await promptConflicts(opts);
+      await importData(opts.client, {
+        files,
+        params: { ...params, forceMode },
+      });
+    }
     success('Done!');
   };
 
@@ -134,7 +192,6 @@ export default (config: Schema) =>
         'What should we do with possible conflicts? If unspecified, the user will be prompted interactively, or the command will fail when in non-interactive'
       )
         .choices(['OVERRIDE', 'KEEP', 'NO_FORCE'])
-        .default('NO_FORCE')
         .argParser((v) => v.toUpperCase())
     )
     .addOption(
