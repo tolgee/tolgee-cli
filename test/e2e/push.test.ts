@@ -8,7 +8,7 @@ import {
   requestDelete,
 } from './utils/tg.js';
 import { tolgeeDataToDict } from './utils/data.js';
-import { run } from './utils/run.js';
+import { run, runWithStdin } from './utils/run.js';
 
 const FIXTURES_PATH = new URL('../__fixtures__/', import.meta.url);
 const PROJECT_1_CONFIG = fileURLToPath(
@@ -258,13 +258,10 @@ it('does preserve the remote strings when using KEEP', async () => {
 });
 
 it('asks for confirmation when there are conflicts', async () => {
-  const out = await run([
-    '--config',
-    PROJECT_2_CONFIG,
-    'push',
-    '--api-key',
-    PROJECT_PAK_2,
-  ]);
+  const out = await runWithStdin(
+    ['--config', PROJECT_2_CONFIG, 'push', '--api-key', PROJECT_PAK_2],
+    'OVERRIDE'
+  );
 
   expect(out.code).toBe(0);
 
@@ -278,8 +275,8 @@ it('asks for confirmation when there are conflicts', async () => {
   expect(stored).toEqual({
     'cat-name': {
       __ns: null,
-      en: 'Cat',
-      fr: 'Chat',
+      en: 'Kitty',
+      fr: 'Chaton',
     },
     'fox-name': {
       __ns: null,
