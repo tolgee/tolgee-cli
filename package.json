@@ -15,7 +15,6 @@
     "test": "npm run test:unit && npm run test:e2e && npm run test:package",
     "test:unit": "cross-env NODE_OPTIONS=\"--experimental-vm-modules\" jest -c jest.unit.config.ts",
     "pretest:e2e": "npm run build && npm run tolgee:start",
-    "posttest:e2e": "npm run tolgee:stop",
     "test:e2e": "cross-env NODE_OPTIONS=\"--experimental-vm-modules\" jest -c jest.e2e.config.ts --runInBand",
     "test:e2e-run": "cross-env NODE_OPTIONS=\"--experimental-vm-modules\" jest -c jest.e2e.config.ts --runInBand",
     "test:package": "node scripts/validatePackage.js",
