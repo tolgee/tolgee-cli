@@ -81,8 +81,8 @@ export default (config: Schema) =>
         '-s, --states <states...>',
         'List of translation states to include. Defaults all except untranslated'
       )
-        .default(config.pull?.languages)
         .choices(['UNTRANSLATED', 'TRANSLATED', 'REVIEWED'])
+        .default(config.pull?.languages)
         .argParser((v, a: string[]) => [v.toUpperCase(), ...(a || [])])
     )
     .addOption(

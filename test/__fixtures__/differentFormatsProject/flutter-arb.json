@@ -1,0 +1,12 @@
+{
+  "$schema": "../../../schema.json",
+  "format": "FLUTTER_ARB",
+  "push": {
+    "files": [
+      {
+        "path": "./flutter-arb/app_en.arb",
+        "language": "en"
+      }
+    ]
+  }
+}

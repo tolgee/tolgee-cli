@@ -1,0 +1,26 @@
+msgid ""
+msgstr ""
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals = 2; plural = (n !== 1)\n"
+"X-Generator: Tolgee\n"
+
+msgid "controller"
+msgstr "You have %s items"
+
+msgid "desk"
+msgstr "Desk"
+
+msgid "keyboard"
+msgstr "Keyboard"
+
+msgid "mouse"
+msgstr "Mouse"
+
+msgid "remote"
+msgstr "Remote"
+
+msgid "screen"
+msgstr "Screen"

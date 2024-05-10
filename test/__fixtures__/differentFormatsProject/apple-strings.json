@@ -1,0 +1,12 @@
+{
+  "$schema": "../../../schema.json",
+  "format": "STRINGSDICT",
+  "push": {
+    "files": [
+      {
+        "path": "./apple-strings/en.lproj/**",
+        "language": "en"
+      }
+    ]
+  }
+}
