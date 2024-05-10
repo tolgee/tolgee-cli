@@ -20,4 +20,5 @@ export default <JestConfigWithTsJest>{
   maxConcurrency: 1,
   testTimeout: 15e3,
   slowTestThreshold: 60e3,
+  globalSetup: '<rootDir>/test/e2e/__internal__/setup.ts',
 };
