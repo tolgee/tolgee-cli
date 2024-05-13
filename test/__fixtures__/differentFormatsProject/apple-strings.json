@@ -1,6 +1,6 @@
 {
   "$schema": "../../../schema.json",
-  "format": "STRINGSDICT",
+  "format": "STRINGS",
   "push": {
     "files": [
       {

@@ -89,8 +89,6 @@ expect.extend({
     const actualStructure = await getStructure(actual);
     const expectedStructure = await getStructure(expected);
 
-    console.log(actualStructure);
-
     if (actualStructure !== expectedStructure) {
       return {
         pass: false,
