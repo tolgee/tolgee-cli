@@ -165,7 +165,6 @@ const pushHandler = (config: Schema) =>
         params,
       });
     } catch (e) {
-      console.log(e);
       if (!(e instanceof HttpError)) {
         throw e;
       }

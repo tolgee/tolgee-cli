@@ -55,7 +55,7 @@ it('works with tolgee icu format', async () => {
 });
 
 it('works with xliff-icu format', async () => {
-  await testWithConfig('xliff');
+  await testWithConfig('xliff-icu');
 });
 
 it('works with xliff-php format', async () => {

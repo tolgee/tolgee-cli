@@ -71,6 +71,24 @@
           "items": {
             "type": "string"
           }
+        },
+        "tags": {
+          "description": "List of tags which to include.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "noTags": {
+          "description": "List of tags which to exclude.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "emptyDir": {
+          "description": "Empty [path] folder before inserting pulled files.",
+          "type": "boolean"
         }
       }
     },

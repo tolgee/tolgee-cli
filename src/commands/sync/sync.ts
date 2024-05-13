@@ -10,7 +10,7 @@ import {
 import { dumpWarnings } from '../../extractor/warnings.js';
 import { type PartialKey, compareKeys, printKey } from './syncUtils.js';
 
-import { overwriteDir } from '../../utils/overwriteDir.js';
+import { prepareDir } from '../../utils/prepareDir.js';
 import { unzipBuffer } from '../../utils/zip.js';
 import { askBoolean } from '../../utils/ask.js';
 import { loading, error } from '../../utils/logger.js';
@@ -107,7 +107,7 @@ const syncHandler = (config: Schema) =>
 
     // Prepare backup
     if (opts.backup) {
-      await overwriteDir(opts.backup, opts.yes);
+      await prepareDir(opts.backup, opts.yes);
       await loading(
         'Backing up Tolgee project',
         backup(opts.client, opts.backup)

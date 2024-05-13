@@ -1,9 +1,10 @@
 import { fileURLToPath } from 'url';
-import { mkdir } from 'fs/promises';
+import { mkdir, readFile, rm, writeFile } from 'fs/promises';
 import { TMP_FOLDER, setupTemporaryFolder } from './utils/tmp.js';
 import { PROJECT_PAK_1, PROJECT_PAK_3 } from './utils/tg.js';
-import { run, runWithStdin } from './utils/run.js';
+import { run } from './utils/run.js';
 import './utils/toMatchContentsOf.js';
+import { dirname, join } from 'path';
 
 const FIXTURES_PATH = new URL('../__fixtures__/', import.meta.url);
 const PROJECT_1_DATA = fileURLToPath(
@@ -47,46 +48,72 @@ it('pulls strings only from the specified namespaces', async () => {
   await expect(TMP_FOLDER).toMatchContentsOf(PROJECT_3_DATA_ONLY_FOOD);
 });
 
-it('does not overwrite existing folder', async () => {
+it('keeps existing files in folders', async () => {
   await mkdir(TMP_FOLDER);
-  const out = await run(['pull', '--api-key', PROJECT_PAK_1, TMP_FOLDER]);
+  const existingFile = join(TMP_FOLDER, 'food', 'test');
+  await mkdir(dirname(existingFile), { recursive: true });
+  await writeFile(existingFile, 'test');
+  const out = await run(['pull', '--api-key', PROJECT_PAK_3, TMP_FOLDER]);
 
-  expect(out.code).toBe(1);
-  await expect(TMP_FOLDER).not.toMatchContentsOf(PROJECT_1_DATA);
+  expect(out.code).toBe(0);
+  expect((await readFile(existingFile)).toString()).toEqual('test');
+  await rm(existingFile);
+
+  await expect(TMP_FOLDER).toMatchStructureOf(PROJECT_3_DATA);
 });
 
-it('does overwrite existing folder if asked to (arg)', async () => {
+it('does empty existing folder if asked to (arg)', async () => {
   await mkdir(TMP_FOLDER);
+  const existingFile = join(TMP_FOLDER, 'test');
+  await writeFile(existingFile, 'test');
   const out = await run([
     'pull',
     '--api-key',
     PROJECT_PAK_1,
-    '--overwrite',
+    '--empty-dir',
     TMP_FOLDER,
   ]);
 
   expect(out.code).toBe(0);
-  await expect(TMP_FOLDER).toMatchContentsOf(PROJECT_1_DATA);
+  expect(TMP_FOLDER).toMatchContentsOf(PROJECT_1_DATA);
 });
 
-it('does overwrite existing folder if asked to (interactive)', async () => {
+it('filters by languages', async () => {
   await mkdir(TMP_FOLDER);
-  const out = await runWithStdin(
-    ['pull', '--api-key', PROJECT_PAK_1, TMP_FOLDER],
-    'Y'
-  );
+  const out = await run([
+    'pull',
+    '--api-key',
+    PROJECT_PAK_3,
+    '-l',
+    'en',
+    '--',
+    TMP_FOLDER,
+  ]);
 
   expect(out.code).toBe(0);
-  await expect(TMP_FOLDER).toMatchContentsOf(PROJECT_1_DATA);
+  await expect(TMP_FOLDER).toMatchStructure(`
+├── drinks/
+|  └── en.json
+├── en.json
+└── food/
+   └── en.json`);
 });
 
-it('does not overwrite existing folder if operation cancelled (interactive)', async () => {
+it('filters by namespace', async () => {
   await mkdir(TMP_FOLDER);
-  const out = await runWithStdin(
-    ['pull', '--api-key', PROJECT_PAK_1, TMP_FOLDER],
-    'N'
-  );
+  const out = await run([
+    'pull',
+    '--api-key',
+    PROJECT_PAK_3,
+    '-n',
+    'food',
+    '--',
+    TMP_FOLDER,
+  ]);
 
-  expect(out.code).toBe(1);
-  await expect(TMP_FOLDER).not.toMatchContentsOf(PROJECT_1_DATA);
+  expect(out.code).toBe(0);
+  await expect(TMP_FOLDER).toMatchStructure(`
+└── food/
+   ├── en.json
+   └── fr.json`);
 });

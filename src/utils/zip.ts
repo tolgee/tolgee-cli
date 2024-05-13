@@ -1,6 +1,6 @@
 import type { ZipFile, Entry } from 'yauzl';
 import type { Blob } from 'buffer';
-import { createWriteStream } from 'fs';
+import { createWriteStream, existsSync } from 'fs';
 import { mkdir } from 'fs/promises';
 import { join, dirname } from 'path';
 import { fromBuffer } from 'yauzl';
@@ -65,12 +65,6 @@ export function unzip(zip: ZipFile, dest: string) {
     zip.on('error', reject);
     zip.on('end', resolve);
 
-    // There is no mechanism for zip files to contain directories
-    // by standards, and implementations diverge. Some make an explicit
-    // directory entry (ending with /), some don't make any specific treatment.
-    // The "safest" way is to check the path on files and create them as necessary.
-    const seenDirectories = new Set<string>([dest]);
-
     zip.readEntry();
     zip.on('entry', (entry: Entry) => {
       if (entry.fileName.endsWith('/')) {
@@ -82,7 +76,7 @@ export function unzip(zip: ZipFile, dest: string) {
 
       // Handle directory creation
       const entryDirName = dirname(entryPath);
-      if (!seenDirectories.has(entryDirName)) {
+      if (!existsSync(entryDirName)) {
         mkdir(entryDirName, { recursive: true }).then(() =>
           dumpFile(zip, entry, entryPath)
         );

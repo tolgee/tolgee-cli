@@ -10,13 +10,13 @@ export function setupTemporaryFolder() {
     TMP_FOLDER = join(tmpdir(), randomUUID());
   });
 
-  afterEach(async () => {
-    try {
-      await rm(TMP_FOLDER, { recursive: true });
-    } catch (e: any) {
-      if (e.code !== 'ENOENT') {
-        throw e;
-      }
-    }
-  });
+  // afterEach(async () => {
+  //   try {
+  //     await rm(TMP_FOLDER, { recursive: true });
+  //   } catch (e: any) {
+  //     if (e.code !== 'ENOENT') {
+  //       throw e;
+  //     }
+  //   }
+  // });
 }

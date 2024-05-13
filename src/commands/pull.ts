@@ -4,18 +4,21 @@ import type { BaseOptions } from '../options.js';
 import { Command, Option } from 'commander';
 
 import { unzipBuffer } from '../utils/zip.js';
-import { overwriteDir } from '../utils/overwriteDir.js';
+import { prepareDir } from '../utils/prepareDir.js';
 import { error, loading, success } from '../utils/logger.js';
 import { HttpError } from '../client/errors.js';
 import { Schema } from '../schema.js';
+import { checkPathNotAFile } from '../utils/checkPathNotAFile.js';
 
 type PullOptions = BaseOptions & {
   format: 'JSON' | 'XLIFF';
   languages?: string[];
   states?: Array<'UNTRANSLATED' | 'TRANSLATED' | 'REVIEWED'>;
   delimiter?: string;
-  overwrite?: boolean;
+  emptyDir?: boolean;
   namespaces?: string[];
+  tags?: string[];
+  noTags?: string[];
 };
 
 async function fetchZipBlob(opts: PullOptions): Promise<Blob> {
@@ -26,6 +29,8 @@ async function fetchZipBlob(opts: PullOptions): Promise<Blob> {
     filterState: opts.states,
     structureDelimiter: opts.delimiter,
     filterNamespace: opts.namespaces,
+    filterTagIn: opts.tags,
+    filterTagNotIn: opts.noTags,
   });
 }
 
@@ -33,16 +38,20 @@ const pullHandler = () =>
   async function (this: Command, path: string | undefined) {
     const opts: PullOptions = this.optsWithGlobals();
 
+    console.log(opts);
+
     if (!path) {
       throw new Error('Missing or argument <path>');
     }
 
-    await overwriteDir(path, opts.overwrite);
+    await checkPathNotAFile(path);
+
     try {
       const zipBlob = await loading(
         'Fetching strings from Tolgee...',
         fetchZipBlob(opts)
       );
+      await prepareDir(path, opts.emptyDir);
       await loading('Extracting strings...', unzipBuffer(zipBlob, path));
       success('Done!');
     } catch (e) {
@@ -72,9 +81,11 @@ export default (config: Schema) =>
         .default(config.format ?? 'JSON')
         .argParser((v) => v.toUpperCase())
     )
-    .option(
-      '-l, --languages <languages...>',
-      'List of languages to pull. Leave unspecified to export them all'
+    .addOption(
+      new Option(
+        '-l, --languages <languages...>',
+        'List of languages to pull. Leave unspecified to export them all'
+      ).default(config.pull?.languagess)
     )
     .addOption(
       new Option(
@@ -82,7 +93,7 @@ export default (config: Schema) =>
         'List of translation states to include. Defaults all except untranslated'
       )
         .choices(['UNTRANSLATED', 'TRANSLATED', 'REVIEWED'])
-        .default(config.pull?.languages)
+        .default(config.pull?.states)
         .argParser((v, a: string[]) => [v.toUpperCase(), ...(a || [])])
     )
     .addOption(
@@ -99,8 +110,22 @@ export default (config: Schema) =>
         'List of namespaces to pull. Defaults to all namespaces'
       ).default(config.pull?.namespaces)
     )
-    .option(
-      '-o, --overwrite',
-      'Whether to automatically overwrite existing files. BE CAREFUL, THIS WILL WIPE *ALL* THE CONTENTS OF THE TARGET FOLDER. If unspecified, the user will be prompted interactively, or the command will fail when in non-interactive'
+    .addOption(
+      new Option(
+        '-t, --tags <tags...>',
+        'List of tags which to include.'
+      ).default(config.pull?.tags)
+    )
+    .addOption(
+      new Option(
+        '-nt, --no-tags <tags...>',
+        'List of tags which to exclude.'
+      ).default(config.pull?.noTags)
+    )
+    .addOption(
+      new Option(
+        '--empty-dir',
+        'Empty [path] directory before inserting pulled files.'
+      ).default(config.pull?.emptyDir)
     )
     .action(pullHandler());

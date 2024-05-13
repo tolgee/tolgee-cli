@@ -90,6 +90,18 @@ export interface Schema {
      * List of namespaces to pull. Defaults to all namespaces.
      */
     namespaces?: string[];
+    /**
+     * List of tags which to include.
+     */
+    tags?: string[];
+    /**
+     * List of tags which to exclude.
+     */
+    noTags?: string[];
+    /**
+     * Empty [path] folder before inserting pulled files.
+     */
+    emptyDir?: boolean;
     [k: string]: unknown;
   };
   /**
