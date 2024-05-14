@@ -18,7 +18,7 @@ type PullOptions = BaseOptions & {
   emptyDir?: boolean;
   namespaces?: string[];
   tags?: string[];
-  noTags?: string[];
+  excludeTags?: string[];
 };
 
 async function fetchZipBlob(opts: PullOptions): Promise<Blob> {
@@ -30,15 +30,13 @@ async function fetchZipBlob(opts: PullOptions): Promise<Blob> {
     structureDelimiter: opts.delimiter,
     filterNamespace: opts.namespaces,
     filterTagIn: opts.tags,
-    filterTagNotIn: opts.noTags,
+    filterTagNotIn: opts.excludeTags,
   });
 }
 
 const pullHandler = () =>
   async function (this: Command, path: string | undefined) {
     const opts: PullOptions = this.optsWithGlobals();
-
-    console.log(opts);
 
     if (!path) {
       throw new Error('Missing or argument <path>');
@@ -118,9 +116,9 @@ export default (config: Schema) =>
     )
     .addOption(
       new Option(
-        '-nt, --no-tags <tags...>',
+        '--exclude-tags <tags...>',
         'List of tags which to exclude.'
-      ).default(config.pull?.noTags)
+      ).default(config.pull?.excludeTags)
     )
     .addOption(
       new Option(

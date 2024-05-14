@@ -79,7 +79,7 @@
             "type": "string"
           }
         },
-        "noTags": {
+        "excludeTags": {
           "description": "List of tags which to exclude.",
           "type": "array",
           "items": {

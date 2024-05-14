@@ -16,10 +16,11 @@ export default class ExportClient {
   constructor(private requester: Requester) {}
 
   async export(req: ExportRequest): Promise<Blob> {
+    const body = { ...req, zip: true };
     return this.requester.requestBlob({
       method: 'POST',
       path: `${this.requester.projectUrl}/export`,
-      body: { ...req, zip: true },
+      body: body,
     });
   }
 

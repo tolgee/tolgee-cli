@@ -1,7 +1,12 @@
 import { fileURLToPath } from 'url';
 import { mkdir, readFile, rm, writeFile } from 'fs/promises';
 import { TMP_FOLDER, setupTemporaryFolder } from './utils/tmp.js';
-import { PROJECT_PAK_1, PROJECT_PAK_3 } from './utils/tg.js';
+import {
+  PROJECT_PAK_1,
+  PROJECT_PAK_3,
+  requestGet,
+  requestPut,
+} from './utils/tg.js';
 import { run } from './utils/run.js';
 import './utils/toMatchContentsOf.js';
 import { dirname, join } from 'path';
@@ -18,6 +23,31 @@ const PROJECT_3_DATA_ONLY_FOOD = fileURLToPath(
 );
 
 setupTemporaryFolder();
+
+async function addTag(search: string, tag: string) {
+  const result = await requestGet(
+    `/v2/projects/3/translations?search=${search}`,
+    PROJECT_PAK_3
+  );
+  for (const keyData of result._embedded.keys) {
+    const { keyId } = keyData;
+    await requestPut(
+      `http://localhost:22222/v2/projects/3/keys/${keyId}/tags`,
+      { name: tag },
+      PROJECT_PAK_3
+    );
+  }
+}
+
+async function prepareTags() {
+  addTag('soda', 'soda_tag');
+  addTag('soda', 'drinks_tag');
+  addTag('water', 'drinks_tag');
+}
+
+beforeAll(() => {
+  prepareTags();
+});
 
 it('pulls strings from Tolgee', async () => {
   const out = await run(['pull', '--api-key', PROJECT_PAK_1, TMP_FOLDER]);
@@ -116,4 +146,45 @@ it('filters by namespace', async () => {
 └── food/
    ├── en.json
    └── fr.json`);
+});
+
+it('filters by tag', async () => {
+  await mkdir(TMP_FOLDER);
+  const out = await run([
+    'pull',
+    '--api-key',
+    PROJECT_PAK_3,
+    '-t',
+    'soda_tag',
+    '--',
+    TMP_FOLDER,
+  ]);
+
+  expect(out.code).toBe(0);
+  await expect(TMP_FOLDER).toMatchStructure(`
+└── drinks/
+   ├── en.json
+   └── fr.json`);
+  const content = (await import(join(TMP_FOLDER, 'drinks', 'en.json'))).default;
+  expect(content).toEqual({ soda: 'Soda' });
+});
+
+it('filters negatively by tag', async () => {
+  await mkdir(TMP_FOLDER);
+  const out = await run([
+    'pull',
+    '--api-key',
+    PROJECT_PAK_3,
+    '--exclude-tags',
+    'soda_tag',
+    '--',
+    TMP_FOLDER,
+  ]);
+
+  expect(out.code).toBe(0);
+  await expect(TMP_FOLDER).toMatchStructure(`
+└── drinks/
+   └── fr.json`);
+  const content = (await import(join(TMP_FOLDER, 'drinks', 'en.json'))).default;
+  expect(content).toEqual({ water: 'Water' });
 });

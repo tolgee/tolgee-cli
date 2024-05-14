@@ -116,7 +116,7 @@ expect.extend({
       return {
         pass: false,
         message: () =>
-          `Structure doesn't match\n:` +
+          `Structure doesn't match:\n` +
           this.utils.printDiffOrStringify(
             expectedStructure,
             actualStructure,
