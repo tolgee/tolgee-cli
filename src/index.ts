@@ -20,6 +20,8 @@ import {
   API_KEY_OPT,
   API_URL_OPT,
   CONFIG_OPT,
+  EXTRACTOR,
+  FILE_PATTERNS,
   FORMAT_OPT,
   PROJECT_ID_OPT,
 } from './options.js';
@@ -200,6 +202,8 @@ async function run() {
     program.addOption(API_KEY_OPT);
     program.addOption(PROJECT_ID_OPT.default(-1));
     program.addOption(FORMAT_OPT.default('JSON_TOLGEE'));
+    program.addOption(EXTRACTOR);
+    program.addOption(FILE_PATTERNS.default([]));
 
     const config = await loadConfig(program);
     program.hook('preAction', preHandler(config));

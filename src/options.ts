@@ -61,7 +61,7 @@ export const CONFIG_OPT = new Option(
 ).argParser(parsePath);
 
 export const FORMAT_OPT = new Option(
-  '--format <format>',
+  '-f, --format <format>',
   'Localization files format.'
 ).choices([
   'JSON_TOLGEE',
@@ -90,3 +90,8 @@ export const FORMAT_OPT = new Option(
   'XLIFF_PHP',
   'XLIFF_RUBY',
 ]);
+
+export const FILE_PATTERNS = new Option(
+  '-pt, --patterns <patterns...>',
+  'File glob patterns to include (hint: make sure to escape it in quotes, or your shell might attempt to unroll some tokens like *)'
+);

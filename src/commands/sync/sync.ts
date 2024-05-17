@@ -14,18 +14,16 @@ import { prepareDir } from '../../utils/prepareDir.js';
 import { unzipBuffer } from '../../utils/zip.js';
 import { askBoolean } from '../../utils/ask.js';
 import { loading, error } from '../../utils/logger.js';
-
-import { EXTRACTOR } from '../../options.js';
-import { FILE_PATTERNS } from '../../arguments.js';
 import { Schema } from '../../schema.js';
+import { BaseExtractOptions } from '../extract.js';
 
-type Options = BaseOptions & {
-  extractor: string;
-  backup?: string;
-  removeUnused?: boolean;
-  continueOnWarning?: boolean;
-  yes?: boolean;
-};
+type Options = BaseOptions &
+  BaseExtractOptions & {
+    backup?: string;
+    removeUnused?: boolean;
+    continueOnWarning?: boolean;
+    yes?: boolean;
+  };
 
 async function backup(client: Client, dest: string) {
   const blob = await client.export.export({
@@ -63,19 +61,19 @@ async function askForConfirmation(
 }
 
 const syncHandler = (config: Schema) =>
-  async function (this: Command, filesPatterns: string[]) {
-    const patterns = filesPatterns.length ? filesPatterns : config.patterns;
+  async function (this: Command) {
+    const opts: Options = this.optsWithGlobals();
+
+    const patterns = opts.patterns?.length ? opts.patterns : config.patterns;
 
     if (!patterns?.length) {
       error('Missing argument <patterns>');
       process.exit(1);
     }
 
-    const opts: Options = this.optsWithGlobals();
-
     const rawKeys = await loading(
       'Analyzing code...',
-      extractKeysOfFiles(filesPatterns, opts.extractor)
+      extractKeysOfFiles(patterns, opts.extractor)
     );
     const warnCount = dumpWarnings(rawKeys);
     if (!opts.continueOnWarning && warnCount) {
@@ -189,8 +187,6 @@ export default (config: Schema) =>
     .description(
       'Synchronizes the keys in your code project and in the Tolgee project, by creating missing keys and optionally deleting unused ones. For a dry-run, use `tolgee compare`.'
     )
-    .addArgument(FILE_PATTERNS.default(config.patterns))
-    .addOption(EXTRACTOR.default(config.extractor))
     .option(
       '-B, --backup <path>',
       'Path where a backup should be downloaded before performing the sync. If something goes wrong, the backup can be used to restore the project to its previous state.'

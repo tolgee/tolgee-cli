@@ -8,21 +8,18 @@ import {
   emitGitHubWarning,
 } from '../../extractor/warnings.js';
 import { error, loading } from '../../utils/logger.js';
-import { FILE_PATTERNS } from '../../arguments.js';
 import { Schema } from '../../schema.js';
 
 type ExtractLintOptions = BaseExtractOptions;
 
 const lintHandler = (config: Schema) =>
-  async function (this: Command, filesPatterns: string[]) {
-    const patterns = filesPatterns.length ? filesPatterns : config.patterns;
-
+  async function (this: Command) {
+    const opts: ExtractLintOptions = this.optsWithGlobals();
+    const patterns = opts.patterns?.length ? opts.patterns : config.patterns;
     if (!patterns?.length) {
-      error('Missing argument <patterns>');
+      error('Missing option --patterns or config.patterns option');
       process.exit(1);
     }
-
-    const opts: ExtractLintOptions = this.optsWithGlobals();
     const extracted = await loading(
       'Analyzing code...',
       extractKeysOfFiles(patterns, opts.extractor)
@@ -70,5 +67,4 @@ export default (config: Schema) =>
     .description(
       'Checks if the keys can be extracted automatically, and reports problems if any'
     )
-    .addArgument(FILE_PATTERNS.default(config.patterns))
     .action(lintHandler(config));

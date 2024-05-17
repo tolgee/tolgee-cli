@@ -26,7 +26,13 @@ const CODE_UNORDERED = fileURLToPathSlash(
 
 it('says projects are in sync when they do match', async () => {
   const out = await run(
-    ['compare', '--api-key', PROJECT_PAK_2, CODE_PROJECT_2_COMPLETE],
+    [
+      'compare',
+      '--api-key',
+      PROJECT_PAK_2,
+      '--patterns',
+      CODE_PROJECT_2_COMPLETE,
+    ],
     undefined,
     20e3
   );
@@ -37,7 +43,7 @@ it('says projects are in sync when they do match', async () => {
 
 it('detects new keys in code projects', async () => {
   const out = await run(
-    ['compare', '--api-key', PROJECT_PAK_2, CODE_PROJECT_2_ADDED],
+    ['compare', '--api-key', PROJECT_PAK_2, '--patterns', CODE_PROJECT_2_ADDED],
     undefined,
     20e3
   );
@@ -52,7 +58,13 @@ it('detects new keys in code projects', async () => {
 
 it('detects keys that no longer exist', async () => {
   const out = await run(
-    ['compare', '--api-key', PROJECT_PAK_2, CODE_PROJECT_2_DELETED],
+    [
+      'compare',
+      '--api-key',
+      PROJECT_PAK_2,
+      '--patterns',
+      CODE_PROJECT_2_DELETED,
+    ],
     undefined,
     20e3
   );
@@ -67,7 +79,7 @@ it('detects keys that no longer exist', async () => {
 
 it('handles namespaces properly', async () => {
   const out = await run(
-    ['compare', '--api-key', PROJECT_PAK_3, CODE_PROJECT_3],
+    ['compare', '--api-key', PROJECT_PAK_3, '--patterns', CODE_PROJECT_3],
     undefined,
     20e3
   );
@@ -84,7 +96,13 @@ it('handles namespaces properly', async () => {
 
 it('logs emitted warnings to stderr', async () => {
   const out = await run(
-    ['compare', '--api-key', PROJECT_PAK_2, CODE_PROJECT_2_WARNING],
+    [
+      'compare',
+      '--api-key',
+      PROJECT_PAK_2,
+      '--patterns',
+      CODE_PROJECT_2_WARNING,
+    ],
     undefined,
     20e3
   );
@@ -95,7 +113,7 @@ it('logs emitted warnings to stderr', async () => {
 
 it('prints keys sorted in alphabetical order', async () => {
   const out = await run(
-    ['compare', '--api-key', PROJECT_PAK_2, CODE_UNORDERED],
+    ['compare', '--api-key', PROJECT_PAK_2, '--patterns', CODE_UNORDERED],
     undefined,
     20e3
   );

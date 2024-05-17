@@ -70,7 +70,14 @@ afterEach(async () => {
 
 it('says projects are in sync when they do match', async () => {
   const out = await run(
-    ['sync', '--yes', '--api-key', PROJECT_PAK_2, CODE_PROJECT_2_COMPLETE],
+    [
+      'sync',
+      '--yes',
+      '--api-key',
+      PROJECT_PAK_2,
+      '--patterns',
+      CODE_PROJECT_2_COMPLETE,
+    ],
     undefined,
     20e3
   );
@@ -81,7 +88,7 @@ it('says projects are in sync when they do match', async () => {
 
 it('creates new keys in code projects', async () => {
   const out = await run(
-    ['sync', '--yes', '--api-key', PROJECT_PAK_2, CODE_PROJECT_2_ADDED],
+    ['sync', '--yes', '--api-key', PROJECT_PAK_2, '-pt', CODE_PROJECT_2_ADDED],
     undefined,
     20e3
   );
@@ -117,6 +124,7 @@ it('deletes keys that no longer exist', async () => {
       '--remove-unused',
       '--api-key',
       PROJECT_PAK_2,
+      '--patterns',
       CODE_PROJECT_2_DELETED,
     ],
     undefined,
@@ -136,7 +144,7 @@ it('deletes keys that no longer exist', async () => {
 
 it('handles namespaces properly', async () => {
   const out = await run(
-    ['sync', '--yes', '--api-key', PROJECT_PAK_3, CODE_PROJECT_3],
+    ['sync', '--yes', '--api-key', PROJECT_PAK_3, '--patterns', CODE_PROJECT_3],
     undefined,
     20e3
   );
@@ -169,6 +177,7 @@ it('does a proper backup', async () => {
       PROJECT_PAK_2,
       '--backup',
       TMP_FOLDER,
+      '--patterns',
       CODE_PROJECT_2_DELETED,
     ],
     undefined,
@@ -181,7 +190,14 @@ it('does a proper backup', async () => {
 
 it('logs warnings to stderr and aborts', async () => {
   const out = await run(
-    ['sync', '--yes', '--api-key', PROJECT_PAK_2, CODE_PROJECT_2_WARNING],
+    [
+      'sync',
+      '--yes',
+      '--api-key',
+      PROJECT_PAK_2,
+      '--patterns',
+      CODE_PROJECT_2_WARNING,
+    ],
     undefined,
     20e3
   );
@@ -198,6 +214,7 @@ it('continues when there are warnings and --continue-on-warning is set', async (
       '--continue-on-warning',
       '--api-key',
       PROJECT_PAK_2,
+      '--patterns',
       CODE_PROJECT_2_WARNING,
     ],
     undefined,

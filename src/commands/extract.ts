@@ -7,6 +7,7 @@ import { Schema } from '../schema.js';
 
 export type BaseExtractOptions = {
   extractor: string;
+  patterns: string[] | undefined;
 };
 
 export default (config: Schema) =>

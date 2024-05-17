@@ -29,7 +29,7 @@ beforeAll(async () => {
 
 it('prints all the strings and warnings from test project', async () => {
   const out = await run(
-    ['extract', 'print', CODE_PROJECT_ERR_MATCH],
+    ['extract', 'print', '--patterns', CODE_PROJECT_ERR_MATCH],
     undefined,
     50e3
   );
@@ -47,7 +47,7 @@ it('prints all the strings and warnings from test project', async () => {
 
 it('prints all the checking information from test project (without error)', async () => {
   const out = await run(
-    ['extract', 'check', CODE_PROJECT_MATCH],
+    ['extract', 'check', '--patterns', CODE_PROJECT_MATCH],
     undefined,
     50e3
   );
@@ -59,7 +59,7 @@ it('prints all the checking information from test project (without error)', asyn
 
 it('prints all the checking information from test project (with error)', async () => {
   const out = await run(
-    ['extract', 'check', CODE_PROJECT_ERR_MATCH],
+    ['extract', 'check', '--patterns', CODE_PROJECT_ERR_MATCH],
     undefined,
     50e3
   );
@@ -72,7 +72,7 @@ it('prints all the checking information from test project (with error)', async (
 
 it('spits GitHub Workflow Commands when it detects GH Actions env', async () => {
   const out = await run(
-    ['extract', 'check', CODE_PROJECT_ERR_MATCH],
+    ['extract', 'check', '--patterns', CODE_PROJECT_ERR_MATCH],
     { CI: 'true', GITHUB_ACTIONS: 'true' },
     50e3
   );
@@ -83,7 +83,7 @@ it('spits GitHub Workflow Commands when it detects GH Actions env', async () => 
 
 it('extracts from files with only magic comments', async () => {
   const out = await run(
-    ['extract', 'print', CODE_PROJECT_COMMENT_MATCH],
+    ['extract', 'print', '--patterns', CODE_PROJECT_COMMENT_MATCH],
     undefined,
     50e3
   );

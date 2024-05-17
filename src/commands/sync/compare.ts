@@ -1,25 +1,24 @@
 import { Command } from 'commander';
 import ansi from 'ansi-colors';
 
-import type { BaseOptions } from '../../options.js';
 import { compareKeys, printKey } from './syncUtils.js';
 import {
   extractKeysOfFiles,
   filterExtractionResult,
 } from '../../extractor/runner.js';
 import { dumpWarnings } from '../../extractor/warnings.js';
-import { EXTRACTOR } from '../../options.js';
 import { error, loading } from '../../utils/logger.js';
-import { FILE_PATTERNS } from '../../arguments.js';
 import { Schema } from '../../schema.js';
+import { BaseExtractOptions } from '../extract.js';
+import { BaseOptions } from '../../options.js';
 
-type Options = BaseOptions & {
-  extractor: string;
-};
+type Options = BaseOptions & BaseExtractOptions;
 
-const asyncHandler = () =>
-  async function (this: Command, patterns: string[]) {
+const asyncHandler = (config: Schema) =>
+  async function (this: Command) {
     const opts: Options = this.optsWithGlobals();
+
+    const patterns = opts.patterns?.length ? opts.patterns : config.patterns;
 
     if (!patterns?.length) {
       error('Missing argument <patterns>');
@@ -77,6 +76,4 @@ export default (config: Schema) =>
     .description(
       'Compares the keys in your code project and in the Tolgee project.'
     )
-    .addArgument(FILE_PATTERNS.default(config.patterns))
-    .addOption(EXTRACTOR.default(config.extractor))
-    .action(asyncHandler());
+    .action(asyncHandler(config));

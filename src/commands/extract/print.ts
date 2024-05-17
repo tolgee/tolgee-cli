@@ -5,21 +5,20 @@ import { Command } from 'commander';
 import { extractKeysOfFiles } from '../../extractor/runner.js';
 import { WarningMessages } from '../../extractor/warnings.js';
 import { error, loading } from '../../utils/logger.js';
-import { FILE_PATTERNS } from '../../arguments.js';
 import { Schema } from '../../schema.js';
 
 type ExtractPrintOptions = BaseExtractOptions;
 
 const printHandler = (config: Schema) =>
-  async function (this: Command, filesPatterns: string[]) {
-    const patterns = filesPatterns.length ? filesPatterns : config.patterns;
+  async function (this: Command) {
+    const opts: ExtractPrintOptions = this.optsWithGlobals();
 
+    const patterns = opts.patterns?.length ? opts.patterns : config.patterns;
     if (!patterns?.length) {
       error('Missing argument <patterns>');
       process.exit(1);
     }
 
-    const opts: ExtractPrintOptions = this.optsWithGlobals();
     const extracted = await loading(
       'Analyzing code...',
       extractKeysOfFiles(patterns, opts.extractor)
@@ -78,5 +77,4 @@ const printHandler = (config: Schema) =>
 export default (config: Schema) =>
   new Command('print')
     .description('Prints extracted data to the console')
-    .addArgument(FILE_PATTERNS.default(config.patterns))
     .action(printHandler(config));
