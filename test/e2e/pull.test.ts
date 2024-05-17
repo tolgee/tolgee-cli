@@ -183,8 +183,14 @@ it('filters negatively by tag', async () => {
 
   expect(out.code).toBe(0);
   await expect(TMP_FOLDER).toMatchStructure(`
-└── drinks/
-   └── fr.json`);
+├── drinks/
+|  ├── en.json
+|  └── fr.json
+├── en.json
+├── food/
+|  ├── en.json
+|  └── fr.json
+└── fr.json`);
   const content = (await import(join(TMP_FOLDER, 'drinks', 'en.json'))).default;
   expect(content).toEqual({ water: 'Water' });
 });

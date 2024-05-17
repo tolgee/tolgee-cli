@@ -87,7 +87,7 @@ export interface paths {
   };
   "/v2/projects/{projectId}": {
     /** Get one project */
-    get: operations["get_3"];
+    get: operations["get_4"];
     /** Update project settings */
     put: operations["editProject"];
     /** Delete project */
@@ -95,7 +95,7 @@ export interface paths {
   };
   "/v2/projects/{projectId}/webhook-configs/{id}": {
     /** Get one webhook configuration */
-    get: operations["get_4"];
+    get: operations["get_5"];
     /** Update webhook configuration */
     put: operations["update"];
     /** Delete webhook configuration */
@@ -160,7 +160,7 @@ export interface paths {
   };
   "/v2/projects/{projectId}/keys/{id}": {
     /** Get one key */
-    get: operations["get_5"];
+    get: operations["get_6"];
     /** Edit key name */
     put: operations["edit"];
   };
@@ -170,7 +170,7 @@ export interface paths {
   };
   "/v2/projects/{projectId}/content-storages/{contentStorageId}": {
     /** Get Content Storage */
-    get: operations["get_7"];
+    get: operations["get_8"];
     /** Update Content Storage */
     put: operations["update_3"];
     /** Delete Content Storage */
@@ -178,7 +178,7 @@ export interface paths {
   };
   "/v2/projects/{projectId}/content-delivery-configs/{id}": {
     /** Get one Content Delivery Config */
-    get: operations["get_8"];
+    get: operations["get_9"];
     /** Update Content Delivery Config */
     put: operations["update_4"];
     /**
@@ -202,6 +202,10 @@ export interface paths {
      * @description Sets default auto-translation settings for project (deprecated: use per language config with null language id)
      */
     put: operations["setAutoTranslationSettings"];
+  };
+  "/v2/projects/{projectId}/tag-complex": {
+    /** Execute complex tag operation */
+    put: operations["executeComplexTagOperation"];
   };
   "/v2/projects/{projectId}/keys/{keyId}/tags": {
     /**
@@ -278,7 +282,7 @@ export interface paths {
      * Get Import Settings
      * @description Returns import settings for the authenticated user and the project.
      */
-    get: operations["get_9"];
+    get: operations["get_10"];
     /**
      * Set Import Settings
      * @description Stores import settings for the authenticated user and the project.
@@ -302,7 +306,7 @@ export interface paths {
   };
   "/v2/projects/{projectId}/translations/{translationId}/comments/{commentId}": {
     /** Get one translation comment */
-    get: operations["get_13"];
+    get: operations["get_14"];
     /** Update translation comment */
     put: operations["update_5"];
     /** Delete translation comment */
@@ -349,7 +353,7 @@ export interface paths {
   };
   "/v2/projects/{projectId}/languages/{languageId}": {
     /** Get one language */
-    get: operations["get_15"];
+    get: operations["get_16"];
     /** Update language */
     put: operations["editLanguage"];
     /** Delete specific language */
@@ -383,7 +387,7 @@ export interface paths {
   };
   "/v2/pats/{id}": {
     /** Get one PAK */
-    get: operations["get_17"];
+    get: operations["get_18"];
     /**
      * Update PAK
      * @description Updates Personal Access Token
@@ -425,7 +429,7 @@ export interface paths {
   };
   "/v2/organizations/{id}": {
     /** Get one organization */
-    get: operations["get_19"];
+    get: operations["get_20"];
     /** Update organization data */
     put: operations["update_8"];
     /**
@@ -518,34 +522,9 @@ export interface paths {
     /** Generate organization slug */
     post: operations["generateOrganizationSlug"];
   };
-  "/v2/public/translator/translate": {
-    post: operations["translate"];
-  };
-  "/v2/public/telemetry/report": {
-    post: operations["report"];
-  };
-  "/v2/public/licensing/subscription": {
-    post: operations["getMySubscription"];
-  };
-  "/v2/public/licensing/set-key": {
-    /** Triggered when user sets licence key on their instance */
-    post: operations["onLicenceSetKey"];
-  };
-  "/v2/public/licensing/report-usage": {
-    post: operations["reportUsage"];
-  };
-  "/v2/public/licensing/report-error": {
-    post: operations["reportError"];
-  };
-  "/v2/public/licensing/release-key": {
-    post: operations["releaseKey"];
-  };
-  "/v2/public/licensing/prepare-set-key": {
-    post: operations["prepareSetLicenseKey"];
-  };
   "/v2/public/business-events/report": {
     /** Reports business event */
-    post: operations["report_1"];
+    post: operations["report"];
   };
   "/v2/public/business-events/identify": {
     /** Identifies user */
@@ -656,7 +635,7 @@ export interface paths {
      * Pre-translate by TM
      * @description Pre-translate provided keys to provided languages by TM.
      */
-    post: operations["translate_1"];
+    post: operations["translate"];
   };
   "/v2/projects/{projectId}/start-batch-job/machine-translate": {
     /**
@@ -791,7 +770,7 @@ export interface paths {
      * Get info before applying the license key
      * @description Get info about the upcoming EE subscription. This will show, how much the subscription will cost when key is applied.
      */
-    post: operations["prepareSetLicenseKey_1"];
+    post: operations["prepareSetLicenseKey"];
   };
   "/v2/api-keys": {
     /** Get all user's API keys */
@@ -876,9 +855,12 @@ export interface paths {
      */
     get: operations["get_1"];
   };
+  "/v2/public/export-info/formats": {
+    get: operations["get_2"];
+  };
   "/v2/public/configuration-properties": {
     /** @description Return server configuration properties documentation */
-    get: operations["get_2"];
+    get: operations["get_3"];
   };
   "/v2/projects/{projectId}/users": {
     /**
@@ -998,7 +980,7 @@ export interface paths {
   };
   "/v2/projects/{projectId}/batch-jobs/{id}": {
     /** Get batch operation */
-    get: operations["get_11"];
+    get: operations["get_12"];
   };
   "/v2/projects/{projectId}/batch-jobs": {
     /** List batch operations */
@@ -1082,7 +1064,7 @@ export interface paths {
   };
   "/v2/organizations/{slug}": {
     /** Get organization by slug */
-    get: operations["get_18"];
+    get: operations["get_19"];
   };
   "/v2/organizations/{slug}/projects": {
     /**
@@ -1147,7 +1129,7 @@ export interface paths {
      * Get one API key
      * @description Returns specific API key info
      */
-    get: operations["get_20"];
+    get: operations["get_21"];
   };
   "/v2/api-keys/current": {
     /**
@@ -1328,6 +1310,14 @@ export interface components {
        */
       permittedLanguageIds?: number[];
       /**
+       * @description Granted scopes to the user. When user has type permissions, this field contains permission scopes of the type.
+       * @example [
+       *   "KEYS_EDIT",
+       *   "TRANSLATIONS_VIEW"
+       * ]
+       */
+      scopes: ("translations.view" | "translations.edit" | "keys.edit" | "screenshots.upload" | "screenshots.delete" | "screenshots.view" | "activity.view" | "languages.edit" | "admin" | "project.edit" | "members.view" | "members.edit" | "translation-comments.add" | "translation-comments.edit" | "translation-comments.set-state" | "translations.state-edit" | "keys.view" | "keys.delete" | "keys.create" | "batch-jobs.view" | "batch-jobs.cancel" | "translations.batch-by-tm" | "translations.batch-machine" | "content-delivery.manage" | "content-delivery.publish" | "webhooks.manage")[];
+      /**
        * @description List of languages user can translate to. If null, all languages editing is permitted.
        * @example [
        *   200001,
@@ -1335,14 +1325,6 @@ export interface components {
        * ]
        */
       translateLanguageIds?: number[];
-      /**
-       * @description List of languages user can view. If null, all languages view is permitted.
-       * @example [
-       *   200001,
-       *   200004
-       * ]
-       */
-      viewLanguageIds?: number[];
       /**
        * @description List of languages user can change state to. If null, changing state of all language values is permitted.
        * @example [
@@ -1352,13 +1334,13 @@ export interface components {
        */
       stateChangeLanguageIds?: number[];
       /**
-       * @description Granted scopes to the user. When user has type permissions, this field contains permission scopes of the type.
+       * @description List of languages user can view. If null, all languages view is permitted.
        * @example [
-       *   "KEYS_EDIT",
-       *   "TRANSLATIONS_VIEW"
+       *   200001,
+       *   200004
        * ]
        */
-      scopes: ("translations.view" | "translations.edit" | "keys.edit" | "screenshots.upload" | "screenshots.delete" | "screenshots.view" | "activity.view" | "languages.edit" | "admin" | "project.edit" | "members.view" | "members.edit" | "translation-comments.add" | "translation-comments.edit" | "translation-comments.set-state" | "translations.state-edit" | "keys.view" | "keys.delete" | "keys.create" | "batch-jobs.view" | "batch-jobs.cancel" | "translations.batch-by-tm" | "translations.batch-machine" | "content-delivery.manage" | "content-delivery.publish" | "webhooks.manage")[];
+      viewLanguageIds?: number[];
     };
     LanguageModel: {
       /** Format: int64 */
@@ -1891,9 +1873,9 @@ export interface components {
       secretKey?: string;
       endpoint: string;
       signingRegion: string;
-      enabled?: boolean;
       /** @enum {string} */
       contentStorageType?: "S3" | "AZURE";
+      enabled?: boolean;
     };
     AzureContentStorageConfigModel: {
       containerName?: string;
@@ -1991,6 +1973,21 @@ export interface components {
        * @enum {string}
        */
       messageFormat?: "C_SPRINTF" | "PHP_SPRINTF" | "JAVA_STRING_FORMAT" | "APPLE_SPRINTF" | "RUBY_SPRINTF" | "ICU";
+      /**
+       * @description This is a template that defines the structure of the resulting .zip file content.
+       *
+       * The template is a string that can contain the following placeholders: {namespace}, {languageTag},
+       * {androidLanguageTag}, {snakeLanguageTag}, {extension}.
+       *
+       * For example, when exporting to JSON with the template `{namespace}/{languageTag}.{extension}`,
+       * the English translations of the `home` namespace will be stored in `home/en.json`.
+       *
+       * The `{snakeLanguageTag}` placeholder is the same as `{languageTag}` but in snake case. (e.g., en_US).
+       *
+       * The Android specific `{androidLanguageTag}` placeholder is the same as `{languageTag}`
+       * but in Android format. (e.g., en-rUS)
+       */
+      fileStructureTemplate?: string;
     };
     ContentDeliveryConfigModel: {
       /** Format: int64 */
@@ -2060,6 +2057,36 @@ export interface components {
        * e.g. Key hello[0] will be exported as {"hello": ["..."]}
        */
       supportArrays: boolean;
+      /**
+       * @description This is a template that defines the structure of the resulting .zip file content.
+       *
+       * The template is a string that can contain the following placeholders: {namespace}, {languageTag},
+       * {androidLanguageTag}, {snakeLanguageTag}, {extension}.
+       *
+       * For example, when exporting to JSON with the template `{namespace}/{languageTag}.{extension}`,
+       * the English translations of the `home` namespace will be stored in `home/en.json`.
+       *
+       * The `{snakeLanguageTag}` placeholder is the same as `{languageTag}` but in snake case. (e.g., en_US).
+       *
+       * The Android specific `{androidLanguageTag}` placeholder is the same as `{languageTag}`
+       * but in Android format. (e.g., en-rUS)
+       */
+      fileStructureTemplate?: string;
+    };
+    ComplexTagKeysRequest: {
+      filterKeys?: components["schemas"]["KeyId"][];
+      filterTag?: string[];
+      filterTagNot?: string[];
+      tagFiltered?: string[];
+      untagFiltered?: string[];
+      tagOther?: string[];
+      untagOther?: string[];
+    };
+    KeyId: {
+      name?: string;
+      namespace?: string;
+      /** Format: int64 */
+      id?: number;
     };
     TagKeyDto: {
       name: string;
@@ -2075,10 +2102,10 @@ export interface components {
       convertPlaceholdersToIcu: boolean;
     };
     ImportSettingsModel: {
-      /** @description If true, placeholders from other formats will be converted to ICU when possible */
-      convertPlaceholdersToIcu: boolean;
       /** @description If true, key descriptions will be overridden by the import */
       overrideKeyDescriptions: boolean;
+      /** @description If true, placeholders from other formats will be converted to ICU when possible */
+      convertPlaceholdersToIcu: boolean;
     };
     /** @description User who created the comment */
     SimpleUserAccountModel: {
@@ -2264,15 +2291,15 @@ export interface components {
       token: string;
       /** Format: int64 */
       id: number;
-      description: string;
-      /** Format: int64 */
-      createdAt: number;
-      /** Format: int64 */
-      updatedAt: number;
       /** Format: int64 */
       expiresAt?: number;
       /** Format: int64 */
       lastUsedAt?: number;
+      /** Format: int64 */
+      createdAt: number;
+      /** Format: int64 */
+      updatedAt: number;
+      description: string;
     };
     SetOrganizationRoleDto: {
       /** @enum {string} */
@@ -2400,17 +2427,17 @@ export interface components {
       key: string;
       /** Format: int64 */
       id: number;
-      projectName: string;
       userFullName?: string;
-      username?: string;
-      description: string;
+      projectName: string;
       /** Format: int64 */
       expiresAt?: number;
-      /** Format: int64 */
-      projectId: number;
+      scopes: string[];
       /** Format: int64 */
       lastUsedAt?: number;
-      scopes: string[];
+      /** Format: int64 */
+      projectId: number;
+      username?: string;
+      description: string;
     };
     SuperTokenRequest: {
       /** @description Has to be provided when TOTP enabled */
@@ -2421,154 +2448,6 @@ export interface components {
     GenerateSlugDto: {
       name: string;
       oldSlug?: string;
-    };
-    ExampleItem: {
-      source: string;
-      target: string;
-      key: string;
-      keyNamespace?: string;
-    };
-    Metadata: {
-      examples: components["schemas"]["ExampleItem"][];
-      closeItems: components["schemas"]["ExampleItem"][];
-      keyDescription?: string;
-      projectDescription?: string;
-      languageDescription?: string;
-    };
-    TolgeeTranslateParams: {
-      text: string;
-      keyName?: string;
-      sourceTag: string;
-      targetTag: string;
-      metadata?: components["schemas"]["Metadata"];
-      /** @enum {string} */
-      formality?: "FORMAL" | "INFORMAL" | "DEFAULT";
-      isBatch: boolean;
-      pluralForms?: {
-        [key: string]: string | undefined;
-      };
-      pluralFormExamples?: {
-        [key: string]: string | undefined;
-      };
-    };
-    MtResult: {
-      translated?: string;
-      /** Format: int32 */
-      price: number;
-      contextDescription?: string;
-    };
-    TelemetryReportRequest: {
-      instanceId: string;
-      /** Format: int64 */
-      projectsCount: number;
-      /** Format: int64 */
-      translationsCount: number;
-      /** Format: int64 */
-      languagesCount: number;
-      /** Format: int64 */
-      distinctLanguagesCount: number;
-      /** Format: int64 */
-      usersCount: number;
-    };
-    GetMySubscriptionDto: {
-      licenseKey: string;
-      instanceId: string;
-    };
-    PlanIncludedUsageModel: {
-      /** Format: int64 */
-      seats: number;
-      /** Format: int64 */
-      translationSlots: number;
-      /** Format: int64 */
-      translations: number;
-      /** Format: int64 */
-      mtCredits: number;
-    };
-    PlanPricesModel: {
-      perSeat: number;
-      perThousandTranslations?: number;
-      perThousandMtCredits?: number;
-      subscriptionMonthly: number;
-      subscriptionYearly: number;
-    };
-    SelfHostedEePlanModel: {
-      /** Format: int64 */
-      id: number;
-      name: string;
-      public: boolean;
-      enabledFeatures: ("GRANULAR_PERMISSIONS" | "PRIORITIZED_FEATURE_REQUESTS" | "PREMIUM_SUPPORT" | "DEDICATED_SLACK_CHANNEL" | "ASSISTED_UPDATES" | "DEPLOYMENT_ASSISTANCE" | "BACKUP_CONFIGURATION" | "TEAM_TRAINING" | "ACCOUNT_MANAGER" | "STANDARD_SUPPORT" | "PROJECT_LEVEL_CONTENT_STORAGES" | "WEBHOOKS" | "MULTIPLE_CONTENT_DELIVERY_CONFIGS" | "AI_PROMPT_CUSTOMIZATION")[];
-      prices: components["schemas"]["PlanPricesModel"];
-      includedUsage: components["schemas"]["PlanIncludedUsageModel"];
-      hasYearlyPrice: boolean;
-      free: boolean;
-    };
-    SelfHostedEeSubscriptionModel: {
-      /** Format: int64 */
-      id: number;
-      /** Format: int64 */
-      currentPeriodStart?: number;
-      /** Format: int64 */
-      currentPeriodEnd?: number;
-      /** @enum {string} */
-      currentBillingPeriod: "MONTHLY" | "YEARLY";
-      /** Format: int64 */
-      createdAt: number;
-      plan: components["schemas"]["SelfHostedEePlanModel"];
-      /** @enum {string} */
-      status: "ACTIVE" | "CANCELED" | "PAST_DUE" | "UNPAID" | "ERROR" | "KEY_USED_BY_ANOTHER_INSTANCE";
-      licenseKey?: string;
-      estimatedCosts?: number;
-    };
-    SetLicenseKeyLicensingDto: {
-      licenseKey: string;
-      /** Format: int64 */
-      seats: number;
-      instanceId: string;
-    };
-    ReportUsageDto: {
-      licenseKey: string;
-      /** Format: int64 */
-      seats: number;
-    };
-    ReportErrorDto: {
-      stackTrace: string;
-      licenseKey: string;
-    };
-    ReleaseKeyDto: {
-      licenseKey: string;
-    };
-    PrepareSetLicenseKeyDto: {
-      licenseKey: string;
-      /** Format: int64 */
-      seats: number;
-    };
-    AverageProportionalUsageItemModel: {
-      total: number;
-      unusedQuantity: number;
-      usedQuantity: number;
-      usedQuantityOverPlan: number;
-    };
-    PrepareSetEeLicenceKeyModel: {
-      plan: components["schemas"]["SelfHostedEePlanModel"];
-      usage: components["schemas"]["UsageModel"];
-    };
-    SumUsageItemModel: {
-      total: number;
-      /** Format: int64 */
-      unusedQuantity: number;
-      /** Format: int64 */
-      usedQuantity: number;
-      /** Format: int64 */
-      usedQuantityOverPlan: number;
-    };
-    UsageModel: {
-      subscriptionPrice?: number;
-      /** @description Relevant for invoices only. When there are applied stripe credits, we need to reduce the total price by this amount. */
-      appliedStripeCredits?: number;
-      seats: components["schemas"]["AverageProportionalUsageItemModel"];
-      translations: components["schemas"]["AverageProportionalUsageItemModel"];
-      credits?: components["schemas"]["SumUsageItemModel"];
-      total: number;
     };
     BusinessEventReportRequest: {
       eventName: string;
@@ -2725,7 +2604,7 @@ export interface components {
     StorageTestResult: {
       success: boolean;
       /** @enum {string} */
-      message?: "UNAUTHENTICATED" | "API_ACCESS_FORBIDDEN" | "API_KEY_NOT_FOUND" | "INVALID_API_KEY" | "INVALID_PROJECT_API_KEY" | "PROJECT_API_KEY_EXPIRED" | "BAD_CREDENTIALS" | "MFA_ENABLED" | "INVALID_OTP_CODE" | "MFA_NOT_ENABLED" | "CAN_NOT_REVOKE_OWN_PERMISSIONS" | "DATA_CORRUPTED" | "INVITATION_CODE_DOES_NOT_EXIST_OR_EXPIRED" | "LANGUAGE_TAG_EXISTS" | "LANGUAGE_NAME_EXISTS" | "LANGUAGE_NOT_FOUND" | "OPERATION_NOT_PERMITTED" | "REGISTRATIONS_NOT_ALLOWED" | "PROJECT_NOT_FOUND" | "RESOURCE_NOT_FOUND" | "SCOPE_NOT_FOUND" | "KEY_EXISTS" | "THIRD_PARTY_AUTH_ERROR_MESSAGE" | "THIRD_PARTY_AUTH_NO_EMAIL" | "THIRD_PARTY_AUTH_NO_SUB" | "THIRD_PARTY_AUTH_UNKNOWN_ERROR" | "THIRD_PARTY_UNAUTHORIZED" | "THIRD_PARTY_GOOGLE_WORKSPACE_MISMATCH" | "USERNAME_ALREADY_EXISTS" | "USERNAME_OR_PASSWORD_INVALID" | "USER_ALREADY_HAS_PERMISSIONS" | "USER_ALREADY_HAS_ROLE" | "USER_NOT_FOUND" | "FILE_NOT_IMAGE" | "FILE_TOO_BIG" | "INVALID_TIMESTAMP" | "EMAIL_NOT_VERIFIED" | "MISSING_CALLBACK_URL" | "INVALID_JWT_TOKEN" | "EXPIRED_JWT_TOKEN" | "GENERAL_JWT_ERROR" | "CANNOT_FIND_SUITABLE_ADDRESS_PART" | "ADDRESS_PART_NOT_UNIQUE" | "USER_IS_NOT_MEMBER_OF_ORGANIZATION" | "ORGANIZATION_HAS_NO_OTHER_OWNER" | "USER_HAS_NO_PROJECT_ACCESS" | "USER_IS_ORGANIZATION_OWNER" | "CANNOT_SET_YOUR_OWN_PERMISSIONS" | "USER_IS_ORGANIZATION_MEMBER" | "PROPERTY_NOT_MUTABLE" | "IMPORT_LANGUAGE_NOT_FROM_PROJECT" | "EXISTING_LANGUAGE_NOT_SELECTED" | "CONFLICT_IS_NOT_RESOLVED" | "LANGUAGE_ALREADY_SELECTED" | "CANNOT_PARSE_FILE" | "COULD_NOT_RESOLVE_PROPERTY" | "CANNOT_ADD_MORE_THEN_100_LANGUAGES" | "NO_LANGUAGES_PROVIDED" | "LANGUAGE_WITH_BASE_LANGUAGE_TAG_NOT_FOUND" | "LANGUAGE_NOT_FROM_PROJECT" | "NAMESPACE_NOT_FROM_PROJECT" | "CANNOT_DELETE_BASE_LANGUAGE" | "KEY_NOT_FROM_PROJECT" | "MAX_SCREENSHOTS_EXCEEDED" | "TRANSLATION_NOT_FROM_PROJECT" | "CAN_EDIT_ONLY_OWN_COMMENT" | "REQUEST_PARSE_ERROR" | "FILTER_BY_VALUE_STATE_NOT_VALID" | "IMPORT_HAS_EXPIRED" | "TAG_NOT_FROM_PROJECT" | "TRANSLATION_TEXT_TOO_LONG" | "INVALID_RECAPTCHA_TOKEN" | "CANNOT_LEAVE_OWNING_PROJECT" | "CANNOT_LEAVE_PROJECT_WITH_ORGANIZATION_ROLE" | "DONT_HAVE_DIRECT_PERMISSIONS" | "TAG_TOO_LOG" | "TOO_MANY_UPLOADED_IMAGES" | "ONE_OR_MORE_IMAGES_NOT_FOUND" | "SCREENSHOT_NOT_OF_KEY" | "SERVICE_NOT_FOUND" | "TOO_MANY_REQUESTS" | "TRANSLATION_NOT_FOUND" | "OUT_OF_CREDITS" | "KEY_NOT_FOUND" | "ORGANIZATION_NOT_FOUND" | "CANNOT_FIND_BASE_LANGUAGE" | "BASE_LANGUAGE_NOT_FOUND" | "NO_EXPORTED_RESULT" | "CANNOT_SET_YOUR_OWN_ROLE" | "ONLY_TRANSLATE_REVIEW_OR_VIEW_PERMISSION_ACCEPTS_VIEW_LANGUAGES" | "OAUTH2_TOKEN_URL_NOT_SET" | "OAUTH2_USER_URL_NOT_SET" | "EMAIL_ALREADY_INVITED_OR_MEMBER" | "PRICE_NOT_FOUND" | "INVOICE_NOT_FROM_ORGANIZATION" | "INVOICE_NOT_FOUND" | "PLAN_NOT_FOUND" | "PLAN_NOT_AVAILABLE_ANY_MORE" | "NO_AUTO_TRANSLATION_METHOD" | "CANNOT_TRANSLATE_BASE_LANGUAGE" | "PAT_NOT_FOUND" | "INVALID_PAT" | "PAT_EXPIRED" | "OPERATION_UNAVAILABLE_FOR_ACCOUNT_TYPE" | "VALIDATION_EMAIL_IS_NOT_VALID" | "CURRENT_PASSWORD_REQUIRED" | "CANNOT_CREATE_ORGANIZATION" | "WRONG_CURRENT_PASSWORD" | "WRONG_PARAM_TYPE" | "EXPIRED_SUPER_JWT_TOKEN" | "CANNOT_DELETE_YOUR_OWN_ACCOUNT" | "CANNOT_SORT_BY_THIS_COLUMN" | "NAMESPACE_NOT_FOUND" | "NAMESPACE_EXISTS" | "INVALID_AUTHENTICATION_METHOD" | "UNKNOWN_SORT_PROPERTY" | "ONLY_REVIEW_PERMISSION_ACCEPTS_STATE_CHANGE_LANGUAGES" | "ONLY_TRANSLATE_OR_REVIEW_PERMISSION_ACCEPTS_TRANSLATE_LANGUAGES" | "CANNOT_SET_LANGUAGE_PERMISSIONS_FOR_ADMIN_SCOPE" | "CANNOT_SET_VIEW_LANGUAGES_WITHOUT_TRANSLATIONS_VIEW_SCOPE" | "CANNOT_SET_TRANSLATE_LANGUAGES_WITHOUT_TRANSLATIONS_EDIT_SCOPE" | "CANNOT_SET_STATE_CHANGE_LANGUAGES_WITHOUT_TRANSLATIONS_STATE_EDIT_SCOPE" | "LANGUAGE_NOT_PERMITTED" | "SCOPES_HAS_TO_BE_SET" | "SET_EXACTLY_ONE_OF_SCOPES_OR_TYPE" | "TRANSLATION_EXISTS" | "IMPORT_KEYS_ERROR" | "PROVIDE_ONLY_ONE_OF_SCREENSHOTS_AND_SCREENSHOT_UPLOADED_IMAGE_IDS" | "MULTIPLE_PROJECTS_NOT_SUPPORTED" | "PLAN_TRANSLATION_LIMIT_EXCEEDED" | "FEATURE_NOT_ENABLED" | "LICENSE_KEY_NOT_FOUND" | "CANNOT_SET_VIEW_LANGUAGES_WITHOUT_FOR_LEVEL_BASED_PERMISSIONS" | "CANNOT_SET_DIFFERENT_TRANSLATE_AND_STATE_CHANGE_LANGUAGES_FOR_LEVEL_BASED_PERMISSIONS" | "CANNOT_DISABLE_YOUR_OWN_ACCOUNT" | "SUBSCRIPTION_NOT_FOUND" | "INVOICE_DOES_NOT_HAVE_USAGE" | "CUSTOMER_NOT_FOUND" | "SUBSCRIPTION_NOT_ACTIVE" | "ORGANIZATION_ALREADY_SUBSCRIBED" | "ORGANIZATION_NOT_SUBSCRIBED" | "LICENSE_KEY_USED_BY_ANOTHER_INSTANCE" | "TRANSLATION_SPENDING_LIMIT_EXCEEDED" | "CREDIT_SPENDING_LIMIT_EXCEEDED" | "SEATS_SPENDING_LIMIT_EXCEEDED" | "THIS_INSTANCE_IS_ALREADY_LICENSED" | "BIG_META_NOT_FROM_PROJECT" | "MT_SERVICE_NOT_ENABLED" | "PROJECT_NOT_SELECTED" | "ORGANIZATION_NOT_SELECTED" | "PLAN_HAS_SUBSCRIBERS" | "TRANSLATION_FAILED" | "BATCH_JOB_NOT_FOUND" | "KEY_EXISTS_IN_NAMESPACE" | "TAG_IS_BLANK" | "EXECUTION_FAILED_ON_MANAGEMENT_ERROR" | "TRANSLATION_API_RATE_LIMIT" | "CANNOT_FINALIZE_ACTIVITY" | "FORMALITY_NOT_SUPPORTED_BY_SERVICE" | "LANGUAGE_NOT_SUPPORTED_BY_SERVICE" | "RATE_LIMITED" | "PAT_ACCESS_NOT_ALLOWED" | "PAK_ACCESS_NOT_ALLOWED" | "CANNOT_MODIFY_DISABLED_TRANSLATION" | "AZURE_CONFIG_REQUIRED" | "S3_CONFIG_REQUIRED" | "CONTENT_STORAGE_CONFIG_REQUIRED" | "CONTENT_STORAGE_TEST_FAILED" | "CONTENT_STORAGE_CONFIG_INVALID" | "INVALID_CONNECTION_STRING" | "CANNOT_CREATE_AZURE_STORAGE_CLIENT" | "S3_ACCESS_KEY_REQUIRED" | "AZURE_CONNECTION_STRING_REQUIRED" | "S3_SECRET_KEY_REQUIRED" | "CANNOT_STORE_FILE_TO_CONTENT_STORAGE" | "UNEXPECTED_ERROR_WHILE_PUBLISHING_TO_CONTENT_STORAGE" | "WEBHOOK_RESPONDED_WITH_NON_200_STATUS" | "UNEXPECTED_ERROR_WHILE_EXECUTING_WEBHOOK" | "CONTENT_STORAGE_IS_IN_USE" | "CANNOT_SET_STATE_FOR_MISSING_TRANSLATION" | "NO_PROJECT_ID_PROVIDED" | "LICENSE_KEY_NOT_PROVIDED" | "SUBSCRIPTION_ALREADY_CANCELED" | "USER_IS_SUBSCRIBED_TO_PAID_PLAN" | "CANNOT_CREATE_FREE_PLAN_WITHOUT_FIXED_TYPE" | "CANNOT_MODIFY_PLAN_FREE_STATUS" | "KEY_ID_NOT_PROVIDED" | "FREE_SELF_HOSTED_SEAT_LIMIT_EXCEEDED" | "ADVANCED_PARAMS_NOT_SUPPORTED" | "PLURAL_FORMS_NOT_FOUND_FOR_LANGUAGE" | "NESTED_PLURALS_NOT_SUPPORTED" | "MESSAGE_IS_NOT_PLURAL" | "CONTENT_OUTSIDE_PLURAL_FORMS" | "INVALID_PLURAL_FORM" | "MULTIPLE_PLURALS_NOT_SUPPORTED" | "CUSTOM_VALUES_JSON_TOO_LONG" | "UNSUPPORTED_PO_MESSAGE_FORMAT" | "PLURAL_FORMS_DATA_LOSS" | "CURRENT_USER_DOES_NOT_OWN_IMAGE" | "USER_CANNOT_VIEW_THIS_ORGANIZATION" | "USER_IS_NOT_OWNER_OF_ORGANIZATION" | "PAK_CREATED_FOR_DIFFERENT_PROJECT" | "CUSTOM_SLUG_IS_ONLY_APPLICABLE_FOR_CUSTOM_STORAGE" | "INVALID_SLUG_FORMAT" | "BATCH_JOB_CANCELLATION_TIMEOUT" | "IMPORT_FAILED" | "CANNOT_ADD_MORE_THEN_1000_LANGUAGES" | "NO_DATA_TO_IMPORT" | "MULTIPLE_NAMESPACES_MAPPED_TO_SINGLE_FILE" | "MULTIPLE_MAPPINGS_FOR_SAME_FILE_LANGUAGE_NAME" | "MULTIPLE_MAPPINGS_FOR_NULL_FILE_LANGUAGE_NAME" | "TOO_MANY_MAPPINGS_FOR_FILE";
+      message?: "UNAUTHENTICATED" | "API_ACCESS_FORBIDDEN" | "API_KEY_NOT_FOUND" | "INVALID_API_KEY" | "INVALID_PROJECT_API_KEY" | "PROJECT_API_KEY_EXPIRED" | "BAD_CREDENTIALS" | "MFA_ENABLED" | "INVALID_OTP_CODE" | "MFA_NOT_ENABLED" | "CAN_NOT_REVOKE_OWN_PERMISSIONS" | "DATA_CORRUPTED" | "INVITATION_CODE_DOES_NOT_EXIST_OR_EXPIRED" | "LANGUAGE_TAG_EXISTS" | "LANGUAGE_NAME_EXISTS" | "LANGUAGE_NOT_FOUND" | "OPERATION_NOT_PERMITTED" | "REGISTRATIONS_NOT_ALLOWED" | "PROJECT_NOT_FOUND" | "RESOURCE_NOT_FOUND" | "SCOPE_NOT_FOUND" | "KEY_EXISTS" | "THIRD_PARTY_AUTH_ERROR_MESSAGE" | "THIRD_PARTY_AUTH_NO_EMAIL" | "THIRD_PARTY_AUTH_NO_SUB" | "THIRD_PARTY_AUTH_UNKNOWN_ERROR" | "THIRD_PARTY_UNAUTHORIZED" | "THIRD_PARTY_GOOGLE_WORKSPACE_MISMATCH" | "USERNAME_ALREADY_EXISTS" | "USERNAME_OR_PASSWORD_INVALID" | "USER_ALREADY_HAS_PERMISSIONS" | "USER_ALREADY_HAS_ROLE" | "USER_NOT_FOUND" | "FILE_NOT_IMAGE" | "FILE_TOO_BIG" | "INVALID_TIMESTAMP" | "EMAIL_NOT_VERIFIED" | "MISSING_CALLBACK_URL" | "INVALID_JWT_TOKEN" | "EXPIRED_JWT_TOKEN" | "GENERAL_JWT_ERROR" | "CANNOT_FIND_SUITABLE_ADDRESS_PART" | "ADDRESS_PART_NOT_UNIQUE" | "USER_IS_NOT_MEMBER_OF_ORGANIZATION" | "ORGANIZATION_HAS_NO_OTHER_OWNER" | "USER_HAS_NO_PROJECT_ACCESS" | "USER_IS_ORGANIZATION_OWNER" | "CANNOT_SET_YOUR_OWN_PERMISSIONS" | "USER_IS_ORGANIZATION_MEMBER" | "PROPERTY_NOT_MUTABLE" | "IMPORT_LANGUAGE_NOT_FROM_PROJECT" | "EXISTING_LANGUAGE_NOT_SELECTED" | "CONFLICT_IS_NOT_RESOLVED" | "LANGUAGE_ALREADY_SELECTED" | "CANNOT_PARSE_FILE" | "COULD_NOT_RESOLVE_PROPERTY" | "CANNOT_ADD_MORE_THEN_100_LANGUAGES" | "NO_LANGUAGES_PROVIDED" | "LANGUAGE_WITH_BASE_LANGUAGE_TAG_NOT_FOUND" | "LANGUAGE_NOT_FROM_PROJECT" | "NAMESPACE_NOT_FROM_PROJECT" | "CANNOT_DELETE_BASE_LANGUAGE" | "KEY_NOT_FROM_PROJECT" | "MAX_SCREENSHOTS_EXCEEDED" | "TRANSLATION_NOT_FROM_PROJECT" | "CAN_EDIT_ONLY_OWN_COMMENT" | "REQUEST_PARSE_ERROR" | "FILTER_BY_VALUE_STATE_NOT_VALID" | "IMPORT_HAS_EXPIRED" | "TAG_NOT_FROM_PROJECT" | "TRANSLATION_TEXT_TOO_LONG" | "INVALID_RECAPTCHA_TOKEN" | "CANNOT_LEAVE_OWNING_PROJECT" | "CANNOT_LEAVE_PROJECT_WITH_ORGANIZATION_ROLE" | "DONT_HAVE_DIRECT_PERMISSIONS" | "TAG_TOO_LOG" | "TOO_MANY_UPLOADED_IMAGES" | "ONE_OR_MORE_IMAGES_NOT_FOUND" | "SCREENSHOT_NOT_OF_KEY" | "SERVICE_NOT_FOUND" | "TOO_MANY_REQUESTS" | "TRANSLATION_NOT_FOUND" | "OUT_OF_CREDITS" | "KEY_NOT_FOUND" | "ORGANIZATION_NOT_FOUND" | "CANNOT_FIND_BASE_LANGUAGE" | "BASE_LANGUAGE_NOT_FOUND" | "NO_EXPORTED_RESULT" | "CANNOT_SET_YOUR_OWN_ROLE" | "ONLY_TRANSLATE_REVIEW_OR_VIEW_PERMISSION_ACCEPTS_VIEW_LANGUAGES" | "OAUTH2_TOKEN_URL_NOT_SET" | "OAUTH2_USER_URL_NOT_SET" | "EMAIL_ALREADY_INVITED_OR_MEMBER" | "PRICE_NOT_FOUND" | "INVOICE_NOT_FROM_ORGANIZATION" | "INVOICE_NOT_FOUND" | "PLAN_NOT_FOUND" | "PLAN_NOT_AVAILABLE_ANY_MORE" | "NO_AUTO_TRANSLATION_METHOD" | "CANNOT_TRANSLATE_BASE_LANGUAGE" | "PAT_NOT_FOUND" | "INVALID_PAT" | "PAT_EXPIRED" | "OPERATION_UNAVAILABLE_FOR_ACCOUNT_TYPE" | "VALIDATION_EMAIL_IS_NOT_VALID" | "CURRENT_PASSWORD_REQUIRED" | "CANNOT_CREATE_ORGANIZATION" | "WRONG_CURRENT_PASSWORD" | "WRONG_PARAM_TYPE" | "EXPIRED_SUPER_JWT_TOKEN" | "CANNOT_DELETE_YOUR_OWN_ACCOUNT" | "CANNOT_SORT_BY_THIS_COLUMN" | "NAMESPACE_NOT_FOUND" | "NAMESPACE_EXISTS" | "INVALID_AUTHENTICATION_METHOD" | "UNKNOWN_SORT_PROPERTY" | "ONLY_REVIEW_PERMISSION_ACCEPTS_STATE_CHANGE_LANGUAGES" | "ONLY_TRANSLATE_OR_REVIEW_PERMISSION_ACCEPTS_TRANSLATE_LANGUAGES" | "CANNOT_SET_LANGUAGE_PERMISSIONS_FOR_ADMIN_SCOPE" | "CANNOT_SET_VIEW_LANGUAGES_WITHOUT_TRANSLATIONS_VIEW_SCOPE" | "CANNOT_SET_TRANSLATE_LANGUAGES_WITHOUT_TRANSLATIONS_EDIT_SCOPE" | "CANNOT_SET_STATE_CHANGE_LANGUAGES_WITHOUT_TRANSLATIONS_STATE_EDIT_SCOPE" | "LANGUAGE_NOT_PERMITTED" | "SCOPES_HAS_TO_BE_SET" | "SET_EXACTLY_ONE_OF_SCOPES_OR_TYPE" | "TRANSLATION_EXISTS" | "IMPORT_KEYS_ERROR" | "PROVIDE_ONLY_ONE_OF_SCREENSHOTS_AND_SCREENSHOT_UPLOADED_IMAGE_IDS" | "MULTIPLE_PROJECTS_NOT_SUPPORTED" | "PLAN_TRANSLATION_LIMIT_EXCEEDED" | "FEATURE_NOT_ENABLED" | "LICENSE_KEY_NOT_FOUND" | "CANNOT_SET_VIEW_LANGUAGES_WITHOUT_FOR_LEVEL_BASED_PERMISSIONS" | "CANNOT_SET_DIFFERENT_TRANSLATE_AND_STATE_CHANGE_LANGUAGES_FOR_LEVEL_BASED_PERMISSIONS" | "CANNOT_DISABLE_YOUR_OWN_ACCOUNT" | "SUBSCRIPTION_NOT_FOUND" | "INVOICE_DOES_NOT_HAVE_USAGE" | "CUSTOMER_NOT_FOUND" | "SUBSCRIPTION_NOT_ACTIVE" | "ORGANIZATION_ALREADY_SUBSCRIBED" | "ORGANIZATION_NOT_SUBSCRIBED" | "LICENSE_KEY_USED_BY_ANOTHER_INSTANCE" | "TRANSLATION_SPENDING_LIMIT_EXCEEDED" | "CREDIT_SPENDING_LIMIT_EXCEEDED" | "SEATS_SPENDING_LIMIT_EXCEEDED" | "THIS_INSTANCE_IS_ALREADY_LICENSED" | "BIG_META_NOT_FROM_PROJECT" | "MT_SERVICE_NOT_ENABLED" | "PROJECT_NOT_SELECTED" | "ORGANIZATION_NOT_SELECTED" | "PLAN_HAS_SUBSCRIBERS" | "TRANSLATION_FAILED" | "BATCH_JOB_NOT_FOUND" | "KEY_EXISTS_IN_NAMESPACE" | "TAG_IS_BLANK" | "EXECUTION_FAILED_ON_MANAGEMENT_ERROR" | "TRANSLATION_API_RATE_LIMIT" | "CANNOT_FINALIZE_ACTIVITY" | "FORMALITY_NOT_SUPPORTED_BY_SERVICE" | "LANGUAGE_NOT_SUPPORTED_BY_SERVICE" | "RATE_LIMITED" | "PAT_ACCESS_NOT_ALLOWED" | "PAK_ACCESS_NOT_ALLOWED" | "CANNOT_MODIFY_DISABLED_TRANSLATION" | "AZURE_CONFIG_REQUIRED" | "S3_CONFIG_REQUIRED" | "CONTENT_STORAGE_CONFIG_REQUIRED" | "CONTENT_STORAGE_TEST_FAILED" | "CONTENT_STORAGE_CONFIG_INVALID" | "INVALID_CONNECTION_STRING" | "CANNOT_CREATE_AZURE_STORAGE_CLIENT" | "S3_ACCESS_KEY_REQUIRED" | "AZURE_CONNECTION_STRING_REQUIRED" | "S3_SECRET_KEY_REQUIRED" | "CANNOT_STORE_FILE_TO_CONTENT_STORAGE" | "UNEXPECTED_ERROR_WHILE_PUBLISHING_TO_CONTENT_STORAGE" | "WEBHOOK_RESPONDED_WITH_NON_200_STATUS" | "UNEXPECTED_ERROR_WHILE_EXECUTING_WEBHOOK" | "CONTENT_STORAGE_IS_IN_USE" | "CANNOT_SET_STATE_FOR_MISSING_TRANSLATION" | "NO_PROJECT_ID_PROVIDED" | "LICENSE_KEY_NOT_PROVIDED" | "SUBSCRIPTION_ALREADY_CANCELED" | "USER_IS_SUBSCRIBED_TO_PAID_PLAN" | "CANNOT_CREATE_FREE_PLAN_WITHOUT_FIXED_TYPE" | "CANNOT_MODIFY_PLAN_FREE_STATUS" | "KEY_ID_NOT_PROVIDED" | "FREE_SELF_HOSTED_SEAT_LIMIT_EXCEEDED" | "ADVANCED_PARAMS_NOT_SUPPORTED" | "PLURAL_FORMS_NOT_FOUND_FOR_LANGUAGE" | "NESTED_PLURALS_NOT_SUPPORTED" | "MESSAGE_IS_NOT_PLURAL" | "CONTENT_OUTSIDE_PLURAL_FORMS" | "INVALID_PLURAL_FORM" | "MULTIPLE_PLURALS_NOT_SUPPORTED" | "CUSTOM_VALUES_JSON_TOO_LONG" | "UNSUPPORTED_PO_MESSAGE_FORMAT" | "PLURAL_FORMS_DATA_LOSS" | "CURRENT_USER_DOES_NOT_OWN_IMAGE" | "USER_CANNOT_VIEW_THIS_ORGANIZATION" | "USER_IS_NOT_OWNER_OF_ORGANIZATION" | "PAK_CREATED_FOR_DIFFERENT_PROJECT" | "CUSTOM_SLUG_IS_ONLY_APPLICABLE_FOR_CUSTOM_STORAGE" | "INVALID_SLUG_FORMAT" | "BATCH_JOB_CANCELLATION_TIMEOUT" | "IMPORT_FAILED" | "CANNOT_ADD_MORE_THEN_1000_LANGUAGES" | "NO_DATA_TO_IMPORT" | "MULTIPLE_NAMESPACES_MAPPED_TO_SINGLE_FILE" | "MULTIPLE_MAPPINGS_FOR_SAME_FILE_LANGUAGE_NAME" | "MULTIPLE_MAPPINGS_FOR_NULL_FILE_LANGUAGE_NAME" | "TOO_MANY_MAPPINGS_FOR_FILE" | "MISSING_PLACEHOLDER_IN_TEMPLATE" | "TAG_NOT_FOUND";
       params?: Record<string, never>[];
     };
     UntagKeysRequest: {
@@ -2989,6 +2868,21 @@ export interface components {
        */
       messageFormat?: "C_SPRINTF" | "PHP_SPRINTF" | "JAVA_STRING_FORMAT" | "APPLE_SPRINTF" | "RUBY_SPRINTF" | "ICU";
       /**
+       * @description This is a template that defines the structure of the resulting .zip file content.
+       *
+       * The template is a string that can contain the following placeholders: {namespace}, {languageTag},
+       * {androidLanguageTag}, {snakeLanguageTag}, {extension}.
+       *
+       * For example, when exporting to JSON with the template `{namespace}/{languageTag}.{extension}`,
+       * the English translations of the `home` namespace will be stored in `home/en.json`.
+       *
+       * The `{snakeLanguageTag}` placeholder is the same as `{languageTag}` but in snake case. (e.g., en_US).
+       *
+       * The Android specific `{androidLanguageTag}` placeholder is the same as `{languageTag}`
+       * but in Android format. (e.g., en-rUS)
+       */
+      fileStructureTemplate?: string;
+      /**
        * @description If true, for structured formats (like JSON) arrays are supported.
        *
        * e.g. Key hello[0] will be exported as {"hello": ["..."]}
@@ -3117,6 +3011,62 @@ export interface components {
       createdAt: string;
       location?: string;
     };
+    AverageProportionalUsageItemModel: {
+      total: number;
+      unusedQuantity: number;
+      usedQuantity: number;
+      usedQuantityOverPlan: number;
+    };
+    PlanIncludedUsageModel: {
+      /** Format: int64 */
+      seats: number;
+      /** Format: int64 */
+      translationSlots: number;
+      /** Format: int64 */
+      translations: number;
+      /** Format: int64 */
+      mtCredits: number;
+    };
+    PlanPricesModel: {
+      perSeat: number;
+      perThousandTranslations?: number;
+      perThousandMtCredits?: number;
+      subscriptionMonthly: number;
+      subscriptionYearly: number;
+    };
+    PrepareSetEeLicenceKeyModel: {
+      plan: components["schemas"]["SelfHostedEePlanModel"];
+      usage: components["schemas"]["UsageModel"];
+    };
+    SelfHostedEePlanModel: {
+      /** Format: int64 */
+      id: number;
+      name: string;
+      public: boolean;
+      enabledFeatures: ("GRANULAR_PERMISSIONS" | "PRIORITIZED_FEATURE_REQUESTS" | "PREMIUM_SUPPORT" | "DEDICATED_SLACK_CHANNEL" | "ASSISTED_UPDATES" | "DEPLOYMENT_ASSISTANCE" | "BACKUP_CONFIGURATION" | "TEAM_TRAINING" | "ACCOUNT_MANAGER" | "STANDARD_SUPPORT" | "PROJECT_LEVEL_CONTENT_STORAGES" | "WEBHOOKS" | "MULTIPLE_CONTENT_DELIVERY_CONFIGS" | "AI_PROMPT_CUSTOMIZATION")[];
+      prices: components["schemas"]["PlanPricesModel"];
+      includedUsage: components["schemas"]["PlanIncludedUsageModel"];
+      hasYearlyPrice: boolean;
+      free: boolean;
+    };
+    SumUsageItemModel: {
+      total: number;
+      /** Format: int64 */
+      unusedQuantity: number;
+      /** Format: int64 */
+      usedQuantity: number;
+      /** Format: int64 */
+      usedQuantityOverPlan: number;
+    };
+    UsageModel: {
+      subscriptionPrice?: number;
+      /** @description Relevant for invoices only. When there are applied stripe credits, we need to reduce the total price by this amount. */
+      appliedStripeCredits?: number;
+      seats: components["schemas"]["AverageProportionalUsageItemModel"];
+      translations: components["schemas"]["AverageProportionalUsageItemModel"];
+      credits?: components["schemas"]["SumUsageItemModel"];
+      total: number;
+    };
     CreateApiKeyDto: {
       /** Format: int64 */
       projectId: number;
@@ -3227,10 +3177,7 @@ export interface components {
       /** Format: int64 */
       id: number;
       basePermissions: components["schemas"]["PermissionModel"];
-      /** @example btforg */
-      slug: string;
-      /** @example This is a beautiful organization full of beautiful and clever people */
-      description?: string;
+      avatar?: components["schemas"]["Avatar"];
       /**
        * @description The role of currently authorized user.
        *
@@ -3238,7 +3185,10 @@ export interface components {
        * @enum {string}
        */
       currentUserRole?: "MEMBER" | "OWNER";
-      avatar?: components["schemas"]["Avatar"];
+      /** @example btforg */
+      slug: string;
+      /** @example This is a beautiful organization full of beautiful and clever people */
+      description?: string;
     };
     PublicBillingConfigurationDTO: {
       enabled: boolean;
@@ -3269,6 +3219,18 @@ export interface components {
       postHogApiKey?: string;
       postHogHost?: string;
       contentDeliveryConfigured: boolean;
+    };
+    CollectionModelExportFormatModel: {
+      _embedded?: {
+        exportFormats?: components["schemas"]["ExportFormatModel"][];
+      };
+    };
+    ExportFormatModel: {
+      /** @enum {string} */
+      format: "JSON" | "JSON_TOLGEE" | "XLIFF" | "PO" | "APPLE_STRINGS_STRINGSDICT" | "APPLE_XLIFF" | "ANDROID_XML" | "FLUTTER_ARB" | "PROPERTIES" | "YAML_RUBY" | "YAML";
+      extension: string;
+      mediaType: string;
+      defaultFileStructureTemplate: string;
     };
     DocItem: {
       name: string;
@@ -3349,20 +3311,20 @@ export interface components {
       name: string;
       /** Format: int64 */
       id: number;
-      namespace?: string;
-      description?: string;
       translation?: string;
       baseTranslation?: string;
+      namespace?: string;
+      description?: string;
     };
     KeySearchSearchResultModel: {
       view?: components["schemas"]["KeySearchResultView"];
       name: string;
       /** Format: int64 */
       id: number;
-      namespace?: string;
-      description?: string;
       translation?: string;
       baseTranslation?: string;
+      namespace?: string;
+      description?: string;
     };
     PagedModelKeySearchSearchResultModel: {
       _embedded?: {
@@ -3447,7 +3409,7 @@ export interface components {
       /** Format: int64 */
       timestamp: number;
       /** @enum {string} */
-      type: "UNKNOWN" | "SET_TRANSLATION_STATE" | "SET_TRANSLATIONS" | "DISMISS_AUTO_TRANSLATED_STATE" | "SET_OUTDATED_FLAG" | "TRANSLATION_COMMENT_ADD" | "TRANSLATION_COMMENT_DELETE" | "TRANSLATION_COMMENT_EDIT" | "TRANSLATION_COMMENT_SET_STATE" | "SCREENSHOT_DELETE" | "SCREENSHOT_ADD" | "KEY_TAGS_EDIT" | "KEY_NAME_EDIT" | "KEY_DELETE" | "CREATE_KEY" | "COMPLEX_EDIT" | "IMPORT" | "CREATE_LANGUAGE" | "EDIT_LANGUAGE" | "DELETE_LANGUAGE" | "CREATE_PROJECT" | "EDIT_PROJECT" | "NAMESPACE_EDIT" | "BATCH_PRE_TRANSLATE_BY_TM" | "BATCH_MACHINE_TRANSLATE" | "AUTO_TRANSLATE" | "BATCH_CLEAR_TRANSLATIONS" | "BATCH_COPY_TRANSLATIONS" | "BATCH_SET_TRANSLATION_STATE" | "BATCH_TAG_KEYS" | "BATCH_UNTAG_KEYS" | "BATCH_SET_KEYS_NAMESPACE" | "AUTOMATION" | "CONTENT_DELIVERY_CONFIG_CREATE" | "CONTENT_DELIVERY_CONFIG_UPDATE" | "CONTENT_DELIVERY_CONFIG_DELETE" | "CONTENT_STORAGE_CREATE" | "CONTENT_STORAGE_UPDATE" | "CONTENT_STORAGE_DELETE" | "WEBHOOK_CONFIG_CREATE" | "WEBHOOK_CONFIG_UPDATE" | "WEBHOOK_CONFIG_DELETE";
+      type: "UNKNOWN" | "SET_TRANSLATION_STATE" | "SET_TRANSLATIONS" | "DISMISS_AUTO_TRANSLATED_STATE" | "SET_OUTDATED_FLAG" | "TRANSLATION_COMMENT_ADD" | "TRANSLATION_COMMENT_DELETE" | "TRANSLATION_COMMENT_EDIT" | "TRANSLATION_COMMENT_SET_STATE" | "SCREENSHOT_DELETE" | "SCREENSHOT_ADD" | "KEY_TAGS_EDIT" | "KEY_NAME_EDIT" | "KEY_DELETE" | "CREATE_KEY" | "COMPLEX_EDIT" | "IMPORT" | "CREATE_LANGUAGE" | "EDIT_LANGUAGE" | "DELETE_LANGUAGE" | "CREATE_PROJECT" | "EDIT_PROJECT" | "NAMESPACE_EDIT" | "BATCH_PRE_TRANSLATE_BY_TM" | "BATCH_MACHINE_TRANSLATE" | "AUTO_TRANSLATE" | "BATCH_CLEAR_TRANSLATIONS" | "BATCH_COPY_TRANSLATIONS" | "BATCH_SET_TRANSLATION_STATE" | "BATCH_TAG_KEYS" | "BATCH_UNTAG_KEYS" | "BATCH_SET_KEYS_NAMESPACE" | "AUTOMATION" | "CONTENT_DELIVERY_CONFIG_CREATE" | "CONTENT_DELIVERY_CONFIG_UPDATE" | "CONTENT_DELIVERY_CONFIG_DELETE" | "CONTENT_STORAGE_CREATE" | "CONTENT_STORAGE_UPDATE" | "CONTENT_STORAGE_DELETE" | "WEBHOOK_CONFIG_CREATE" | "WEBHOOK_CONFIG_UPDATE" | "WEBHOOK_CONFIG_DELETE" | "COMPLEX_TAG_OPERATION";
       author?: components["schemas"]["ProjectActivityAuthorModel"];
       modifiedEntities?: {
         [key: string]: components["schemas"]["ModifiedEntityModel"][] | undefined;
@@ -3860,15 +3822,15 @@ export interface components {
       user: components["schemas"]["SimpleUserAccountModel"];
       /** Format: int64 */
       id: number;
-      description: string;
-      /** Format: int64 */
-      createdAt: number;
-      /** Format: int64 */
-      updatedAt: number;
       /** Format: int64 */
       expiresAt?: number;
       /** Format: int64 */
       lastUsedAt?: number;
+      /** Format: int64 */
+      createdAt: number;
+      /** Format: int64 */
+      updatedAt: number;
+      description: string;
     };
     OrganizationRequestParamsDto: {
       filterCurrentUserOwner: boolean;
@@ -3988,17 +3950,17 @@ export interface components {
       permittedLanguageIds?: number[];
       /** Format: int64 */
       id: number;
-      projectName: string;
       userFullName?: string;
-      username?: string;
-      description: string;
+      projectName: string;
       /** Format: int64 */
       expiresAt?: number;
-      /** Format: int64 */
-      projectId: number;
+      scopes: string[];
       /** Format: int64 */
       lastUsedAt?: number;
-      scopes: string[];
+      /** Format: int64 */
+      projectId: number;
+      username?: string;
+      description: string;
     };
     PagedModelUserAccountModel: {
       _embedded?: {
@@ -4644,7 +4606,7 @@ export interface operations {
     };
   };
   /** Get one project */
-  get_3: {
+  get_4: {
     parameters: {
       path: {
         projectId: number;
@@ -4765,7 +4727,7 @@ export interface operations {
     };
   };
   /** Get one webhook configuration */
-  get_4: {
+  get_5: {
     parameters: {
       path: {
         id: number;
@@ -5422,7 +5384,7 @@ export interface operations {
     };
   };
   /** Get one key */
-  get_5: {
+  get_6: {
     parameters: {
       path: {
         id: number;
@@ -5554,7 +5516,7 @@ export interface operations {
     };
   };
   /** Get Content Storage */
-  get_7: {
+  get_8: {
     parameters: {
       path: {
         contentStorageId: number;
@@ -5678,7 +5640,7 @@ export interface operations {
     };
   };
   /** Get one Content Delivery Config */
-  get_8: {
+  get_9: {
     parameters: {
       path: {
         id: number;
@@ -5908,6 +5870,47 @@ export interface operations {
           "application/json": components["schemas"]["AutoTranslationConfigModel"];
         };
       };
+      /** @description Bad Request */
+      400: {
+        content: {
+          "*/*": string;
+        };
+      };
+      /** @description Unauthorized */
+      401: {
+        content: {
+          "*/*": string;
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "*/*": string;
+        };
+      };
+      /** @description Not Found */
+      404: {
+        content: {
+          "*/*": string;
+        };
+      };
+    };
+  };
+  /** Execute complex tag operation */
+  executeComplexTagOperation: {
+    parameters: {
+      path: {
+        projectId: number;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ComplexTagKeysRequest"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: never;
       /** @description Bad Request */
       400: {
         content: {
@@ -6365,7 +6368,7 @@ export interface operations {
    * Get Import Settings
    * @description Returns import settings for the authenticated user and the project.
    */
-  get_9: {
+  get_10: {
     parameters: {
       path: {
         projectId: number;
@@ -6578,7 +6581,7 @@ export interface operations {
     };
   };
   /** Get one translation comment */
-  get_13: {
+  get_14: {
     parameters: {
       path: {
         translationId: number;
@@ -7073,7 +7076,7 @@ export interface operations {
     };
   };
   /** Get one language */
-  get_15: {
+  get_16: {
     parameters: {
       path: {
         languageId: number;
@@ -7468,7 +7471,7 @@ export interface operations {
     };
   };
   /** Get one PAK */
-  get_17: {
+  get_18: {
     parameters: {
       path: {
         id: number;
@@ -7777,7 +7780,7 @@ export interface operations {
     };
   };
   /** Get one organization */
-  get_19: {
+  get_20: {
     parameters: {
       path: {
         id: number;
@@ -8554,305 +8557,8 @@ export interface operations {
       };
     };
   };
-  translate: {
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["TolgeeTranslateParams"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        content: {
-          "application/json": components["schemas"]["MtResult"];
-        };
-      };
-      /** @description Bad Request */
-      400: {
-        content: {
-          "*/*": string;
-        };
-      };
-      /** @description Unauthorized */
-      401: {
-        content: {
-          "*/*": string;
-        };
-      };
-      /** @description Forbidden */
-      403: {
-        content: {
-          "*/*": string;
-        };
-      };
-      /** @description Not Found */
-      404: {
-        content: {
-          "*/*": string;
-        };
-      };
-    };
-  };
-  report: {
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["TelemetryReportRequest"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: never;
-      /** @description Bad Request */
-      400: {
-        content: {
-          "*/*": string;
-        };
-      };
-      /** @description Unauthorized */
-      401: {
-        content: {
-          "*/*": string;
-        };
-      };
-      /** @description Forbidden */
-      403: {
-        content: {
-          "*/*": string;
-        };
-      };
-      /** @description Not Found */
-      404: {
-        content: {
-          "*/*": string;
-        };
-      };
-    };
-  };
-  getMySubscription: {
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["GetMySubscriptionDto"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        content: {
-          "application/json": components["schemas"]["SelfHostedEeSubscriptionModel"];
-        };
-      };
-      /** @description Bad Request */
-      400: {
-        content: {
-          "*/*": string;
-        };
-      };
-      /** @description Unauthorized */
-      401: {
-        content: {
-          "*/*": string;
-        };
-      };
-      /** @description Forbidden */
-      403: {
-        content: {
-          "*/*": string;
-        };
-      };
-      /** @description Not Found */
-      404: {
-        content: {
-          "*/*": string;
-        };
-      };
-    };
-  };
-  /** Triggered when user sets licence key on their instance */
-  onLicenceSetKey: {
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["SetLicenseKeyLicensingDto"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        content: {
-          "application/json": components["schemas"]["SelfHostedEeSubscriptionModel"];
-        };
-      };
-      /** @description Bad Request */
-      400: {
-        content: {
-          "*/*": string;
-        };
-      };
-      /** @description Unauthorized */
-      401: {
-        content: {
-          "*/*": string;
-        };
-      };
-      /** @description Forbidden */
-      403: {
-        content: {
-          "*/*": string;
-        };
-      };
-      /** @description Not Found */
-      404: {
-        content: {
-          "*/*": string;
-        };
-      };
-    };
-  };
-  reportUsage: {
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["ReportUsageDto"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: never;
-      /** @description Bad Request */
-      400: {
-        content: {
-          "*/*": string;
-        };
-      };
-      /** @description Unauthorized */
-      401: {
-        content: {
-          "*/*": string;
-        };
-      };
-      /** @description Forbidden */
-      403: {
-        content: {
-          "*/*": string;
-        };
-      };
-      /** @description Not Found */
-      404: {
-        content: {
-          "*/*": string;
-        };
-      };
-    };
-  };
-  reportError: {
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["ReportErrorDto"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: never;
-      /** @description Bad Request */
-      400: {
-        content: {
-          "*/*": string;
-        };
-      };
-      /** @description Unauthorized */
-      401: {
-        content: {
-          "*/*": string;
-        };
-      };
-      /** @description Forbidden */
-      403: {
-        content: {
-          "*/*": string;
-        };
-      };
-      /** @description Not Found */
-      404: {
-        content: {
-          "*/*": string;
-        };
-      };
-    };
-  };
-  releaseKey: {
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["ReleaseKeyDto"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: never;
-      /** @description Bad Request */
-      400: {
-        content: {
-          "*/*": string;
-        };
-      };
-      /** @description Unauthorized */
-      401: {
-        content: {
-          "*/*": string;
-        };
-      };
-      /** @description Forbidden */
-      403: {
-        content: {
-          "*/*": string;
-        };
-      };
-      /** @description Not Found */
-      404: {
-        content: {
-          "*/*": string;
-        };
-      };
-    };
-  };
-  prepareSetLicenseKey: {
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["PrepareSetLicenseKeyDto"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        content: {
-          "application/json": components["schemas"]["PrepareSetEeLicenceKeyModel"];
-        };
-      };
-      /** @description Bad Request */
-      400: {
-        content: {
-          "*/*": string;
-        };
-      };
-      /** @description Unauthorized */
-      401: {
-        content: {
-          "*/*": string;
-        };
-      };
-      /** @description Forbidden */
-      403: {
-        content: {
-          "*/*": string;
-        };
-      };
-      /** @description Not Found */
-      404: {
-        content: {
-          "*/*": string;
-        };
-      };
-    };
-  };
   /** Reports business event */
-  report_1: {
+  report: {
     requestBody: {
       content: {
         "application/json": components["schemas"]["BusinessEventReportRequest"];
@@ -9938,7 +9644,7 @@ export interface operations {
    * Pre-translate by TM
    * @description Pre-translate provided keys to provided languages by TM.
    */
-  translate_1: {
+  translate: {
     parameters: {
       path: {
         projectId: number;
@@ -10371,6 +10077,21 @@ export interface operations {
          * For specific formats like `YAML_RUBY` it's ignored.
          */
         messageFormat?: "C_SPRINTF" | "PHP_SPRINTF" | "JAVA_STRING_FORMAT" | "APPLE_SPRINTF" | "RUBY_SPRINTF" | "ICU";
+        /**
+         * @description This is a template that defines the structure of the resulting .zip file content.
+         *
+         * The template is a string that can contain the following placeholders: {namespace}, {languageTag},
+         * {androidLanguageTag}, {snakeLanguageTag}, {extension}.
+         *
+         * For example, when exporting to JSON with the template `{namespace}/{languageTag}.{extension}`,
+         * the English translations of the `home` namespace will be stored in `home/en.json`.
+         *
+         * The `{snakeLanguageTag}` placeholder is the same as `{languageTag}` but in snake case. (e.g., en_US).
+         *
+         * The Android specific `{androidLanguageTag}` placeholder is the same as `{languageTag}`
+         * but in Android format. (e.g., en-rUS)
+         */
+        fileStructureTemplate?: string;
         /**
          * @description If true, for structured formats (like JSON) arrays are supported.
          *
@@ -11211,7 +10932,7 @@ export interface operations {
    * Get info before applying the license key
    * @description Get info about the upcoming EE subscription. This will show, how much the subscription will cost when key is applied.
    */
-  prepareSetLicenseKey_1: {
+  prepareSetLicenseKey: {
     requestBody: {
       content: {
         "application/json": components["schemas"]["SetLicenseKeyDto"];
@@ -11874,8 +11595,42 @@ export interface operations {
       };
     };
   };
-  /** @description Return server configuration properties documentation */
   get_2: {
+    responses: {
+      /** @description OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["CollectionModelExportFormatModel"];
+        };
+      };
+      /** @description Bad Request */
+      400: {
+        content: {
+          "*/*": string;
+        };
+      };
+      /** @description Unauthorized */
+      401: {
+        content: {
+          "*/*": string;
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        content: {
+          "*/*": string;
+        };
+      };
+      /** @description Not Found */
+      404: {
+        content: {
+          "*/*": string;
+        };
+      };
+    };
+  };
+  /** @description Return server configuration properties documentation */
+  get_3: {
     responses: {
       /** @description OK */
       200: {
@@ -12798,7 +12553,7 @@ export interface operations {
     };
   };
   /** Get batch operation */
-  get_11: {
+  get_12: {
     parameters: {
       path: {
         id: number;
@@ -13579,7 +13334,7 @@ export interface operations {
     };
   };
   /** Get organization by slug */
-  get_18: {
+  get_19: {
     parameters: {
       path: {
         slug: string;
@@ -14076,7 +13831,7 @@ export interface operations {
    * Get one API key
    * @description Returns specific API key info
    */
-  get_20: {
+  get_21: {
     parameters: {
       path: {
         keyId: number;
