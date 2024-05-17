@@ -61,7 +61,7 @@ export const CONFIG_OPT = new Option(
 ).argParser(parsePath);
 
 export const FORMAT_OPT = new Option(
-  '-f, --format <format>',
+  '--format <format>',
   'Localization files format.'
 ).choices([
   'JSON_TOLGEE',
