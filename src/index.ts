@@ -199,7 +199,7 @@ async function run() {
     program.addOption(API_URL_OPT.default(DEFAULT_API_URL));
     program.addOption(API_KEY_OPT);
     program.addOption(PROJECT_ID_OPT.default(-1));
-    program.addOption(FORMAT_OPT);
+    program.addOption(FORMAT_OPT.default('JSON_TOLGEE'));
 
     const config = await loadConfig(program);
     program.hook('preAction', preHandler(config));

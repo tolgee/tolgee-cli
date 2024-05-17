@@ -9,22 +9,28 @@ import { error, loading, success } from '../utils/logger.js';
 import { HttpError } from '../client/errors.js';
 import { Schema } from '../schema.js';
 import { checkPathNotAFile } from '../utils/checkPathNotAFile.js';
+import { mapExportFormat } from '../utils/mapExportFormat.js';
 
 type PullOptions = BaseOptions & {
-  format: 'JSON' | 'XLIFF';
+  format: Schema['format'];
   languages?: string[];
   states?: Array<'UNTRANSLATED' | 'TRANSLATED' | 'REVIEWED'>;
   delimiter?: string;
   emptyDir?: boolean;
   namespaces?: string[];
   tags?: string[];
+  supportArrays: boolean;
   excludeTags?: string[];
 };
 
 async function fetchZipBlob(opts: PullOptions): Promise<Blob> {
+  const exportFormat = mapExportFormat(opts.format);
+  console.log(opts.format, exportFormat);
+  const { format, messageFormat } = exportFormat;
   return opts.client.export.export({
-    format: opts.format,
-    supportArrays: false,
+    format,
+    messageFormat,
+    supportArrays: opts.supportArrays,
     languages: opts.languages,
     filterState: opts.states,
     structureDelimiter: opts.delimiter,
@@ -74,12 +80,6 @@ export default (config: Schema) =>
       config.pull?.path
     )
     .addOption(
-      new Option('-f, --format <format>', 'Format of the exported files')
-        .choices(['JSON', 'XLIFF'])
-        .default(config.format ?? 'JSON')
-        .argParser((v) => v.toUpperCase())
-    )
-    .addOption(
       new Option(
         '-l, --languages <languages...>',
         'List of languages to pull. Leave unspecified to export them all'
@@ -119,6 +119,12 @@ export default (config: Schema) =>
         '--exclude-tags <tags...>',
         'List of tags which to exclude.'
       ).default(config.pull?.excludeTags)
+    )
+    .addOption(
+      new Option(
+        '--support-arrays',
+        'Export keys with array syntax (e.g. item[0]) as arrays.'
+      ).default(config.pull?.supportArrays ?? false)
     )
     .addOption(
       new Option(

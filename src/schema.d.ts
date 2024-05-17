@@ -9,38 +9,36 @@
  * Format for push and pull operations.
  */
 export type Format =
-  | 'JSON_ICU'
-  | 'JSON_JAVA'
-  | 'JSON_PHP'
-  | 'JSON_RUBY'
-  | 'JSON_C'
-  | 'PO_PHP'
-  | 'PO_C'
-  | 'PO_JAVA'
-  | 'PO_ICU'
-  | 'PO_RUBY'
-  | 'STRINGS'
-  | 'STRINGSDICT'
-  | 'APPLE_XLIFF'
-  | 'PROPERTIES_ICU'
-  | 'PROPERTIES_JAVA'
-  | 'PROPERTIES_UNKNOWN'
-  | 'ANDROID_XML'
-  | 'FLUTTER_ARB'
-  | 'YAML_RUBY'
-  | 'YAML_JAVA'
-  | 'YAML_ICU'
-  | 'YAML_PHP'
-  | 'YAML_UNKNOWN'
-  | 'XLIFF_ICU'
-  | 'XLIFF_JAVA'
-  | 'XLIFF_PHP'
-  | 'XLIFF_RUBY';
+  | "JSON_TOLGEE"
+  | "JSON_ICU"
+  | "JSON_JAVA"
+  | "JSON_PHP"
+  | "JSON_RUBY"
+  | "JSON_C"
+  | "PO_PHP"
+  | "PO_C"
+  | "PO_JAVA"
+  | "PO_ICU"
+  | "PO_RUBY"
+  | "APPLE_STRINGS"
+  | "APPLE_XLIFF"
+  | "PROPERTIES_ICU"
+  | "PROPERTIES_JAVA"
+  | "ANDROID_XML"
+  | "FLUTTER_ARB"
+  | "YAML_RUBY"
+  | "YAML_JAVA"
+  | "YAML_ICU"
+  | "YAML_PHP"
+  | "XLIFF_ICU"
+  | "XLIFF_JAVA"
+  | "XLIFF_PHP"
+  | "XLIFF_RUBY";
 /**
  * File glob specifying which files to include.
  */
 export type Path = string;
-export type ForceMode = 'OVERRIDE' | 'KEEP' | 'NO_FORCE';
+export type ForceMode = "OVERRIDE" | "KEEP" | "NO_FORCE";
 
 export interface Schema {
   /**
@@ -85,7 +83,7 @@ export interface Schema {
     /**
      * List of translation states to include. Defaults all except untranslated.
      */
-    states?: ('UNTRANSLATED' | 'TRANSLATED' | 'REVIEWED')[];
+    states?: ("UNTRANSLATED" | "TRANSLATED" | "REVIEWED")[];
     /**
      * List of namespaces to pull. Defaults to all namespaces.
      */
@@ -98,6 +96,10 @@ export interface Schema {
      * List of tags which to exclude.
      */
     excludeTags?: string[];
+    /**
+     * Export keys with array syntax (e.g. item[0]) as arrays.
+     */
+    supportArrays?: boolean;
     /**
      * Empty [path] folder before inserting pulled files.
      */

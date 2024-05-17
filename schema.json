@@ -86,6 +86,10 @@
             "type": "string"
           }
         },
+        "supportArrays": {
+          "description": "Export keys with array syntax (e.g. item[0]) as arrays.",
+          "type": "boolean"
+        },
         "emptyDir": {
           "description": "Empty [path] folder before inserting pulled files.",
           "type": "boolean"
@@ -118,6 +122,7 @@
     "format": {
       "description": "Format for push and pull operations.",
       "enum": [
+        "JSON_TOLGEE",
         "JSON_ICU",
         "JSON_JAVA",
         "JSON_PHP",
@@ -128,19 +133,16 @@
         "PO_JAVA",
         "PO_ICU",
         "PO_RUBY",
-        "STRINGS",
-        "STRINGSDICT",
+        "APPLE_STRINGS",
         "APPLE_XLIFF",
         "PROPERTIES_ICU",
         "PROPERTIES_JAVA",
-        "PROPERTIES_UNKNOWN",
         "ANDROID_XML",
         "FLUTTER_ARB",
         "YAML_RUBY",
         "YAML_JAVA",
         "YAML_ICU",
         "YAML_PHP",
-        "YAML_UNKNOWN",
         "XLIFF_ICU",
         "XLIFF_JAVA",
         "XLIFF_PHP",

@@ -1,6 +1,6 @@
 {
   "$schema": "../../../schema.json",
-  "format": "STRINGS",
+  "format": "APPLE_STRINGS",
   "push": {
     "files": [
       {

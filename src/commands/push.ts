@@ -2,7 +2,7 @@ import type { File, ImportProps } from '../client/import.js';
 import type Client from '../client/index.js';
 import type { BaseOptions } from '../options.js';
 
-import { join } from 'path';
+import { extname, join } from 'path';
 import { readdir, readFile, stat } from 'fs/promises';
 import { Command, Option } from 'commander';
 import { glob } from 'glob';
@@ -11,6 +11,7 @@ import { loading, success, error, warn } from '../utils/logger.js';
 import { ForceMode, Format, Schema, FileMatch } from '../schema.js';
 import { askString } from '../utils/ask.js';
 import { HttpError } from '../client/errors.js';
+import { mapImportFormat } from '../utils/mapImportFormat.js';
 
 type FileRecord = File & {
   language?: string;
@@ -150,9 +151,11 @@ const pushHandler = (config: Schema) =>
       overrideKeyDescriptions: opts.overrideKeyDescriptions,
       convertPlaceholdersToIcu: opts.convertPlaceholdersToIcu,
       fileMappings: files.map((f) => {
+        const format = mapImportFormat(opts.format, extname(f.name));
+        console.log(format, opts.format, extname(f.name));
         return {
           fileName: f.name,
-          format: opts.format,
+          format: format,
           languageTag: f.language,
           namespace: f.namespace ?? '',
         };
