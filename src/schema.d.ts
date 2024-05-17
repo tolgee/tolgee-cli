@@ -101,6 +101,18 @@ export interface Schema {
      */
     supportArrays?: boolean;
     /**
+     * This is a template that defines the structure of the resulting .zip file content.
+     *
+     * The template is a string that can contain the following placeholders: {namespace}, {languageTag}, {androidLanguageTag}, {snakeLanguageTag}, {extension}.
+     *
+     * For example, when exporting to JSON with the template {namespace}/{languageTag}.{extension}, the English translations of the home namespace will be stored in home/en.json.
+     *
+     * The {snakeLanguageTag} placeholder is the same as {languageTag} but in snake case. (e.g., en_US).
+     *
+     * The Android specific {androidLanguageTag} placeholder is the same as {languageTag} but in Android format. (e.g., en-rUS)
+     */
+    fileStructureTemplate?: string;
+    /**
      * Empty [path] folder before inserting pulled files.
      */
     emptyDir?: boolean;

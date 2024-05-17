@@ -194,3 +194,31 @@ it('filters negatively by tag', async () => {
   const content = (await import(join(TMP_FOLDER, 'drinks', 'en.json'))).default;
   expect(content).toEqual({ water: 'Water' });
 });
+
+it('honors files template structure', async () => {
+  await mkdir(TMP_FOLDER);
+  const out = await run([
+    'pull',
+    '--api-key',
+    PROJECT_PAK_3,
+    '--exclude-tags',
+    'soda_tag',
+    '--file-structure-template',
+    '{namespace}/lang-{languageTag}.{extension}',
+    TMP_FOLDER,
+  ]);
+
+  expect(out.code).toBe(0);
+  await expect(TMP_FOLDER).toMatchStructure(`
+├── drinks/
+|  ├── lang-en.json
+|  └── lang-fr.json
+├── food/
+|  ├── lang-en.json
+|  └── lang-fr.json
+├── lang-en.json
+└── lang-fr.json`);
+  const content = (await import(join(TMP_FOLDER, 'drinks', 'lang-en.json')))
+    .default;
+  expect(content).toEqual({ water: 'Water' });
+});

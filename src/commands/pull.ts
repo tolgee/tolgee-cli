@@ -21,6 +21,7 @@ type PullOptions = BaseOptions & {
   tags?: string[];
   supportArrays: boolean;
   excludeTags?: string[];
+  fileStructureTemplate?: string;
 };
 
 async function fetchZipBlob(opts: PullOptions): Promise<Blob> {
@@ -36,6 +37,7 @@ async function fetchZipBlob(opts: PullOptions): Promise<Blob> {
     filterNamespace: opts.namespaces,
     filterTagIn: opts.tags,
     filterTagNotIn: opts.excludeTags,
+    fileStructureTemplate: opts.fileStructureTemplate,
   });
 }
 
@@ -130,5 +132,15 @@ export default (config: Schema) =>
         '--empty-dir',
         'Empty [path] directory before inserting pulled files.'
       ).default(config.pull?.emptyDir)
+    )
+    .addOption(
+      new Option(
+        '--file-structure-template <template>',
+        'This is a template that defines the structure of the resulting .zip file content.\n\n' +
+          'The template is a string that can contain the following placeholders: {namespace}, {languageTag}, {androidLanguageTag}, {snakeLanguageTag}, {extension}.\n\n' +
+          'For example, when exporting to JSON with the template {namespace}/{languageTag}.{extension}, the English translations of the home namespace will be stored in home/en.json.\n\n' +
+          'The {snakeLanguageTag} placeholder is the same as {languageTag} but in snake case. (e.g., en_US).\n\n' +
+          'The Android specific {androidLanguageTag} placeholder is the same as {languageTag} but in Android format. (e.g., en-rUS)'
+      ).default(config.pull?.fileStructureTemplate)
     )
     .action(pullHandler());
