@@ -26,8 +26,6 @@ const asyncHandler = () =>
       process.exit(1);
     }
 
-    console.log({ patterns });
-
     const rawKeys = await loading(
       'Analyzing code...',
       extractKeysOfFiles(patterns, opts.extractor)

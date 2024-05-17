@@ -25,7 +25,6 @@ type PullOptions = BaseOptions & {
 
 async function fetchZipBlob(opts: PullOptions): Promise<Blob> {
   const exportFormat = mapExportFormat(opts.format);
-  console.log(opts.format, exportFormat);
   const { format, messageFormat } = exportFormat;
   return opts.client.export.export({
     format,

@@ -152,7 +152,6 @@ const pushHandler = (config: Schema) =>
       convertPlaceholdersToIcu: opts.convertPlaceholdersToIcu,
       fileMappings: files.map((f) => {
         const format = mapImportFormat(opts.format, extname(f.name));
-        console.log(format, opts.format, extname(f.name));
         return {
           fileName: f.name,
           format: format,
