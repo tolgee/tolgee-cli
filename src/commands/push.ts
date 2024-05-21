@@ -1,5 +1,4 @@
 import type { File, ImportProps } from '../client/import.js';
-import type Client from '../client/index.js';
 import type { BaseOptions } from '../options.js';
 
 import { extname, join } from 'path';
@@ -10,8 +9,9 @@ import { glob } from 'glob';
 import { loading, success, error, warn } from '../utils/logger.js';
 import { ForceMode, Format, Schema, FileMatch } from '../schema.js';
 import { askString } from '../utils/ask.js';
-import { HttpError } from '../client/errors.js';
 import { mapImportFormat } from '../utils/mapImportFormat.js';
+import { TolgeeClient } from '../client/newClient/TolgeeClient.js';
+import { errorFromLoadable } from '../client/newClient/errorFromLoadable.js';
 
 type FileRecord = File & {
   language?: string;
@@ -99,7 +99,7 @@ async function promptConflicts(
   return resp;
 }
 
-async function importData(client: Client, data: ImportProps) {
+async function importData(client: TolgeeClient, data: ImportProps) {
   return loading('Uploading files...', client.import.import(data));
 }
 
@@ -161,24 +161,27 @@ const pushHandler = (config: Schema) =>
       }),
     };
 
-    try {
-      await importData(opts.client, {
-        files,
-        params,
-      });
-    } catch (e) {
-      if (!(e instanceof HttpError)) {
-        throw e;
-      }
-      const response = await e.getErrorResponse();
+    const attempt1 = await importData(opts.client, {
+      files,
+      params,
+    });
+
+    if (attempt1.error) {
+      const response = attempt1.error as any;
+
       if (response.code !== 'conflict_is_not_resolved') {
-        throw e;
+        error(errorFromLoadable(attempt1));
+        process.exit(1);
       }
       const forceMode = await promptConflicts(opts);
-      await importData(opts.client, {
+      const attempt2 = await importData(opts.client, {
         files,
         params: { ...params, forceMode },
       });
+      if (attempt2.error) {
+        error(errorFromLoadable(attempt2));
+        process.exit(1);
+      }
     }
     success('Done!');
   };

@@ -15,7 +15,7 @@ export class HttpError extends Error {
   }
 
   async getErrorResponse(): Promise<{ code: string }> {
-    return this.response.body.json();
+    return { code: '' };
   }
 
   getErrorText() {

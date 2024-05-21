@@ -7,14 +7,7 @@ import { getApiKey, savePak, savePat } from './config/credentials.js';
 import loadTolgeeRc from './config/tolgeerc.js';
 
 import RestClient from './client/index.js';
-import { HttpError } from './client/errors.js';
-import {
-  setDebug,
-  isDebugEnabled,
-  debug,
-  info,
-  error,
-} from './utils/logger.js';
+import { setDebug, info, error } from './utils/logger.js';
 
 import {
   API_KEY_OPT,
@@ -40,6 +33,7 @@ import CompareCommand from './commands/sync/compare.js';
 import SyncCommand from './commands/sync/sync.js';
 import { getSingleOption } from './utils/getSingleOption.js';
 import { Schema } from './schema.js';
+import { createTolgeeClient } from './client/newClient/TolgeeClient.js';
 
 const NO_KEY_COMMANDS = ['login', 'logout', 'extract'];
 
@@ -125,8 +119,8 @@ const preHandler = (config: Schema) =>
       validateOptions(cmd);
 
       const opts = cmd.optsWithGlobals();
-      const client = new RestClient({
-        apiUrl: opts.apiUrl ?? config.apiUrl,
+      const client = createTolgeeClient({
+        baseUrl: opts.apiUrl?.toString() ?? config.apiUrl?.toString(),
         apiKey: opts.apiKey ?? config.apiKey,
         projectId: opts.projectId ?? config.projectId,
       });
@@ -168,31 +162,31 @@ async function loadConfig(program: Command) {
   return tgConfig ?? {};
 }
 
-async function handleHttpError(e: HttpError) {
-  error('An error occurred while requesting the API.');
-  error(`${e.request.method} ${e.request.path}`);
-  error(e.getErrorText());
+// async function handleHttpError(e: HttpError) {
+//   error('An error occurred while requesting the API.');
+//   error(`${e.request.method} ${e.request.path}`);
+//   error(e.getErrorText());
 
-  // Remove token from store if necessary
-  if (e.response.statusCode === 401) {
-    const removeFn = program.getOptionValue('_removeApiKeyFromStore');
-    if (removeFn) {
-      info('Removing the API key from the authentication store.');
-      removeFn();
-    }
-  }
+//   // Remove token from store if necessary
+//   if (e.response.statusCode === 401) {
+//     const removeFn = program.getOptionValue('_removeApiKeyFromStore');
+//     if (removeFn) {
+//       info('Removing the API key from the authentication store.');
+//       removeFn();
+//     }
+//   }
 
-  // Print server output for server errors
-  if (isDebugEnabled()) {
-    // We cannot parse the response as JSON and pull error codes here as we may be here due to a 5xx error:
-    // by nature 5xx class errors can happen for a lot of reasons (e.g. upstream issues, server issues,
-    // catastrophic failure) which means the output is completely unpredictable. While some errors are
-    // formatted by the Tolgee server, reality is there's a huge chance the 5xx error hasn't been raised
-    // by Tolgee's error handler.
-    const res = await e.response.body.text();
-    debug(`Server response:\n\n---\n${res}\n---`);
-  }
-}
+//   // Print server output for server errors
+//   if (isDebugEnabled()) {
+//     // We cannot parse the response as JSON and pull error codes here as we may be here due to a 5xx error:
+//     // by nature 5xx class errors can happen for a lot of reasons (e.g. upstream issues, server issues,
+//     // catastrophic failure) which means the output is completely unpredictable. While some errors are
+//     // formatted by the Tolgee server, reality is there's a huge chance the 5xx error hasn't been raised
+//     // by Tolgee's error handler.
+//     const res = await e.response.body.text();
+//     debug(`Server response:\n\n---\n${res}\n---`);
+//   }
+// }
 
 async function run() {
   try {
@@ -229,11 +223,6 @@ async function run() {
 
     await program.parseAsync();
   } catch (e: any) {
-    if (e instanceof HttpError) {
-      await handleHttpError(e);
-      process.exit(1);
-    }
-
     // If the error is uncaught, huge chance that either:
     //  - The error should be handled here but isn't
     //  - The error should be handled in the command but isn't

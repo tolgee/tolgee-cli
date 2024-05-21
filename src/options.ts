@@ -1,7 +1,7 @@
-import type Client from './client/index.js';
 import { existsSync } from 'fs';
 import { resolve } from 'path';
 import { Option, InvalidArgumentError } from 'commander';
+import { createTolgeeClient } from './client/newClient/TolgeeClient.js';
 
 function parseProjectId(v: string) {
   const val = Number(v);
@@ -32,7 +32,7 @@ export type BaseOptions = {
   apiUrl: URL;
   apiKey: string;
   projectId: number;
-  client: Client;
+  client: ReturnType<typeof createTolgeeClient>;
 };
 
 export const API_KEY_OPT = new Option(

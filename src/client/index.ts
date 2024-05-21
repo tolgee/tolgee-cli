@@ -6,7 +6,6 @@ import Requester from './internal/requester.js';
 
 import ProjectClient from './project.js';
 import LanguagesClient from './languages.js';
-import ImportClient from './import.js';
 import ExportClient from './export.js';
 
 import { API_KEY_PAK_PREFIX } from '../constants.js';
@@ -36,7 +35,6 @@ export default class RestClient {
   private requester: Requester;
   readonly project: ProjectClient;
   readonly languages: LanguagesClient;
-  readonly import: ImportClient;
   readonly export: ExportClient;
 
   constructor(private params: RequesterParams) {
@@ -44,7 +42,6 @@ export default class RestClient {
 
     this.project = new ProjectClient(this.requester);
     this.languages = new LanguagesClient(this.requester);
-    this.import = new ImportClient(this.requester);
     this.export = new ExportClient(this.requester);
   }
 
@@ -60,6 +57,10 @@ export default class RestClient {
   }
 
   static projectIdFromKey(key: string) {
+    if (!key.startsWith(API_KEY_PAK_PREFIX)) {
+      return undefined;
+    }
+
     const keyBuffer = base32Decode(
       key.slice(API_KEY_PAK_PREFIX.length).toUpperCase(),
       'RFC4648'

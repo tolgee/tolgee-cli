@@ -269,6 +269,7 @@ it('asks for confirmation when there are conflicts', async () => {
     '/v2/projects/2/translations?filterKeyName=cat-name&filterKeyName=fox-name',
     PROJECT_PAK_2
   );
+
   expect(keys.page.totalElements).toBe(2);
 
   const stored = tolgeeDataToDict(keys);

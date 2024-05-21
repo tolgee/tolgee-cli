@@ -1,4 +1,4 @@
-import type { Blob } from 'buffer';
+import { Blob } from 'buffer';
 import type { BaseOptions } from '../options.js';
 
 import { Command, Option } from 'commander';
@@ -6,10 +6,10 @@ import { Command, Option } from 'commander';
 import { unzipBuffer } from '../utils/zip.js';
 import { prepareDir } from '../utils/prepareDir.js';
 import { error, loading, success } from '../utils/logger.js';
-import { HttpError } from '../client/errors.js';
 import { Schema } from '../schema.js';
 import { checkPathNotAFile } from '../utils/checkPathNotAFile.js';
 import { mapExportFormat } from '../utils/mapExportFormat.js';
+import { errorFromLoadable } from '../client/newClient/errorFromLoadable.js';
 
 type PullOptions = BaseOptions & {
   format: Schema['format'];
@@ -27,7 +27,7 @@ type PullOptions = BaseOptions & {
 async function fetchZipBlob(opts: PullOptions): Promise<Blob> {
   const exportFormat = mapExportFormat(opts.format);
   const { format, messageFormat } = exportFormat;
-  return opts.client.export.export({
+  const loadable = await opts.client.export.export({
     format,
     messageFormat,
     supportArrays: opts.supportArrays,
@@ -39,6 +39,19 @@ async function fetchZipBlob(opts: PullOptions): Promise<Blob> {
     filterTagNotIn: opts.excludeTags,
     fileStructureTemplate: opts.fileStructureTemplate,
   });
+
+  if (loadable.error) {
+    if (loadable.response.status === 400) {
+      error(
+        `Please check if your parameters, including namespaces, are configured correctly. Tolgee responded with: ${loadable.response.statusText}`
+      );
+      process.exit(1);
+    } else {
+      error(errorFromLoadable(loadable));
+      process.exit(1);
+    }
+  }
+  return loadable.data as unknown as Blob;
 }
 
 const pullHandler = () =>
@@ -51,24 +64,13 @@ const pullHandler = () =>
 
     await checkPathNotAFile(path);
 
-    try {
-      const zipBlob = await loading(
-        'Fetching strings from Tolgee...',
-        fetchZipBlob(opts)
-      );
-      await prepareDir(path, opts.emptyDir);
-      await loading('Extracting strings...', unzipBuffer(zipBlob, path));
-      success('Done!');
-    } catch (e) {
-      if (e instanceof HttpError && e.response.statusCode === 400) {
-        const res: any = await e.response.body.json();
-        error(
-          `Please check if your parameters, including namespaces, are configured correctly. Tolgee responded with: ${res.code}`
-        );
-        return;
-      }
-      throw e;
-    }
+    const zipBlob = await loading(
+      'Fetching strings from Tolgee...',
+      fetchZipBlob(opts)
+    );
+    await prepareDir(path, opts.emptyDir);
+    await loading('Extracting strings...', unzipBuffer(zipBlob, path));
+    success('Done!');
   };
 
 export default (config: Schema) =>

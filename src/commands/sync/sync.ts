@@ -1,5 +1,4 @@
 import type { BaseOptions } from '../../options.js';
-import type Client from '../../client/index.js';
 import { Command } from 'commander';
 import ansi from 'ansi-colors';
 
@@ -16,6 +15,8 @@ import { askBoolean } from '../../utils/ask.js';
 import { loading, error } from '../../utils/logger.js';
 import { Schema } from '../../schema.js';
 import { BaseExtractOptions } from '../extract.js';
+import { errorFromLoadable } from '../../client/newClient/errorFromLoadable.js';
+import { TolgeeClient } from '../../client/newClient/TolgeeClient.js';
 
 type Options = BaseOptions &
   BaseExtractOptions & {
@@ -25,13 +26,20 @@ type Options = BaseOptions &
     yes?: boolean;
   };
 
-async function backup(client: Client, dest: string) {
-  const blob = await client.export.export({
+async function backup(client: TolgeeClient, dest: string) {
+  const loadable = await client.export.export({
     format: 'JSON',
     supportArrays: false,
     filterState: ['UNTRANSLATED', 'TRANSLATED', 'REVIEWED'],
     structureDelimiter: '',
   });
+
+  if (loadable.error) {
+    error(errorFromLoadable(loadable));
+    process.exit(1);
+  }
+
+  const blob = loadable.data!;
 
   await unzipBuffer(blob, dest);
 }
@@ -82,7 +90,19 @@ const syncHandler = (config: Schema) =>
     }
 
     const localKeys = filterExtractionResult(rawKeys);
-    const remoteKeys = await opts.client.project.fetchAllKeys();
+    const allKeysLoadable = await opts.client.GET(
+      '/v2/projects/{projectId}/all-keys',
+      {
+        params: { path: { projectId: opts.client.getProjectId() } },
+      }
+    );
+
+    if (allKeysLoadable.error) {
+      error(errorFromLoadable(allKeysLoadable));
+      process.exit(1);
+    }
+
+    const remoteKeys = allKeysLoadable.data?._embedded?.keys ?? [];
 
     const diff = compareKeys(localKeys, remoteKeys);
     if (!diff.added.length && !diff.removed.length) {
@@ -95,8 +115,18 @@ const syncHandler = (config: Schema) =>
     }
 
     // Load project settings. We're interested in the default locale here.
-    const { baseLanguage } =
-      await opts.client.project.fetchProjectInformation();
+
+    const projectLoadable = await opts.client.GET('/v2/projects/{projectId}', {
+      params: { path: { projectId: opts.client.getProjectId() } },
+    });
+
+    if (projectLoadable.error) {
+      error(errorFromLoadable(projectLoadable));
+      process.exit(1);
+    }
+
+    const baseLanguage = projectLoadable.data!.baseLanguage;
+
     if (!baseLanguage) {
       // I'm highly unsure how we could reach this state, but this is what the OAI spec tells me ¯\_(ツ)_/¯
       error('Your project does not have a base language!');
@@ -126,10 +156,18 @@ const syncHandler = (config: Schema) =>
           : {},
       }));
 
-      await loading(
+      const loadable = await loading(
         'Creating missing keys...',
-        opts.client.project.createBulkKey(keys)
+        opts.client.POST('/v2/projects/{projectId}/keys/import', {
+          params: { path: { projectId: opts.client.getProjectId() } },
+          body: { keys },
+        })
       );
+
+      if (loadable.error) {
+        error(errorFromLoadable(loadable));
+        process.exit(1);
+      }
     }
 
     if (opts.removeUnused) {
@@ -140,10 +178,18 @@ const syncHandler = (config: Schema) =>
         }
 
         const ids = await diff.removed.map((k) => k.id);
-        await loading(
+        const loadable = await loading(
           'Deleting unused keys...',
-          opts.client.project.deleteBulkKeys(ids)
+          opts.client.DELETE('/v2/projects/{projectId}/keys', {
+            params: { path: { projectId: opts.client.getProjectId() } },
+            body: { ids },
+          })
         );
+
+        if (loadable.error) {
+          error(errorFromLoadable(loadable));
+          process.exit(1);
+        }
       }
     }
 

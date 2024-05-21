@@ -11,6 +11,7 @@ import { error, loading } from '../../utils/logger.js';
 import { Schema } from '../../schema.js';
 import { BaseExtractOptions } from '../extract.js';
 import { BaseOptions } from '../../options.js';
+import { errorFromLoadable } from '../../client/newClient/errorFromLoadable.js';
 
 type Options = BaseOptions & BaseExtractOptions;
 
@@ -32,7 +33,17 @@ const asyncHandler = (config: Schema) =>
     dumpWarnings(rawKeys);
 
     const localKeys = filterExtractionResult(rawKeys);
-    const remoteKeys = await opts.client.project.fetchAllKeys();
+    const loadable = await opts.client.GET(
+      '/v2/projects/{projectId}/all-keys',
+      { params: { path: { projectId: opts.client.getProjectId() } } }
+    );
+
+    if (loadable.error) {
+      error(errorFromLoadable(loadable));
+      process.exit(1);
+    }
+
+    const remoteKeys = loadable.data!._embedded!.keys ?? [];
 
     const diff = compareKeys(localKeys, remoteKeys);
     if (!diff.added.length && !diff.removed.length) {

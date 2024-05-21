@@ -43,7 +43,7 @@ async function testWithConfig({
   const projectPath = fileURLToPath(
     new URL(`./differentFormatsProject/${config}/`, FIXTURES_PATH)
   );
-  const outPull = await run([
+  const outPush = await run([
     '--config',
     configPath,
     '--api-key',
@@ -55,7 +55,7 @@ async function testWithConfig({
     'OVERRIDE',
   ]);
 
-  expect(outPull.code).toBe(0);
+  expect(outPush.code).toBe(0);
 
   const keys = await requestGet('/v2/projects/1/translations', PROJECT_PAK_1);
 
@@ -66,7 +66,7 @@ async function testWithConfig({
     fr: 'Manette',
   });
 
-  const outPush = await run([
+  const outPull = await run([
     '--config',
     configPath,
     '--api-key',
@@ -74,7 +74,7 @@ async function testWithConfig({
     'pull',
     TMP_FOLDER,
   ]);
-  expect(outPush.code).toBe(0);
+  expect(outPull.code).toBe(0);
   await expect(TMP_FOLDER).toMatchStructureOf(projectPath);
   expect(readFileSync(join(TMP_FOLDER, fileLocation)).toString()).toContain(
     inFile
