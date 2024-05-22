@@ -10,8 +10,10 @@ import { loading, success, error, warn } from '../utils/logger.js';
 import { ForceMode, Format, Schema, FileMatch } from '../schema.js';
 import { askString } from '../utils/ask.js';
 import { mapImportFormat } from '../utils/mapImportFormat.js';
-import { TolgeeClient } from '../client/newClient/TolgeeClient.js';
-import { errorFromLoadable } from '../client/newClient/errorFromLoadable.js';
+import {
+  TolgeeClient,
+  handleLoadableError,
+} from '../client/newClient/TolgeeClient.js';
 
 type FileRecord = File & {
   language?: string;
@@ -167,21 +169,15 @@ const pushHandler = (config: Schema) =>
     });
 
     if (attempt1.error) {
-      const response = attempt1.error as any;
-
-      if (response.code !== 'conflict_is_not_resolved') {
-        error(errorFromLoadable(attempt1));
-        process.exit(1);
+      if (attempt1.error.code !== 'conflict_is_not_resolved') {
+        handleLoadableError(attempt1);
       }
       const forceMode = await promptConflicts(opts);
       const attempt2 = await importData(opts.client, {
         files,
         params: { ...params, forceMode },
       });
-      if (attempt2.error) {
-        error(errorFromLoadable(attempt2));
-        process.exit(1);
-      }
+      handleLoadableError(attempt2);
     }
     success('Done!');
   };

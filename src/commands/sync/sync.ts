@@ -15,8 +15,10 @@ import { askBoolean } from '../../utils/ask.js';
 import { loading, error } from '../../utils/logger.js';
 import { Schema } from '../../schema.js';
 import { BaseExtractOptions } from '../extract.js';
-import { errorFromLoadable } from '../../client/newClient/errorFromLoadable.js';
-import { TolgeeClient } from '../../client/newClient/TolgeeClient.js';
+import {
+  TolgeeClient,
+  handleLoadableError,
+} from '../../client/newClient/TolgeeClient.js';
 
 type Options = BaseOptions &
   BaseExtractOptions & {
@@ -34,10 +36,7 @@ async function backup(client: TolgeeClient, dest: string) {
     structureDelimiter: '',
   });
 
-  if (loadable.error) {
-    error(errorFromLoadable(loadable));
-    process.exit(1);
-  }
+  handleLoadableError(loadable);
 
   const blob = loadable.data!;
 
@@ -97,10 +96,7 @@ const syncHandler = (config: Schema) =>
       }
     );
 
-    if (allKeysLoadable.error) {
-      error(errorFromLoadable(allKeysLoadable));
-      process.exit(1);
-    }
+    handleLoadableError(allKeysLoadable);
 
     const remoteKeys = allKeysLoadable.data?._embedded?.keys ?? [];
 
@@ -120,10 +116,7 @@ const syncHandler = (config: Schema) =>
       params: { path: { projectId: opts.client.getProjectId() } },
     });
 
-    if (projectLoadable.error) {
-      error(errorFromLoadable(projectLoadable));
-      process.exit(1);
-    }
+    handleLoadableError(projectLoadable);
 
     const baseLanguage = projectLoadable.data!.baseLanguage;
 
@@ -164,10 +157,7 @@ const syncHandler = (config: Schema) =>
         })
       );
 
-      if (loadable.error) {
-        error(errorFromLoadable(loadable));
-        process.exit(1);
-      }
+      handleLoadableError(loadable);
     }
 
     if (opts.removeUnused) {
@@ -186,10 +176,7 @@ const syncHandler = (config: Schema) =>
           })
         );
 
-        if (loadable.error) {
-          error(errorFromLoadable(loadable));
-          process.exit(1);
-        }
+        handleLoadableError(loadable);
       }
     }
 

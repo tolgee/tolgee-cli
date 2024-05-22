@@ -1,3 +1,5 @@
+import { getStackTrace } from './getStackTrace.js';
+
 const SYMBOLS = ['      🐁', '    🐁  ', '  🐁    ', '🐁      '];
 
 let debugEnabled = false;
@@ -65,6 +67,14 @@ export function warn(msg: string) {
  */
 export function error(msg: string) {
   console.log(`🔴 ${msg}`);
+}
+
+export function exitWithError(msg: string): never {
+  error(msg);
+  if (debugEnabled) {
+    console.log(getStackTrace());
+  }
+  process.exit(1);
 }
 
 /**

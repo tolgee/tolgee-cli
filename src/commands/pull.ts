@@ -5,11 +5,11 @@ import { Command, Option } from 'commander';
 
 import { unzipBuffer } from '../utils/zip.js';
 import { prepareDir } from '../utils/prepareDir.js';
-import { error, loading, success } from '../utils/logger.js';
+import { exitWithError, loading, success } from '../utils/logger.js';
 import { Schema } from '../schema.js';
 import { checkPathNotAFile } from '../utils/checkPathNotAFile.js';
 import { mapExportFormat } from '../utils/mapExportFormat.js';
-import { errorFromLoadable } from '../client/newClient/errorFromLoadable.js';
+import { handleLoadableError } from '../client/newClient/TolgeeClient.js';
 
 type PullOptions = BaseOptions & {
   format: Schema['format'];
@@ -40,18 +40,13 @@ async function fetchZipBlob(opts: PullOptions): Promise<Blob> {
     fileStructureTemplate: opts.fileStructureTemplate,
   });
 
-  if (loadable.error) {
-    if (loadable.response.status === 400) {
-      error(
-        `Please check if your parameters, including namespaces, are configured correctly. Tolgee responded with: ${loadable.response.statusText}`
-      );
-      process.exit(1);
-    } else {
-      error(errorFromLoadable(loadable));
-      process.exit(1);
-    }
+  if (loadable.response.status === 400) {
+    exitWithError(
+      `Please check if your parameters, including namespaces, are configured correctly. Tolgee responded with: ${loadable.response.statusText}`
+    );
   }
-  return loadable.data as unknown as Blob;
+  handleLoadableError(loadable);
+  return loadable.data;
 }
 
 const pullHandler = () =>

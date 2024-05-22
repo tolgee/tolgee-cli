@@ -11,7 +11,7 @@ import { error, loading } from '../../utils/logger.js';
 import { Schema } from '../../schema.js';
 import { BaseExtractOptions } from '../extract.js';
 import { BaseOptions } from '../../options.js';
-import { errorFromLoadable } from '../../client/newClient/errorFromLoadable.js';
+import { handleLoadableError } from '../../client/newClient/TolgeeClient.js';
 
 type Options = BaseOptions & BaseExtractOptions;
 
@@ -38,10 +38,7 @@ const asyncHandler = (config: Schema) =>
       { params: { path: { projectId: opts.client.getProjectId() } } }
     );
 
-    if (loadable.error) {
-      error(errorFromLoadable(loadable));
-      process.exit(1);
-    }
+    handleLoadableError(loadable);
 
     const remoteKeys = loadable.data!._embedded!.keys ?? [];
 
