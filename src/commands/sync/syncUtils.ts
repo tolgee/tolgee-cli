@@ -1,7 +1,17 @@
-import type { AllKeys } from '../../client/project.js';
+import type { ResponseOf } from '../../client/internal/schema.utils.js';
 import type { Key } from '../../extractor/index.js';
 import { type FilteredKeys, NullNamespace } from '../../extractor/runner.js';
 import ansi from 'ansi-colors';
+
+type ResponseAllKeys = ResponseOf<
+  '/v2/projects/{projectId}/all-keys',
+  'get'
+>[200];
+
+export type AllKeys = Exclude<
+  Exclude<ResponseAllKeys['_embedded'], undefined>['keys'],
+  undefined
+>;
 
 export type PartialKey = { keyName: string; namespace?: string };
 

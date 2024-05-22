@@ -11,7 +11,7 @@ import { error, loading } from '../../utils/logger.js';
 import { Schema } from '../../schema.js';
 import { BaseExtractOptions } from '../extract.js';
 import { BaseOptions } from '../../options.js';
-import { handleLoadableError } from '../../client/newClient/TolgeeClient.js';
+import { handleLoadableError } from '../../client/TolgeeClient.js';
 
 type Options = BaseOptions & BaseExtractOptions;
 

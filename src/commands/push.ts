@@ -1,4 +1,3 @@
-import type { File, ImportProps } from '../client/import.js';
 import type { BaseOptions } from '../options.js';
 
 import { extname, join } from 'path';
@@ -10,10 +9,18 @@ import { loading, success, error, warn } from '../utils/logger.js';
 import { ForceMode, Format, Schema, FileMatch } from '../schema.js';
 import { askString } from '../utils/ask.js';
 import { mapImportFormat } from '../utils/mapImportFormat.js';
-import {
-  TolgeeClient,
-  handleLoadableError,
-} from '../client/newClient/TolgeeClient.js';
+import { TolgeeClient, handleLoadableError } from '../client/TolgeeClient.js';
+import { BodyOf } from '../client/internal/schema.utils.js';
+
+type ImportRequest = BodyOf<
+  '/v2/projects/{projectId}/single-step-import',
+  'post'
+>;
+
+export type File = { name: string; data: string | Buffer | Blob };
+export type ImportProps = Omit<ImportRequest, 'files'> & {
+  files: Array<File>;
+};
 
 type FileRecord = File & {
   language?: string;

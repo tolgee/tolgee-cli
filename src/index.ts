@@ -6,7 +6,6 @@ import ansi from 'ansi-colors';
 import { getApiKey, savePak, savePat } from './config/credentials.js';
 import loadTolgeeRc from './config/tolgeerc.js';
 
-import RestClient from './client/index.js';
 import { setDebug, info, error } from './utils/logger.js';
 
 import {
@@ -33,7 +32,8 @@ import CompareCommand from './commands/sync/compare.js';
 import SyncCommand from './commands/sync/sync.js';
 import { getSingleOption } from './utils/getSingleOption.js';
 import { Schema } from './schema.js';
-import { createTolgeeClient } from './client/newClient/TolgeeClient.js';
+import { createTolgeeClient } from './client/TolgeeClient.js';
+import { projectIdFromKey } from './client/ApiClient.js';
 
 const NO_KEY_COMMANDS = ['login', 'logout', 'extract'];
 
@@ -73,7 +73,7 @@ function loadProjectId(cmd: Command) {
 
   if (opts.apiKey?.startsWith(API_KEY_PAK_PREFIX)) {
     // Parse the key and ensure we can access the specified Project ID
-    const projectId = RestClient.projectIdFromKey(opts.apiKey);
+    const projectId = projectIdFromKey(opts.apiKey);
     program.setOptionValue('projectId', projectId);
 
     if (opts.projectId !== -1 && opts.projectId !== projectId) {
@@ -161,32 +161,6 @@ async function loadConfig(program: Command) {
 
   return tgConfig ?? {};
 }
-
-// async function handleHttpError(e: HttpError) {
-//   error('An error occurred while requesting the API.');
-//   error(`${e.request.method} ${e.request.path}`);
-//   error(e.getErrorText());
-
-//   // Remove token from store if necessary
-//   if (e.response.statusCode === 401) {
-//     const removeFn = program.getOptionValue('_removeApiKeyFromStore');
-//     if (removeFn) {
-//       info('Removing the API key from the authentication store.');
-//       removeFn();
-//     }
-//   }
-
-//   // Print server output for server errors
-//   if (isDebugEnabled()) {
-//     // We cannot parse the response as JSON and pull error codes here as we may be here due to a 5xx error:
-//     // by nature 5xx class errors can happen for a lot of reasons (e.g. upstream issues, server issues,
-//     // catastrophic failure) which means the output is completely unpredictable. While some errors are
-//     // formatted by the Tolgee server, reality is there's a huge chance the 5xx error hasn't been raised
-//     // by Tolgee's error handler.
-//     const res = await e.response.body.text();
-//     debug(`Server response:\n\n---\n${res}\n---`);
-//   }
-// }
 
 async function run() {
   try {

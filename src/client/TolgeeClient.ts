@@ -1,4 +1,4 @@
-import { exitWithError } from '../../utils/logger.js';
+import { exitWithError } from './../utils/logger.js';
 import { ApiClientProps, createApiClient } from './ApiClient.js';
 import { createExportClient } from './ExportClient.js';
 import { createImportClient } from './ImportClient.js';

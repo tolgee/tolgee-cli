@@ -1,10 +1,26 @@
 import createClient from 'openapi-fetch';
 
-import { API_KEY_PAK_PREFIX } from '../../constants.js';
-import { ApiKeyInfo } from '../index.js';
-import { paths } from '../internal/schema.generated.js';
+import { API_KEY_PAK_PREFIX } from './../constants.js';
+import { paths } from './internal/schema.generated.js';
 import { handleLoadableError } from './TolgeeClient.js';
-import { exitWithError } from '../../utils/logger.js';
+import { exitWithError } from './../utils/logger.js';
+
+export type ApiKeyInfoPat = {
+  type: 'PAT';
+  key: string;
+  username: string;
+  expires: number;
+};
+
+export type ApiKeyInfoPak = {
+  type: 'PAK';
+  key: string;
+  username: string;
+  project: { id: number; name: string };
+  expires: number;
+};
+
+export type ApiKeyInfo = ApiKeyInfoPat | ApiKeyInfoPak;
 
 export const getApiKeyInformation = async (
   client: ReturnType<typeof createClient<paths>>,

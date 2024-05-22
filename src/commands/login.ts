@@ -6,7 +6,7 @@ import {
   clearAuthStore,
 } from '../config/credentials.js';
 import { success } from '../utils/logger.js';
-import { createTolgeeClient } from '../client/newClient/TolgeeClient.js';
+import { createTolgeeClient } from '../client/TolgeeClient.js';
 
 type Options = {
   apiUrl: URL;

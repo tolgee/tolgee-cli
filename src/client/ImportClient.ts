@@ -1,4 +1,4 @@
-import type { BodyOf } from '../internal/schema.utils.js';
+import type { BodyOf } from './internal/schema.utils.js';
 
 import FormData from 'form-data';
 import type { ApiClient } from './ApiClient.js';

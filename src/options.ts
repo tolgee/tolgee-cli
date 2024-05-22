@@ -1,7 +1,7 @@
 import { existsSync } from 'fs';
 import { resolve } from 'path';
 import { Option, InvalidArgumentError } from 'commander';
-import { createTolgeeClient } from './client/newClient/TolgeeClient.js';
+import { createTolgeeClient } from './client/TolgeeClient.js';
 
 function parseProjectId(v: string) {
   const val = Number(v);

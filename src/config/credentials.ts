@@ -1,8 +1,7 @@
-import type { ApiKeyInfo } from '../client/index.js';
-
 import { join, dirname } from 'path';
 import { mkdir, readFile, writeFile } from 'fs/promises';
 
+import type { ApiKeyInfo } from '../client/getApiKeyInformation.js';
 import { warn } from '../utils/logger.js';
 import { CONFIG_PATH } from '../constants.js';
 

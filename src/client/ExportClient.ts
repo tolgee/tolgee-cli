@@ -1,4 +1,4 @@
-import type { BodyOf } from '../internal/schema.utils.js';
+import type { BodyOf } from './internal/schema.utils.js';
 import type { Blob } from 'buffer';
 import { ApiClient } from './ApiClient.js';
 

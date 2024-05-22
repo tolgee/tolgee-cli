@@ -18,7 +18,7 @@ import { BaseExtractOptions } from '../extract.js';
 import {
   TolgeeClient,
   handleLoadableError,
-} from '../../client/newClient/TolgeeClient.js';
+} from '../../client/TolgeeClient.js';
 
 type Options = BaseOptions &
   BaseExtractOptions & {

@@ -1,11 +1,11 @@
 import createClient from 'openapi-fetch';
-import { paths } from '../internal/schema.generated.js';
+import { paths } from './internal/schema.generated.js';
 import base32Decode from 'base32-decode';
-import { API_KEY_PAK_PREFIX, USER_AGENT } from '../../constants.js';
+import { API_KEY_PAK_PREFIX, USER_AGENT } from '../constants.js';
 import { getApiKeyInformation } from './getApiKeyInformation.js';
-import { debug } from '../../utils/logger.js';
+import { debug } from '../utils/logger.js';
 
-function projectIdFromKey(key: string) {
+export function projectIdFromKey(key: string) {
   if (!key.startsWith(API_KEY_PAK_PREFIX)) {
     return undefined;
   }

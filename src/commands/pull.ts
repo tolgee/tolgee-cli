@@ -9,7 +9,7 @@ import { exitWithError, loading, success } from '../utils/logger.js';
 import { Schema } from '../schema.js';
 import { checkPathNotAFile } from '../utils/checkPathNotAFile.js';
 import { mapExportFormat } from '../utils/mapExportFormat.js';
-import { handleLoadableError } from '../client/newClient/TolgeeClient.js';
+import { handleLoadableError } from '../client/TolgeeClient.js';
 
 type PullOptions = BaseOptions & {
   format: Schema['format'];
