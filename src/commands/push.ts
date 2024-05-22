@@ -170,20 +170,26 @@ const pushHandler = (config: Schema) =>
       }),
     };
 
-    const attempt1 = await importData(opts.client, {
-      files,
-      params,
-    });
+    const attempt1 = await loading(
+      'Importing...',
+      importData(opts.client, {
+        files,
+        params,
+      })
+    );
 
     if (attempt1.error) {
       if (attempt1.error.code !== 'conflict_is_not_resolved') {
         handleLoadableError(attempt1);
       }
       const forceMode = await promptConflicts(opts);
-      const attempt2 = await importData(opts.client, {
-        files,
-        params: { ...params, forceMode },
-      });
+      const attempt2 = await loading(
+        'Overriding...',
+        importData(opts.client, {
+          files,
+          params: { ...params, forceMode },
+        })
+      );
       handleLoadableError(attempt2);
     }
     success('Done!');

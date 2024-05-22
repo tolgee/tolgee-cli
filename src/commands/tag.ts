@@ -1,17 +1,56 @@
 import { Command, Option } from 'commander';
 import { Schema } from '../schema.js';
+import { BaseOptions } from '../options.js';
+import { handleLoadableError } from '../client/TolgeeClient.js';
+import { loading, success } from '../utils/logger.js';
 
-const pushHandler = (config: Schema) => async function (this: Command) {};
+type TagOptions = BaseOptions & {
+  filterExtracted?: boolean;
+  filterTag?: string[];
+  filterNoTag?: string[];
+  tagFiltered?: string[];
+  tagOther?: string[];
+  untagFiltered?: string[];
+  untagOther?: string[];
+};
+
+const tagHandler = (config: Schema) =>
+  async function (this: Command) {
+    const opts: TagOptions = this.optsWithGlobals();
+
+    const loadable = await loading(
+      'Tagging...',
+      opts.client.PUT('/v2/projects/{projectId}/tag-complex', {
+        params: { path: { projectId: opts.client.getProjectId() } },
+        body: {
+          filterTag: opts.filterTag,
+          filterTagNot: opts.filterNoTag,
+          tagFiltered: opts.tagFiltered,
+          tagOther: opts.tagOther,
+          untagFiltered: opts.untagFiltered,
+          untagOther: opts.untagOther,
+        },
+      })
+    );
+
+    handleLoadableError(loadable);
+    success('Done!');
+  };
 
 export default (config: Schema) =>
   new Command('tag')
     .description('Update tags in your project.')
     .addOption(
-      new Option('--with-extracted', 'Extract keys from code and filter by it.')
+      new Option(
+        '--filter-extracted',
+        'Extract keys from code and filter by it.'
+      )
     )
-    .addOption(new Option('--with-tag <tags...>', 'Filter only keys with tag.'))
     .addOption(
-      new Option('--without-tag <tags...>', 'Filter only keys without tag.')
+      new Option('--filter-tag <tags...>', 'Filter only keys with tag.')
+    )
+    .addOption(
+      new Option('--filter-no-tag <tags...>', 'Filter only keys without tag.')
     )
     .addOption(
       new Option('--tag-filtered <tags...>', 'Add tag to filtered keys.')
@@ -28,4 +67,4 @@ export default (config: Schema) =>
         'Remove tag from keys which are not filtered.'
       )
     )
-    .action(pushHandler(config));
+    .action(tagHandler(config));

@@ -30,6 +30,8 @@ import PullCommand from './commands/pull.js';
 import ExtractCommand from './commands/extract.js';
 import CompareCommand from './commands/sync/compare.js';
 import SyncCommand from './commands/sync/sync.js';
+import TagCommand from './commands/tag.js';
+
 import { getSingleOption } from './utils/getSingleOption.js';
 import { Schema } from './schema.js';
 import { createTolgeeClient } from './client/TolgeeClient.js';
@@ -193,6 +195,9 @@ async function run() {
     );
     program.addCommand(
       SyncCommand(config).configureHelp({ showGlobalOptions: true })
+    );
+    program.addCommand(
+      TagCommand(config).configureHelp({ showGlobalOptions: true })
     );
 
     await program.parseAsync();
