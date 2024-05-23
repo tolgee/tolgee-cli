@@ -33,6 +33,8 @@ export type BaseOptions = {
   apiKey: string;
   projectId: number;
   client: ReturnType<typeof createTolgeeClient>;
+  extractor: string;
+  patterns: string[] | undefined;
 };
 
 export const API_KEY_OPT = new Option(

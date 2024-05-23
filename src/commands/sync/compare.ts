@@ -7,13 +7,12 @@ import {
   filterExtractionResult,
 } from '../../extractor/runner.js';
 import { dumpWarnings } from '../../extractor/warnings.js';
-import { error, loading } from '../../utils/logger.js';
+import { exitWithError, loading } from '../../utils/logger.js';
 import { Schema } from '../../schema.js';
-import { BaseExtractOptions } from '../extract.js';
 import { BaseOptions } from '../../options.js';
 import { handleLoadableError } from '../../client/TolgeeClient.js';
 
-type Options = BaseOptions & BaseExtractOptions;
+type Options = BaseOptions;
 
 const asyncHandler = (config: Schema) =>
   async function (this: Command) {
@@ -22,8 +21,7 @@ const asyncHandler = (config: Schema) =>
     const patterns = opts.patterns?.length ? opts.patterns : config.patterns;
 
     if (!patterns?.length) {
-      error('Missing argument <patterns>');
-      process.exit(1);
+      exitWithError('Missing argument <patterns>');
     }
 
     const rawKeys = await loading(

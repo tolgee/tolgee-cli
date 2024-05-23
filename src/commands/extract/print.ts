@@ -1,22 +1,21 @@
-import type { BaseExtractOptions } from '../extract.js';
 import { relative } from 'path';
 import { Command } from 'commander';
 
 import { extractKeysOfFiles } from '../../extractor/runner.js';
 import { WarningMessages } from '../../extractor/warnings.js';
-import { error, loading } from '../../utils/logger.js';
+import { exitWithError, loading } from '../../utils/logger.js';
 import { Schema } from '../../schema.js';
+import type { BaseOptions } from '../../options.js';
 
-type ExtractPrintOptions = BaseExtractOptions;
+type ExtractPrintOptions = BaseOptions;
 
 const printHandler = (config: Schema) =>
   async function (this: Command) {
     const opts: ExtractPrintOptions = this.optsWithGlobals();
 
-    const patterns = opts.patterns?.length ? opts.patterns : config.patterns;
+    const patterns = opts.patterns;
     if (!patterns?.length) {
-      error('Missing argument <patterns>');
-      process.exit(1);
+      exitWithError('Missing option --patterns or config.patterns option');
     }
 
     const extracted = await loading(

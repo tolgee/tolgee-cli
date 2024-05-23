@@ -5,7 +5,13 @@ import { readdir, readFile, stat } from 'fs/promises';
 import { Command, Option } from 'commander';
 import { glob } from 'glob';
 
-import { loading, success, error, warn } from '../utils/logger.js';
+import {
+  loading,
+  success,
+  error,
+  warn,
+  exitWithError,
+} from '../utils/logger.js';
 import { ForceMode, Format, Schema, FileMatch } from '../schema.js';
 import { askString } from '../utils/ask.js';
 import { mapImportFormat } from '../utils/mapImportFormat.js';
@@ -77,10 +83,9 @@ async function promptConflicts(
   const resolveUrl = new URL(`/projects/${projectId}/import`, opts.apiUrl).href;
 
   if (opts.forceMode === 'NO_FORCE') {
-    error(
+    exitWithError(
       `There are conflicts in the import. You can resolve them and complete the import here: ${resolveUrl}.`
     );
-    process.exit(1);
   }
 
   if (opts.forceMode) {
@@ -88,10 +93,9 @@ async function promptConflicts(
   }
 
   if (!process.stdout.isTTY) {
-    error(
+    exitWithError(
       `There are conflicts in the import. Please specify a --force-mode, or resolve them in your browser at ${resolveUrl}.`
     );
-    process.exit(1);
   }
 
   warn('There are conflicts in the import. What do you want to do?');
@@ -99,10 +103,9 @@ async function promptConflicts(
     'Type "KEEP" to preserve the version on the server, "OVERRIDE" to use the version from the import, and nothing to abort: '
   );
   if (resp !== 'KEEP' && resp !== 'OVERRIDE') {
-    error(
+    exitWithError(
       `Aborting. You can resolve the conflicts and complete the import here: ${resolveUrl}`
     );
-    process.exit(1);
   }
 
   return resp;

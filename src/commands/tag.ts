@@ -2,7 +2,11 @@ import { Command, Option } from 'commander';
 import { Schema } from '../schema.js';
 import { BaseOptions } from '../options.js';
 import { handleLoadableError } from '../client/TolgeeClient.js';
-import { loading, success } from '../utils/logger.js';
+import { exitWithError, loading, success } from '../utils/logger.js';
+import { extractKeysOfFiles } from '../extractor/runner.js';
+import { components } from '../client/internal/schema.generated.js';
+
+type KeyId = components['schemas']['KeyId'];
 
 type TagOptions = BaseOptions & {
   filterExtracted?: boolean;
@@ -18,6 +22,25 @@ const tagHandler = (config: Schema) =>
   async function (this: Command) {
     const opts: TagOptions = this.optsWithGlobals();
 
+    let extractedKeys: KeyId[] | undefined;
+    if (opts.filterExtracted) {
+      const patterns = opts.patterns;
+      if (!patterns?.length) {
+        exitWithError('Missing option --patterns or config.patterns option');
+      }
+
+      const extracted = await loading(
+        'Analyzing code...',
+        extractKeysOfFiles(patterns, opts.extractor)
+      );
+
+      const keys = [...extracted.values()].flatMap((item) => item.keys);
+      extractedKeys = keys.map((key) => ({
+        name: key.keyName,
+        namespace: key.namespace,
+      }));
+    }
+
     const loadable = await loading(
       'Tagging...',
       opts.client.PUT('/v2/projects/{projectId}/tag-complex', {
@@ -29,6 +52,7 @@ const tagHandler = (config: Schema) =>
           tagOther: opts.tagOther,
           untagFiltered: opts.untagFiltered,
           untagOther: opts.untagOther,
+          filterKeys: extractedKeys,
         },
       })
     );

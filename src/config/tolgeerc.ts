@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 import { dirname, join, resolve } from 'path';
 
 import { CosmiconfigResult } from 'cosmiconfig/dist/types.js';
-import { error } from '../utils/logger.js';
+import { error, exitWithError } from '../utils/logger.js';
 import { existsSync } from 'fs';
 import { Schema } from '../schema.js';
 
@@ -111,8 +111,7 @@ export default async function loadTolgeeRc(
       'instance.',
       ''
     )}' ${message}`;
-    error(errMessage);
-    process.exit(1);
+    exitWithError(errMessage);
   }
 
   return config;

@@ -6,7 +6,7 @@ import ansi from 'ansi-colors';
 import { getApiKey, savePak, savePat } from './config/credentials.js';
 import loadTolgeeRc from './config/tolgeerc.js';
 
-import { setDebug, info, error } from './utils/logger.js';
+import { setDebug, info, error, exitWithError } from './utils/logger.js';
 
 import {
   API_KEY_OPT,
@@ -106,10 +106,9 @@ function validateOptions(cmd: Command) {
   }
 
   if (!opts.apiKey) {
-    error(
+    exitWithError(
       'No API key has been provided. You must either provide one via --api-key, or login via `tolgee login`.'
     );
-    process.exit(1);
   }
 }
 
@@ -207,11 +206,9 @@ async function run() {
     //  - The error should be handled in the command but isn't
     //  - Something went wrong with the code
     error('An unexpected error occurred while running the command.');
-    error(
+    exitWithError(
       'Please report this to our issue tracker: https://github.com/tolgee/tolgee-cli/issues'
     );
-    console.log(e.stack);
-    process.exit(1);
   }
 }
 

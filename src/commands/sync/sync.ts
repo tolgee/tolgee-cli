@@ -12,21 +12,20 @@ import { type PartialKey, compareKeys, printKey } from './syncUtils.js';
 import { prepareDir } from '../../utils/prepareDir.js';
 import { unzipBuffer } from '../../utils/zip.js';
 import { askBoolean } from '../../utils/ask.js';
-import { loading, error } from '../../utils/logger.js';
+import { loading, exitWithError } from '../../utils/logger.js';
 import { Schema } from '../../schema.js';
-import { BaseExtractOptions } from '../extract.js';
+
 import {
   TolgeeClient,
   handleLoadableError,
 } from '../../client/TolgeeClient.js';
 
-type Options = BaseOptions &
-  BaseExtractOptions & {
-    backup?: string;
-    removeUnused?: boolean;
-    continueOnWarning?: boolean;
-    yes?: boolean;
-  };
+type Options = BaseOptions & {
+  backup?: string;
+  removeUnused?: boolean;
+  continueOnWarning?: boolean;
+  yes?: boolean;
+};
 
 async function backup(client: TolgeeClient, dest: string) {
   const loadable = await client.export.export({
@@ -48,10 +47,9 @@ async function askForConfirmation(
   operation: 'created' | 'deleted'
 ) {
   if (!process.stdout.isTTY) {
-    error(
+    exitWithError(
       'You must run this command interactively, or specify --yes to proceed.'
     );
-    process.exit(1);
   }
 
   const str = `The following keys will be ${operation}:`;
@@ -62,8 +60,7 @@ async function askForConfirmation(
 
   const shouldContinue = await askBoolean('Does this look correct?', true);
   if (!shouldContinue) {
-    error('Aborting.');
-    process.exit(1);
+    exitWithError('Aborting.');
   }
 }
 
@@ -74,8 +71,7 @@ const syncHandler = (config: Schema) =>
     const patterns = opts.patterns?.length ? opts.patterns : config.patterns;
 
     if (!patterns?.length) {
-      error('Missing argument <patterns>');
-      process.exit(1);
+      exitWithError('Missing argument <patterns>');
     }
 
     const rawKeys = await loading(
@@ -122,8 +118,7 @@ const syncHandler = (config: Schema) =>
 
     if (!baseLanguage) {
       // I'm highly unsure how we could reach this state, but this is what the OAI spec tells me ¯\_(ツ)_/¯
-      error('Your project does not have a base language!');
-      process.exit(1);
+      exitWithError('Your project does not have a base language!');
     }
 
     // Prepare backup
