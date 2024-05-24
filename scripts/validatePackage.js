@@ -64,9 +64,12 @@ await writeFile(
   TEST_EXTRACTOR_FILE,
   `import '@tolgee/react'\nReact.createElement(T, { keyName: 'owo' })`
 );
-const tolgeeExtract = execOrError('npx --no tolgee extract print test.js', {
-  cwd: PACKAGE_DEST,
-});
+const tolgeeExtract = execOrError(
+  'npx --no tolgee extract print --patterns test.js',
+  {
+    cwd: PACKAGE_DEST,
+  }
+);
 ok(tolgeeExtract.toString().includes('1 key found in test.js:'));
 console.log('OK: tolgee extract print works');
 
