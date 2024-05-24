@@ -1,7 +1,4 @@
 export default {
-  apiKey:
-    'tgpak_' +
-    'gfpxizltoqys2ylenvuw4lljnvyg64tumvsc24dsn5vgky3ufvuw24dmnfrws5a',
   push: {
     files: [
       {
