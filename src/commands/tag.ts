@@ -13,9 +13,9 @@ type TagOptions = BaseOptions & {
   filterNotExtracted?: boolean;
   filterTag?: string[];
   filterNoTag?: string[];
-  tagFiltered?: string[];
+  tag?: string[];
   tagOther?: string[];
-  untagFiltered?: string[];
+  untag?: string[];
   untagOther?: string[];
 };
 
@@ -55,9 +55,9 @@ const tagHandler = (config: Schema) =>
         body: {
           filterTag: opts.filterTag,
           filterTagNot: opts.filterNoTag,
-          tagFiltered: opts.tagFiltered,
+          tagFiltered: opts.tag,
           tagOther: opts.tagOther,
-          untagFiltered: opts.untagFiltered,
+          untagFiltered: opts.untag,
           untagOther: opts.untagOther,
           filterKeys: opts.filterExtracted ? extractedKeys : undefined,
           filterKeysNot: opts.filterNotExtracted ? extractedKeys : undefined,

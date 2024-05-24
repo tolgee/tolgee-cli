@@ -10,8 +10,8 @@ export type LoadableData = Awaited<ReturnType<TolgeeClient['GET']>> & {
 
 type Props = ApiClientProps;
 
-export function createTolgeeClient({ baseUrl, apiKey, projectId }: Props) {
-  const apiClient = createApiClient({ baseUrl, apiKey, projectId });
+export function createTolgeeClient(props: Props) {
+  const apiClient = createApiClient(props);
 
   return {
     ...apiClient,

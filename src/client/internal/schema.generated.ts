@@ -2434,6 +2434,7 @@ export interface components {
       description: string;
       /** Format: int64 */
       id: number;
+      scopes: string[];
       username?: string;
       /** Format: int64 */
       projectId: number;
@@ -2443,7 +2444,6 @@ export interface components {
       lastUsedAt?: number;
       projectName: string;
       userFullName?: string;
-      scopes: string[];
     };
     SuperTokenRequest: {
       /** @description Has to be provided when TOTP enabled */
@@ -3840,10 +3840,6 @@ export interface components {
       /** Format: int64 */
       lastUsedAt?: number;
     };
-    OrganizationRequestParamsDto: {
-      filterCurrentUserOwner: boolean;
-      search?: string;
-    };
     PagedModelOrganizationModel: {
       _embedded?: {
         organizations?: components["schemas"]["OrganizationModel"][];
@@ -3959,6 +3955,7 @@ export interface components {
       description: string;
       /** Format: int64 */
       id: number;
+      scopes: string[];
       username?: string;
       /** Format: int64 */
       projectId: number;
@@ -3968,7 +3965,6 @@ export interface components {
       lastUsedAt?: number;
       projectName: string;
       userFullName?: string;
-      scopes: string[];
     };
     PagedModelUserAccountModel: {
       _embedded?: {
@@ -10901,14 +10897,15 @@ export interface operations {
    */
   getAll_10: {
     parameters: {
-      query: {
+      query?: {
         /** @description Zero-based page index (0..N) */
         page?: number;
         /** @description The size of the page to be returned */
         size?: number;
         /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
         sort?: string[];
-        params: components["schemas"]["OrganizationRequestParamsDto"];
+        filterCurrentUserOwner?: boolean;
+        search?: string;
       };
     };
     responses: {

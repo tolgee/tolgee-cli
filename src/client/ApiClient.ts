@@ -73,7 +73,7 @@ export function createApiClient({
   });
 
   apiClient.use({
-    onRequest: (req) => {
+    onRequest: (req, options) => {
       debug(`[HTTP] Requesting: ${req.method} ${req.url}`);
       return undefined;
     },
@@ -81,7 +81,11 @@ export function createApiClient({
       debug(`[HTTP] Response: ${res.url} [${res.status}]`);
       if (autoThrow && !res.ok) {
         const loadable = await parseResponse(res, options.parseAs);
-        throw new Error(errorFromLoadable(loadable as any));
+        throw new Error(
+          `Tolgee request error ${res.url} ${errorFromLoadable(
+            loadable as any
+          )}`
+        );
       }
       return undefined;
     },

@@ -1,0 +1,19 @@
+{
+  "$schema": "../../../schema.json",
+  "apiUrl": "http://localhost:22222",
+  "patterns": [
+    "./react.tsx"
+  ],
+  "push": {
+    "files": [
+      {
+        "path": "./testfiles/en.json",
+        "language": "en"
+      },
+      {
+        "path": "./testfiles/cs.json",
+        "language": "cs"
+      }
+    ]
+  }
+}
