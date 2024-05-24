@@ -9,10 +9,6 @@
       {
         "path": "./testfiles/en.json",
         "language": "en"
-      },
-      {
-        "path": "./testfiles/cs.json",
-        "language": "cs"
       }
     ]
   }

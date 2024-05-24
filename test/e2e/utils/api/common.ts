@@ -3,8 +3,8 @@ import {
   TolgeeClient,
   createTolgeeClient,
 } from '../../../../src/client/TolgeeClient.js';
+import { components } from '../../../../src/client/internal/schema.generated.js';
 import { languagesTestData } from './languagesTestData.js';
-import { projectTestData } from './projectTestData.js';
 
 const API_URL = 'http://localhost:22222';
 
@@ -44,7 +44,10 @@ export async function deleteProject(client: TolgeeClient) {
   });
 }
 
-export async function createProjectWithClient(name: string) {
+export async function createProjectWithClient(
+  name: string,
+  data: components['schemas']['ImportKeysResolvableDto']
+) {
   const userToken = await userLogin();
   let client = createClient(userToken!);
   const organizations = await client.GET('/v2/organizations');
@@ -62,10 +65,10 @@ export async function createProjectWithClient(name: string) {
 
   await client.POST('/v2/projects/{projectId}/keys/import-resolvable', {
     params: { path: { projectId: client.getProjectId() } },
-    body: projectTestData,
+    body: data,
   });
 
-  return { client, project: project!.data };
+  return client;
 }
 
 export const DEFAULT_SCOPES = [

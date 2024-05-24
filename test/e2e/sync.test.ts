@@ -1,16 +1,18 @@
 import { fileURLToPath } from 'url';
 import { fileURLToPathSlash } from './utils/toFilePath.js';
 import { TMP_FOLDER, setupTemporaryFolder } from './utils/tmp.js';
-import {
-  PROJECT_PAK_2,
-  PROJECT_PAK_3,
-  requestGet,
-  requestPost,
-  requestDelete,
-} from './utils/tg.js';
 import { tolgeeDataToDict } from './utils/data.js';
 import { run } from './utils/run.js';
 import './utils/toMatchContentsOf';
+import { TolgeeClient } from '../../src/client/TolgeeClient.js';
+import {
+  DEFAULT_SCOPES,
+  createPak,
+  createProjectWithClient,
+  deleteProject,
+} from './utils/api/common.js';
+import { PROJECT_2 } from './utils/api/project2.js';
+import { PROJECT_3 } from './utils/api/project3.js';
 
 const FIXTURES_PATH = new URL('../__fixtures__/', import.meta.url);
 const CODE_PATH = fileURLToPathSlash(
@@ -28,56 +30,18 @@ const CODE_PROJECT_3 = `${CODE_PATH}/Test3SingleDiff.tsx`;
 
 setupTemporaryFolder();
 
+let client: TolgeeClient;
+let pak: string;
+
 afterEach(async () => {
-  // Project 2: delete mouse-* keys, restore bird-name bird-sound
-  const data1 = await requestGet(
-    '/v2/projects/2/translations?search=mouse-',
-    PROJECT_PAK_2
-  );
-  if (data1._embedded) {
-    const keys = data1._embedded.keys.map((k: any) => k.keyId);
-    await requestDelete('/v2/projects/2/keys', { ids: keys }, PROJECT_PAK_2);
-  }
-
-  await requestPost(
-    '/v2/projects/2/keys',
-    {
-      name: 'bird-name',
-      translations: { en: 'Bird', fr: 'Oiseau' },
-    },
-    PROJECT_PAK_2
-  );
-
-  await requestPost(
-    '/v2/projects/2/keys',
-    {
-      name: 'bird-sound',
-      translations: { en: 'Tweet', fr: 'Cui-cui' },
-    },
-    PROJECT_PAK_2
-  );
-
-  // Project 3: delete welcome key
-  const data2 = await requestGet(
-    '/v2/projects/3/translations?search=welcome',
-    PROJECT_PAK_3
-  );
-  if (data2._embedded) {
-    const keys = data2._embedded.keys.map((k: any) => k.keyId);
-    await requestDelete('/v2/projects/3/keys', { ids: keys }, PROJECT_PAK_3);
-  }
+  await deleteProject(client);
 });
 
 it('says projects are in sync when they do match', async () => {
+  client = await createProjectWithClient('Project 2', PROJECT_2);
+  pak = await createPak(client);
   const out = await run(
-    [
-      'sync',
-      '--yes',
-      '--api-key',
-      PROJECT_PAK_2,
-      '--patterns',
-      CODE_PROJECT_2_COMPLETE,
-    ],
+    ['sync', '--yes', '--api-key', pak, '--patterns', CODE_PROJECT_2_COMPLETE],
     undefined,
     20e3
   );
@@ -87,8 +51,11 @@ it('says projects are in sync when they do match', async () => {
 }, 30e3);
 
 it('creates new keys in code projects', async () => {
+  client = await createProjectWithClient('Project 2', PROJECT_2);
+  pak = await createPak(client);
+
   const out = await run(
-    ['sync', '--yes', '--api-key', PROJECT_PAK_2, '-pt', CODE_PROJECT_2_ADDED],
+    ['sync', '--yes', '--api-key', pak, '-pt', CODE_PROJECT_2_ADDED],
     undefined,
     20e3
   );
@@ -96,14 +63,16 @@ it('creates new keys in code projects', async () => {
   expect(out.code).toBe(0);
   expect(out.stdout).toContain('+ 2 strings');
 
-  const keys = await requestGet(
-    '/v2/projects/2/translations?filterKeyName=mouse-name&filterKeyName=mouse-sound',
-    PROJECT_PAK_2
-  );
+  const keys = await client.GET('/v2/projects/{projectId}/translations', {
+    params: {
+      path: { projectId: client.getProjectId() },
+      query: { filterKeyName: ['mouse-name', 'mouse-sound'] },
+    },
+  });
 
-  expect(keys.page.totalElements).toBe(2);
+  expect(keys.data?.page?.totalElements).toBe(2);
 
-  const stored = tolgeeDataToDict(keys);
+  const stored = tolgeeDataToDict(keys!.data);
   expect(stored).toEqual({
     'mouse-name': {
       __ns: null,
@@ -117,13 +86,16 @@ it('creates new keys in code projects', async () => {
 }, 30e3);
 
 it('deletes keys that no longer exist', async () => {
+  client = await createProjectWithClient('Project 2', PROJECT_2);
+  pak = await createPak(client, [...DEFAULT_SCOPES, 'keys.delete']);
+
   const out = await run(
     [
       'sync',
       '--yes',
       '--remove-unused',
       '--api-key',
-      PROJECT_PAK_2,
+      pak,
       '--patterns',
       CODE_PROJECT_2_DELETED,
     ],
@@ -134,17 +106,22 @@ it('deletes keys that no longer exist', async () => {
   expect(out.code).toBe(0);
   expect(out.stdout).toContain('- 2 strings');
 
-  const keys = await requestGet(
-    '/v2/projects/2/translations?filterKeyName=bird-name&filterKeyName=bird-sound',
-    PROJECT_PAK_2
-  );
+  const keys = await client.GET('/v2/projects/{projectId}/translations', {
+    params: {
+      path: { projectId: client.getProjectId() },
+      query: { filterKeyName: ['bird-name', 'bird-sound'] },
+    },
+  });
 
-  expect(keys.page.totalElements).toBe(0);
+  expect(keys.data?.page?.totalElements).toBe(0);
 }, 30e3);
 
 it('handles namespaces properly', async () => {
+  client = await createProjectWithClient('Project 3', PROJECT_3);
+  pak = await createPak(client, DEFAULT_SCOPES);
+
   const out = await run(
-    ['sync', '--yes', '--api-key', PROJECT_PAK_3, '--patterns', CODE_PROJECT_3],
+    ['sync', '--yes', '--api-key', pak, '--patterns', CODE_PROJECT_3],
     undefined,
     20e3
   );
@@ -152,14 +129,16 @@ it('handles namespaces properly', async () => {
   expect(out.code).toBe(0);
   expect(out.stdout).toContain('+ 1 string');
 
-  const keys = await requestGet(
-    '/v2/projects/3/translations?filterKeyName=welcome',
-    PROJECT_PAK_3
-  );
+  const keys = await client.GET('/v2/projects/{projectId}/translations', {
+    params: {
+      path: { projectId: client.getProjectId() },
+      query: { filterKeyName: ['welcome'] },
+    },
+  });
 
-  expect(keys.page.totalElements).toBe(1);
+  expect(keys.data?.page?.totalElements).toBe(1);
 
-  const stored = tolgeeDataToDict(keys);
+  const stored = tolgeeDataToDict(keys.data);
   expect(stored).toEqual({
     welcome: {
       __ns: 'greeting',
@@ -169,12 +148,15 @@ it('handles namespaces properly', async () => {
 }, 30e3);
 
 it('does a proper backup', async () => {
+  client = await createProjectWithClient('Project 2', PROJECT_2);
+  pak = await createPak(client, DEFAULT_SCOPES);
+
   const out = await run(
     [
       'sync',
       '--yes',
       '--api-key',
-      PROJECT_PAK_2,
+      pak,
       '--backup',
       TMP_FOLDER,
       '--patterns',
@@ -189,15 +171,11 @@ it('does a proper backup', async () => {
 }, 30e3);
 
 it('logs warnings to stderr and aborts', async () => {
+  client = await createProjectWithClient('Project 2', PROJECT_2);
+  pak = await createPak(client, DEFAULT_SCOPES);
+
   const out = await run(
-    [
-      'sync',
-      '--yes',
-      '--api-key',
-      PROJECT_PAK_2,
-      '--patterns',
-      CODE_PROJECT_2_WARNING,
-    ],
+    ['sync', '--yes', '--api-key', pak, '--patterns', CODE_PROJECT_2_WARNING],
     undefined,
     20e3
   );
@@ -207,13 +185,16 @@ it('logs warnings to stderr and aborts', async () => {
 }, 30e3);
 
 it('continues when there are warnings and --continue-on-warning is set', async () => {
+  client = await createProjectWithClient('Project 2', PROJECT_2);
+  pak = await createPak(client, DEFAULT_SCOPES);
+
   const out = await run(
     [
       'sync',
       '--yes',
       '--continue-on-warning',
       '--api-key',
-      PROJECT_PAK_2,
+      pak,
       '--patterns',
       CODE_PROJECT_2_WARNING,
     ],

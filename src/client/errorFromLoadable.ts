@@ -1,10 +1,15 @@
 import { LoadableData } from './TolgeeClient.js';
 
 export const addErrorDetails = (loadable: LoadableData, showBeError = true) => {
+  const items: string[] = [];
+  items.push(`status: ${loadable.response.status}`);
   if (showBeError && loadable.error?.code) {
-    return `[status: ${loadable.response.status}, code: ${loadable.error.code}]`;
+    items.push(`code: ${loadable.error.code}`);
   }
-  return `[status: ${loadable.response.status}]`;
+  if (loadable.response.status === 403 && loadable.error?.params?.[0]) {
+    items.push(`missing scope: ${loadable.error.params[0]}`);
+  }
+  return `[${items.join(', ')}]`;
 };
 
 export const errorFromLoadable = (loadable: LoadableData) => {

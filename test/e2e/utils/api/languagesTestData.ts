@@ -8,9 +8,9 @@ export const languagesTestData: components['schemas']['LanguageRequest'][] = [
     flagEmoji: '🇬🇧',
   },
   {
-    name: 'Czech',
-    originalName: 'Česky',
-    tag: 'cs',
-    flagEmoji: '🇨🇿',
+    name: 'French',
+    originalName: 'French',
+    tag: 'fr',
+    flagEmoji: '🇫🇷',
   },
 ];

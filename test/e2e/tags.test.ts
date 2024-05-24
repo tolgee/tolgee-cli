@@ -4,6 +4,7 @@ import {
   createProjectWithClient,
   deleteProject,
 } from './utils/api/common';
+import { PROJECT_1 } from './utils/api/project1';
 import { ORIGINAL_TAGS, createTestTags, getTagsMap } from './utils/api/tags';
 import { run } from './utils/run';
 import { fileURLToPathSlash } from './utils/toFilePath';
@@ -16,8 +17,7 @@ let client: TolgeeClient;
 let pak: string;
 
 beforeEach(async () => {
-  const data = await createProjectWithClient('Project with tags');
-  client = data.client;
+  client = await createProjectWithClient('Project with tags', PROJECT_1);
   pak = await createPak(client);
   await createTestTags(client);
 });
@@ -111,6 +111,7 @@ it('marks other keys', async () => {
   expect(await getTagsMap(client)).toEqual({
     ...ORIGINAL_TAGS,
     keyboard: ['other'],
+    remote: ['other'],
   });
 });
 

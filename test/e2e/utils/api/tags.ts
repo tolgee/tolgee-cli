@@ -34,6 +34,7 @@ export const ORIGINAL_TAGS = {
   controller: ['production-v12'],
   desk: ['production-v12'],
   keyboard: [],
+  remote: [],
   mouse: ['draft-test-branch'],
   screen: ['deprecated-v11'],
 } as const;
