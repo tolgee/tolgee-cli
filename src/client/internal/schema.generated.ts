@@ -1304,6 +1304,30 @@ export interface components {
        */
       type?: "NONE" | "VIEW" | "TRANSLATE" | "REVIEW" | "EDIT" | "MANAGE";
       /**
+       * @description List of languages user can translate to. If null, all languages editing is permitted.
+       * @example [
+       *   200001,
+       *   200004
+       * ]
+       */
+      translateLanguageIds?: number[];
+      /**
+       * @description List of languages user can view. If null, all languages view is permitted.
+       * @example [
+       *   200001,
+       *   200004
+       * ]
+       */
+      viewLanguageIds?: number[];
+      /**
+       * @description List of languages user can change state to. If null, changing state of all language values is permitted.
+       * @example [
+       *   200001,
+       *   200004
+       * ]
+       */
+      stateChangeLanguageIds?: number[];
+      /**
        * @deprecated
        * @description Deprecated (use translateLanguageIds).
        *
@@ -1315,22 +1339,6 @@ export interface components {
        */
       permittedLanguageIds?: number[];
       /**
-       * @description List of languages user can translate to. If null, all languages editing is permitted.
-       * @example [
-       *   200001,
-       *   200004
-       * ]
-       */
-      translateLanguageIds?: number[];
-      /**
-       * @description List of languages user can change state to. If null, changing state of all language values is permitted.
-       * @example [
-       *   200001,
-       *   200004
-       * ]
-       */
-      stateChangeLanguageIds?: number[];
-      /**
        * @description Granted scopes to the user. When user has type permissions, this field contains permission scopes of the type.
        * @example [
        *   "KEYS_EDIT",
@@ -1338,14 +1346,6 @@ export interface components {
        * ]
        */
       scopes: ("translations.view" | "translations.edit" | "keys.edit" | "screenshots.upload" | "screenshots.delete" | "screenshots.view" | "activity.view" | "languages.edit" | "admin" | "project.edit" | "members.view" | "members.edit" | "translation-comments.add" | "translation-comments.edit" | "translation-comments.set-state" | "translations.state-edit" | "keys.view" | "keys.delete" | "keys.create" | "batch-jobs.view" | "batch-jobs.cancel" | "translations.batch-by-tm" | "translations.batch-machine" | "content-delivery.manage" | "content-delivery.publish" | "webhooks.manage")[];
-      /**
-       * @description List of languages user can view. If null, all languages view is permitted.
-       * @example [
-       *   200001,
-       *   200004
-       * ]
-       */
-      viewLanguageIds?: number[];
     };
     LanguageModel: {
       /** Format: int64 */
@@ -1878,9 +1878,9 @@ export interface components {
       secretKey?: string;
       endpoint: string;
       signingRegion: string;
+      enabled?: boolean;
       /** @enum {string} */
       contentStorageType?: "S3" | "AZURE";
-      enabled?: boolean;
     };
     AzureContentStorageConfigModel: {
       containerName?: string;
@@ -2080,6 +2080,7 @@ export interface components {
     };
     ComplexTagKeysRequest: {
       filterKeys?: components["schemas"]["KeyId"][];
+      filterKeysNot?: components["schemas"]["KeyId"][];
       filterTag?: string[];
       filterTagNot?: string[];
       tagFiltered?: string[];
@@ -2107,10 +2108,10 @@ export interface components {
       convertPlaceholdersToIcu: boolean;
     };
     ImportSettingsModel: {
-      /** @description If true, placeholders from other formats will be converted to ICU when possible */
-      convertPlaceholdersToIcu: boolean;
       /** @description If true, key descriptions will be overridden by the import */
       overrideKeyDescriptions: boolean;
+      /** @description If true, placeholders from other formats will be converted to ICU when possible */
+      convertPlaceholdersToIcu: boolean;
     };
     /** @description User who created the comment */
     SimpleUserAccountModel: {
@@ -2294,17 +2295,17 @@ export interface components {
     };
     RevealedPatModel: {
       token: string;
+      description: string;
       /** Format: int64 */
       id: number;
-      /** Format: int64 */
-      lastUsedAt?: number;
-      /** Format: int64 */
-      expiresAt?: number;
       /** Format: int64 */
       createdAt: number;
       /** Format: int64 */
       updatedAt: number;
-      description: string;
+      /** Format: int64 */
+      expiresAt?: number;
+      /** Format: int64 */
+      lastUsedAt?: number;
     };
     SetOrganizationRoleDto: {
       /** @enum {string} */
@@ -2430,19 +2431,19 @@ export interface components {
     RevealedApiKeyModel: {
       /** @description Resulting user's api key */
       key: string;
+      description: string;
       /** Format: int64 */
       id: number;
-      userFullName?: string;
-      projectName: string;
-      /** Format: int64 */
-      lastUsedAt?: number;
-      scopes: string[];
-      /** Format: int64 */
-      projectId: number;
       username?: string;
       /** Format: int64 */
+      projectId: number;
+      /** Format: int64 */
       expiresAt?: number;
-      description: string;
+      /** Format: int64 */
+      lastUsedAt?: number;
+      projectName: string;
+      userFullName?: string;
+      scopes: string[];
     };
     SuperTokenRequest: {
       /** @description Has to be provided when TOTP enabled */
@@ -2772,6 +2773,8 @@ export interface components {
       convertPlaceholdersToIcu: boolean;
       /** @description Definition of mapping for each file to import. */
       fileMappings: components["schemas"]["ImportFileMapping"][];
+      /** @description Keys created by this import will be tagged with these tags. It add tags only to new keys. The keys that already exist will not be tagged. */
+      tagNewKeys: string[];
     };
     ErrorResponseBody: {
       code: string;
@@ -3177,14 +3180,12 @@ export interface components {
       /** @example Features organization has enabled */
       enabledFeatures: ("GRANULAR_PERMISSIONS" | "PRIORITIZED_FEATURE_REQUESTS" | "PREMIUM_SUPPORT" | "DEDICATED_SLACK_CHANNEL" | "ASSISTED_UPDATES" | "DEPLOYMENT_ASSISTANCE" | "BACKUP_CONFIGURATION" | "TEAM_TRAINING" | "ACCOUNT_MANAGER" | "STANDARD_SUPPORT" | "PROJECT_LEVEL_CONTENT_STORAGES" | "WEBHOOKS" | "MULTIPLE_CONTENT_DELIVERY_CONFIGS" | "AI_PROMPT_CUSTOMIZATION")[];
       quickStart?: components["schemas"]["QuickStartModel"];
+      /** @example This is a beautiful organization full of beautiful and clever people */
+      description?: string;
       /** @example Beautiful organization */
       name: string;
       /** Format: int64 */
       id: number;
-      basePermissions: components["schemas"]["PermissionModel"];
-      avatar?: components["schemas"]["Avatar"];
-      /** @example btforg */
-      slug: string;
       /**
        * @description The role of currently authorized user.
        *
@@ -3192,8 +3193,10 @@ export interface components {
        * @enum {string}
        */
       currentUserRole?: "MEMBER" | "OWNER";
-      /** @example This is a beautiful organization full of beautiful and clever people */
-      description?: string;
+      basePermissions: components["schemas"]["PermissionModel"];
+      /** @example btforg */
+      slug: string;
+      avatar?: components["schemas"]["Avatar"];
     };
     PublicBillingConfigurationDTO: {
       enabled: boolean;
@@ -3238,9 +3241,9 @@ export interface components {
       defaultFileStructureTemplate: string;
     };
     DocItem: {
+      description?: string;
       name: string;
       displayName?: string;
-      description?: string;
     };
     PagedModelProjectModel: {
       _embedded?: {
@@ -3313,23 +3316,23 @@ export interface components {
       formalitySupported: boolean;
     };
     KeySearchResultView: {
+      description?: string;
       name: string;
       /** Format: int64 */
       id: number;
-      translation?: string;
-      baseTranslation?: string;
       namespace?: string;
-      description?: string;
+      baseTranslation?: string;
+      translation?: string;
     };
     KeySearchSearchResultModel: {
       view?: components["schemas"]["KeySearchResultView"];
+      description?: string;
       name: string;
       /** Format: int64 */
       id: number;
-      translation?: string;
-      baseTranslation?: string;
       namespace?: string;
-      description?: string;
+      baseTranslation?: string;
+      translation?: string;
     };
     PagedModelKeySearchSearchResultModel: {
       _embedded?: {
@@ -3825,17 +3828,17 @@ export interface components {
     };
     PatWithUserModel: {
       user: components["schemas"]["SimpleUserAccountModel"];
+      description: string;
       /** Format: int64 */
       id: number;
-      /** Format: int64 */
-      lastUsedAt?: number;
-      /** Format: int64 */
-      expiresAt?: number;
       /** Format: int64 */
       createdAt: number;
       /** Format: int64 */
       updatedAt: number;
-      description: string;
+      /** Format: int64 */
+      expiresAt?: number;
+      /** Format: int64 */
+      lastUsedAt?: number;
     };
     OrganizationRequestParamsDto: {
       filterCurrentUserOwner: boolean;
@@ -3953,19 +3956,19 @@ export interface components {
        * @description Languages for which user has translate permission.
        */
       permittedLanguageIds?: number[];
+      description: string;
       /** Format: int64 */
       id: number;
-      userFullName?: string;
-      projectName: string;
-      /** Format: int64 */
-      lastUsedAt?: number;
-      scopes: string[];
-      /** Format: int64 */
-      projectId: number;
       username?: string;
       /** Format: int64 */
+      projectId: number;
+      /** Format: int64 */
       expiresAt?: number;
-      description: string;
+      /** Format: int64 */
+      lastUsedAt?: number;
+      projectName: string;
+      userFullName?: string;
+      scopes: string[];
     };
     PagedModelUserAccountModel: {
       _embedded?: {

@@ -38,8 +38,9 @@ type PushOptions = BaseOptions & {
   format: Format;
   overrideKeyDescriptions: boolean;
   convertPlaceholdersToIcu: boolean;
-  languages: string[];
-  namespaces: string[];
+  languages?: string[];
+  namespaces?: string[];
+  tagNewKeys?: string[];
 };
 
 async function allInPattern(pattern: string) {
@@ -162,6 +163,7 @@ const pushHandler = (config: Schema) =>
       forceMode: opts.forceMode,
       overrideKeyDescriptions: opts.overrideKeyDescriptions,
       convertPlaceholdersToIcu: opts.convertPlaceholdersToIcu,
+      tagNewKeys: opts.tagNewKeys ?? [],
       fileMappings: files.map((f) => {
         const format = mapImportFormat(opts.format, extname(f.name));
         return {
@@ -230,6 +232,9 @@ export default (config: Schema) =>
       new Option('-n, --namespaces <namespaces...>').default(
         config.push?.namespaces
       )
+    )
+    .addOption(
+      new Option('--tag-new-keys <tags...>').default(config.push?.tagNewKeys)
     )
     .addOption(new Option('--no-convert-placeholders-to-icu').hideHelp())
     .action(pushHandler(config));

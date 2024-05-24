@@ -41,6 +41,13 @@
         },
         "convertPlaceholdersToIcu": {
           "type": "boolean"
+        },
+        "tagNewKeys": {
+          "description": "Add tags to newly created keys.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },

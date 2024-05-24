@@ -69,6 +69,10 @@ export interface Schema {
     forceMode?: ForceMode;
     overrideKeyDescriptions?: boolean;
     convertPlaceholdersToIcu?: boolean;
+    /**
+     * Add tags to newly created keys.
+     */
+    tagNewKeys?: string[];
     [k: string]: unknown;
   };
   pull?: {

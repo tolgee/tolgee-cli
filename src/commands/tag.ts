@@ -10,6 +10,7 @@ type KeyId = components['schemas']['KeyId'];
 
 type TagOptions = BaseOptions & {
   filterExtracted?: boolean;
+  filterNotExtracted?: boolean;
   filterTag?: string[];
   filterNoTag?: string[];
   tagFiltered?: string[];
@@ -23,7 +24,13 @@ const tagHandler = (config: Schema) =>
     const opts: TagOptions = this.optsWithGlobals();
 
     let extractedKeys: KeyId[] | undefined;
-    if (opts.filterExtracted) {
+    if (opts.filterExtracted || opts.filterNotExtracted) {
+      if (opts.filterExtracted && opts.filterNotExtracted) {
+        exitWithError(
+          'Use either "--filter-extracted" or "--filter-not-extracted", not both'
+        );
+      }
+
       const patterns = opts.patterns;
       if (!patterns?.length) {
         exitWithError('Missing option --patterns or config.patterns option');
@@ -52,7 +59,8 @@ const tagHandler = (config: Schema) =>
           tagOther: opts.tagOther,
           untagFiltered: opts.untagFiltered,
           untagOther: opts.untagOther,
-          filterKeys: extractedKeys,
+          filterKeys: opts.filterExtracted ? extractedKeys : undefined,
+          filterKeysNot: opts.filterNotExtracted ? extractedKeys : undefined,
         },
       })
     );
@@ -71,19 +79,23 @@ export default (config: Schema) =>
       )
     )
     .addOption(
+      new Option(
+        '--filter-not-extracted',
+        'Extract keys from code and filter them out.'
+      )
+    )
+    .addOption(
       new Option('--filter-tag <tags...>', 'Filter only keys with tag.')
     )
     .addOption(
       new Option('--filter-no-tag <tags...>', 'Filter only keys without tag.')
     )
-    .addOption(
-      new Option('--tag-filtered <tags...>', 'Add tag to filtered keys.')
-    )
+    .addOption(new Option('--tag <tags...>', 'Add tag to filtered keys.'))
     .addOption(
       new Option('--tag-other <tags...>', 'Tag keys which are not filtered.')
     )
     .addOption(
-      new Option('--untag-filtered <tags...>', 'Remove tag from filtered keys.')
+      new Option('--untag <tags...>', 'Remove tag from filtered keys.')
     )
     .addOption(
       new Option(
