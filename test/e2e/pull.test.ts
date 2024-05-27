@@ -4,7 +4,11 @@ import { TMP_FOLDER, setupTemporaryFolder } from './utils/tmp.js';
 import { run } from './utils/run.js';
 import './utils/toMatchContentsOf.js';
 import { dirname, join } from 'path';
-import { createPak, createProjectWithClient } from './utils/api/common.js';
+import {
+  createPak,
+  createProjectWithClient,
+  deleteProject,
+} from './utils/api/common.js';
 import { TolgeeClient } from '../../src/client/TolgeeClient.js';
 import { PROJECT_1 } from './utils/api/project1.js';
 import { PROJECT_3 } from './utils/api/project3.js';
@@ -48,6 +52,9 @@ describe('Project 1', () => {
     client = await createProjectWithClient('Project 1', PROJECT_1);
     pak = await createPak(client);
   });
+  afterEach(async () => {
+    deleteProject(client);
+  });
 
   it('pulls strings from Tolgee', async () => {
     const out = await run(['pull', '--api-key', pak, TMP_FOLDER]);
@@ -78,6 +85,9 @@ describe('Project 3', () => {
   beforeEach(async () => {
     client = await createProjectWithClient('Project 3', PROJECT_3);
     pak = await createPak(client);
+  });
+  afterEach(async () => {
+    deleteProject(client);
   });
 
   it('pulls strings with all namespaces from Tolgee', async () => {

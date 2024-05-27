@@ -7,8 +7,18 @@
     "type": "git",
     "url": "https://github.com/tolgee/tolgee-cli.git"
   },
+  "main": "./dist/index.js",
+  "types": "./dist-types/index.d.ts",
   "bin": {
-    "tolgee": "./dist/index.js"
+    "tolgee": "./dist/cli.js"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist-types/index.d.ts"
+    },
+    "./schema.json": "./schema.json",
+    "./package.json": "./package.json"
   },
   "scripts": {
     "build": "rimraf dist dist-types && tsc && node scripts/copyExtractorTypes.mjs",
@@ -21,7 +31,7 @@
     "tolgee:stop": "docker stop tolgee_cli_e2e",
     "lint": "eslint --ext .ts --ext .js --ext .cjs ./src ./test ./scripts jest.config.ts jest.*.config.ts",
     "prettier": "prettier --write ./src ./test ./scripts jest.config.ts jest.*.config.ts",
-    "run-dev": "cross-env NODE_OPTIONS=\"--import=./scripts/registerTsNode.js\" node ./src/index.ts",
+    "run-dev": "cross-env NODE_OPTIONS=\"--import=./scripts/registerTsNode.js\" node ./src/cli.ts",
     "schema": "openapi-typescript http://localhost:22222/v3/api-docs/All%20Internal%20-%20for%20Tolgee%20Web%20application --output src/client/internal/schema.generated.ts",
     "release": "semantic-release",
     "config:type": "node scripts/configType.mjs"

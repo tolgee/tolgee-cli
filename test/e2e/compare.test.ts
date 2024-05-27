@@ -2,7 +2,11 @@ import { fileURLToPathSlash } from './utils/toFilePath.js';
 import { run } from './utils/run.js';
 import { TolgeeClient } from '../../src/client/TolgeeClient.js';
 import { PROJECT_2 } from './utils/api/project2.js';
-import { createPak, createProjectWithClient } from './utils/api/common.js';
+import {
+  createPak,
+  createProjectWithClient,
+  deleteProject,
+} from './utils/api/common.js';
 import { PROJECT_3 } from './utils/api/project3.js';
 
 const FIXTURES_PATH = new URL('../__fixtures__/', import.meta.url);
@@ -34,6 +38,9 @@ describe('Project 1', () => {
   beforeEach(async () => {
     client = await createProjectWithClient('Project 2', PROJECT_2);
     pak = await createPak(client);
+  });
+  afterEach(async () => {
+    deleteProject(client);
   });
 
   it('says projects are in sync when they do match', async () => {
@@ -151,6 +158,9 @@ describe('Project 3', () => {
   beforeEach(async () => {
     client = await createProjectWithClient('Project 3', PROJECT_3);
     pak = await createPak(client);
+  });
+  afterEach(async () => {
+    deleteProject(client);
   });
 
   it('handles namespaces properly', async () => {

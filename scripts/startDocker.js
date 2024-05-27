@@ -65,7 +65,7 @@ async function main() {
       console.log(d);
     }
 
-    if (d.includes('Importing initial project test3')) {
+    if (d.includes('Completed initialization in')) {
       console.log('Test Tolgee server up on port 22222.');
       process.exit(0);
     }

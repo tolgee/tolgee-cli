@@ -12,7 +12,7 @@ const PRELOAD = fileURLToPath(
   new URL('../__internal__/preload.cjs', import.meta.url)
 );
 const CLI_INDEX = fileURLToPath(
-  new URL('../../../dist/index.js', import.meta.url)
+  new URL('../../../dist/cli.js', import.meta.url)
 );
 const DEBUG_ENABLED = process.env.RUNNER_DEBUG === '1';
 
