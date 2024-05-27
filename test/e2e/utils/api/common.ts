@@ -90,3 +90,11 @@ export async function createPak(client: TolgeeClient, scopes = DEFAULT_SCOPES) {
 
   return apiKey.data!.key;
 }
+
+export async function createPat(client: TolgeeClient) {
+  const apiKey = await client.POST('/v2/pats', {
+    body: { description: 'e2e test pat' },
+  });
+
+  return apiKey.data!.token;
+}

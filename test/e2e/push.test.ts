@@ -25,14 +25,13 @@ const PROJECT_3_CONFIG = fileURLToPath(
 let client: TolgeeClient;
 let pak: string;
 
-afterEach(async () => {
-  await deleteProject(client);
-});
-
 describe('project 1', () => {
   beforeEach(async () => {
     client = await createProjectWithClient('Project 1', PROJECT_1);
     pak = await createPak(client);
+  });
+  afterEach(async () => {
+    await deleteProject(client);
   });
 
   it('pushes updated strings to Tolgee', async () => {
@@ -111,6 +110,9 @@ describe('project 3', () => {
     client = await createProjectWithClient('Project 3', PROJECT_3);
     pak = await createPak(client);
   });
+  afterEach(async () => {
+    await deleteProject(client);
+  });
 
   it('pushes to Tolgee with correct namespaces', async () => {
     const out = await run([
@@ -186,6 +188,9 @@ describe('project 2', () => {
   beforeEach(async () => {
     client = await createProjectWithClient('Project 2', PROJECT_2);
     pak = await createPak(client);
+  });
+  afterEach(async () => {
+    await deleteProject(client);
   });
 
   it('does not push strings to Tolgee if there are conflicts', async () => {
