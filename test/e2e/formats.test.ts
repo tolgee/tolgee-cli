@@ -1,28 +1,20 @@
 /* eslint-disable jest/expect-expect */
 import { fileURLToPath } from 'url';
-import { PROJECT_PAK_1, requestGet, requestPut } from './utils/tg.js';
 import { tolgeeDataToDict } from './utils/data.js';
 import { run } from './utils/run.js';
 import { TMP_FOLDER, setupTemporaryFolder } from './utils/tmp.js';
 import './utils/toMatchContentsOf.js';
 import { join } from 'path';
 import { readFileSync } from 'fs';
+import { TolgeeClient } from '../../src/client/TolgeeClient.js';
+import { PROJECT_1 } from './utils/api/project1.js';
+import {
+  createPak,
+  createProjectWithClient,
+  deleteProject,
+} from './utils/api/common.js';
 
 const FIXTURES_PATH = new URL('../__fixtures__/', import.meta.url);
-
-async function cleanupProjectState() {
-  await requestPut(
-    '/v2/projects/1/translations',
-    {
-      key: 'controller',
-      translations: {
-        en: 'Controller',
-        fr: 'Manette',
-      },
-    },
-    PROJECT_PAK_1
-  );
-}
 
 type TestConfigProps = {
   config: string;
@@ -30,6 +22,9 @@ type TestConfigProps = {
   fileLocation?: string;
   inFile?: string;
 };
+
+let client: TolgeeClient;
+let pak: string;
 
 async function testWithConfig({
   config,
@@ -47,7 +42,7 @@ async function testWithConfig({
     '--config',
     configPath,
     '--api-key',
-    PROJECT_PAK_1,
+    pak,
     'push',
     '-l',
     'en',
@@ -57,9 +52,11 @@ async function testWithConfig({
 
   expect(outPush.code).toBe(0);
 
-  const keys = await requestGet('/v2/projects/1/translations', PROJECT_PAK_1);
+  const keys = await client.GET('/v2/projects/{projectId}/translations', {
+    params: { path: { projectId: client.getProjectId() } },
+  });
 
-  const stored = tolgeeDataToDict(keys);
+  const stored = tolgeeDataToDict(keys.data);
   expect(stored.controller).toEqual({
     __ns: null,
     en: inPlatform,
@@ -70,7 +67,7 @@ async function testWithConfig({
     '--config',
     configPath,
     '--api-key',
-    PROJECT_PAK_1,
+    pak,
     'pull',
     TMP_FOLDER,
   ]);
@@ -81,71 +78,79 @@ async function testWithConfig({
   );
 }
 
-setupTemporaryFolder();
-afterEach(cleanupProjectState);
-
-it('works with tolgee icu format', async () => {
-  await testWithConfig({ config: 'tolgee-json' });
-});
-
-it('works with xliff-icu format', async () => {
-  await testWithConfig({ config: 'xliff-icu', fileLocation: 'en.xliff' });
-});
-
-it('works with xliff-php format', async () => {
-  await testWithConfig({
-    config: 'xliff-php',
-    inPlatform: 'You have {0} items',
-    fileLocation: 'en.xliff',
-    inFile: 'You have %s items',
+describe('push and pull with different formats', () => {
+  setupTemporaryFolder();
+  beforeEach(async () => {
+    client = await createProjectWithClient('Project 1', PROJECT_1);
+    pak = await createPak(client);
   });
-});
-
-it('works with xliff-java format', async () => {
-  await testWithConfig({
-    config: 'xliff-java',
-    inPlatform: 'You have {0} items',
-    fileLocation: 'en.xliff',
-    inFile: 'You have %s items',
+  afterEach(async () => {
+    deleteProject(client);
   });
-});
 
-it('works with po-c format', async () => {
-  await testWithConfig({
-    config: 'po-c',
-    inPlatform: 'You have {0} items',
-    fileLocation: 'en.po',
-    inFile: 'You have %s items',
+  it('works with tolgee icu format', async () => {
+    await testWithConfig({ config: 'tolgee-json' });
   });
-});
 
-it('works with apple-strings icu format', async () => {
-  await testWithConfig({
-    config: 'apple-strings',
-    inPlatform: 'You have {0} items',
-    fileLocation: 'en.lproj/Localizable.strings',
-    inFile: 'You have %@ items',
+  it('works with xliff-icu format', async () => {
+    await testWithConfig({ config: 'xliff-icu', fileLocation: 'en.xliff' });
   });
-});
 
-it('works with apple-xliff icu format', async () => {
-  await testWithConfig({
-    config: 'apple-xliff',
-    inPlatform: 'You have {0} items',
-    fileLocation: 'en.xliff',
-    inFile: 'You have %@ items',
+  it('works with xliff-php format', async () => {
+    await testWithConfig({
+      config: 'xliff-php',
+      inPlatform: 'You have {0} items',
+      fileLocation: 'en.xliff',
+      inFile: 'You have %s items',
+    });
   });
-});
 
-it('works with android-xml icu format', async () => {
-  await testWithConfig({
-    config: 'android-xml',
-    inPlatform: 'You have {0} items',
-    fileLocation: 'values-en/strings.xml',
-    inFile: 'You have %s items',
+  it('works with xliff-java format', async () => {
+    await testWithConfig({
+      config: 'xliff-java',
+      inPlatform: 'You have {0} items',
+      fileLocation: 'en.xliff',
+      inFile: 'You have %s items',
+    });
   });
-});
 
-it('works with flutter-arb icu format', async () => {
-  await testWithConfig({ config: 'flutter-arb', fileLocation: 'app_en.arb' });
+  it('works with po-c format', async () => {
+    await testWithConfig({
+      config: 'po-c',
+      inPlatform: 'You have {0} items',
+      fileLocation: 'en.po',
+      inFile: 'You have %s items',
+    });
+  });
+
+  it('works with apple-strings icu format', async () => {
+    await testWithConfig({
+      config: 'apple-strings',
+      inPlatform: 'You have {0} items',
+      fileLocation: 'en.lproj/Localizable.strings',
+      inFile: 'You have %@ items',
+    });
+  });
+
+  it('works with apple-xliff icu format', async () => {
+    await testWithConfig({
+      config: 'apple-xliff',
+      inPlatform: 'You have {0} items',
+      fileLocation: 'en.xliff',
+      inFile: 'You have %@ items',
+    });
+  });
+
+  it('works with android-xml icu format', async () => {
+    await testWithConfig({
+      config: 'android-xml',
+      inPlatform: 'You have {0} items',
+      fileLocation: 'values-en/strings.xml',
+      inFile: 'You have %s items',
+    });
+  });
+
+  it('works with flutter-arb icu format', async () => {
+    await testWithConfig({ config: 'flutter-arb', fileLocation: 'app_en.arb' });
+  });
 });
