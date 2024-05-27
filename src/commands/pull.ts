@@ -5,7 +5,7 @@ import { Command, Option } from 'commander';
 
 import { unzipBuffer } from '../utils/zip.js';
 import { prepareDir } from '../utils/prepareDir.js';
-import { exitWithError, loading, success } from '../utils/logger.js';
+import { loading, success } from '../utils/logger.js';
 import { Schema } from '../schema.js';
 import { checkPathNotAFile } from '../utils/checkPathNotAFile.js';
 import { mapExportFormat } from '../utils/mapExportFormat.js';
@@ -40,11 +40,6 @@ async function fetchZipBlob(opts: PullOptions): Promise<Blob> {
     fileStructureTemplate: opts.fileStructureTemplate,
   });
 
-  if (loadable.response.status === 400) {
-    exitWithError(
-      `Please check if your parameters, including namespaces, are configured correctly. Tolgee responded with: ${loadable.response.statusText}`
-    );
-  }
   handleLoadableError(loadable);
   return loadable.data;
 }
