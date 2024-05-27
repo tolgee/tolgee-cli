@@ -1,20 +1,20 @@
 {
   "type": "object",
   "properties": {
-    "apiUrl": {
-      "description": "The url of Tolgee API.",
-      "type": "string"
-    },
-    "apiKey": {
-      "description": "Tolgee API Key. Can be a Project API Key or a Personal Access Token.",
-      "type": "string"
-    },
     "projectId": {
       "description": "Project ID. Only required when using a Personal Access Token.",
       "type": ["number", "string"]
     },
+    "delimiter": {
+      "description": "Structure delimiter to use. By default, Tolgee interprets `.` as a nested structure. You can change the delimiter, or disable structure formatting by not specifying any value to the option.",
+      "type": ["string", "null"]
+    },
     "extractor": {
       "description": "A path to a custom extractor to use instead of the default one.",
+      "type": "string"
+    },
+    "apiUrl": {
+      "description": "The url of Tolgee API.",
       "type": "string"
     },
     "patterns": {
@@ -106,10 +106,6 @@
           "type": "boolean"
         }
       }
-    },
-    "delimiter": {
-      "description": "Structure delimiter to use. By default, Tolgee interprets `.` as a nested structure. You can change the delimiter, or disable structure formatting by not specifying any value to the option.",
-      "type": ["string", "null"]
     }
   },
   "$defs": {
@@ -131,7 +127,7 @@
       "type": "string"
     },
     "format": {
-      "description": "Format for push and pull operations.",
+      "description": "Localization files format for push and pull operations.",
       "enum": [
         "JSON_TOLGEE",
         "JSON_ICU",

@@ -80,12 +80,9 @@ async function readDirectory(directory: string, base = ''): Promise<File[]> {
 async function promptConflicts(
   opts: PushOptions
 ): Promise<'KEEP' | 'OVERRIDE'> {
-  const projectId = opts.client.getProjectId();
-  const resolveUrl = new URL(`/projects/${projectId}/import`, opts.apiUrl).href;
-
   if (opts.forceMode === 'NO_FORCE') {
     exitWithError(
-      `There are conflicts in the import. You can resolve them and complete the import here: ${resolveUrl}.`
+      `There are conflicts in the import. And the force mode is set to "NO_FORCE".`
     );
   }
 
@@ -95,7 +92,7 @@ async function promptConflicts(
 
   if (!process.stdout.isTTY) {
     exitWithError(
-      `There are conflicts in the import. Please specify a --force-mode, or resolve them in your browser at ${resolveUrl}.`
+      `There are conflicts in the import. Please specify a --force-mode.`
     );
   }
 
@@ -104,9 +101,7 @@ async function promptConflicts(
     'Type "KEEP" to preserve the version on the server, "OVERRIDE" to use the version from the import, and nothing to abort: '
   );
   if (resp !== 'KEEP' && resp !== 'OVERRIDE') {
-    exitWithError(
-      `Aborting. You can resolve the conflicts and complete the import here: ${resolveUrl}`
-    );
+    exitWithError(`Aborting.`);
   }
 
   return resp;

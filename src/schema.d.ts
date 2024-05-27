@@ -46,10 +46,6 @@ export interface Schema {
    */
   apiUrl?: string;
   /**
-   * Tolgee API Key. Can be a Project API Key or a Personal Access Token.
-   */
-  apiKey?: string;
-  /**
    * Project ID. Only required when using a Personal Access Token.
    */
   projectId?: number | string;
