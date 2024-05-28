@@ -57,7 +57,7 @@ describe('Project 1', () => {
   });
 
   it('pulls strings from Tolgee', async () => {
-    const out = await run(['pull', '--api-key', pak, TMP_FOLDER]);
+    const out = await run(['pull', '--api-key', pak, '--path', TMP_FOLDER]);
 
     expect(out.code).toBe(0);
     await expect(TMP_FOLDER).toMatchContentsOf(PROJECT_1_DATA);
@@ -72,6 +72,7 @@ describe('Project 1', () => {
       '--api-key',
       pak,
       '--empty-dir',
+      '--path',
       TMP_FOLDER,
     ]);
 
@@ -91,7 +92,7 @@ describe('Project 3', () => {
   });
 
   it('pulls strings with all namespaces from Tolgee', async () => {
-    const out = await run(['pull', '--api-key', pak, TMP_FOLDER]);
+    const out = await run(['pull', '--api-key', pak, '--path', TMP_FOLDER]);
 
     expect(out.code).toBe(0);
     await expect(TMP_FOLDER).toMatchContentsOf(PROJECT_3_DATA);
@@ -103,6 +104,7 @@ describe('Project 3', () => {
       'pull',
       '--api-key',
       pak,
+      '--path',
       TMP_FOLDER,
       '--namespaces',
       namespaceFolder,
@@ -117,7 +119,7 @@ describe('Project 3', () => {
     const existingFile = join(TMP_FOLDER, 'food', 'test');
     await mkdir(dirname(existingFile), { recursive: true });
     await writeFile(existingFile, 'test');
-    const out = await run(['pull', '--api-key', pak, TMP_FOLDER]);
+    const out = await run(['pull', '--api-key', pak, '--path', TMP_FOLDER]);
 
     expect(out.code).toBe(0);
     expect((await readFile(existingFile)).toString()).toEqual('test');
@@ -134,7 +136,7 @@ describe('Project 3', () => {
       pak,
       '-l',
       'en',
-      '--',
+      '--path',
       TMP_FOLDER,
     ]);
 
@@ -155,7 +157,7 @@ describe('Project 3', () => {
       pak,
       '-n',
       'food',
-      '--',
+      '--path',
       TMP_FOLDER,
     ]);
 
@@ -175,7 +177,7 @@ describe('Project 3', () => {
       pak,
       '-t',
       'soda_tag',
-      '--',
+      '--path',
       TMP_FOLDER,
     ]);
 
@@ -199,7 +201,7 @@ describe('Project 3', () => {
       pak,
       '--exclude-tags',
       'soda_tag',
-      '--',
+      '--path',
       TMP_FOLDER,
     ]);
 
@@ -230,6 +232,7 @@ describe('Project 3', () => {
       'soda_tag',
       '--file-structure-template',
       '{namespace}/lang-{languageTag}.{extension}',
+      '--path',
       TMP_FOLDER,
     ]);
 

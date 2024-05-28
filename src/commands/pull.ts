@@ -22,6 +22,7 @@ type PullOptions = BaseOptions & {
   supportArrays: boolean;
   excludeTags?: string[];
   fileStructureTemplate?: string;
+  path?: string;
 };
 
 async function fetchZipBlob(opts: PullOptions): Promise<Blob> {
@@ -45,21 +46,21 @@ async function fetchZipBlob(opts: PullOptions): Promise<Blob> {
 }
 
 const pullHandler = () =>
-  async function (this: Command, path: string | undefined) {
+  async function (this: Command) {
     const opts: PullOptions = this.optsWithGlobals();
 
-    if (!path) {
-      throw new Error('Missing or argument <path>');
+    if (!opts.path) {
+      throw new Error('Missing or option --path <path>');
     }
 
-    await checkPathNotAFile(path);
+    await checkPathNotAFile(opts.path);
 
     const zipBlob = await loading(
       'Fetching strings from Tolgee...',
       fetchZipBlob(opts)
     );
-    await prepareDir(path, opts.emptyDir);
-    await loading('Extracting strings...', unzipBuffer(zipBlob, path));
+    await prepareDir(opts.path, opts.emptyDir);
+    await loading('Extracting strings...', unzipBuffer(zipBlob, opts.path));
     success('Done!');
   };
 
@@ -67,10 +68,11 @@ export default (config: Schema) =>
   new Command()
     .name('pull')
     .description('Pulls translations to Tolgee')
-    .argument(
-      '[path]',
-      'Destination path where translation files will be stored in',
-      config.pull?.path
+    .addOption(
+      new Option(
+        '-p, --path <path>',
+        'Destination of a folder where translation files will be stored in'
+      ).default(config.pull?.path)
     )
     .addOption(
       new Option(

@@ -6,7 +6,7 @@
  */
 
 /**
- * Format for push and pull operations.
+ * Localization files format for push and pull operations.
  */
 export type Format =
   | "JSON_TOLGEE"
@@ -38,42 +38,70 @@ export type Format =
  * File glob specifying which files to include.
  */
 export type Path = string;
+/**
+ * Specifies how to solve potential conflicts in the pushed data.
+ *
+ * Options:
+ *
+ *   `OVERRIDE` - update everything according to local files
+ *   `KEEP` - create only non-existent strings, don't touch existing ones
+ *   `NO_FORCE` - throw an error, if there are any conflict
+ */
 export type ForceMode = "OVERRIDE" | "KEEP" | "NO_FORCE";
 
 export interface Schema {
-  /**
-   * The url of Tolgee API.
-   */
-  apiUrl?: string;
   /**
    * Project ID. Only required when using a Personal Access Token.
    */
   projectId?: number | string;
   /**
+   * Structure delimiter to use. By default, Tolgee interprets `.` as a nested structure. You can change the delimiter, or disable structure formatting by not specifying any value to the option.
+   */
+  delimiter?: string | null;
+  /**
    * A path to a custom extractor to use instead of the default one.
    */
   extractor?: string;
+  /**
+   * The url of Tolgee API.
+   */
+  apiUrl?: string;
   /**
    * File glob patterns to your source code, used for keys extraction.
    */
   patterns?: string[];
   format?: Format;
   push?: {
+    /**
+     * Define, which files should be pushed and attach language/namespace to them. By default Tolgee pushes all files specified here, you can filter them by languages and namespaces properties.
+     */
     files?: FileMatch[];
+    /**
+     * Specifies which languages should be pushed from push.files.
+     */
     languages?: string[];
+    /**
+     * Specifies which namespaces should be pushed from push.files.
+     */
     namespaces?: string[];
     forceMode?: ForceMode;
+    /**
+     * Override existing key descriptions from local files (only relevant for some formats).
+     */
     overrideKeyDescriptions?: boolean;
+    /**
+     * Convert placeholders in local files to ICU format. (Default: true)
+     */
     convertPlaceholdersToIcu?: boolean;
     /**
-     * Add tags to newly created keys.
+     * Specify tags that will be added to newly created keys.
      */
     tagNewKeys?: string[];
     [k: string]: unknown;
   };
   pull?: {
     /**
-     * File
+     * Path to a folder where the localization files are stored. (Structure itself can be defined with `fileStructureTemplate`)
      */
     path?: string;
     /**
@@ -81,13 +109,13 @@ export interface Schema {
      */
     languages?: string[];
     /**
-     * List of translation states to include. Defaults all except untranslated.
-     */
-    states?: ("UNTRANSLATED" | "TRANSLATED" | "REVIEWED")[];
-    /**
      * List of namespaces to pull. Defaults to all namespaces.
      */
     namespaces?: string[];
+    /**
+     * List of translation states to include. Defaults all except untranslated.
+     */
+    states?: ("UNTRANSLATED" | "TRANSLATED" | "REVIEWED")[];
     /**
      * List of tags which to include.
      */
@@ -118,10 +146,6 @@ export interface Schema {
     emptyDir?: boolean;
     [k: string]: unknown;
   };
-  /**
-   * Structure delimiter to use. By default, Tolgee interprets `.` as a nested structure. You can change the delimiter, or disable structure formatting by not specifying any value to the option.
-   */
-  delimiter?: string | null;
   [k: string]: unknown;
 }
 export interface FileMatch {

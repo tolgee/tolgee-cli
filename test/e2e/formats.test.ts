@@ -69,6 +69,7 @@ async function testWithConfig({
     '--api-key',
     pak,
     'pull',
+    '--path',
     TMP_FOLDER,
   ]);
   expect(outPull.code).toBe(0);

@@ -30,20 +30,34 @@
     "push": {
       "type": "object",
       "properties": {
-        "files": { "type": "array", "items": { "$ref": "#/$defs/fileMatch" } },
-        "languages": { "type": "array", "items": { "type": "string" } },
-        "namespaces": { "type": "array", "items": { "type": "string" } },
+        "files": {
+          "description": "Define, which files should be pushed and attach language/namespace to them. By default Tolgee pushes all files specified here, you can filter them by languages and namespaces properties.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/fileMatch" }
+        },
+        "languages": {
+          "description": "Specifies which languages should be pushed from push.files.",
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "namespaces": {
+          "description": "Specifies which namespaces should be pushed from push.files.",
+          "type": "array",
+          "items": { "type": "string" }
+        },
         "forceMode": {
           "$ref": "#/$defs/forceMode"
         },
         "overrideKeyDescriptions": {
+          "description": "Override existing key descriptions from local files (only relevant for some formats).",
           "type": "boolean"
         },
         "convertPlaceholdersToIcu": {
+          "description": "Convert placeholders in local files to ICU format. (Default: true)",
           "type": "boolean"
         },
         "tagNewKeys": {
-          "description": "Add tags to newly created keys.",
+          "description": "Specify tags that will be added to newly created keys.",
           "type": "array",
           "items": {
             "type": "string"
@@ -55,11 +69,18 @@
       "type": "object",
       "properties": {
         "path": {
-          "description": "File ",
+          "description": "Path to a folder where the localization files are stored. (Structure itself can be defined with `fileStructureTemplate`)",
           "type": "string"
         },
         "languages": {
           "description": "List of languages to pull. Leave unspecified to export them all.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "namespaces": {
+          "description": "List of namespaces to pull. Defaults to all namespaces.",
           "type": "array",
           "items": {
             "type": "string"
@@ -70,13 +91,6 @@
           "type": "array",
           "items": {
             "enum": ["UNTRANSLATED", "TRANSLATED", "REVIEWED"]
-          }
-        },
-        "namespaces": {
-          "description": "List of namespaces to pull. Defaults to all namespaces.",
-          "type": "array",
-          "items": {
-            "type": "string"
           }
         },
         "tags": {
@@ -119,6 +133,7 @@
       "required": ["path", "language"]
     },
     "forceMode": {
+      "description": "Specifies how to solve potential conflicts in the pushed data.\n\nOptions:\n\n  `OVERRIDE` - update everything according to local files\n  `KEEP` - create only non-existent strings, don't touch existing ones\n  `NO_FORCE` - throw an error, if there are any conflict",
       "type": "string",
       "enum": ["OVERRIDE", "KEEP", "NO_FORCE"]
     },
