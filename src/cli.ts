@@ -122,8 +122,13 @@ const preHandler = (config: Schema) =>
       const opts = cmd.optsWithGlobals();
       const client = createTolgeeClient({
         baseUrl: opts.apiUrl?.toString() ?? config.apiUrl?.toString(),
-        apiKey: opts.apiKey ?? config.apiKey,
-        projectId: opts.projectId ?? config.projectId,
+        apiKey: opts.apiKey,
+        projectId:
+          opts.projectId !== undefined
+            ? Number(opts.projectId)
+            : config.projectId !== undefined
+            ? Number(config.projectId)
+            : undefined,
       });
 
       cmd.setOptionValue('client', client);
