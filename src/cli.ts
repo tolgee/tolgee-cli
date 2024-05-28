@@ -172,7 +172,7 @@ async function run() {
     program.addOption(PROJECT_ID_OPT.default(-1));
     program.addOption(FORMAT_OPT.default('JSON_TOLGEE'));
     program.addOption(EXTRACTOR);
-    program.addOption(FILE_PATTERNS.default([]));
+    program.addOption(FILE_PATTERNS);
 
     const config = await loadConfig(program);
     program.hook('preAction', preHandler(config));
