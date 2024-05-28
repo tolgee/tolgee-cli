@@ -208,28 +208,33 @@ export default (config: Schema) =>
         .argParser((v) => v.toUpperCase())
     )
     .addOption(
-      new Option('--override-key-descriptions').default(
-        config.push?.overrideKeyDescriptions ?? true
-      )
-    )
-    .addOption(new Option('--no-override-key-descriptions').hideHelp())
-    .addOption(
-      new Option('--convert-placeholders-to-icu').default(
-        config.push?.convertPlaceholdersToIcu ?? true
-      )
+      new Option(
+        '--override-key-descriptions',
+        'Override existing key descriptions from local files (only relevant for some formats).'
+      ).default(config.push?.overrideKeyDescriptions ?? true)
     )
     .addOption(
-      new Option('-l, --languages <languages...>').default(
-        config.push?.languages
-      )
+      new Option(
+        '--convert-placeholders-to-icu',
+        'Convert placeholders in local files to ICU format.'
+      ).default(config.push?.convertPlaceholdersToIcu ?? true)
     )
     .addOption(
-      new Option('-n, --namespaces <namespaces...>').default(
-        config.push?.namespaces
-      )
+      new Option(
+        '-l, --languages <languages...>',
+        'Specifies which languages should be pushed (see push.files in config).'
+      ).default(config.push?.languages)
     )
     .addOption(
-      new Option('--tag-new-keys <tags...>').default(config.push?.tagNewKeys)
+      new Option(
+        '-n, --namespaces <namespaces...>',
+        'Specifies which namespaces should be pushed (see push.files in config).'
+      ).default(config.push?.namespaces)
     )
-    .addOption(new Option('--no-convert-placeholders-to-icu').hideHelp())
+    .addOption(
+      new Option(
+        '--tag-new-keys <tags...>',
+        'Specify tags that will be added to newly created keys.'
+      ).default(config.push?.tagNewKeys)
+    )
     .action(pushHandler(config));
