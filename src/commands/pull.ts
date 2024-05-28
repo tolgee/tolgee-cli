@@ -67,7 +67,7 @@ const pullHandler = () =>
 export default (config: Schema) =>
   new Command()
     .name('pull')
-    .description('Pulls translations to Tolgee')
+    .description('Pulls translations from Tolgee')
     .addOption(
       new Option(
         '-p, --path <path>',
@@ -94,7 +94,7 @@ export default (config: Schema) =>
         '-d, --delimiter',
         'Structure delimiter to use. By default, Tolgee interprets `.` as a nested structure. You can change the delimiter, or disable structure formatting by not specifying any value to the option'
       )
-        .default(config.delimiter ?? '.')
+        .default(config.pull?.delimiter ?? '.')
         .argParser((v) => v || '')
     )
     .addOption(

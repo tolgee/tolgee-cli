@@ -5,10 +5,6 @@
       "description": "Project ID. Only required when using a Personal Access Token.",
       "type": ["number", "string"]
     },
-    "delimiter": {
-      "description": "Structure delimiter to use. By default, Tolgee interprets `.` as a nested structure. You can change the delimiter, or disable structure formatting by not specifying any value to the option.",
-      "type": ["string", "null"]
-    },
     "extractor": {
       "description": "A path to a custom extractor to use instead of the default one.",
       "type": "string"
@@ -118,6 +114,10 @@
         "emptyDir": {
           "description": "Empty [path] folder before inserting pulled files.",
           "type": "boolean"
+        },
+        "delimiter": {
+          "description": "Structure delimiter to use. By default, Tolgee interprets `.` as a nested structure. You can change the delimiter, or disable structure formatting by not specifying any value to the option.",
+          "type": ["string", "null"]
         }
       }
     }

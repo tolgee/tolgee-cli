@@ -55,10 +55,6 @@ export interface Schema {
    */
   projectId?: number | string;
   /**
-   * Structure delimiter to use. By default, Tolgee interprets `.` as a nested structure. You can change the delimiter, or disable structure formatting by not specifying any value to the option.
-   */
-  delimiter?: string | null;
-  /**
    * A path to a custom extractor to use instead of the default one.
    */
   extractor?: string;
@@ -144,6 +140,10 @@ export interface Schema {
      * Empty [path] folder before inserting pulled files.
      */
     emptyDir?: boolean;
+    /**
+     * Structure delimiter to use. By default, Tolgee interprets `.` as a nested structure. You can change the delimiter, or disable structure formatting by not specifying any value to the option.
+     */
+    delimiter?: string | null;
     [k: string]: unknown;
   };
   [k: string]: unknown;
