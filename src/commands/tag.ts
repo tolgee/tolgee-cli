@@ -85,22 +85,31 @@ export default (config: Schema) =>
       )
     )
     .addOption(
-      new Option('--filter-tag <tags...>', 'Filter only keys with tag.')
+      new Option(
+        '--filter-tag <tags...>',
+        'Filter only keys with tag. Use * as a wildcard.'
+      )
     )
     .addOption(
-      new Option('--filter-no-tag <tags...>', 'Filter only keys without tag.')
+      new Option(
+        '--filter-no-tag <tags...>',
+        'Filter only keys without tag. Use * as a wildcard.'
+      )
     )
     .addOption(new Option('--tag <tags...>', 'Add tag to filtered keys.'))
     .addOption(
       new Option('--tag-other <tags...>', 'Tag keys which are not filtered.')
     )
     .addOption(
-      new Option('--untag <tags...>', 'Remove tag from filtered keys.')
+      new Option(
+        '--untag <tags...>',
+        'Remove tag from filtered keys. Use * as a wildcard.'
+      )
     )
     .addOption(
       new Option(
         '--untag-other <tags...>',
-        'Remove tag from keys which are not filtered.'
+        'Remove tag from keys which are not filtered. Use * as a wildcard.'
       )
     )
     .action(tagHandler(config));
