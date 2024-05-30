@@ -21,7 +21,6 @@ beforeEach(async () => {
   pak = await createPak(client);
   await createTestTags(client);
 });
-
 afterEach(async () => {
   await deleteProject(client);
 });
@@ -82,9 +81,7 @@ it('marks newly created keys as drafts', async () => {
     '--tag-new-keys',
     'draft-another-branch',
   ]);
-
   expect(out.code).toBe(0);
-
   expect(await getTagsMap(client)).toEqual({
     ...ORIGINAL_TAGS,
     new: ['draft-another-branch'],

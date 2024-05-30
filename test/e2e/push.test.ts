@@ -21,6 +21,9 @@ const PROJECT_2_CONFIG = fileURLToPath(
 const PROJECT_3_CONFIG = fileURLToPath(
   new URL('./updatedProject3/.tolgeerc', FIXTURES_PATH)
 );
+const PROJECT_3_DEPRECATED_CONFIG = fileURLToPath(
+  new URL('./updatedProject3DeprecatedKeys/.tolgeerc', FIXTURES_PATH)
+);
 
 let client: TolgeeClient;
 let pak: string;
@@ -181,6 +184,35 @@ describe('project 3', () => {
         fr: 'Monoxyde de dihydrogène',
       },
     });
+  });
+
+  it('removes other keys', async () => {
+    const out = await run([
+      '--config',
+      PROJECT_3_DEPRECATED_CONFIG,
+      'push',
+      '--api-key',
+      pak,
+      '--remove-other-keys',
+    ]);
+
+    expect(out.code).toEqual(0);
+
+    const keys = await client.GET('/v2/projects/{projectId}/translations', {
+      params: {
+        path: { projectId: client.getProjectId() },
+      },
+    });
+
+    const stored = tolgeeDataToDict(keys.data);
+
+    expect(Object.keys(stored)).toEqual([
+      'table',
+      'chair',
+      'plate',
+      'fork',
+      'water',
+    ]);
   });
 });
 

@@ -2434,7 +2434,6 @@ export interface components {
       description: string;
       /** Format: int64 */
       id: number;
-      scopes: string[];
       username?: string;
       /** Format: int64 */
       projectId: number;
@@ -2444,6 +2443,7 @@ export interface components {
       lastUsedAt?: number;
       projectName: string;
       userFullName?: string;
+      scopes: string[];
     };
     SuperTokenRequest: {
       /** @description Has to be provided when TOTP enabled */
@@ -2775,6 +2775,8 @@ export interface components {
       fileMappings: components["schemas"]["ImportFileMapping"][];
       /** @description Keys created by this import will be tagged with these tags. It add tags only to new keys. The keys that already exist will not be tagged. */
       tagNewKeys: string[];
+      /** @description Delete keys that were not included in import. */
+      removeOtherKeys?: boolean;
     };
     ErrorResponseBody: {
       code: string;
@@ -3096,6 +3098,8 @@ export interface components {
       password: string;
       invitationCode?: string;
       callbackUrl?: string;
+      /** @description Where did the user find us? */
+      userSource?: string;
       recaptchaToken?: string;
     };
     ResetPassword: {
@@ -3194,9 +3198,9 @@ export interface components {
        */
       currentUserRole?: "MEMBER" | "OWNER";
       basePermissions: components["schemas"]["PermissionModel"];
+      avatar?: components["schemas"]["Avatar"];
       /** @example btforg */
       slug: string;
-      avatar?: components["schemas"]["Avatar"];
     };
     PublicBillingConfigurationDTO: {
       enabled: boolean;
@@ -3227,6 +3231,7 @@ export interface components {
       postHogApiKey?: string;
       postHogHost?: string;
       contentDeliveryConfigured: boolean;
+      userSourceField: boolean;
     };
     CollectionModelExportFormatModel: {
       _embedded?: {
@@ -3321,8 +3326,8 @@ export interface components {
       /** Format: int64 */
       id: number;
       namespace?: string;
-      baseTranslation?: string;
       translation?: string;
+      baseTranslation?: string;
     };
     KeySearchSearchResultModel: {
       view?: components["schemas"]["KeySearchResultView"];
@@ -3331,8 +3336,8 @@ export interface components {
       /** Format: int64 */
       id: number;
       namespace?: string;
-      baseTranslation?: string;
       translation?: string;
+      baseTranslation?: string;
     };
     PagedModelKeySearchSearchResultModel: {
       _embedded?: {
@@ -3955,7 +3960,6 @@ export interface components {
       description: string;
       /** Format: int64 */
       id: number;
-      scopes: string[];
       username?: string;
       /** Format: int64 */
       projectId: number;
@@ -3965,6 +3969,7 @@ export interface components {
       lastUsedAt?: number;
       projectName: string;
       userFullName?: string;
+      scopes: string[];
     };
     PagedModelUserAccountModel: {
       _embedded?: {

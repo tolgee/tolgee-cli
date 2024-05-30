@@ -41,6 +41,7 @@ type PushOptions = BaseOptions & {
   languages?: string[];
   namespaces?: string[];
   tagNewKeys?: string[];
+  removeOtherKeys?: boolean;
 };
 
 async function allInPattern(pattern: string) {
@@ -82,7 +83,7 @@ async function promptConflicts(
 ): Promise<'KEEP' | 'OVERRIDE'> {
   if (opts.forceMode === 'NO_FORCE') {
     exitWithError(
-      `There are conflicts in the import. And the force mode is set to "NO_FORCE".`
+      `There are conflicts in the import and the force mode is set to "NO_FORCE". Set it to "KEEP" or "OVERRIDE" to continue.`
     );
   }
 
@@ -168,6 +169,7 @@ const pushHandler = (config: Schema) =>
           namespace: f.namespace ?? '',
         };
       }),
+      removeOtherKeys: opts.removeOtherKeys,
     };
 
     const attempt1 = await loading(
@@ -236,5 +238,11 @@ export default (config: Schema) =>
         '--tag-new-keys <tags...>',
         'Specify tags that will be added to newly created keys.'
       ).default(config.push?.tagNewKeys)
+    )
+    .addOption(
+      new Option(
+        '--remove-other-keys',
+        'Remove keys which are not present in the import'
+      ).default(false)
     )
     .action(pushHandler(config));

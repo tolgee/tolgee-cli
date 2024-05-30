@@ -217,7 +217,7 @@ export default (config: Schema) =>
     )
     .option(
       '-B, --backup <path>',
-      'Path where a backup should be downloaded before performing the sync. If something goes wrong, the backup can be used to restore the project to its previous state.'
+      'Store translation files backup (only translation files, not states, comments, tags, etc.). If something goes wrong, the backup can be used to restore the project to its previous state.'
     )
     .option(
       '--continue-on-warning',

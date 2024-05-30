@@ -1,0 +1,25 @@
+{
+  "$schema": "../../../schema.json",
+  "push": {
+    "files": [
+      {
+        "path": "./en.json",
+        "language": "en"
+      },
+      {
+        "path": "./fr.json",
+        "language": "fr"
+      },
+      {
+        "path": "./drinks/en.json",
+        "language": "en",
+        "namespace": "drinks"
+      },
+      {
+        "path": "./drinks/fr.json",
+        "language": "fr",
+        "namespace": "drinks"
+      }
+    ]
+  }
+}
