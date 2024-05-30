@@ -106,13 +106,13 @@ export default (config: Schema) =>
     .addOption(
       new Option(
         '-t, --tags <tags...>',
-        'List of tags which to include.'
+        'List of tags which to include. Keys tagged by at least one of these tags will be included.'
       ).default(config.pull?.tags)
     )
     .addOption(
       new Option(
         '--exclude-tags <tags...>',
-        'List of tags which to exclude.'
+        'List of tags which to exclude. Keys tagged by at least one of these tags will be excluded.'
       ).default(config.pull?.excludeTags)
     )
     .addOption(
@@ -124,17 +124,13 @@ export default (config: Schema) =>
     .addOption(
       new Option(
         '--empty-dir',
-        'Empty [path] directory before inserting pulled files.'
+        'Empty target directory before inserting pulled files.'
       ).default(config.pull?.emptyDir)
     )
     .addOption(
       new Option(
         '--file-structure-template <template>',
-        'This is a template that defines the structure of the resulting .zip file content.\n\n' +
-          'The template is a string that can contain the following placeholders: {namespace}, {languageTag}, {androidLanguageTag}, {snakeLanguageTag}, {extension}.\n\n' +
-          'For example, when exporting to JSON with the template {namespace}/{languageTag}.{extension}, the English translations of the home namespace will be stored in home/en.json.\n\n' +
-          'The {snakeLanguageTag} placeholder is the same as {languageTag} but in snake case. (e.g., en_US).\n\n' +
-          'The Android specific {androidLanguageTag} placeholder is the same as {languageTag} but in Android format. (e.g., en-rUS)'
+        'Defines exported file structure: https://tolgee.io/tolgee-cli/push-pull-strings#file-structure-template-format'
       ).default(config.pull?.fileStructureTemplate)
     )
     .action(pullHandler());
