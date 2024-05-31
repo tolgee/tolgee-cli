@@ -18,6 +18,7 @@ export default <JestConfigWithTsJest>{
 
   // Tests may update their global env (e.g. Tolgee properties) and cannot be concurrent.
   maxConcurrency: 1,
-  testTimeout: 15e3,
+  testTimeout: 30e3,
   slowTestThreshold: 60e3,
+  globalSetup: '<rootDir>/test/e2e/__internal__/setup.ts',
 };

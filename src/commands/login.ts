@@ -1,14 +1,12 @@
-import type { ApiKeyInfo } from '../client/index.js';
 import { Command } from 'commander';
-import RestClient from '../client/index.js';
 
-import { HttpError } from '../client/errors.js';
 import {
   saveApiKey,
   removeApiKeys,
   clearAuthStore,
 } from '../config/credentials.js';
-import { success, error } from '../utils/logger.js';
+import { success } from '../utils/logger.js';
+import { createTolgeeClient } from '../client/TolgeeClient.js';
 
 type Options = {
   apiUrl: URL;
@@ -17,17 +15,10 @@ type Options = {
 
 async function loginHandler(this: Command, key: string) {
   const opts: Options = this.optsWithGlobals();
-  let keyInfo: ApiKeyInfo;
-  try {
-    keyInfo = await RestClient.getApiKeyInformation(opts.apiUrl, key);
-  } catch (e) {
-    if (e instanceof HttpError && e.response.statusCode === 401) {
-      error("Couldn't log in: the API key you provided is invalid.");
-      process.exit(1);
-    }
-
-    throw e;
-  }
+  const keyInfo = await createTolgeeClient({
+    baseUrl: opts.apiUrl.toString(),
+    apiKey: key,
+  }).getApiKeyInfo();
 
   await saveApiKey(opts.apiUrl, keyInfo);
   success(

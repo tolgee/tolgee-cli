@@ -1,0 +1,14 @@
+{
+  "$schema": "../../../schema.json",
+  "apiUrl": "https://app.tolgee.io",
+  "projectId": 1337,
+  "delimiter": "testDelimiter",
+  "extractor": "./fakeExtractor.js",
+  "patterns": ["./src/**/*.tsx"],
+  "push": {
+    "files": [{ "path": "./i18n/en.json", "language": "en" }]
+  },
+  "pull": {
+    "path": "./i18n/"
+  }
+}

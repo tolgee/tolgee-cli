@@ -1,0 +1,12 @@
+{
+  "$schema": "../../../schema.json",
+  "format": "APPLE_XLIFF",
+  "push": {
+    "files": [
+      {
+        "path": "./apple-xliff/en.xliff",
+        "language": "en"
+      }
+    ]
+  }
+}

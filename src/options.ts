@@ -1,8 +1,7 @@
-import type Client from './client/index.js';
 import { existsSync } from 'fs';
 import { resolve } from 'path';
 import { Option, InvalidArgumentError } from 'commander';
-import { DEFAULT_API_URL } from './constants.js';
+import { createTolgeeClient } from './client/TolgeeClient.js';
 
 function parseProjectId(v: string) {
   const val = Number(v);
@@ -33,7 +32,9 @@ export type BaseOptions = {
   apiUrl: URL;
   apiKey: string;
   projectId: number;
-  client: Client;
+  client: ReturnType<typeof createTolgeeClient>;
+  extractor: string;
+  patterns: string[] | undefined;
 };
 
 export const API_KEY_OPT = new Option(
@@ -44,18 +45,55 @@ export const API_KEY_OPT = new Option(
 export const PROJECT_ID_OPT = new Option(
   '-p, --project-id <id>',
   'Project ID. Only required when using a Personal Access Token.'
-)
-  .default(-1)
-  .argParser(parseProjectId);
+).argParser(parseProjectId);
 
 export const API_URL_OPT = new Option(
   '-au, --api-url <url>',
   'The url of Tolgee API.'
-)
-  .default(DEFAULT_API_URL)
-  .argParser(parseUrlArgument);
+).argParser(parseUrlArgument);
 
 export const EXTRACTOR = new Option(
   '-e, --extractor <extractor>',
   `A path to a custom extractor to use instead of the default one.`
 ).argParser(parsePath);
+
+export const CONFIG_OPT = new Option(
+  '-c, --config [config]',
+  'A path to tolgeerc config file.'
+).argParser(parsePath);
+
+export const FORMAT_OPT = new Option(
+  '--format <format>',
+  'Localization files format.'
+).choices([
+  'JSON_TOLGEE',
+  'JSON_ICU',
+  'JSON_JAVA',
+  'JSON_PHP',
+  'JSON_RUBY',
+  'JSON_C',
+  'PO_PHP',
+  'PO_C',
+  'PO_JAVA',
+  'PO_ICU',
+  'PO_RUBY',
+  'APPLE_STRINGS',
+  'APPLE_XLIFF',
+  'PROPERTIES_ICU',
+  'PROPERTIES_JAVA',
+  'ANDROID_XML',
+  'FLUTTER_ARB',
+  'YAML_RUBY',
+  'YAML_JAVA',
+  'YAML_ICU',
+  'YAML_PHP',
+  'XLIFF_ICU',
+  'XLIFF_JAVA',
+  'XLIFF_PHP',
+  'XLIFF_RUBY',
+]);
+
+export const FILE_PATTERNS = new Option(
+  '-pt, --patterns <patterns...>',
+  'File glob patterns to include (hint: make sure to escape it in quotes, or your shell might attempt to unroll some tokens like *)'
+);

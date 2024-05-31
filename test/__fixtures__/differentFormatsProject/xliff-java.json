@@ -1,0 +1,7 @@
+{
+  "$schema": "../../../schema.json",
+  "format": "XLIFF_JAVA",
+  "push": {
+    "files": [{ "path": "./xliff-java/en.xliff", "language": "en" }]
+  }
+}

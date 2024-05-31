@@ -1,6 +1,7 @@
 import { join, extname } from 'path';
 import { createHash } from 'crypto';
 import { readdir, stat, readFile } from 'fs/promises';
+import tree from 'tree-cli';
 
 async function recursiveReaddir(path: string, base = '') {
   const files: Record<string, string> = {};
@@ -33,6 +34,16 @@ async function recursiveReaddir(path: string, base = '') {
   }
 
   return files;
+}
+
+async function getStructure(path: string) {
+  return (
+    (await tree({ base: path, l: 100, f: true })).report
+      .split('\n')
+      // remove first line with folder name and last few lines with statistics
+      .slice(1, -4)
+      .join('\n')
+  );
 }
 
 expect.extend({
@@ -74,12 +85,60 @@ expect.extend({
       message: () => `expected folders to NOT contain the same files`,
     };
   },
+  async toMatchStructureOf(actual: string, expected: string) {
+    const actualStructure = await getStructure(actual);
+    const expectedStructure = await getStructure(expected);
+
+    if (actualStructure !== expectedStructure) {
+      return {
+        pass: false,
+        message: () =>
+          `Structure doesn't match:\n` +
+          this.utils.printDiffOrStringify(
+            expectedStructure,
+            actualStructure,
+            'expected',
+            'found',
+            this.expand !== false
+          ),
+      };
+    }
+    return {
+      pass: true,
+      message: () => `structure doesn't match`,
+    };
+  },
+  async toMatchStructure(actual: string, expected: string) {
+    const actualStructure = (await getStructure(actual)).trim();
+    const expectedStructure = expected.trim();
+
+    if (actualStructure !== expectedStructure) {
+      return {
+        pass: false,
+        message: () =>
+          `Structure doesn't match:\n` +
+          this.utils.printDiffOrStringify(
+            expectedStructure,
+            actualStructure,
+            'expected',
+            'found',
+            this.expand !== false
+          ),
+      };
+    }
+    return {
+      pass: true,
+      message: () => `structure doesn't match`,
+    };
+  },
 });
 
 declare global {
   namespace jest {
     interface Matchers<R> {
-      toMatchContentsOf(expected: string): R;
+      toMatchContentsOf(expected: string): Promise<R>;
+      toMatchStructureOf(expected: string): Promise<R>;
+      toMatchStructure(expected: string): Promise<R>;
     }
   }
 }

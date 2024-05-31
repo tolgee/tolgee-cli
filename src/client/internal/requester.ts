@@ -6,7 +6,6 @@ import { STATUS_CODES } from 'http';
 import { request } from 'undici';
 import FormData from 'form-data';
 
-import { HttpError } from '../errors.js';
 import { debug } from '../../utils/logger.js';
 import { USER_AGENT } from '../../constants.js';
 
@@ -114,7 +113,6 @@ export default class Requester {
       }`
     );
 
-    if (response.statusCode >= 400) throw new HttpError(req, response);
     return response;
   }
 

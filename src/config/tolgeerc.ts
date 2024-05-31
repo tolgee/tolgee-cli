@@ -1,17 +1,13 @@
 import { cosmiconfig, defaultLoaders } from 'cosmiconfig';
-import { resolve } from 'path';
+import { Validator } from 'jsonschema';
+import { readFile } from 'fs/promises';
+import { fileURLToPath } from 'url';
+import { dirname, join, resolve } from 'path';
+
+import { CosmiconfigResult } from 'cosmiconfig/dist/types.js';
+import { error, exitWithError } from '../utils/logger.js';
 import { existsSync } from 'fs';
-import { SDKS } from '../constants.js';
-
-export type ProjectSdk = (typeof SDKS)[number];
-
-export type TolgeeConfig = {
-  apiUrl?: URL;
-  projectId?: number;
-  sdk?: ProjectSdk;
-  extractor?: string;
-  delimiter?: string;
-};
+import { Schema } from '../schema.js';
 
 const explorer = cosmiconfig('tolgee', {
   loaders: {
@@ -19,72 +15,104 @@ const explorer = cosmiconfig('tolgee', {
   },
 });
 
-function parseConfig(rc: any): TolgeeConfig {
-  if (typeof rc !== 'object' || Array.isArray(rc)) {
-    throw new Error('Invalid config: config is not an object.');
-  }
+function parseConfig(input: Schema, configDir: string): Schema {
+  const rc = { ...input };
 
-  const cfg: TolgeeConfig = {};
-  if ('apiUrl' in rc) {
-    if (typeof rc.apiUrl !== 'string') {
-      throw new Error('Invalid config: apiUrl is not a string');
-    }
-
+  if (rc.apiUrl !== undefined) {
     try {
-      cfg.apiUrl = new URL(rc.apiUrl);
+      new URL(rc.apiUrl);
     } catch (e) {
       throw new Error('Invalid config: apiUrl is an invalid URL');
     }
   }
 
-  if ('projectId' in rc) {
-    cfg.projectId = Number(rc.projectId); // Number("") returns 0
-    if (!Number.isInteger(cfg.projectId) || cfg.projectId <= 0) {
+  if (rc.projectId !== undefined) {
+    const projectId = Number(rc.projectId); // Number("") returns 0
+    if (!Number.isInteger(projectId) || projectId <= 0) {
       throw new Error(
         'Invalid config: projectId should be an integer representing your project Id'
       );
     }
   }
 
-  if ('sdk' in rc) {
-    if (!SDKS.includes(rc.sdk)) {
+  if (rc.extractor !== undefined) {
+    rc.extractor = resolve(configDir, rc.extractor);
+    if (!existsSync(rc.extractor)) {
       throw new Error(
-        `Invalid config: invalid sdk. Must be one of: ${SDKS.join(' ')}`
+        `Invalid config: extractor points to a file that does not exists (${rc.extractor})`
       );
     }
-
-    cfg.sdk = rc.sdk;
   }
 
-  if ('extractor' in rc) {
-    if (typeof rc.extractor !== 'string') {
-      throw new Error('Invalid config: extractor is not a string');
-    }
-
-    const extractorPath = resolve(rc.extractor);
-    if (!existsSync(extractorPath)) {
-      throw new Error(
-        `Invalid config: extractor points to a file that does not exists (${extractorPath})`
-      );
-    }
-
-    cfg.extractor = extractorPath;
+  if (rc.delimiter !== undefined) {
+    rc.delimiter = rc.delimiter || '';
   }
 
-  if ('delimiter' in rc) {
-    if (typeof rc.delimiter !== 'string' && rc.delimiter !== null) {
-      throw new Error('Invalid config: delimiter is not a string');
-    }
+  // convert relative paths in config to absolute
+  // so it's always relative to config location
 
-    cfg.delimiter = rc.delimiter || '';
+  if (rc.push?.files) {
+    rc.push.files = rc.push.files.map((r) => ({
+      ...r,
+      path: resolve(configDir, r.path),
+    }));
   }
 
-  return cfg;
+  if (rc.pull?.path !== undefined) {
+    rc.pull.path = resolve(configDir, rc.pull.path);
+  }
+
+  if (rc.patterns !== undefined) {
+    rc.patterns = rc.patterns.map((pattern: string) =>
+      resolve(configDir, pattern)
+    );
+  }
+
+  return rc;
 }
 
-export default async function loadTolgeeRc(): Promise<TolgeeConfig | null> {
-  const res = await explorer.search();
+async function getSchema() {
+  const path = join(
+    fileURLToPath(new URL('.', import.meta.url)),
+    '..',
+    '..',
+    'schema.json'
+  );
+
+  return JSON.parse((await readFile(path)).toString());
+}
+
+export default async function loadTolgeeRc(
+  path?: string
+): Promise<Schema | null> {
+  let res: CosmiconfigResult;
+  if (path) {
+    try {
+      res = await explorer.load(path);
+    } catch (e: any) {
+      error(e.message);
+      throw new Error(`Can't open config file on path "${path}"`);
+    }
+  } else {
+    res = await explorer.search();
+  }
+
   if (!res || res.isEmpty) return null;
 
-  return parseConfig(res.config);
+  const config = parseConfig(res.config, dirname(path || '.'));
+
+  const validator = new Validator();
+  const schema = await getSchema();
+  const result = validator.validate(config, schema);
+
+  if (result.errors.length) {
+    const { message, property } = result.errors[0];
+    const errMessage = `Tolgee config: '${property.replace(
+      'instance.',
+      ''
+    )}' ${message}`;
+    exitWithError(errMessage);
+  }
+
+  return config;
 }

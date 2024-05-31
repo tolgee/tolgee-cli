@@ -2,14 +2,10 @@ import { Command } from 'commander';
 
 import extractPrint from './extract/print.js';
 import extractCheck from './extract/check.js';
-import { EXTRACTOR } from '../options.js';
+import { Schema } from '../schema.js';
 
-export type BaseExtractOptions = {
-  extractor: string;
-};
-
-export default new Command('extract')
-  .description('Extracts strings from your projects')
-  .addOption(EXTRACTOR)
-  .addCommand(extractPrint)
-  .addCommand(extractCheck);
+export default (config: Schema) =>
+  new Command('extract')
+    .description('Extracts strings from your projects')
+    .addCommand(extractPrint(config))
+    .addCommand(extractCheck(config));
