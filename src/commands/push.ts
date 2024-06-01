@@ -132,7 +132,7 @@ const pushHandler = (config: Schema) =>
     const opts: PushOptions = this.optsWithGlobals();
 
     if (!config.push?.files) {
-      throw new Error('Missing option `push.files` in configuration file.');
+      exitWithError('Missing option `push.files` in configuration file.');
     }
 
     const filteredMatchers = config.push.files.filter((r) => {
