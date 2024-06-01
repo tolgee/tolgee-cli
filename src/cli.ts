@@ -211,9 +211,10 @@ async function run() {
     //  - The error should be handled in the command but isn't
     //  - Something went wrong with the code
     error('An unexpected error occurred while running the command.');
-    exitWithError(
+    error(
       'Please report this to our issue tracker: https://github.com/tolgee/tolgee-cli/issues'
     );
+    exitWithError(e);
   }
 }
 

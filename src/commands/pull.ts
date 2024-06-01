@@ -5,7 +5,7 @@ import { Command, Option } from 'commander';
 
 import { unzipBuffer } from '../utils/zip.js';
 import { prepareDir } from '../utils/prepareDir.js';
-import { loading, success } from '../utils/logger.js';
+import { exitWithError, loading, success } from '../utils/logger.js';
 import { Schema } from '../schema.js';
 import { checkPathNotAFile } from '../utils/checkPathNotAFile.js';
 import { mapExportFormat } from '../utils/mapExportFormat.js';
@@ -50,7 +50,9 @@ const pullHandler = () =>
     const opts: PullOptions = this.optsWithGlobals();
 
     if (!opts.path) {
-      throw new Error('Missing or option --path <path>');
+      exitWithError(
+        'Missing option --path <path> or `pull.path` in tolgee config'
+      );
     }
 
     await checkPathNotAFile(opts.path);
@@ -70,7 +72,7 @@ export default (config: Schema) =>
     .description('Pulls translations from Tolgee')
     .addOption(
       new Option(
-        '-p, --path <path>',
+        '--path <path>',
         'Destination of a folder where translation files will be stored in'
       ).default(config.pull?.path)
     )

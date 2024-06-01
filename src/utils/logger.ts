@@ -69,10 +69,21 @@ export function error(msg: string) {
   console.log(`🔴 ${msg}`);
 }
 
-export function exitWithError(msg: string): never {
-  error(msg);
-  if (debugEnabled) {
-    console.log(getStackTrace());
+export function exitWithError(err: string | Error): never {
+  let message: string;
+  let stack: string | undefined;
+
+  if (err instanceof Error) {
+    message = err.message;
+    stack = err.stack;
+  } else {
+    message = err;
+    stack = getStackTrace();
+  }
+
+  error(message);
+  if (debugEnabled && stack) {
+    console.log(stack);
   }
   process.exit(1);
 }
