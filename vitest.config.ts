@@ -10,5 +10,6 @@ export default defineConfig({
     globals: true,
     globalSetup: './src/test/e2e/__internal__/setup.ts',
     setupFiles: ['./src/test/setenv.ts'],
+    testTimeout: 30e3,
   },
 });
