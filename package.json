@@ -11,7 +11,7 @@
     "tolgee": "./dist/cli.js"
   },
   "scripts": {
-    "build": "rimraf dist dist-types && tsc && node scripts/copyExtractorTypes.mjs",
+    "build": "rimraf dist dist-types && tsc -p tsconfig.prod.json && node scripts/copyExtractorTypes.mjs",
     "test": "vitest",
     "test:unit": "cross-env NODE_OPTIONS=\"--experimental-vm-modules\" jest -c jest.unit.config.ts",
     "test:e2e": "cross-env NODE_OPTIONS=\"--experimental-vm-modules\" jest -c jest.e2e.config.ts --runInBand",
