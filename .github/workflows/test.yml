@@ -64,7 +64,7 @@ jobs:
       - name: Start Tolgee Container
         run: npm run tolgee:start
       - name: Run Tests
-        run: npm run test:e2e-run
+        run: npm run test:e2e
       - name: Stop Tolgee Container
         run: npm run tolgee:stop
         if: always()

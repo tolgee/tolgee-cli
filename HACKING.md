@@ -21,7 +21,6 @@ Tests:
  - `test`: Run all tests (Unit & E2E). Will start (and stop) the E2E Tolgee test instance
  - `test:unit`: Run unit tests only.
  - `test:e2e`: Run e2e tests only. Will start (and stop) the E2E Tolgee test instance
- - `test:e2e-run`: Run e2e tests only. Will not start/stop the E2E Tolgee test instance
 
 E2E test instance:
  - `tolgee:start`: Start the E2E testing instance. Will be available on port 22222.
