@@ -315,6 +315,10 @@ export default createMachine<PropertiesContext>(
           cond: (ctx) => ctx.jsxDepth === 0,
         },
         {
+          actions: 'decrementDoubleJsxDepth',
+          cond: (_ctx, e) => e.token === '/>',
+        },
+        {
           actions: 'decrementJsxDepth',
         },
       ],
@@ -411,6 +415,9 @@ export default createMachine<PropertiesContext>(
 
       incrementJsxDepth: assign({
         jsxDepth: (ctx, _evt) => ctx.jsxDepth + 2,
+      }),
+      decrementDoubleJsxDepth: assign({
+        jsxDepth: (ctx, _evt) => ctx.jsxDepth - 2,
       }),
       decrementJsxDepth: assign({
         jsxDepth: (ctx, _evt) => ctx.jsxDepth - 1,

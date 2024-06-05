@@ -2,6 +2,7 @@ import { fileURLToPath } from 'url';
 import { tolgeeDataToDict } from './utils/data.js';
 import { run, runWithStdin } from './utils/run.js';
 import {
+  DEFAULT_SCOPES,
   createPak,
   createProjectWithClient,
   deleteProject,
@@ -187,12 +188,16 @@ describe('project 3', () => {
   });
 
   it('removes other keys', async () => {
+    const pakWithDelete = await createPak(client, [
+      ...DEFAULT_SCOPES,
+      'keys.delete',
+    ]);
     const out = await run([
       '--config',
       PROJECT_3_DEPRECATED_CONFIG,
       'push',
       '--api-key',
-      pak,
+      pakWithDelete,
       '--remove-other-keys',
     ]);
 
