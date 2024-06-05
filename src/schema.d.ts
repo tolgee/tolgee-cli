@@ -9,31 +9,31 @@
  * Localization files format for push and pull operations.
  */
 export type Format =
-  | "JSON_TOLGEE"
-  | "JSON_ICU"
-  | "JSON_JAVA"
-  | "JSON_PHP"
-  | "JSON_RUBY"
-  | "JSON_C"
-  | "PO_PHP"
-  | "PO_C"
-  | "PO_JAVA"
-  | "PO_ICU"
-  | "PO_RUBY"
-  | "APPLE_STRINGS"
-  | "APPLE_XLIFF"
-  | "PROPERTIES_ICU"
-  | "PROPERTIES_JAVA"
-  | "ANDROID_XML"
-  | "FLUTTER_ARB"
-  | "YAML_RUBY"
-  | "YAML_JAVA"
-  | "YAML_ICU"
-  | "YAML_PHP"
-  | "XLIFF_ICU"
-  | "XLIFF_JAVA"
-  | "XLIFF_PHP"
-  | "XLIFF_RUBY";
+  | 'JSON_TOLGEE'
+  | 'JSON_ICU'
+  | 'JSON_JAVA'
+  | 'JSON_PHP'
+  | 'JSON_RUBY'
+  | 'JSON_C'
+  | 'PO_PHP'
+  | 'PO_C'
+  | 'PO_JAVA'
+  | 'PO_ICU'
+  | 'PO_RUBY'
+  | 'APPLE_STRINGS'
+  | 'APPLE_XLIFF'
+  | 'PROPERTIES_ICU'
+  | 'PROPERTIES_JAVA'
+  | 'ANDROID_XML'
+  | 'FLUTTER_ARB'
+  | 'YAML_RUBY'
+  | 'YAML_JAVA'
+  | 'YAML_ICU'
+  | 'YAML_PHP'
+  | 'XLIFF_ICU'
+  | 'XLIFF_JAVA'
+  | 'XLIFF_PHP'
+  | 'XLIFF_RUBY';
 /**
  * File glob specifying which files to include.
  */
@@ -47,7 +47,7 @@ export type Path = string;
  *   `KEEP` - create only non-existent strings, don't touch existing ones
  *   `NO_FORCE` - throw an error, if there are any conflict
  */
-export type ForceMode = "OVERRIDE" | "KEEP" | "NO_FORCE";
+export type ForceMode = 'OVERRIDE' | 'KEEP' | 'NO_FORCE';
 
 export interface Schema {
   /**
@@ -111,7 +111,7 @@ export interface Schema {
     /**
      * List of translation states to include. Defaults all except untranslated.
      */
-    states?: ("UNTRANSLATED" | "TRANSLATED" | "REVIEWED")[];
+    states?: ('UNTRANSLATED' | 'TRANSLATED' | 'REVIEWED')[];
     /**
      * List of tags which to include.
      */

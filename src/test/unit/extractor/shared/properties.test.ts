@@ -492,11 +492,6 @@ describe('JSX', () => {
       });
     });
   });
-
-  // There is nothing to test for TSX specifically;
-  // Leaving this so the person who'll stumble across a TSX quirk can laugh at me via `git blame` (and write tests :p)
-  // eslint-disable-next-line jest/no-commented-out-tests
-  // describe('TSX', () => {})
 });
 
 describe('Svelte', () => {

@@ -22,13 +22,5 @@
       }
     ]
   },
-  "overrides": [
-    {
-      "env": { "jest": true },
-      "files": ["test/**"],
-      "plugins": ["jest"],
-      "extends": ["plugin:jest/recommended"]
-    }
-  ],
   "ignorePatterns": ["schema.generated.ts"]
 }
