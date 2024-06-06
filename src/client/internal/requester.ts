@@ -84,7 +84,7 @@ export default class Requester {
       'x-api-key': this.params.apiKey,
     };
 
-    let body = undefined;
+    let body: any = undefined;
 
     if (req.body) {
       if (req.body instanceof FormData) {

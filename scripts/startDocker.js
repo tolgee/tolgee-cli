@@ -32,9 +32,6 @@ async function main() {
   let stderr = '';
 
   const ENV_FILE = fileURLToPath(new URL('./tolgee.env', import.meta.url));
-  const TG_IMPORT_FOLDER = fileURLToPath(
-    new URL('../test/__fixtures__/tolgeeImportData', import.meta.url)
-  );
 
   const ARGS = [
     'run',
@@ -45,8 +42,6 @@ async function main() {
     '22222:8080',
     '--env-file',
     ENV_FILE,
-    '--mount',
-    `type=bind,source=${TG_IMPORT_FOLDER},target=/mnt/tolgee-import-data`,
     'tolgee/tolgee:latest',
   ];
 
