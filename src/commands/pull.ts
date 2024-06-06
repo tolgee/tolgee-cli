@@ -80,7 +80,7 @@ export default (config: Schema) =>
       new Option(
         '-l, --languages <languages...>',
         'List of languages to pull. Leave unspecified to export them all'
-      ).default(config.pull?.languagess)
+      ).default(config.pull?.languages)
     )
     .addOption(
       new Option(
