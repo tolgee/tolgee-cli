@@ -35,6 +35,7 @@ function parseConfig(input: Schema, configDir: string): Schema {
     }
   }
 
+  // convert relative paths in config to absolute
   if (rc.extractor !== undefined) {
     rc.extractor = resolve(configDir, rc.extractor);
     if (!existsSync(rc.extractor)) {
@@ -44,13 +45,14 @@ function parseConfig(input: Schema, configDir: string): Schema {
     }
   }
 
-  if (rc.delimiter !== undefined) {
-    rc.delimiter = rc.delimiter || '';
+  // convert relative paths in config to absolute
+  if (rc.patterns !== undefined) {
+    rc.patterns = rc.patterns.map((pattern: string) =>
+      resolve(configDir, pattern)
+    );
   }
 
   // convert relative paths in config to absolute
-  // so it's always relative to config location
-
   if (rc.push?.files) {
     rc.push.files = rc.push.files.map((r) => ({
       ...r,
@@ -60,12 +62,6 @@ function parseConfig(input: Schema, configDir: string): Schema {
 
   if (rc.pull?.path !== undefined) {
     rc.pull.path = resolve(configDir, rc.pull.path);
-  }
-
-  if (rc.patterns !== undefined) {
-    rc.patterns = rc.patterns.map((pattern: string) =>
-      resolve(configDir, pattern)
-    );
   }
 
   return rc;

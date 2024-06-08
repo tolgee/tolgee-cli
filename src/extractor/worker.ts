@@ -1,4 +1,9 @@
-import type { Extractor } from './index.js';
+import type {
+  ExtractOptions,
+  ExtractionResult,
+  Extractor,
+  ParserType,
+} from './index.js';
 import { fileURLToPath } from 'url';
 import { resolve, extname } from 'path';
 import { Worker, isMainThread, parentPort } from 'worker_threads';
@@ -8,16 +13,21 @@ import internalExtractor from './extractor.js';
 import { loadModule } from '../utils/moduleLoader.js';
 import { type Deferred, createDeferred } from '../utils/deferred.js';
 
-export type WorkerParams = { extractor?: string; file: string };
+export type WorkerParams = {
+  extractor?: string;
+  file: string;
+  parserType: ParserType;
+  options: ExtractOptions;
+};
 
 const IS_TS_NODE = extname(import.meta.url) === '.ts';
 
 // --- Worker functions
 
 let loadedExtractor: string | undefined | symbol = Symbol('unloaded');
-let extractor: Extractor;
+let extractor: Extractor | typeof internalExtractor;
 
-async function handleJob(args: WorkerParams) {
+async function handleJob(args: WorkerParams): Promise<ExtractionResult> {
   if (loadedExtractor !== args.extractor) {
     loadedExtractor = args.extractor;
     extractor = args.extractor
@@ -27,7 +37,7 @@ async function handleJob(args: WorkerParams) {
 
   const file = resolve(args.file);
   const code = await readFile(file, 'utf8');
-  return extractor(code, file);
+  return extractor(code, file, args.parserType, args.options);
 }
 
 async function workerInit() {

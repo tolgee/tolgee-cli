@@ -6,7 +6,7 @@ import {
   WarningMessages,
   emitGitHubWarning,
 } from '../../extractor/warnings.js';
-import { exitWithError, loading } from '../../utils/logger.js';
+import { loading } from '../../utils/logger.js';
 import { Schema } from '../../schema.js';
 import type { BaseOptions } from '../../options.js';
 
@@ -15,13 +15,9 @@ type ExtractLintOptions = BaseOptions;
 const lintHandler = (config: Schema) =>
   async function (this: Command) {
     const opts: ExtractLintOptions = this.optsWithGlobals();
-    const patterns = opts.patterns;
-    if (!patterns?.length) {
-      exitWithError('Missing option --patterns or config.patterns option');
-    }
     const extracted = await loading(
       'Analyzing code...',
-      extractKeysOfFiles(patterns, opts.extractor)
+      extractKeysOfFiles(opts)
     );
 
     let warningCount = 0;

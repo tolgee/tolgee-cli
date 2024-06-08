@@ -1,0 +1,6 @@
+{
+  "$schema": "../../../../schema.json",
+  "patterns": ["./code/*.svelte"],
+  "strictNamespace": false,
+  "defaultNamespace": "default"
+}

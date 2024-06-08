@@ -5,7 +5,7 @@ on:
   pull_request:
 
 jobs:
-  lint:
+  eslint:
     name: Eslint
     runs-on: ubuntu-latest
     steps:
@@ -22,7 +22,7 @@ jobs:
         run: npm ci
 
       - name: Run eslint
-        run: npm run lint
+        run: npm run eslint
 
   test-unit:
     name: Unit Tests

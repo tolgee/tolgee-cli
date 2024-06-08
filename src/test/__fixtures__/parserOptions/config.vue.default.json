@@ -1,0 +1,6 @@
+{
+  "$schema": "../../../../schema.json",
+  "patterns": ["./code/*.vue"],
+  "strictNamespace": false,
+  "defaultNamespace": "default"
+}

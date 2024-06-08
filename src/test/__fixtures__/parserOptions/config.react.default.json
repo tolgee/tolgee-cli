@@ -1,0 +1,6 @@
+{
+  "$schema": "../../../../schema.json",
+  "patterns": ["./code/*.tsx"],
+  "strictNamespace": false,
+  "defaultNamespace": "default"
+}

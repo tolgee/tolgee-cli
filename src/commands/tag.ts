@@ -31,14 +31,9 @@ const tagHandler = (config: Schema) =>
         );
       }
 
-      const patterns = opts.patterns;
-      if (!patterns?.length) {
-        exitWithError('Missing option --patterns or config.patterns option');
-      }
-
       const extracted = await loading(
         'Analyzing code...',
-        extractKeysOfFiles(patterns, opts.extractor)
+        extractKeysOfFiles(opts)
       );
 
       const keys = [...extracted.values()].flatMap((item) => item.keys);

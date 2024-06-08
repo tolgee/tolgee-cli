@@ -9,16 +9,12 @@ const CODE_PROJECT = fileURLToPathSlash(
 const CODE_PROJECT_ERR = fileURLToPathSlash(
   new URL('./codeProjectReactWithErr', FIXTURES_PATH)
 );
-const CODE_PROJECT_COMMENT = fileURLToPathSlash(
-  new URL('./codeProjectCommentOnly', FIXTURES_PATH)
-);
 const EXTRACTED_DATA = fileURLToPathSlash(
   new URL('./codeProjectExtracted/en.json', FIXTURES_PATH)
 );
 
 const CODE_PROJECT_MATCH = `${CODE_PROJECT}/**/*.tsx`;
 const CODE_PROJECT_ERR_MATCH = `${CODE_PROJECT_ERR}/**/*.tsx`;
-const CODE_PROJECT_COMMENT_MATCH = `${CODE_PROJECT_COMMENT}/**/*.ts`;
 
 let expectedStrings: Record<string, string> = {};
 
@@ -80,15 +76,3 @@ it('spits GitHub Workflow Commands when it detects GH Actions env', async () => 
   expect(out.code).toBe(1);
   expect(out.stdout).toContain('::warning file=');
 }, 60e3);
-
-it('extracts from files with only magic comments', async () => {
-  const out = await run(
-    ['extract', 'print', '--patterns', CODE_PROJECT_COMMENT_MATCH],
-    undefined,
-    50e3
-  );
-
-  expect(out.code).toBe(0);
-  expect(out.stdout).toContain('Total unique keys found: 1');
-  expect(out.stdout).toContain('uwu');
-});

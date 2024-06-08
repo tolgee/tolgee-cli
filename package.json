@@ -18,7 +18,7 @@
     "test:package": "node scripts/validatePackage.js",
     "tolgee:start": "node scripts/startDocker.js",
     "tolgee:stop": "docker stop tolgee_cli_e2e",
-    "lint": "eslint --ext .ts --ext .js --ext .cjs ./src ./scripts vitest.config.ts",
+    "eslint": "eslint --max-warnings 0 --ext .ts --ext .js --ext .cjs ./src ./scripts vitest.config.ts",
     "prettier": "prettier --write ./src ./scripts vitest.config.ts",
     "run-dev": "cross-env NODE_OPTIONS=\"--import=./scripts/registerTsNode.js\" node ./src/cli.ts",
     "schema": "openapi-typescript http://localhost:22222/v3/api-docs/All%20Internal%20-%20for%20Tolgee%20Web%20application --output src/client/internal/schema.generated.ts",

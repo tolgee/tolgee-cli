@@ -331,15 +331,6 @@ describe('Nested keys project', () => {
   });
 
   it('pulls nested structure with delimiter in parameter', async () => {
-    console.log(
-      'pull',
-      '--delimiter',
-      '.',
-      '--api-key',
-      pak,
-      '--path',
-      TMP_FOLDER
-    );
     const out = await run([
       'pull',
       '--delimiter',

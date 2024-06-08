@@ -1,7 +1,14 @@
-import type { ExtractionResults } from './index.js';
+import type {
+  ExtractOptions,
+  ExtractionResults,
+  ParserType,
+  VerboseOption,
+} from './index.js';
 import { glob } from 'glob';
+import { extname } from 'path';
 
 import { callWorker } from './worker.js';
+import { exitWithError } from '../utils/logger.js';
 
 export const NullNamespace = Symbol('namespace.null');
 
@@ -10,23 +17,99 @@ export type FilteredKeys = {
   [key: string]: Map<string, string | null>;
 };
 
-export async function extractKeysFromFile(file: string, extractor?: string) {
+function parseVerbose(v: VerboseOption[] | boolean | undefined) {
+  return Array.isArray(v) ? v : v ? [] : undefined;
+}
+
+export async function extractKeysFromFile(
+  file: string,
+  parserType: ParserType,
+  options: ExtractOptions,
+  extractor?: string
+) {
   return callWorker({
     extractor: extractor,
+    parserType,
     file: file,
+    options,
   });
 }
 
-export async function extractKeysOfFiles(
-  filesPatterns: string[],
-  extractor: string | undefined
-) {
-  const files = await glob(filesPatterns, { nodir: true });
+export function findPossibleFrameworks(fileNames: string[]) {
+  const possibleFrameworks: ParserType[] = [];
+  const extensions = new Set(fileNames.map((name) => extname(name)));
+
+  if (extensions.has('.jsx') || extensions.has('.tsx')) {
+    possibleFrameworks.push('react');
+  }
+  if (extensions.has('.vue')) {
+    possibleFrameworks.push('vue');
+  }
+  if (extensions.has('.svelte')) {
+    possibleFrameworks.push('svelte');
+  }
+  return possibleFrameworks;
+}
+
+function detectParserType(fileNames: string[]): ParserType {
+  const possibleFrameworks = findPossibleFrameworks(fileNames);
+
+  if (possibleFrameworks.length === 1) {
+    return possibleFrameworks[0];
+  } else if (possibleFrameworks.length === 0) {
+    exitWithError(
+      "Couldn't detect which framework is used, use '--parser' or 'config.parser' option"
+    );
+  } else {
+    exitWithError(
+      `Detected multiple possible frameworks used (${possibleFrameworks.join(
+        ', '
+      )}), use '--parser' or 'config.parser' options`
+    );
+  }
+}
+
+type Opts = {
+  patterns?: string[];
+  extractor?: string;
+  parser?: ParserType;
+  strictNamespace?: boolean;
+  defaultNamespace?: string;
+  verbose?: VerboseOption[] | boolean;
+};
+
+export async function extractKeysOfFiles(opts: Opts) {
+  if (!opts.patterns?.length) {
+    exitWithError("Missing '--patterns' or 'config.patterns' option");
+  }
+
+  const files = await glob(opts.patterns, { nodir: true });
+
+  if (files.length === 0) {
+    exitWithError('No files were matched for extraction');
+  }
+
+  let parserType = opts.parser;
+
+  if (!parserType) {
+    parserType = detectParserType(files);
+  }
+
   const result: ExtractionResults = new Map();
+  const options: ExtractOptions = {
+    strictNamespace: Boolean(opts.strictNamespace),
+    defaultNamespace: opts.defaultNamespace,
+    verbose: parseVerbose(opts.verbose),
+  };
 
   await Promise.all(
     files.map(async (file) => {
-      const keys = await extractKeysFromFile(file, extractor);
+      const keys = await extractKeysFromFile(
+        file,
+        parserType,
+        options,
+        opts.extractor
+      );
       result.set(file, keys);
     })
   );

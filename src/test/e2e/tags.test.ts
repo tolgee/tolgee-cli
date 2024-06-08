@@ -10,7 +10,7 @@ import { run } from './utils/run.js';
 import { fileURLToPathSlash } from './utils/toFilePath.js';
 
 const TAGS_PROJECT_CONFIG = fileURLToPathSlash(
-  new URL('../__fixtures__/tagsProject/.tolgeerc', import.meta.url)
+  new URL('../__fixtures__/tagsProject/config.json', import.meta.url)
 );
 
 let client: TolgeeClient;
