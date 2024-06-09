@@ -22,6 +22,7 @@ import {
 
 type Options = BaseOptions & {
   backup?: string;
+  defaultNamespace?: string;
   removeUnused?: boolean;
   continueOnWarning?: boolean;
   yes?: boolean;
@@ -76,7 +77,7 @@ const syncHandler = (config: Schema) =>
 
     const rawKeys = await loading(
       'Analyzing code...',
-      extractKeysOfFiles(patterns, opts.extractor)
+      extractKeysOfFiles(patterns, opts.extractor, opts.defaultNamespace)
     );
     const warnCount = dumpWarnings(rawKeys);
     if (!opts.continueOnWarning && warnCount) {
@@ -218,6 +219,10 @@ export default (config: Schema) =>
     .option(
       '-B, --backup <path>',
       'Store translation files backup (only translation files, not states, comments, tags, etc.). If something goes wrong, the backup can be used to restore the project to its previous state.'
+    )
+    .option(
+      '-dn, --default-namespace <namespace>',
+      'Use the specified namespace for keys with undetected namespace. Without this parameter, keys with undetected namespace will assume no namespace.'
     )
     .option(
       '--continue-on-warning',

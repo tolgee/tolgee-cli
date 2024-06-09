@@ -19,7 +19,8 @@ export async function extractKeysFromFile(file: string, extractor?: string) {
 
 export async function extractKeysOfFiles(
   filesPatterns: string[],
-  extractor: string | undefined
+  extractor: string | undefined,
+  defaultNamespace?: string | undefined
 ) {
   const files = await glob(filesPatterns, { nodir: true });
   const result: ExtractionResults = new Map();
@@ -27,6 +28,11 @@ export async function extractKeysOfFiles(
   await Promise.all(
     files.map(async (file) => {
       const keys = await extractKeysFromFile(file, extractor);
+      for (const key of keys.keys) {
+        if (!key.namespace && defaultNamespace) {
+          key.namespace = defaultNamespace;
+        }
+      }
       result.set(file, keys);
     })
   );
