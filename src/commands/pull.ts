@@ -28,13 +28,14 @@ type PullOptions = BaseOptions & {
 async function fetchZipBlob(opts: PullOptions): Promise<Blob> {
   const exportFormat = mapExportFormat(opts.format);
   const { format, messageFormat } = exportFormat;
+
   const loadable = await opts.client.export.export({
     format,
     messageFormat,
     supportArrays: opts.supportArrays,
     languages: opts.languages,
     filterState: opts.states,
-    structureDelimiter: opts.delimiter,
+    structureDelimiter: opts.delimiter ?? '',
     filterNamespace: opts.namespaces,
     filterTagIn: opts.tags,
     filterTagNotIn: opts.excludeTags,
@@ -93,11 +94,11 @@ export default (config: Schema) =>
     )
     .addOption(
       new Option(
-        '-d, --delimiter',
+        '-d, --delimiter <delimiter>',
         'Structure delimiter to use. By default, Tolgee interprets `.` as a nested structure. You can change the delimiter, or disable structure formatting by not specifying any value to the option'
+      ).default(
+        config.pull?.delimiter === undefined ? '.' : config.pull.delimiter
       )
-        .default(config.pull?.delimiter ?? '.')
-        .argParser((v) => v || '')
     )
     .addOption(
       new Option(
