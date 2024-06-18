@@ -1,5 +1,6 @@
 import { fileURLToPath } from 'url';
 import { mkdir, readFile, rm, writeFile } from 'fs/promises';
+import { readFileSync } from 'fs';
 import { TMP_FOLDER, setupTemporaryFolder } from './utils/tmp.js';
 import { run } from './utils/run.js';
 import './utils/toMatchContentsOf.js';
@@ -12,6 +13,7 @@ import {
 import { TolgeeClient } from '../../client/TolgeeClient.js';
 import { PROJECT_1 } from './utils/api/project1.js';
 import { PROJECT_3 } from './utils/api/project3.js';
+import { NESTED_KEYS_PROJECT } from './utils/api/nestedKeysProject.js';
 
 const FIXTURES_PATH = new URL('../__fixtures__/', import.meta.url);
 const PROJECT_1_DATA = fileURLToPath(
@@ -24,8 +26,20 @@ const PROJECT_3_DATA_ONLY_FOOD = fileURLToPath(
   new URL('./tolgeeImportData/test3-only-food', FIXTURES_PATH)
 );
 
+const NESTED_KEYS_PROJECT_FLAT_CONFIG = fileURLToPath(
+  new URL('./nestedKeysProject/tolgee.config.flat.json', FIXTURES_PATH)
+);
+
+const NESTED_KEYS_PROJECT_NESTED_CONFIG = fileURLToPath(
+  new URL('./nestedKeysProject/tolgee.config.nested.json', FIXTURES_PATH)
+);
+
 let client: TolgeeClient;
 let pak: string;
+
+function readJsonFile(path: string) {
+  return JSON.parse(readFileSync(path).toString());
+}
 
 async function addTag(client: TolgeeClient, search: string, tag: string) {
   const keys = await client.GET('/v2/projects/{projectId}/translations', {
@@ -249,5 +263,96 @@ describe('Project 3', () => {
     const content = (await import(join(TMP_FOLDER, 'drinks', 'lang-en.json')))
       .default;
     expect(content).toEqual({ water: 'Water' });
+  });
+});
+
+describe('Nested keys project', () => {
+  setupTemporaryFolder();
+  beforeEach(async () => {
+    client = await createProjectWithClient(
+      'Nested keys project',
+      NESTED_KEYS_PROJECT
+    );
+    pak = await createPak(client);
+  });
+  afterEach(async () => {
+    deleteProject(client);
+  });
+
+  it('pulls flat structure with config delmiter: null', async () => {
+    const out = await run([
+      'pull',
+      '-c',
+      NESTED_KEYS_PROJECT_FLAT_CONFIG,
+      '--api-key',
+      pak,
+      '--path',
+      TMP_FOLDER,
+    ]);
+
+    expect(out.code).toBe(0);
+    expect(readJsonFile(join(TMP_FOLDER, 'en.json'))).toEqual({
+      'nested.keyboard': 'Keyboard',
+    });
+  });
+
+  it('pulls flat structure with delimiter in parameter', async () => {
+    const out = await run([
+      'pull',
+      // simulating empty string e.g. `--delimiter ""`, which somehow can't be passed here
+      '--delimiter=',
+      '--api-key',
+      pak,
+      '--path',
+      TMP_FOLDER,
+    ]);
+
+    expect(out.code).toBe(0);
+    expect(readJsonFile(join(TMP_FOLDER, 'en.json'))).toEqual({
+      'nested.keyboard': 'Keyboard',
+    });
+  });
+
+  it('pulls nested structure with delmiter: "."', async () => {
+    const out = await run([
+      'pull',
+      '-c',
+      NESTED_KEYS_PROJECT_NESTED_CONFIG,
+      '--api-key',
+      pak,
+      '--path',
+      TMP_FOLDER,
+    ]);
+
+    expect(out.code).toBe(0);
+    expect(readJsonFile(join(TMP_FOLDER, 'en.json'))).toEqual({
+      nested: { keyboard: 'Keyboard' },
+    });
+  });
+
+  it('pulls nested structure with delimiter in parameter', async () => {
+    console.log(
+      'pull',
+      '--delimiter',
+      '.',
+      '--api-key',
+      pak,
+      '--path',
+      TMP_FOLDER
+    );
+    const out = await run([
+      'pull',
+      '--delimiter',
+      '.',
+      '--api-key',
+      pak,
+      '--path',
+      TMP_FOLDER,
+    ]);
+
+    expect(out.code).toBe(0);
+    expect(readJsonFile(join(TMP_FOLDER, 'en.json'))).toEqual({
+      nested: { keyboard: 'Keyboard' },
+    });
   });
 });
