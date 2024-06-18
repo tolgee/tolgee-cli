@@ -275,9 +275,9 @@ describe('Nested keys project', () => {
     );
     pak = await createPak(client);
   });
-  // afterEach(async () => {
-  //   deleteProject(client);
-  // });
+  afterEach(async () => {
+    deleteProject(client);
+  });
 
   it('pulls flat structure with config delmiter: null', async () => {
     const out = await run([
