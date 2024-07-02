@@ -1,88 +1,73 @@
-import { extname } from 'path';
-import { interpret } from 'xstate';
-import reactExtractorMachine from './machines/react.js';
-import vueExtractorMachine from './machines/vue/extract.js';
-import svelteExtractorMachine from './machines/svelte.js';
-import commentsExtractorMachine from './machines/comments.js';
-import vueSfcProcessor from './processors/vueSfc.js';
 import tokenizer from './tokenizer.js';
+import { ParserReact } from './parserReact/ParserReact.js';
+import { Token } from './parser/types.js';
+import { tokensList } from './visualizers/printTokens.js';
+import { visualizeRules } from './visualizers/visualizeRules.js';
+import { ParserVue } from './parserVue/ParserVue.js';
+import { ParserSvelte } from './parserSvelte/ParserSvelte.js';
+import { ExtractOptions, ExtractionResult, ParserType } from './index.js';
+import { IteratorListener } from './parser/iterator.js';
 
-const REACT_EXTS = [
-  '.js',
-  '.mjs',
-  '.cjs',
-  '.ts',
-  '.mts',
-  '.cts',
-  '.jsx',
-  '.tsx',
-];
-const VUE_EXTS = REACT_EXTS;
-const ALL_EXTS = [
-  '.js',
-  '.mjs',
-  '.cjs',
-  '.ts',
-  '.mts',
-  '.cts',
-  '.jsx',
-  '.tsx',
-  '.svelte',
-];
-
-function pickMachine(code: string, ext: string) {
-  if (REACT_EXTS.includes(ext) && code.includes('@tolgee/react')) {
-    return reactExtractorMachine;
+function pickParser(format: ParserType) {
+  switch (format) {
+    case 'react':
+      return ParserReact();
+    case 'vue':
+      return ParserVue();
+    case 'svelte':
+      return ParserSvelte();
   }
-
-  if (VUE_EXTS.includes(ext) && code.includes('@tolgee/vue')) {
-    return vueExtractorMachine;
-  }
-
-  if (ext === '.svelte' && code.includes('@tolgee/svelte')) {
-    return svelteExtractorMachine;
-  }
-
-  if (
-    ALL_EXTS.includes(ext) &&
-    (code.includes('@tolgee-key') || code.includes('@tolgee-ignore'))
-  ) {
-    return commentsExtractorMachine;
-  }
-
-  return null;
 }
 
-export default async function extractor(code: string, fileName: string) {
-  const ext = extname(fileName);
+export async function extractTreeAndReport(
+  code: string,
+  fileName: string,
+  parserType: ParserType,
+  options: ExtractOptions
+) {
+  const debug = options.verbose?.includes('extractor');
+  const tokens = (await tokenizer(code, fileName)) as Token<string>[];
 
-  if (
-    ext === '.vue' &&
-    (code.includes('$t') ||
-      code.includes('@tolgee/vue') ||
-      code.includes('@tolgee-key') ||
-      code.includes('@tolgee-ignore'))
-  ) {
-    return vueSfcProcessor(code, fileName);
+  const parser = pickParser(parserType);
+
+  const tokensMerged: Token<string>[] = [];
+  const tokensWithRules: Token<string>[] = [];
+
+  let onAccept: IteratorListener<any> | undefined = undefined;
+  if (debug) {
+    onAccept = (token, type) => {
+      tokensMerged.push(token);
+      tokensWithRules.push({ ...token, customType: type });
+    };
   }
 
-  const machineSpec = pickMachine(code, ext);
-  if (!machineSpec) {
-    return { warnings: [], keys: [] };
+  const result = parser.parse({
+    tokens,
+    onAccept,
+    options,
+  });
+
+  if (debug) {
+    console.log(JSON.stringify(result.tree, null, 2));
+    console.log(tokensList(tokensMerged));
+    console.log(visualizeRules(tokensMerged, code));
+    console.log(visualizeRules(tokensWithRules, code));
   }
 
-  const tokens = await tokenizer(code, fileName);
-  // @ts-ignore -- Types are whacky, complains about withConfig but it's not a problem here.
-  const machine = interpret(machineSpec);
+  return result;
+}
 
-  machine.start();
-  for (const token of tokens) {
-    machine.send(token);
-  }
-
-  const snapshot = machine.getSnapshot();
-  return {
-    warnings: snapshot.context.warnings,
-    keys: snapshot.context.keys,
-  };
+export default async function extractor(
+  code: string,
+  fileName: string,
+  parserType: ParserType,
+  options: ExtractOptions
+): Promise<ExtractionResult> {
+  const result = await extractTreeAndReport(
+    code,
+    fileName,
+    parserType,
+    options
+  );
+  return result.report;
 }

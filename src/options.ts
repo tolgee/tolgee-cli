@@ -2,6 +2,7 @@ import { existsSync } from 'fs';
 import { resolve } from 'path';
 import { Option, InvalidArgumentError } from 'commander';
 import { createTolgeeClient } from './client/TolgeeClient.js';
+import { VerboseOption } from './extractor/index.js';
 
 function parseProjectId(v: string) {
   const val = Number(v);
@@ -33,8 +34,10 @@ export type BaseOptions = {
   apiKey: string;
   projectId: number;
   client: ReturnType<typeof createTolgeeClient>;
-  extractor: string;
+  extractor: string | undefined;
   patterns: string[] | undefined;
+  strictNamespace: boolean | undefined;
+  verbose: VerboseOption[] | boolean | undefined;
 };
 
 export const API_KEY_OPT = new Option(
@@ -97,3 +100,25 @@ export const FILE_PATTERNS = new Option(
   '-pt, --patterns <patterns...>',
   'File glob patterns to include (hint: make sure to escape it in quotes, or your shell might attempt to unroll some tokens like *)'
 );
+
+export const STRICT_NAMESPACE = new Option('--strict-namespace').hideHelp(true);
+
+export const STRICT_NAMESPACE_NEGATION = new Option(
+  '--no-strict-namespace',
+  "No require namespace to be reachable, use if you don't use namespaces."
+);
+
+export const DEFAULT_NAMESPACE = new Option(
+  '--default-namespace <namespace>',
+  'Default namespace used in extraction if not specified otherwise.'
+);
+
+export const PARSER = new Option(
+  '--parser <parser>',
+  'Override parser detection.'
+).choices(['react', 'vue', 'svelte']);
+
+export const VERBOSE = new Option(
+  '-v, --verbose [rules...]',
+  'Enable verbose logging. If you want more info to be logged pass an option.'
+).choices(['extractor']);

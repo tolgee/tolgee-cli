@@ -9,31 +9,31 @@
  * Localization files format for push and pull operations.
  */
 export type Format =
-  | 'JSON_TOLGEE'
-  | 'JSON_ICU'
-  | 'JSON_JAVA'
-  | 'JSON_PHP'
-  | 'JSON_RUBY'
-  | 'JSON_C'
-  | 'PO_PHP'
-  | 'PO_C'
-  | 'PO_JAVA'
-  | 'PO_ICU'
-  | 'PO_RUBY'
-  | 'APPLE_STRINGS'
-  | 'APPLE_XLIFF'
-  | 'PROPERTIES_ICU'
-  | 'PROPERTIES_JAVA'
-  | 'ANDROID_XML'
-  | 'FLUTTER_ARB'
-  | 'YAML_RUBY'
-  | 'YAML_JAVA'
-  | 'YAML_ICU'
-  | 'YAML_PHP'
-  | 'XLIFF_ICU'
-  | 'XLIFF_JAVA'
-  | 'XLIFF_PHP'
-  | 'XLIFF_RUBY';
+  | "JSON_TOLGEE"
+  | "JSON_ICU"
+  | "JSON_JAVA"
+  | "JSON_PHP"
+  | "JSON_RUBY"
+  | "JSON_C"
+  | "PO_PHP"
+  | "PO_C"
+  | "PO_JAVA"
+  | "PO_ICU"
+  | "PO_RUBY"
+  | "APPLE_STRINGS"
+  | "APPLE_XLIFF"
+  | "PROPERTIES_ICU"
+  | "PROPERTIES_JAVA"
+  | "ANDROID_XML"
+  | "FLUTTER_ARB"
+  | "YAML_RUBY"
+  | "YAML_JAVA"
+  | "YAML_ICU"
+  | "YAML_PHP"
+  | "XLIFF_ICU"
+  | "XLIFF_JAVA"
+  | "XLIFF_PHP"
+  | "XLIFF_RUBY";
 /**
  * File glob specifying which files to include.
  */
@@ -47,7 +47,7 @@ export type Path = string;
  *   `KEEP` - create only non-existent strings, don't touch existing ones
  *   `NO_FORCE` - throw an error, if there are any conflict
  */
-export type ForceMode = 'OVERRIDE' | 'KEEP' | 'NO_FORCE';
+export type ForceMode = "OVERRIDE" | "KEEP" | "NO_FORCE";
 
 export interface Schema {
   /**
@@ -55,18 +55,30 @@ export interface Schema {
    */
   projectId?: number | string;
   /**
+   * The url of Tolgee API.
+   */
+  apiUrl?: string;
+  format?: Format;
+  /**
    * A path to a custom extractor to use instead of the default one.
    */
   extractor?: string;
   /**
-   * The url of Tolgee API.
-   */
-  apiUrl?: string;
-  /**
    * File glob patterns to your source code, used for keys extraction.
    */
   patterns?: string[];
-  format?: Format;
+  /**
+   * Require namespace to be reachable, turn off if you don't use namespaces. (Default: true)
+   */
+  strictNamespace?: boolean;
+  /**
+   * Default namespace used in extraction if not specified otherwise.
+   */
+  defaultNamespace?: string;
+  /**
+   * Override parser detection.
+   */
+  parser?: "react" | "vue" | "svelte";
   push?: {
     /**
      * Define, which files should be pushed and attach language/namespace to them. By default Tolgee pushes all files specified here, you can filter them by languages and namespaces properties.
@@ -93,7 +105,6 @@ export interface Schema {
      * Specify tags that will be added to newly created keys.
      */
     tagNewKeys?: string[];
-    [k: string]: unknown;
   };
   pull?: {
     /**
@@ -111,7 +122,7 @@ export interface Schema {
     /**
      * List of translation states to include. Defaults all except untranslated.
      */
-    states?: ('UNTRANSLATED' | 'TRANSLATED' | 'REVIEWED')[];
+    states?: ("UNTRANSLATED" | "TRANSLATED" | "REVIEWED")[];
     /**
      * List of tags which to include.
      */
@@ -136,13 +147,10 @@ export interface Schema {
      * Structure delimiter to use. By default, Tolgee interprets `.` as a nested structure. You can change the delimiter, or disable structure formatting by not specifying any value to the option.
      */
     delimiter?: string | null;
-    [k: string]: unknown;
   };
-  [k: string]: unknown;
 }
 export interface FileMatch {
   path: Path;
   language: string;
   namespace?: string;
-  [k: string]: unknown;
 }

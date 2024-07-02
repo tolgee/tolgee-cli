@@ -3,7 +3,7 @@ import { relative } from 'path';
 
 export type WarningMessage = { name: string; description: string };
 
-export const WarningMessages: Record<string, WarningMessage> = {
+export const WarningMessages = {
   W_DYNAMIC_KEY: {
     name: 'Dynamic key',
     description:
@@ -47,7 +47,12 @@ export const WarningMessages: Record<string, WarningMessage> = {
     description:
       'The setup function must be directly defined on-site, and not be a reference to a previously defined function.',
   },
-};
+  W_MISSING_T_SOURCE: {
+    name: 'Expected source of `t` function (useTranslate or getTranslate)',
+    description:
+      "When used like this namespace can't be reliably detected so the warning is emitted, use `--no-strict-namespace` or `config.strictNamespace: false` if you don't use namespaces",
+  },
+} as const satisfies Record<string, WarningMessage>;
 
 /**
  * Dumps warnings emitted during an extraction to stdout, with GitHub integration, and counts them.

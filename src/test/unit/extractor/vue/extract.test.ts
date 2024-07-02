@@ -1,4 +1,21 @@
-import extractKeys from '../../../../extractor/extractor.js';
+import { extractTreeAndReport } from '../../../../extractor/extractor.js';
+import { ExtractOptions } from '../../../../extractor/index.js';
+
+const VERBOSE = false;
+
+async function extractVueKeys(
+  code: string,
+  fileName: string,
+  options?: Partial<ExtractOptions>
+) {
+  const { report } = await extractTreeAndReport(code, fileName, 'vue', {
+    strictNamespace: true,
+    defaultNamespace: undefined,
+    verbose: VERBOSE ? ['extractor'] : undefined,
+    ...options,
+  });
+  return report;
+}
 
 describe('$t', () => {
   it('extracts use of $t in the template', async () => {
@@ -8,7 +25,7 @@ describe('$t', () => {
       </template>
     `;
 
-    const extracted = await extractKeys(code, 'App.vue');
+    const extracted = await extractVueKeys(code, 'App.vue');
     expect(extracted.warnings).toEqual([]);
     expect(extracted.keys).toEqual([{ keyName: 'key1', line: 3 }]);
   });
@@ -21,7 +38,7 @@ describe('$t', () => {
       </template>
     `;
 
-    const extracted = await extractKeys(code, 'App.vue');
+    const extracted = await extractVueKeys(code, 'App.vue');
     expect(extracted.warnings).toEqual([]);
     expect(extracted.keys).toEqual([
       { keyName: 'key1', line: 3 },
@@ -36,7 +53,7 @@ describe('$t', () => {
       </template>
     `;
 
-    const extracted = await extractKeys(code, 'App.vue');
+    const extracted = await extractVueKeys(code, 'App.vue');
     expect(extracted.warnings).toEqual([]);
     expect(extracted.keys).toEqual([]);
   });
@@ -48,45 +65,31 @@ describe('$t', () => {
       </template>
     `;
 
-    const extracted = await extractKeys(code, 'App.vue');
+    const extracted = await extractVueKeys(code, 'App.vue');
     expect(extracted.warnings).toEqual([]);
     expect(extracted.keys).toEqual([{ keyName: 'key1', line: 3 }]);
   });
 
-  it('extracts use of this.$t in scripts', async () => {
+  it('extracts both this.$t and $t', async () => {
     const code = `
       <script>
         export default {
           methods: {
             onClick () {
               alert(this.$t('key1'))
+              alert($t('key2'))
             }
           }
         }
       </script>
     `;
 
-    const extracted = await extractKeys(code, 'App.vue');
+    const extracted = await extractVueKeys(code, 'App.vue');
     expect(extracted.warnings).toEqual([]);
-    expect(extracted.keys).toEqual([{ keyName: 'key1', line: 6 }]);
-  });
-
-  it('does not extract use of $t without this in scripts', async () => {
-    const code = `
-      <script>
-        export default {
-          methods: {
-            onClick () {
-              alert($t('key1'))
-            }
-          }
-        }
-      </script>
-    `;
-
-    const extracted = await extractKeys(code, 'App.vue');
-    expect(extracted.warnings).toEqual([]);
-    expect(extracted.keys).toEqual([]);
+    expect(extracted.keys).toEqual([
+      { keyName: 'key1', line: 6 },
+      { keyName: 'key2', line: 7 },
+    ]);
   });
 
   it('extracts calls to $t(string, string)', async () => {
@@ -96,7 +99,7 @@ describe('$t', () => {
       </template>
     `;
 
-    const extracted = await extractKeys(code, 'App.vue');
+    const extracted = await extractVueKeys(code, 'App.vue');
     expect(extracted.warnings).toEqual([]);
     expect(extracted.keys).toEqual([
       { keyName: 'key1', defaultValue: 'default value', line: 3 },
@@ -110,7 +113,7 @@ describe('$t', () => {
       </template>
     `;
 
-    const extracted = await extractKeys(code, 'App.vue');
+    const extracted = await extractVueKeys(code, 'App.vue');
     expect(extracted.warnings).toEqual([]);
     expect(extracted.keys).toEqual([
       {
@@ -125,11 +128,11 @@ describe('$t', () => {
   it('extracts calls to $t(string, opts)', async () => {
     const code = `
       <template>
-        {{ $t('key1', { defaultValue: 'default value', ns: 'ns' }) }}
+        {{ $t('key1', 'default value', { ns: 'ns' }) }}
       </template>
     `;
 
-    const extracted = await extractKeys(code, 'App.vue');
+    const extracted = await extractVueKeys(code, 'App.vue');
     expect(extracted.warnings).toEqual([]);
     expect(extracted.keys).toEqual([
       {
@@ -148,7 +151,7 @@ describe('$t', () => {
       </template>
     `;
 
-    const extracted = await extractKeys(code, 'App.vue');
+    const extracted = await extractVueKeys(code, 'App.vue');
     expect(extracted.warnings).toEqual([]);
     expect(extracted.keys).toEqual([
       {
@@ -171,7 +174,7 @@ describe('$t', () => {
       </template>
     `;
 
-    const extracted = await extractKeys(code, 'App.vue');
+    const extracted = await extractVueKeys(code, 'App.vue');
     expect(extracted.warnings).toEqual([]);
     expect(extracted.keys).toEqual([
       { keyName: 'key1', line: 3 },
@@ -187,7 +190,7 @@ describe('$t', () => {
       </template>
     `;
 
-    const extracted = await extractKeys(code, 'App.vue');
+    const extracted = await extractVueKeys(code, 'App.vue');
     expect(extracted.warnings).toEqual([]);
     expect(extracted.keys).toEqual([
       { keyName: 'key1', line: 3 },
@@ -205,7 +208,7 @@ describe('$t', () => {
         </template>
       `;
 
-      const extracted = await extractKeys(code, 'App.vue');
+      const extracted = await extractVueKeys(code, 'App.vue');
       expect(extracted.warnings).toEqual([
         { warning: 'W_DYNAMIC_KEY', line: 3 },
         { warning: 'W_DYNAMIC_KEY', line: 4 },
@@ -224,7 +227,7 @@ describe('$t', () => {
         </template>
       `;
 
-      const extracted = await extractKeys(code, 'App.vue');
+      const extracted = await extractVueKeys(code, 'App.vue');
       expect(extracted.warnings).toEqual([
         { warning: 'W_DYNAMIC_NAMESPACE', line: 3 },
         { warning: 'W_DYNAMIC_NAMESPACE', line: 4 },
@@ -237,12 +240,12 @@ describe('$t', () => {
     it('emits a warning on dynamic default value but keeps the key', async () => {
       const code = `
         <template>
-          {{ $t('key1', 'dynamic-' + i) }}
-          {{ $t('key2', \`dynamic-\${i}\`) }}
+          {{ $t('key1', 'dynamic-' + i, {}) }}
+          {{ $t('key2', \`dynamic-\${i}\`, {}) }}
         </template>
       `;
 
-      const extracted = await extractKeys(code, 'App.vue');
+      const extracted = await extractVueKeys(code, 'App.vue');
       expect(extracted.warnings).toEqual([
         { warning: 'W_DYNAMIC_DEFAULT_VALUE', line: 3 },
         { warning: 'W_DYNAMIC_DEFAULT_VALUE', line: 4 },
@@ -260,7 +263,7 @@ describe('$t', () => {
         </template>
       `;
 
-      const extracted = await extractKeys(code, 'App.vue');
+      const extracted = await extractVueKeys(code, 'App.vue');
       expect(extracted.warnings).toEqual([
         {
           warning: 'W_DYNAMIC_OPTIONS',
@@ -283,9 +286,24 @@ describe('useTranslate', () => {
       </template>
     `;
 
-    const extracted = await extractKeys(code, 'App.vue');
+    const extracted = await extractVueKeys(code, 'App.vue');
     expect(extracted.warnings).toEqual([]);
     expect(extracted.keys).toEqual([{ keyName: 'key1', line: 6 }]);
+  });
+
+  it('extracts calls to t in when script is under the template', async () => {
+    const code = `
+      <template>
+        {{ t('key1') }}
+      </template>
+      <script setup> // @tolgee/vue
+        const { t } = useTranslate()
+      </script>
+    `;
+
+    const extracted = await extractVueKeys(code, 'App.vue');
+    expect(extracted.warnings).toEqual([]);
+    expect(extracted.keys).toEqual([{ keyName: 'key1', line: 3 }]);
   });
 
   it('extracts calls to t in v-bind attributes', async () => {
@@ -298,7 +316,7 @@ describe('useTranslate', () => {
       </template>
     `;
 
-    const extracted = await extractKeys(code, 'App.vue');
+    const extracted = await extractVueKeys(code, 'App.vue');
     expect(extracted.warnings).toEqual([]);
     expect(extracted.keys).toEqual([{ keyName: 'key1', line: 6 }]);
   });
@@ -313,12 +331,12 @@ describe('useTranslate', () => {
       </template>
     `;
 
-    const extracted = await extractKeys(code, 'App.vue');
+    const extracted = await extractVueKeys(code, 'App.vue');
     expect(extracted.warnings).toEqual([]);
     expect(extracted.keys).toEqual([]);
   });
 
-  it('extracts calls to t in the setup script after useTranslate was used (script setup)', async () => {
+  it('extracts both t and t.value (script setup)', async () => {
     const code = `
       <script setup> // @tolgee/vue
         const { t } = useTranslate()
@@ -327,31 +345,15 @@ describe('useTranslate', () => {
       </script>
     `;
 
-    const extracted = await extractKeys(code, 'App.vue');
+    const extracted = await extractVueKeys(code, 'App.vue');
     expect(extracted.warnings).toEqual([]);
-    expect(extracted.keys).toEqual([{ keyName: 'key1', line: 4 }]);
+    expect(extracted.keys).toEqual([
+      { keyName: 'key1', line: 4 },
+      { keyName: 'key2', line: 5 },
+    ]);
   });
 
-  it('extracts calls to t in the setup script after useTranslate was used (script)', async () => {
-    const code = `
-      <script> // @tolgee/vue
-        export default {
-          setup () {
-            const { t } = useTranslate()
-            alert(t.value('key1'))
-            alert(t('key2'))
-            return { t }
-          }
-        }
-      </script>
-    `;
-
-    const extracted = await extractKeys(code, 'App.vue');
-    expect(extracted.warnings).toEqual([]);
-    expect(extracted.keys).toEqual([{ keyName: 'key1', line: 6 }]);
-  });
-
-  it('does not extract calls to this.t or t in script', async () => {
+  it('warning on t in script methods', async () => {
     const code = `
       <script> // @tolgee/vue
         export default {
@@ -362,27 +364,33 @@ describe('useTranslate', () => {
           methods: {
             onClick () {
               alert(t('key1'))
-              alert(this.t('key1'))
             }
           }
         }
       </script>
     `;
 
-    const extracted = await extractKeys(code, 'App.vue');
-    expect(extracted.warnings).toEqual([]);
+    const extracted = await extractVueKeys(code, 'App.vue');
+    expect(extracted.warnings).toEqual([
+      { line: 10, warning: 'W_MISSING_T_SOURCE' },
+    ]);
     expect(extracted.keys).toEqual([]);
   });
 
-  it('does not extract calls to t if there was no useTranslate', async () => {
+  it('warning on calls to t if there was no useTranslate', async () => {
     const code = `
       <template> <!-- @tolgee/vue -->
         {{ t('key1') }}
       </template>
     `;
 
-    const extracted = await extractKeys(code, 'App.vue');
-    expect(extracted.warnings).toEqual([]);
+    const extracted = await extractVueKeys(code, 'App.vue');
+    expect(extracted.warnings).toEqual([
+      {
+        line: 3,
+        warning: 'W_MISSING_T_SOURCE',
+      },
+    ]);
     expect(extracted.keys).toEqual([]);
   });
 
@@ -396,10 +404,98 @@ describe('useTranslate', () => {
       </template>
     `;
 
-    const extracted = await extractKeys(code, 'App.vue');
+    const extracted = await extractVueKeys(code, 'App.vue');
     expect(extracted.warnings).toEqual([]);
     expect(extracted.keys).toEqual([
       { keyName: 'key1', namespace: 'ns1', line: 6 },
+    ]);
+  });
+
+  it('namespace specified in useTranslate in setup function', async () => {
+    const code = `
+      <script> // @tolgee/vue
+        export default {
+          setup () {
+            const { t } = useTranslate('ns1')
+            return { t }
+          },
+        }
+      </script>
+      <template>
+        {{ t('key1') }}
+      </template>
+    `;
+
+    const extracted = await extractVueKeys(code, 'App.vue');
+    expect(extracted.warnings).toEqual([]);
+    expect(extracted.keys).toEqual([
+      { keyName: 'key1', namespace: 'ns1', line: 11 },
+    ]);
+  });
+
+  it('namespace in setup function, template above script', async () => {
+    const code = `
+      <template>
+        {{ t('key1') }}
+      </template>
+      <script> // @tolgee/vue
+        export default {
+          setup() {
+            const { t } = useTranslate('ns1')
+            return { t }
+          },
+        }
+      </script>
+    `;
+
+    const extracted = await extractVueKeys(code, 'App.vue');
+    expect(extracted.warnings).toEqual([]);
+    expect(extracted.keys).toEqual([
+      { keyName: 'key1', namespace: 'ns1', line: 3 },
+    ]);
+  });
+
+  it('namespace in setup arrow function', async () => {
+    const code = `
+      <template>
+        {{ t('key1') }}
+      </template>
+      <script> // @tolgee/vue
+        export default {
+          setup: () => {
+            const { t } = useTranslate('ns1')
+            return { t }
+          },
+        }
+      </script>
+    `;
+
+    const extracted = await extractVueKeys(code, 'App.vue');
+    expect(extracted.warnings).toEqual([]);
+    expect(extracted.keys).toEqual([
+      { keyName: 'key1', namespace: 'ns1', line: 3 },
+    ]);
+  });
+
+  it('namespace in setup, regular function', async () => {
+    const code = `
+      <template>
+        {{ t('key1') }}
+      </template>
+      <script> // @tolgee/vue
+        export default {
+          setup: function () {
+            const { t } = useTranslate('ns1')
+            return { t }
+          },
+        }
+      </script>
+    `;
+
+    const extracted = await extractVueKeys(code, 'App.vue');
+    expect(extracted.warnings).toEqual([]);
+    expect(extracted.keys).toEqual([
+      { keyName: 'key1', namespace: 'ns1', line: 3 },
     ]);
   });
 
@@ -413,7 +509,7 @@ describe('useTranslate', () => {
       </template>
     `;
 
-    const extracted = await extractKeys(code, 'App.vue');
+    const extracted = await extractVueKeys(code, 'App.vue');
     expect(extracted.warnings).toEqual([]);
     expect(extracted.keys).toEqual([
       { keyName: 'key1', namespace: 'ns1', line: 6 },
@@ -430,7 +526,7 @@ describe('useTranslate', () => {
       </template>
     `;
 
-    const extracted = await extractKeys(code, 'App.vue');
+    const extracted = await extractVueKeys(code, 'App.vue');
     expect(extracted.warnings).toEqual([]);
     expect(extracted.keys).toEqual([
       { keyName: 'key1', namespace: 'ns2', line: 6 },
@@ -447,7 +543,7 @@ describe('useTranslate', () => {
       </template>
     `;
 
-    const extracted = await extractKeys(code, 'App.vue');
+    const extracted = await extractVueKeys(code, 'App.vue');
     expect(extracted.warnings).toEqual([]);
     expect(extracted.keys).toEqual([
       { keyName: 'key1', defaultValue: 'default value', line: 6 },
@@ -464,7 +560,7 @@ describe('useTranslate', () => {
       </template>
     `;
 
-    const extracted = await extractKeys(code, 'App.vue');
+    const extracted = await extractVueKeys(code, 'App.vue');
     expect(extracted.warnings).toEqual([]);
     expect(extracted.keys).toEqual([
       {
@@ -482,11 +578,11 @@ describe('useTranslate', () => {
         const { t } = useTranslate()
       </script>
       <template>
-        {{ t('key1', { ns: 'ns1', defaultValue: 'default value' }) }}
+        {{ t('key1', 'default value', { ns: 'ns1' }) }}
       </template>
     `;
 
-    const extracted = await extractKeys(code, 'App.vue');
+    const extracted = await extractVueKeys(code, 'App.vue');
     expect(extracted.warnings).toEqual([]);
     expect(extracted.keys).toEqual([
       {
@@ -504,11 +600,11 @@ describe('useTranslate', () => {
         const { t } = useTranslate()
       </script>
       <template>
-        {{ t({ keyName: 'key1', ns: 'ns1', defaultValue: 'default value' }) }}
+        {{ t({ key: 'key1', ns: 'ns1', defaultValue: 'default value' }) }}
       </template>
     `;
 
-    const extracted = await extractKeys(code, 'App.vue');
+    const extracted = await extractVueKeys(code, 'App.vue');
     expect(extracted.warnings).toEqual([]);
     expect(extracted.keys).toEqual([
       {
@@ -533,7 +629,7 @@ describe('useTranslate', () => {
       }
     `;
 
-    const extracted = await extractKeys(code, 'useSomething.ts');
+    const extracted = await extractVueKeys(code, 'useSomething.ts');
     expect(extracted.warnings).toEqual([]);
     expect(extracted.keys).toEqual([{ keyName: 'key1', line: 8 }]);
   });
@@ -551,7 +647,7 @@ describe('useTranslate', () => {
         </template>
       `;
 
-      const extracted = await extractKeys(code, 'App.vue');
+      const extracted = await extractVueKeys(code, 'App.vue');
       expect(extracted.warnings).toEqual([
         { warning: 'W_DYNAMIC_KEY', line: 6 },
         { warning: 'W_DYNAMIC_KEY', line: 7 },
@@ -573,7 +669,7 @@ describe('useTranslate', () => {
         </template>
       `;
 
-      const extracted = await extractKeys(code, 'App.vue');
+      const extracted = await extractVueKeys(code, 'App.vue');
       expect(extracted.warnings).toEqual([
         { warning: 'W_DYNAMIC_NAMESPACE', line: 6 },
         { warning: 'W_DYNAMIC_NAMESPACE', line: 7 },
@@ -609,9 +705,9 @@ describe('useTranslate', () => {
         </template>
       `;
 
-      const extracted1 = await extractKeys(code1, 'App.vue');
-      const extracted2 = await extractKeys(code2, 'App.vue');
-      const extracted3 = await extractKeys(code3, 'App.vue');
+      const extracted1 = await extractVueKeys(code1, 'App.vue');
+      const extracted2 = await extractVueKeys(code2, 'App.vue');
+      const extracted3 = await extractVueKeys(code3, 'App.vue');
 
       const expected = [
         { warning: 'W_DYNAMIC_NAMESPACE', line: 3 },
@@ -631,12 +727,12 @@ describe('useTranslate', () => {
           const { t } = useTranslate()
         </script>
         <template>
-          {{ t('key1', 'dynamic-' + i) }}
-          {{ t('key2', \`dynamic-\${i}\`) }}
+          {{ t('key1', 'dynamic-' + i, {}) }}
+          {{ t('key2', \`dynamic-\${i}\`, {}) }}
         </template>
       `;
 
-      const extracted = await extractKeys(code, 'App.vue');
+      const extracted = await extractVueKeys(code, 'App.vue');
       expect(extracted.warnings).toEqual([
         { warning: 'W_DYNAMIC_DEFAULT_VALUE', line: 6 },
         { warning: 'W_DYNAMIC_DEFAULT_VALUE', line: 7 },
@@ -657,7 +753,7 @@ describe('useTranslate', () => {
         </template>
       `;
 
-      const extracted = await extractKeys(code, 'App.vue');
+      const extracted = await extractVueKeys(code, 'App.vue');
       expect(extracted.warnings).toEqual([
         {
           warning: 'W_DYNAMIC_OPTIONS',
@@ -678,7 +774,7 @@ describe('useTranslate', () => {
         </template>
       `;
 
-      const extracted = await extractKeys(code, 'App.vue');
+      const extracted = await extractVueKeys(code, 'App.vue');
       expect(extracted.warnings).toEqual([
         { warning: 'W_DYNAMIC_NAMESPACE', line: 3 },
         { warning: 'W_UNRESOLVABLE_NAMESPACE', line: 6 },
@@ -697,7 +793,7 @@ describe('useTranslate', () => {
         </script>
       `;
 
-      const extracted = await extractKeys(code, 'App.vue');
+      const extracted = await extractVueKeys(code, 'App.vue');
       expect(extracted.warnings).toEqual([
         { warning: 'W_VUE_SETUP_IS_A_REFERENCE', line: 4 },
       ]);
@@ -716,7 +812,7 @@ describe('<T>', () => {
       </template>
     `;
 
-    const extracted = await extractKeys(code, 'App.vue');
+    const extracted = await extractVueKeys(code, 'App.vue');
     expect(extracted.warnings).toEqual([]);
     expect(extracted.keys).toEqual(expected);
   });
@@ -730,7 +826,7 @@ describe('<T>', () => {
       </template>
     `;
 
-    const extracted = await extractKeys(code, 'App.vue');
+    const extracted = await extractVueKeys(code, 'App.vue');
     expect(extracted.warnings).toEqual([]);
     expect(extracted.keys).toEqual(expected);
   });
@@ -746,7 +842,7 @@ describe('<T>', () => {
       </template>
     `;
 
-    const extracted = await extractKeys(code, 'App.vue');
+    const extracted = await extractVueKeys(code, 'App.vue');
     expect(extracted.warnings).toEqual([]);
     expect(extracted.keys).toEqual(expected);
   });
@@ -760,7 +856,7 @@ describe('<T>', () => {
       </template>
     `;
 
-    const extracted = await extractKeys(code, 'App.vue');
+    const extracted = await extractVueKeys(code, 'App.vue');
     expect(extracted.warnings).toEqual([]);
     expect(extracted.keys).toEqual(expected);
   });
@@ -776,7 +872,7 @@ describe('<T>', () => {
       </template>
     `;
 
-    const extracted = await extractKeys(code, 'App.vue');
+    const extracted = await extractVueKeys(code, 'App.vue');
     expect(extracted.warnings).toEqual([]);
     expect(extracted.keys).toEqual(expected);
   });
@@ -790,7 +886,7 @@ describe('<T>', () => {
       </template>
     `;
 
-    const extracted = await extractKeys(code, 'App.vue');
+    const extracted = await extractVueKeys(code, 'App.vue');
     expect(extracted.warnings).toEqual([]);
     expect(extracted.keys).toEqual(expected);
   });
@@ -815,7 +911,7 @@ describe('<T>', () => {
       </template>
     `;
 
-    const extracted = await extractKeys(code, 'App.vue');
+    const extracted = await extractVueKeys(code, 'App.vue');
     expect(extracted.warnings).toEqual([]);
     expect(extracted.keys).toEqual(expected);
   });
@@ -840,7 +936,7 @@ describe('<T>', () => {
         </template>
       `;
 
-      const extracted = await extractKeys(code, 'App.vue');
+      const extracted = await extractVueKeys(code, 'App.vue');
       expect(extracted.warnings).toEqual(expected);
       expect(extracted.keys).toEqual([]);
     });
@@ -864,7 +960,7 @@ describe('<T>', () => {
         </template>
       `;
 
-      const extracted = await extractKeys(code, 'App.vue');
+      const extracted = await extractVueKeys(code, 'App.vue');
       expect(extracted.warnings).toEqual(expected);
       expect(extracted.keys).toEqual([]);
     });
@@ -893,7 +989,7 @@ describe('<T>', () => {
         </template>
       `;
 
-      const extracted = await extractKeys(code, 'App.vue');
+      const extracted = await extractVueKeys(code, 'App.vue');
       expect(extracted.warnings).toEqual(expectedWarnings);
       expect(extracted.keys).toEqual(expectedKeys);
     });
@@ -913,8 +1009,13 @@ describe('magic comments', () => {
         </template>
       `;
 
-      const extracted = await extractKeys(code, 'App.vue');
-      expect(extracted.warnings).toEqual([]);
+      const extracted = await extractVueKeys(code, 'App.vue');
+      expect(extracted.warnings).toEqual([
+        {
+          line: 7,
+          warning: 'W_MISSING_T_SOURCE',
+        },
+      ]);
       expect(extracted.keys).toEqual([]);
     });
 
@@ -929,7 +1030,7 @@ describe('magic comments', () => {
         </template>
       `;
 
-      const extracted = await extractKeys(code, 'App.vue');
+      const extracted = await extractVueKeys(code, 'App.vue');
       expect(extracted.warnings).toEqual([]);
       expect(extracted.keys).toEqual([]);
     });
@@ -942,7 +1043,7 @@ describe('magic comments', () => {
         </template>
       `;
 
-      const extracted = await extractKeys(code, 'App.vue');
+      const extracted = await extractVueKeys(code, 'App.vue');
       expect(extracted.warnings).toEqual([]);
       expect(extracted.keys).toEqual([]);
     });
@@ -964,7 +1065,7 @@ describe('magic comments', () => {
         </template>
       `;
 
-      const extracted = await extractKeys(code, 'App.vue');
+      const extracted = await extractVueKeys(code, 'App.vue');
       expect(extracted.warnings).toEqual(expected);
       expect(extracted.keys).toEqual([]);
     });
@@ -984,7 +1085,7 @@ describe('magic comments', () => {
         </template>
       `;
 
-      const extracted = await extractKeys(code, 'App.vue');
+      const extracted = await extractVueKeys(code, 'App.vue');
       expect(extracted.warnings).toEqual([]);
       expect(extracted.keys).toEqual([]);
     });
@@ -1000,23 +1101,7 @@ describe('magic comments', () => {
         {{ t('key2', \`dynamic-\${i}\`) }}
       `;
 
-      const extracted = await extractKeys(code, 'App.vue');
-      expect(extracted.warnings).toEqual([]);
-      expect(extracted.keys).toEqual([]);
-    });
-
-    it("suppresses warnings related to useTranslate's subsequent resolve failures", async () => {
-      const code = `
-        <script setup> // @tolgee/vue
-          // @tolgee-ignore
-          const { t } = useTranslate(\`dynamic-ns-\${i}\`)
-        </script>
-        <template>
-          {{ t('key1') }}
-        </template>
-      `;
-
-      const extracted = await extractKeys(code, 'App.vue');
+      const extracted = await extractVueKeys(code, 'App.vue');
       expect(extracted.warnings).toEqual([]);
       expect(extracted.keys).toEqual([]);
     });
@@ -1034,7 +1119,7 @@ describe('magic comments', () => {
         </template>
       `;
 
-      const extracted = await extractKeys(code, 'App.vue');
+      const extracted = await extractVueKeys(code, 'App.vue');
       expect(extracted.warnings).toEqual(expected);
       expect(extracted.keys).toEqual([]);
     });
@@ -1051,7 +1136,7 @@ describe('magic comments', () => {
         </template>
       `;
 
-      const extracted = await extractKeys(code, 'App.vue');
+      const extracted = await extractVueKeys(code, 'App.vue');
       expect(extracted.warnings).toEqual([]);
       expect(extracted.keys).toEqual([]);
     });
@@ -1080,7 +1165,7 @@ describe('magic comments', () => {
         </template>
       `;
 
-      const extracted = await extractKeys(code, 'App.vue');
+      const extracted = await extractVueKeys(code, 'App.vue');
       expect(extracted.keys).toEqual(expected);
     });
 
@@ -1102,7 +1187,7 @@ describe('magic comments', () => {
         </template>
       `;
 
-      const extracted = await extractKeys(code, 'App.vue');
+      const extracted = await extractVueKeys(code, 'App.vue');
       expect(extracted.keys).toEqual(expected);
       expect(extracted.warnings).toEqual([]);
     });
@@ -1117,7 +1202,7 @@ describe('magic comments', () => {
         </template>
       `;
 
-      const extracted = await extractKeys(code, 'App.vue');
+      const extracted = await extractVueKeys(code, 'App.vue');
       expect(extracted.keys).toEqual(expected);
       expect(extracted.warnings).toEqual([]);
     });
@@ -1134,7 +1219,7 @@ describe('magic comments', () => {
         </template>
       `;
 
-      const extracted = await extractKeys(code, 'App.vue');
+      const extracted = await extractVueKeys(code, 'App.vue');
       expect(extracted.warnings).toEqual([]);
     });
 
@@ -1153,7 +1238,7 @@ describe('magic comments', () => {
         </template>
       `;
 
-      const extracted = await extractKeys(code, 'App.vue');
+      const extracted = await extractVueKeys(code, 'App.vue');
       expect(extracted.warnings).toEqual([]);
     });
 
@@ -1170,7 +1255,7 @@ describe('magic comments', () => {
         </template>
       `;
 
-      const extracted = await extractKeys(code, 'App.vue');
+      const extracted = await extractVueKeys(code, 'App.vue');
       expect(extracted.warnings).toEqual(expected);
     });
 
@@ -1186,7 +1271,7 @@ describe('magic comments', () => {
         </template>
       `;
 
-      const extracted = await extractKeys(code, 'App.vue');
+      const extracted = await extractVueKeys(code, 'App.vue');
       expect(extracted.warnings).toEqual([]);
     });
 
@@ -1203,7 +1288,7 @@ describe('magic comments', () => {
         </script>
       `;
 
-      const extracted = await extractKeys(code, 'App.vue');
+      const extracted = await extractVueKeys(code, 'App.vue');
       expect(extracted.warnings).toEqual(expected);
       expect(extracted.keys).toEqual([]);
     });

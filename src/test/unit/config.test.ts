@@ -28,7 +28,9 @@ describe('.tolgeerc', () => {
     expect(cfg).toEqual({
       apiUrl: 'https://app.tolgee.io',
       projectId: 1337,
-      delimiter: '',
+      pull: {
+        delimiter: null,
+      },
     });
   });
 
@@ -57,7 +59,9 @@ describe('.tolgeerc', () => {
     expect(cfg).toEqual({
       apiUrl: 'https://app.tolgee.io',
       projectId: 1337,
-      delimiter: '',
+      pull: {
+        delimiter: null,
+      },
     });
   });
 

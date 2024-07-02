@@ -12,10 +12,21 @@ export type ExtractedKey = Key & {
 
 export type Warning = { warning: string; line: number };
 
+export type VerboseOption = 'extractor';
+
+export type ExtractOptions = {
+  verbose?: VerboseOption[];
+  strictNamespace: boolean;
+  defaultNamespace: string | undefined;
+};
+
+export type ParserType = 'react' | 'vue' | 'svelte';
+
 export type Extractor = (
   fileContents: string,
-  fileName: string
-) => ExtractionResult[];
+  fileName: string,
+  options: ExtractOptions
+) => ExtractionResult;
 
 export type ExtractionResult = { keys: ExtractedKey[]; warnings: Warning[] };
 

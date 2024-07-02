@@ -12,10 +12,15 @@ import {
   API_KEY_OPT,
   API_URL_OPT,
   CONFIG_OPT,
+  DEFAULT_NAMESPACE,
   EXTRACTOR,
   FILE_PATTERNS,
   FORMAT_OPT,
+  STRICT_NAMESPACE,
+  PARSER,
   PROJECT_ID_OPT,
+  STRICT_NAMESPACE_NEGATION,
+  VERBOSE,
 } from './options.js';
 import {
   API_KEY_PAK_PREFIX,
@@ -135,52 +140,40 @@ const preHandler = (config: Schema) =>
     }
 
     // Apply verbosity
-    setDebug(prog.opts().verbose);
+    setDebug(Boolean(prog.opts().verbose));
   };
 
 const program = new Command('tolgee')
   .version(VERSION)
   .configureOutput({ writeErr: error })
-  .description('Command Line Interface to interact with the Tolgee Platform')
-  .option('-v, --verbose', 'Enable verbose logging.');
-
+  .description('Command Line Interface to interact with the Tolgee Platform');
 // get config path to update defaults
 const configPath = getSingleOption(CONFIG_OPT, process.argv);
 
 async function loadConfig(program: Command) {
   const tgConfig = await loadTolgeeRc(configPath);
 
-  if (tgConfig) {
-    [program, ...program.commands].forEach((cmd) =>
-      cmd.options.forEach((opt) => {
-        const key = opt.attributeName();
-        const value = (tgConfig as any)[key];
-        if (value) {
-          const parsedValue = opt.parseArg
-            ? opt.parseArg(value, undefined)
-            : value;
-          cmd.setOptionValueWithSource(key, parsedValue, 'config');
-        }
-      })
-    );
-  }
-
   return tgConfig ?? {};
 }
 
 async function run() {
   try {
-    // Global options
-    program.addOption(CONFIG_OPT);
-    program.addOption(API_URL_OPT.default(DEFAULT_API_URL));
-    program.addOption(API_KEY_OPT);
-    program.addOption(PROJECT_ID_OPT.default(-1));
-    program.addOption(FORMAT_OPT.default('JSON_TOLGEE'));
-    program.addOption(EXTRACTOR);
-    program.addOption(FILE_PATTERNS);
-
     const config = await loadConfig(program);
     program.hook('preAction', preHandler(config));
+
+    // Global options
+    program.addOption(VERBOSE);
+    program.addOption(CONFIG_OPT);
+    program.addOption(API_URL_OPT.default(config.apiUrl ?? DEFAULT_API_URL));
+    program.addOption(API_KEY_OPT);
+    program.addOption(PROJECT_ID_OPT.default(config.projectId ?? -1));
+    program.addOption(FORMAT_OPT.default(config.format ?? 'JSON_TOLGEE'));
+    program.addOption(EXTRACTOR.default(config.extractor));
+    program.addOption(FILE_PATTERNS.default(config.patterns));
+    program.addOption(PARSER.default(config.parser));
+    program.addOption(STRICT_NAMESPACE.default(config.strictNamespace ?? true));
+    program.addOption(STRICT_NAMESPACE_NEGATION);
+    program.addOption(DEFAULT_NAMESPACE.default(config.defaultNamespace));
 
     // Register commands
     program.addCommand(Login);

@@ -59,29 +59,29 @@ console.log('OK: tolgee help works');
 // 2. ensure `tolgee extract` works
 // this test is to ensure textmate grammars have been imported work
 console.log('TEST: tolgee extract print works');
-const TEST_EXTRACTOR_FILE = join(PACKAGE_DEST, 'test.js');
+const TEST_EXTRACTOR_FILE = join(PACKAGE_DEST, 'test.tsx');
 await writeFile(
   TEST_EXTRACTOR_FILE,
   `import '@tolgee/react'\nReact.createElement(T, { keyName: 'owo' })`
 );
 const tolgeeExtract = execOrError(
-  'npx --no tolgee extract print --patterns test.js',
+  'npx --no tolgee extract print --patterns test.tsx',
   {
     cwd: PACKAGE_DEST,
   }
 );
-ok(tolgeeExtract.toString().includes('1 key found in test.js:'));
+ok(tolgeeExtract.toString().includes('1 key found in test.tsx:'));
 console.log('OK: tolgee extract print works');
 
 // 3. ensure `tolgee-cli/extractor` types are importable
 console.log('TEST: tolgee-cli/extractor types are importable');
-const TEST_TYPE_FILE = join(PACKAGE_DEST, 'test.ts');
+const TEST_TYPE_FILE = join(PACKAGE_DEST, 'test.tsx');
 await writeFile(
   TEST_TYPE_FILE,
   `import type { ExtractionResult } from '@tolgee/cli/extractor'`
 );
 execOrError('npm i typescript', { cwd: PACKAGE_DEST });
-const tsc = execOrError('npx --no tsc -- --noEmit --lib es2022 test.ts', {
+const tsc = execOrError('npx --no tsc -- --noEmit --lib es2022 test.tsx', {
   cwd: PACKAGE_DEST,
 });
 ok(!tsc.length);

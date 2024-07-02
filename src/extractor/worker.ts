@@ -1,4 +1,9 @@
-import type { Extractor } from './index.js';
+import type {
+  ExtractOptions,
+  ExtractionResult,
+  Extractor,
+  ParserType,
+} from './index.js';
 import { fileURLToPath } from 'url';
 import { resolve, extname } from 'path';
 import { Worker, isMainThread, parentPort } from 'worker_threads';
@@ -8,7 +13,12 @@ import internalExtractor from './extractor.js';
 import { loadModule } from '../utils/moduleLoader.js';
 import { type Deferred, createDeferred } from '../utils/deferred.js';
 
-export type WorkerParams = { extractor?: string; file: string };
+export type WorkerParams = {
+  extractor?: string;
+  file: string;
+  parserType: ParserType;
+  options: ExtractOptions;
+};
 
 const IS_TS_NODE = extname(import.meta.url) === '.ts';
 
@@ -17,17 +27,18 @@ const IS_TS_NODE = extname(import.meta.url) === '.ts';
 let loadedExtractor: string | undefined | symbol = Symbol('unloaded');
 let extractor: Extractor;
 
-async function handleJob(args: WorkerParams) {
-  if (loadedExtractor !== args.extractor) {
-    loadedExtractor = args.extractor;
-    extractor = args.extractor
-      ? await loadModule(args.extractor).then((mdl) => mdl.default)
-      : internalExtractor;
-  }
-
+async function handleJob(args: WorkerParams): Promise<ExtractionResult> {
   const file = resolve(args.file);
   const code = await readFile(file, 'utf8');
-  return extractor(code, file);
+  if (args.extractor) {
+    if (args.extractor !== loadedExtractor) {
+      loadedExtractor = args.extractor;
+      extractor = await loadModule(args.extractor).then((mdl) => mdl.default);
+    }
+    return extractor(code, file, args.options);
+  } else {
+    return internalExtractor(code, file, args.parserType, args.options);
+  }
 }
 
 async function workerInit() {

@@ -1,4 +1,21 @@
-import extractKeys from '../../../extractor/extractor.js';
+import { extractTreeAndReport } from '../../../extractor/extractor.js';
+import { ExtractOptions } from '../../../extractor/index.js';
+
+const VERBOSE = false;
+
+async function extractSvelteKeys(
+  code: string,
+  fileName: string,
+  options?: Partial<ExtractOptions>
+) {
+  const { report } = await extractTreeAndReport(code, fileName, 'svelte', {
+    strictNamespace: true,
+    defaultNamespace: undefined,
+    verbose: VERBOSE ? ['extractor'] : undefined,
+    ...options,
+  });
+  return report;
+}
 
 describe('getTranslate', () => {
   it('extracts from the t call with signature t(string))', async () => {
@@ -12,7 +29,7 @@ describe('getTranslate', () => {
       {$t('key1')}
     `;
 
-    const extracted = await extractKeys(code, 'App.svelte');
+    const extracted = await extractSvelteKeys(code, 'App.svelte');
     expect(extracted.warnings).toEqual([]);
     expect(extracted.keys).toEqual(expected);
   });
@@ -30,7 +47,7 @@ describe('getTranslate', () => {
       {$t('key1', 'default value')}
     `;
 
-    const extracted = await extractKeys(code, 'App.svelte');
+    const extracted = await extractSvelteKeys(code, 'App.svelte');
     expect(extracted.warnings).toEqual([]);
     expect(extracted.keys).toEqual(expected);
   });
@@ -53,7 +70,7 @@ describe('getTranslate', () => {
       {$t('key1', 'default value', { ns: 'ns', defaultValue: 'ignored' })}
     `;
 
-    const extracted = await extractKeys(code, 'App.svelte');
+    const extracted = await extractSvelteKeys(code, 'App.svelte');
     expect(extracted.warnings).toEqual([]);
     expect(extracted.keys).toEqual(expected);
   });
@@ -73,10 +90,10 @@ describe('getTranslate', () => {
       <script>
         const { t } = getTranslate()
       </script>
-      {$t('key1', { defaultValue: 'default value', ns: 'ns' })}
+      {$t('key1', 'default value', { ns: 'ns' })}
     `;
 
-    const extracted = await extractKeys(code, 'App.svelte');
+    const extracted = await extractSvelteKeys(code, 'App.svelte');
     expect(extracted.warnings).toEqual([]);
     expect(extracted.keys).toEqual(expected);
   });
@@ -99,7 +116,7 @@ describe('getTranslate', () => {
       {$t({ key: 'key1', defaultValue: 'default value', ns: 'ns' })}
     `;
 
-    const extracted = await extractKeys(code, 'App.svelte');
+    const extracted = await extractSvelteKeys(code, 'App.svelte');
     expect(extracted.warnings).toEqual([]);
     expect(extracted.keys).toEqual(expected);
   });
@@ -115,7 +132,23 @@ describe('getTranslate', () => {
       {$t('key1')}
     `;
 
-    const extracted = await extractKeys(code, 'App.svelte');
+    const extracted = await extractSvelteKeys(code, 'App.svelte');
+    expect(extracted.warnings).toEqual([]);
+    expect(extracted.keys).toEqual(expected);
+  });
+
+  it('keeps track of the namespace if script is below template', async () => {
+    const expected = [{ keyName: 'key1', namespace: 'namespace', line: 2 }];
+
+    const code = `
+      {$t('key1')}
+      <script lang="ts">
+        import '@tolgee/svelte';
+        const { t } = getTranslate('namespace')
+      </script>
+    `;
+
+    const extracted = await extractSvelteKeys(code, 'App.svelte');
     expect(extracted.warnings).toEqual([]);
     expect(extracted.keys).toEqual(expected);
   });
@@ -131,7 +164,7 @@ describe('getTranslate', () => {
       {$t('key1')}
     `;
 
-    const extracted = await extractKeys(code, 'App.svelte');
+    const extracted = await extractSvelteKeys(code, 'App.svelte');
     expect(extracted.warnings).toEqual([]);
     expect(extracted.keys).toEqual(expected);
   });
@@ -139,7 +172,7 @@ describe('getTranslate', () => {
   it('overrides the specified namespace if one is passed as parameter', async () => {
     const expected = [
       { keyName: 'key1', namespace: 'ns1', line: 6 },
-      { keyName: 'key2', namespace: undefined, line: 7 },
+      { keyName: 'key2', namespace: '', line: 7 },
     ];
 
     const code = `
@@ -151,12 +184,12 @@ describe('getTranslate', () => {
       {$t('key2', { ns: '' })}
     `;
 
-    const extracted = await extractKeys(code, 'App.svelte');
+    const extracted = await extractSvelteKeys(code, 'App.svelte');
     expect(extracted.warnings).toEqual([]);
     expect(extracted.keys).toEqual(expected);
   });
 
-  it('does not extract if there was no getTranslate call', async () => {
+  it('warning if there was no getTranslate call', async () => {
     const code = `
       <script>import '@tolgee/svelte';</script>
       <script>
@@ -165,8 +198,10 @@ describe('getTranslate', () => {
       {$t('key1')}
     `;
 
-    const extracted = await extractKeys(code, 'App.svelte');
-    expect(extracted.warnings).toEqual([]);
+    const extracted = await extractSvelteKeys(code, 'App.svelte');
+    expect(extracted.warnings).toEqual([
+      { line: 6, warning: 'W_MISSING_T_SOURCE' },
+    ]);
     expect(extracted.keys).toEqual([]);
   });
 
@@ -187,7 +222,7 @@ describe('getTranslate', () => {
       }
     `;
 
-    const extracted = await extractKeys(code, 'App.svelte');
+    const extracted = await extractSvelteKeys(code, 'App.svelte');
     expect(extracted.warnings).toEqual([]);
     expect(extracted.keys).toEqual(expected);
   });
@@ -203,7 +238,7 @@ describe('getTranslate', () => {
       {$t     (      'key1')}
     `;
 
-    const extracted = await extractKeys(code, 'App.svelte');
+    const extracted = await extractSvelteKeys(code, 'App.svelte');
     expect(extracted.warnings).toEqual([]);
     expect(extracted.keys).toEqual(expected);
   });
@@ -226,7 +261,7 @@ describe('getTranslate', () => {
         {$t(key)}
       `;
 
-      const extracted = await extractKeys(code, 'App.svelte');
+      const extracted = await extractSvelteKeys(code, 'App.svelte');
       expect(extracted.warnings).toEqual(expected);
       expect(extracted.keys).toEqual([]);
     });
@@ -250,7 +285,7 @@ describe('getTranslate', () => {
         {$t('key2', { ns })}
       `;
 
-      const extracted = await extractKeys(code, 'App.svelte');
+      const extracted = await extractSvelteKeys(code, 'App.svelte');
       expect(extracted.warnings).toEqual(expected);
       expect(extracted.keys).toEqual([]);
     });
@@ -283,9 +318,9 @@ describe('getTranslate', () => {
         {$t('key1')}
       `;
 
-      const extracted1 = await extractKeys(templateCode, 'App.svelte');
-      const extracted2 = await extractKeys(concatCode, 'App.svelte');
-      const extracted3 = await extractKeys(variableCode, 'App.svelte');
+      const extracted1 = await extractSvelteKeys(templateCode, 'App.svelte');
+      const extracted2 = await extractSvelteKeys(concatCode, 'App.svelte');
+      const extracted3 = await extractSvelteKeys(variableCode, 'App.svelte');
       expect(extracted1.warnings).toEqual(expected);
       expect(extracted1.keys).toEqual([]);
       expect(extracted2.warnings).toEqual(expected);
@@ -313,7 +348,7 @@ describe('getTranslate', () => {
         {$t('key2', { ns: 'static-ns' })}
       `;
 
-      const extracted = await extractKeys(code, 'App.svelte');
+      const extracted = await extractSvelteKeys(code, 'App.svelte');
       expect(extracted.warnings).toEqual(expectedWarnings);
       expect(extracted.keys).toEqual(expectedKeys);
     });
@@ -329,7 +364,7 @@ describe('getTranslate', () => {
         {$t('key1', someValue)}
       `;
 
-      const extracted = await extractKeys(code, 'App.svelte');
+      const extracted = await extractSvelteKeys(code, 'App.svelte');
       expect(extracted.warnings).toEqual(expectedWarnings);
       expect(extracted.keys).toEqual([]);
     });
@@ -338,15 +373,11 @@ describe('getTranslate', () => {
       const expectedWarnings = [
         { warning: 'W_DYNAMIC_DEFAULT_VALUE', line: 6 },
         { warning: 'W_DYNAMIC_DEFAULT_VALUE', line: 7 },
-        { warning: 'W_DYNAMIC_DEFAULT_VALUE', line: 8 },
-        { warning: 'W_DYNAMIC_DEFAULT_VALUE', line: 9 },
       ];
 
       const expectedKeys = [
         { keyName: 'key1', defaultValue: undefined, line: 6 },
         { keyName: 'key2', defaultValue: undefined, line: 7 },
-        { keyName: 'key3', defaultValue: undefined, line: 8 },
-        { keyName: 'key4', defaultValue: undefined, line: 9 },
       ];
 
       const code = `
@@ -354,13 +385,11 @@ describe('getTranslate', () => {
         <script>
           const { t } = getTranslate()
         </script>
-        {$t('key1', 'dynamic-' + i)}
-        {$t('key2', \`dynamic-\${i}\`)}
-        {$t('key3', { defaultValue: 'dynamic-' + i })}
-        {$t('key4', { defaultValue: \`dynamic-\${i}\` })}
+        {$t('key1', 'dynamic-' + i, {})}
+        {$t('key2', \`dynamic-\${i}\`, {})}
       `;
 
-      const extracted = await extractKeys(code, 'App.svelte');
+      const extracted = await extractSvelteKeys(code, 'App.svelte');
       expect(extracted.warnings).toEqual(expectedWarnings);
       expect(extracted.keys).toEqual(expectedKeys);
     });
@@ -376,7 +405,7 @@ describe('<T>', () => {
       <T keyName='key1'/>
     `;
 
-    const extracted = await extractKeys(code, 'App.svelte');
+    const extracted = await extractSvelteKeys(code, 'App.svelte');
     expect(extracted.warnings).toEqual([]);
     expect(extracted.keys).toEqual(expected);
   });
@@ -389,7 +418,7 @@ describe('<T>', () => {
       <T keyName={'key1'}/>
     `;
 
-    const extracted = await extractKeys(code, 'App.svelte');
+    const extracted = await extractSvelteKeys(code, 'App.svelte');
     expect(extracted.warnings).toEqual([]);
     expect(extracted.keys).toEqual(expected);
   });
@@ -404,7 +433,7 @@ describe('<T>', () => {
       <T keyName='key1' defaultValue='default value1'/>
     `;
 
-    const extracted = await extractKeys(code, 'App.svelte');
+    const extracted = await extractSvelteKeys(code, 'App.svelte');
     expect(extracted.warnings).toEqual([]);
     expect(extracted.keys).toEqual(expected);
   });
@@ -417,7 +446,7 @@ describe('<T>', () => {
       <T keyName='key1' ns='ns1'/>
     `;
 
-    const extracted = await extractKeys(code, 'App.svelte');
+    const extracted = await extractSvelteKeys(code, 'App.svelte');
     expect(extracted.warnings).toEqual([]);
     expect(extracted.keys).toEqual(expected);
   });
@@ -432,7 +461,7 @@ describe('<T>', () => {
       </div>
     `;
 
-    const extracted = await extractKeys(code, 'App.svelte');
+    const extracted = await extractSvelteKeys(code, 'App.svelte');
     expect(extracted.warnings).toEqual([]);
     expect(extracted.keys).toEqual(expected);
   });
@@ -445,7 +474,7 @@ describe('<T>', () => {
       <T defaultValue='value' properties={{ a: 'b' }} keyName='key1' />
     `;
 
-    const extracted = await extractKeys(code, 'App.svelte');
+    const extracted = await extractSvelteKeys(code, 'App.svelte');
     expect(extracted.warnings).toEqual([]);
     expect(extracted.keys).toEqual(expected);
   });
@@ -469,7 +498,7 @@ describe('<T>', () => {
       />
     `;
 
-    const extracted = await extractKeys(code, 'App.svelte');
+    const extracted = await extractSvelteKeys(code, 'App.svelte');
     expect(extracted.warnings).toEqual([]);
     expect(extracted.keys).toEqual(expected);
   });
@@ -495,7 +524,7 @@ describe('<T>', () => {
         <T keyName="dynamic-key-{i}" />
       `;
 
-      const extracted = await extractKeys(code, 'App.svelte');
+      const extracted = await extractSvelteKeys(code, 'App.svelte');
       expect(extracted.warnings).toEqual(expected);
       expect(extracted.keys).toEqual([]);
     });
@@ -520,7 +549,7 @@ describe('<T>', () => {
         <T keyName='key2' ns="dynamic-ns-{i}"/>
       `;
 
-      const extracted = await extractKeys(code, 'App.svelte');
+      const extracted = await extractSvelteKeys(code, 'App.svelte');
       expect(extracted.warnings).toEqual(expected);
       expect(extracted.keys).toEqual([]);
     });
@@ -548,7 +577,7 @@ describe('<T>', () => {
         <T keyName='key4' defaultValue="dynamic-{i}"/>
       `;
 
-      const extracted = await extractKeys(code, 'App.svelte');
+      const extracted = await extractSvelteKeys(code, 'App.svelte');
       expect(extracted.warnings).toEqual(expectedWarnings);
       expect(extracted.keys).toEqual(expectedKeys);
     });
@@ -567,8 +596,13 @@ describe('magic comments', () => {
         {$t('uwu')}
       `;
 
-      const extracted = await extractKeys(code, 'App.svelte');
-      expect(extracted.warnings).toEqual([]);
+      const extracted = await extractSvelteKeys(code, 'App.svelte');
+      expect(extracted.warnings).toEqual([
+        {
+          line: 7,
+          warning: 'W_MISSING_T_SOURCE',
+        },
+      ]);
       expect(extracted.keys).toEqual([]);
     });
 
@@ -582,7 +616,7 @@ describe('magic comments', () => {
         {$t('uwu')}
       `;
 
-      const extracted = await extractKeys(code, 'App.svelte');
+      const extracted = await extractSvelteKeys(code, 'App.svelte');
       expect(extracted.warnings).toEqual([]);
       expect(extracted.keys).toEqual([]);
     });
@@ -594,7 +628,7 @@ describe('magic comments', () => {
         <T keyName='hello-world' />
       `;
 
-      const extracted = await extractKeys(code, 'App.svelte');
+      const extracted = await extractSvelteKeys(code, 'App.svelte');
       expect(extracted.warnings).toEqual([]);
       expect(extracted.keys).toEqual([]);
     });
@@ -615,7 +649,7 @@ describe('magic comments', () => {
         <div>uwu</div>
       `;
 
-      const extracted = await extractKeys(code, 'App.svelte');
+      const extracted = await extractSvelteKeys(code, 'App.svelte');
       expect(extracted.warnings).toEqual(expected);
       expect(extracted.keys).toEqual([]);
     });
@@ -634,39 +668,7 @@ describe('magic comments', () => {
         {$t('key2', \`dynamic-\${i}\`)}
       `;
 
-      const extracted = await extractKeys(code, 'App.svelte');
-      expect(extracted.warnings).toEqual([]);
-      expect(extracted.keys).toEqual([]);
-    });
-
-    it("suppresses warnings of ignored getTranslate's $t", async () => {
-      const code = `
-        <script>import '@tolgee/svelte';</script>
-        <script>
-          // @tolgee-ignore
-          const { t } = getTranslate()
-        </script>
-        {$t(\`dynamic-key-\${i}\`)}
-        {$t('key1', { ns: \`dynamic-ns-\${i}\` })}
-        {$t('key2', \`dynamic-\${i}\`)}
-      `;
-
-      const extracted = await extractKeys(code, 'App.svelte');
-      expect(extracted.warnings).toEqual([]);
-      expect(extracted.keys).toEqual([]);
-    });
-
-    it("suppresses warnings related to getTranslate's subsequent resolve failures", async () => {
-      const code = `
-        <script>import '@tolgee/svelte';</script>
-        <script>
-          // @tolgee-ignore
-          const { t } = getTranslate(\`dynamic-ns-\${i}\`)
-        </script>
-        {$t('key1')}
-      `;
-
-      const extracted = await extractKeys(code, 'App.svelte');
+      const extracted = await extractSvelteKeys(code, 'App.svelte');
       expect(extracted.warnings).toEqual([]);
       expect(extracted.keys).toEqual([]);
     });
@@ -683,7 +685,7 @@ describe('magic comments', () => {
         {$t('key1')}
       `;
 
-      const extracted = await extractKeys(code, 'App.svelte');
+      const extracted = await extractSvelteKeys(code, 'App.svelte');
       expect(extracted.warnings).toEqual(expected);
       expect(extracted.keys).toEqual([]);
     });
@@ -699,7 +701,7 @@ describe('magic comments', () => {
         <T keyName='key3' defaultValue={\`dynamic-\${i}\`}/>
       `;
 
-      const extracted = await extractKeys(code, 'App.svelte');
+      const extracted = await extractSvelteKeys(code, 'App.svelte');
       expect(extracted.warnings).toEqual([]);
       expect(extracted.keys).toEqual([]);
     });
@@ -725,7 +727,7 @@ describe('magic comments', () => {
         </script>
       `;
 
-      const extracted = await extractKeys(code, 'App.svelte');
+      const extracted = await extractSvelteKeys(code, 'App.svelte');
       expect(extracted.keys).toEqual(expected);
     });
 
@@ -746,7 +748,7 @@ describe('magic comments', () => {
         {$t('key-props-2')}
       `;
 
-      const extracted = await extractKeys(code, 'App.svelte');
+      const extracted = await extractSvelteKeys(code, 'App.svelte');
       expect(extracted.keys).toEqual(expected);
       expect(extracted.warnings).toEqual([]);
     });
@@ -760,7 +762,7 @@ describe('magic comments', () => {
         <T keyName='key-props-1' />
       `;
 
-      const extracted = await extractKeys(code, 'App.svelte');
+      const extracted = await extractSvelteKeys(code, 'App.svelte');
       expect(extracted.keys).toEqual(expected);
       expect(extracted.warnings).toEqual([]);
     });
@@ -779,7 +781,7 @@ describe('magic comments', () => {
         {$t('key2', \`dynamic-\${i}\`)}
       `;
 
-      const extracted = await extractKeys(code, 'App.svelte');
+      const extracted = await extractSvelteKeys(code, 'App.svelte');
       expect(extracted.warnings).toEqual([]);
     });
 
@@ -795,7 +797,7 @@ describe('magic comments', () => {
         {$t('key1')}
       `;
 
-      const extracted = await extractKeys(code, 'App.svelte');
+      const extracted = await extractSvelteKeys(code, 'App.svelte');
       expect(extracted.warnings).toEqual(expected);
     });
 
@@ -810,7 +812,7 @@ describe('magic comments', () => {
         <T keyName='key3' defaultValue={\`dynamic-\${i}\`}/>
       `;
 
-      const extracted = await extractKeys(code, 'App.svelte');
+      const extracted = await extractSvelteKeys(code, 'App.svelte');
       expect(extracted.warnings).toEqual([]);
     });
 
@@ -828,7 +830,7 @@ describe('magic comments', () => {
         </script>
       `;
 
-      const extracted = await extractKeys(code, 'App.svelte');
+      const extracted = await extractSvelteKeys(code, 'App.svelte');
       expect(extracted.warnings).toEqual(expected);
       expect(extracted.keys).toEqual([]);
     });

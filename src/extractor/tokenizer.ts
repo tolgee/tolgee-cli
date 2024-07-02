@@ -6,15 +6,7 @@ import { createRequire } from 'module';
 
 import TextMate from 'vscode-textmate';
 import Oniguruma from 'vscode-oniguruma';
-
-export type Token = {
-  type: string;
-  token: string;
-  line: number;
-  startIndex: number;
-  endIndex: number;
-  scopes: string[];
-};
+import { Token } from './parser/types.js';
 
 const enum Grammar {
   TYPESCRIPT = 'source.ts',
