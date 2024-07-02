@@ -1,7 +1,7 @@
 import { MachineType } from '../../parser/mergerMachine.js';
 import { VueMappedTokenType } from '../ParserVue.js';
 
-export enum S {
+export const enum S {
   Idle,
   ExpectDefault,
   ExpectBlockStart,

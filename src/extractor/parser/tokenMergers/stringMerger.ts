@@ -1,7 +1,7 @@
 import { GeneralTokenType } from '../generalMapper.js';
 import { MachineType } from '../mergerMachine.js';
 
-export enum S {
+export const enum S {
   Idle,
   RegularString,
   RegularStringEnd,

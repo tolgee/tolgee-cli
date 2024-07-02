@@ -1,7 +1,7 @@
 import { GeneralTokenType } from '../../parser/generalMapper.js';
 import { MachineType } from '../../parser/mergerMachine.js';
 
-export enum S {
+export const enum S {
   Idle,
   ExpectBracket,
 }

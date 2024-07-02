@@ -2,7 +2,7 @@ import { GeneralTokenType } from '../generalMapper.js';
 import { DictNode, GeneralNode, ParserContext, Token } from '../types.js';
 import { parseGeneral } from './parseGeneral.js';
 
-export enum S {
+export const enum S {
   ExpectAttribute,
   ExpectAssign,
   ExpectValue,

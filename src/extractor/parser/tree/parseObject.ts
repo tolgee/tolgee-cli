@@ -9,7 +9,7 @@ import {
 } from '../types.js';
 import { parseGeneral } from './parseGeneral.js';
 
-export enum S {
+export const enum S {
   ExpectProperty,
   ExpectDoubleColon,
   ExpectValue,

@@ -1,7 +1,7 @@
 import { MachineType } from '../../parser/mergerMachine.js';
 import { ReactMappedTokenType } from '../ParserReact.js';
 
-export enum S {
+export const enum S {
   Idle,
   ExpectT,
 }

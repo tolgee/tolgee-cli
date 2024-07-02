@@ -1,7 +1,7 @@
 import { MachineType } from '../../parser/mergerMachine.js';
 import { SvelteMappedTokenType } from '../ParserSvelte.js';
 
-export enum S {
+export const enum S {
   Idle,
   ExpectT,
   ExpectBracket,
