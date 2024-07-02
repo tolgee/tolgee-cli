@@ -23,6 +23,8 @@ export const generalMapper = (token: Token) => {
     case 'string.quoted.single.ts':
     case 'string.quoted.double.ts':
       return 'string.body';
+    case 'constant.character.escape.ts':
+      return 'escaped.character';
 
     // template strings
     case 'punctuation.definition.string.template.begin.ts':

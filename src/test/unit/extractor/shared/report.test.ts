@@ -64,5 +64,21 @@ describe('report not influenced by surrounding block', () => {
 
       expect(report.keys).toEqual([{ keyName: 'keyName', line: 3 }]);
     });
+
+    it('respects default namespace in magic comments', async () => {
+      const report = await getReport(
+        `
+        // @tolgee-key key-override
+        t('keyName')
+        `,
+        FILE_NAME,
+        'react',
+        { defaultNamespace: 'namespace' }
+      );
+
+      expect(report.keys).toEqual([
+        { keyName: 'key-override', namespace: 'namespace', line: 2 },
+      ]);
+    });
   });
 });
