@@ -3,7 +3,7 @@ import { ReactMappedTokenType } from '../../parserReact/ParserReact.js';
 
 const INITIAL_DEPTH = -1;
 
-// in ts files we wan to ignore stuff after 'as' `[count as number]`
+// in ts files we want to ignore stuff after 'as' `[count as number]`
 export const typesAsMergerer = {
   initial: INITIAL_DEPTH,
   step: (depth, token, end) => {

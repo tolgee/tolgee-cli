@@ -3,7 +3,7 @@ import { ReactMappedTokenType } from '../../parserReact/ParserReact.js';
 
 const INITIAL_DEPTH = 0;
 
-// in ts files we wan to ignore type casting (<number> count)
+// in ts files we want to ignore type casting (<number> count)
 export const typesCastMergerer = {
   initial: INITIAL_DEPTH,
   step: (depth, token, end) => {
