@@ -37,10 +37,8 @@
     "json5": "^2.2.3",
     "jsonschema": "^1.4.1",
     "openapi-fetch": "^0.9.7",
-    "undici": "^5.22.1",
     "vscode-oniguruma": "^1.7.0",
     "vscode-textmate": "^9.0.0",
-    "xstate": "^4.38.1",
     "yauzl": "^2.10.0"
   },
   "devDependencies": {

@@ -1,3 +1,4 @@
+import { ExtractOptions, ExtractionResult, ParserType } from '../index.js';
 import { GeneralTokenType } from './generalMapper.js';
 import { ParserIterator } from './iterator.js';
 
@@ -89,3 +90,10 @@ export type ParserContext<T extends string = GeneralTokenType> = {
   ruleMap: RuleMap<T>;
   blocks: BlocksType;
 };
+
+export type ExtractorInternal = (
+  fileContents: string,
+  fileName: string,
+  parserType: ParserType,
+  options: ExtractOptions
+) => ExtractionResult;

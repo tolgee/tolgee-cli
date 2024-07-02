@@ -25,7 +25,6 @@ export type ParserType = 'react' | 'vue' | 'svelte';
 export type Extractor = (
   fileContents: string,
   fileName: string,
-  parserType: ParserType,
   options: ExtractOptions
 ) => ExtractionResult;
 

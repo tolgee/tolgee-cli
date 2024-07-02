@@ -25,19 +25,20 @@ const IS_TS_NODE = extname(import.meta.url) === '.ts';
 // --- Worker functions
 
 let loadedExtractor: string | undefined | symbol = Symbol('unloaded');
-let extractor: Extractor | typeof internalExtractor;
+let extractor: Extractor;
 
 async function handleJob(args: WorkerParams): Promise<ExtractionResult> {
-  if (loadedExtractor !== args.extractor) {
-    loadedExtractor = args.extractor;
-    extractor = args.extractor
-      ? await loadModule(args.extractor).then((mdl) => mdl.default)
-      : internalExtractor;
-  }
-
   const file = resolve(args.file);
   const code = await readFile(file, 'utf8');
-  return extractor(code, file, args.parserType, args.options);
+  if (args.extractor) {
+    if (args.extractor !== loadedExtractor) {
+      loadedExtractor = args.extractor;
+      extractor = await loadModule(args.extractor).then((mdl) => mdl.default);
+    }
+    return extractor(code, file, args.options);
+  } else {
+    return internalExtractor(code, file, args.parserType, args.options);
+  }
 }
 
 async function workerInit() {
