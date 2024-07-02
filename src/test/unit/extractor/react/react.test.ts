@@ -1377,7 +1377,7 @@ describe('magic comments', () => {
 
     it('overrides data from code (JSX-specific)', async () => {
       const expected = [
-        { keyName: 'key-override-1', defaultValue: undefined, line: 6 },
+        { keyName: 'key-override-1', namespace: 'namespace', line: 6 },
       ];
 
       const code = `
@@ -1392,7 +1392,9 @@ describe('magic comments', () => {
         }
       `;
 
-      const extracted = await extractReactKeys(code, 'test.jsx');
+      const extracted = await extractReactKeys(code, 'test.jsx', {
+        defaultNamespace: 'namespace',
+      });
       expect(extracted.keys).toEqual(expected);
       expect(extracted.warnings).toEqual([]);
     });

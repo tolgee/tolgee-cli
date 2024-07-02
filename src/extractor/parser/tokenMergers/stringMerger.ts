@@ -4,9 +4,7 @@ import { MachineType } from '../mergerMachine.js';
 export const enum S {
   Idle,
   RegularString,
-  RegularStringEnd,
   TemplateString,
-  TemplateStringEnd,
 }
 
 export const stringMerger = {
@@ -23,35 +21,46 @@ export const stringMerger = {
         break;
       case S.RegularString:
         if (type === 'string.body') {
-          return S.RegularStringEnd;
+          return S.RegularString;
+        } else if (type === 'escaped.character') {
+          return S.RegularString;
         } else if (type === 'string.end') {
-          return end.MERGE_ALL;
-        }
-        break;
-      case S.RegularStringEnd:
-        if (type === 'string.end') {
           return end.MERGE_ALL;
         }
         break;
       case S.TemplateString:
         if (type === 'string.template.body') {
-          return S.TemplateStringEnd;
+          return S.TemplateString;
+        } else if (type === 'escaped.character') {
+          return S.TemplateString;
         } else if (type === 'string.template.end') {
           return end.MERGE_ALL;
         }
         break;
-      case S.TemplateStringEnd:
-        if (type === 'string.template.end') {
-          return end.MERGE_ALL;
-        }
     }
   },
   customType: 'string',
   resultToken: (matched) => {
-    if (matched.length === 3) {
-      return matched[1].token;
-    } else {
-      return '';
-    }
+    return matched
+      .map((t) => {
+        switch (t.customType) {
+          case 'string.template.body':
+          case 'string.body':
+            return t.token;
+          case 'escaped.character':
+            if (t.token === "\\'") {
+              return "'";
+            }
+            // interpret escape character
+            try {
+              return JSON.parse(`"${t.token}"`);
+            } catch (e) {
+              return t.token;
+            }
+          default:
+            return '';
+        }
+      })
+      .join('');
   },
 } as const satisfies MachineType<GeneralTokenType, S>;

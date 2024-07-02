@@ -138,6 +138,84 @@ describe('Plain JavaScript', () => {
         expect(extractValue(dict.value.key)).toBe('key');
         expect(extractValue(dict.value.ns)).toBe('');
       });
+
+      it('handles strings with newlines', async () => {
+        const dict = await getObject(
+          "const a = { key: 'key', defaultValue: 'default\\nvalue' }",
+          FILE_NAME,
+          'react'
+        );
+
+        JSON.stringify(dict.value.defaultValue);
+
+        expect(extractValue(dict.value.key)).toBe('key');
+        expect(extractValue(dict.value.defaultValue)).toBe('default\nvalue');
+      });
+
+      it('handles strings with newlines in template strings', async () => {
+        const dict = await getObject(
+          "const a = { key: 'key', defaultValue: `default\\nvalue` }",
+          FILE_NAME,
+          'react'
+        );
+
+        JSON.stringify(dict.value.defaultValue);
+
+        expect(extractValue(dict.value.key)).toBe('key');
+        expect(extractValue(dict.value.defaultValue)).toBe('default\nvalue');
+      });
+
+      it('handles strings with escaped backslash', async () => {
+        const dict = await getObject(
+          "const a = { key: 'key', defaultValue: `default\\\\value` }",
+          FILE_NAME,
+          'react'
+        );
+
+        JSON.stringify(dict.value.defaultValue);
+
+        expect(extractValue(dict.value.key)).toBe('key');
+        expect(extractValue(dict.value.defaultValue)).toBe('default\\value');
+      });
+
+      it('handles strings with escaped tab', async () => {
+        const dict = await getObject(
+          "const a = { key: 'key', defaultValue: `default\\tvalue` }",
+          FILE_NAME,
+          'react'
+        );
+
+        JSON.stringify(dict.value.defaultValue);
+
+        expect(extractValue(dict.value.key)).toBe('key');
+        expect(extractValue(dict.value.defaultValue)).toBe('default\tvalue');
+      });
+
+      it('handles strings with escaped quotes', async () => {
+        const dict = await getObject(
+          "const a = { key: 'key', defaultValue: `default\\'value` }",
+          FILE_NAME,
+          'react'
+        );
+
+        JSON.stringify(dict.value.defaultValue);
+
+        expect(extractValue(dict.value.key)).toBe('key');
+        expect(extractValue(dict.value.defaultValue)).toBe("default'value");
+      });
+
+      it('handles strings with escaped double quotes', async () => {
+        const dict = await getObject(
+          "const a = { key: 'key', defaultValue: `default\\\"value` }",
+          FILE_NAME,
+          'react'
+        );
+
+        JSON.stringify(dict.value.defaultValue);
+
+        expect(extractValue(dict.value.key)).toBe('key');
+        expect(extractValue(dict.value.defaultValue)).toBe('default"value');
+      });
     });
   });
 });
