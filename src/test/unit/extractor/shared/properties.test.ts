@@ -193,7 +193,7 @@ describe('Plain JavaScript', () => {
 
       it('handles strings with escaped quotes', async () => {
         const dict = await getObject(
-          "const a = { key: 'key', defaultValue: `default\\'value` }",
+          "const a = { key: 'key', defaultValue: 'default\\'value' }",
           FILE_NAME,
           'react'
         );
@@ -206,7 +206,7 @@ describe('Plain JavaScript', () => {
 
       it('handles strings with escaped double quotes', async () => {
         const dict = await getObject(
-          "const a = { key: 'key', defaultValue: `default\\\"value` }",
+          `const a = { key: "key", defaultValue: "default\\"value" }`,
           FILE_NAME,
           'react'
         );
@@ -215,6 +215,21 @@ describe('Plain JavaScript', () => {
 
         expect(extractValue(dict.value.key)).toBe('key');
         expect(extractValue(dict.value.defaultValue)).toBe('default"value');
+      });
+
+      it('handles strings with escaped unicode chars', async () => {
+        const dict = await getObject(
+          "const a = { key: 'key', defaultValue: 'default\\u{03A9}value' }",
+          FILE_NAME,
+          'react'
+        );
+
+        JSON.stringify(dict.value.defaultValue);
+
+        expect(extractValue(dict.value.key)).toBe('key');
+        expect(extractValue(dict.value.defaultValue)).toBe(
+          'default\u{03A9}value'
+        );
       });
     });
   });

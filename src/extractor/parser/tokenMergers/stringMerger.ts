@@ -1,5 +1,6 @@
 import { GeneralTokenType } from '../generalMapper.js';
 import { MachineType } from '../mergerMachine.js';
+import unescape from 'unescape-js';
 
 export const enum S {
   Idle,
@@ -41,26 +42,19 @@ export const stringMerger = {
   },
   customType: 'string',
   resultToken: (matched) => {
-    return matched
+    const escaped = matched
       .map((t) => {
         switch (t.customType) {
           case 'string.template.body':
           case 'string.body':
-            return t.token;
           case 'escaped.character':
-            if (t.token === "\\'") {
-              return "'";
-            }
-            // interpret escape character
-            try {
-              return JSON.parse(`"${t.token}"`);
-            } catch (e) {
-              return t.token;
-            }
+            return t.token;
+
           default:
             return '';
         }
       })
       .join('');
+    return unescape(escaped);
   },
 } as const satisfies MachineType<GeneralTokenType, S>;
