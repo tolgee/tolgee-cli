@@ -37,7 +37,7 @@ function keyInfoFromComment(
     context.unusedComments.delete(commentAtLine);
     return {
       keyName: commentAtLine.keyName,
-      namespace: commentAtLine.namespace,
+      namespace: commentAtLine.namespace ?? context.options.defaultNamespace,
       defaultValue: commentAtLine.defaultValue,
       line: commentAtLine.line,
     };

@@ -37,6 +37,7 @@
     "json5": "^2.2.3",
     "jsonschema": "^1.4.1",
     "openapi-fetch": "^0.9.7",
+    "unescape-js": "^1.1.4",
     "vscode-oniguruma": "^1.7.0",
     "vscode-textmate": "^9.0.0",
     "yauzl": "^2.10.0"
