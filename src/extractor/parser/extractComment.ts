@@ -1,10 +1,14 @@
 import JSON5 from 'json5';
 
 export type MagicIgnoreComment = {
+  type: 'MAGIC_COMMENT';
+  line: number;
   kind: 'ignore';
 };
 
 export type MagicKeyComment = {
+  type: 'MAGIC_COMMENT';
+  line: number;
   kind: 'key';
   keyName: string;
   namespace?: string;
@@ -20,10 +24,8 @@ export type CommentEvent = {
 export type WarningEvent = { type: 'WARNING'; kind: string; line: number };
 
 export type MagicCommentEvent =
-  | ({ type: 'MAGIC_COMMENT'; line: number } & (
-      | MagicIgnoreComment
-      | MagicKeyComment
-    ))
+  | MagicIgnoreComment
+  | MagicKeyComment
   | WarningEvent;
 
 type KeyOverride = { key: string; ns?: string; defaultValue?: string };

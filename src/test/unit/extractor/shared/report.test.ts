@@ -80,5 +80,25 @@ describe('report not influenced by surrounding block', () => {
         { keyName: 'key-override', namespace: 'namespace', line: 2 },
       ]);
     });
+
+    it('respects default namespace in magic comments (even when there is no `t`)', async () => {
+      const report = await getReport(
+        `
+        // @tolgee-key { "key": "errors.cy1001", "defaultValue": "User not found." }
+        `,
+        FILE_NAME,
+        'react',
+        { defaultNamespace: 'ui' }
+      );
+
+      expect(report.keys).toEqual([
+        {
+          keyName: 'errors.cy1001',
+          namespace: 'ui',
+          defaultValue: 'User not found.',
+          line: 2,
+        },
+      ]);
+    });
   });
 });
