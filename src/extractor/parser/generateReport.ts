@@ -1,4 +1,4 @@
-import { MagicCommentEvent } from './extractComment.js';
+import { MagicCommentEvent, MagicKeyComment } from './extractComment.js';
 import { ExtractOptions, ExtractedKey, Warning } from '../index.js';
 import { GeneralNode, KeyInfoNode, NamespaceInfoNode } from './types.js';
 import { extractString, isString } from './nodeUtils.js';
@@ -26,7 +26,7 @@ function shouldBeIgnored(context: Context, line: number) {
   return isIgnore;
 }
 
-function keyInfoFromComment(
+function commentKeyInfoOnLine(
   context: Context,
   line: number
 ): ExtractedKey | undefined {
@@ -35,14 +35,18 @@ function keyInfoFromComment(
     commentAtLine?.type === 'MAGIC_COMMENT' && commentAtLine.kind === 'key';
   if (isKeyInfo) {
     context.unusedComments.delete(commentAtLine);
-    return {
-      keyName: commentAtLine.keyName,
-      namespace: commentAtLine.namespace ?? context.options.defaultNamespace,
-      defaultValue: commentAtLine.defaultValue,
-      line: commentAtLine.line,
-    };
+    return keyInfoFromComment(context, commentAtLine);
   }
   return undefined;
+}
+
+function keyInfoFromComment(context: Context, info: MagicKeyComment) {
+  return {
+    keyName: info.keyName,
+    namespace: info.namespace ?? context.options.defaultNamespace,
+    defaultValue: info.defaultValue,
+    line: info.line,
+  };
 }
 
 function reportKey(
@@ -65,7 +69,7 @@ function reportKey(
     return { keys, warnings };
   }
 
-  const overrideInfo = keyInfoFromComment(context, node.line);
+  const overrideInfo = commentKeyInfoOnLine(context, node.line);
 
   if (overrideInfo) {
     // key info is overriten by comment
@@ -210,12 +214,7 @@ export function generateReport({
     if (value.type === 'WARNING') {
       context.warnings.push({ line: value.line, warning: value.kind });
     } else if (value.type === 'MAGIC_COMMENT' && value.kind === 'key') {
-      context.keys.push({
-        keyName: value.keyName,
-        namespace: value.namespace,
-        defaultValue: value.defaultValue,
-        line: value.line,
-      });
+      context.keys.push(keyInfoFromComment(context, value));
     } else if (value.type === 'MAGIC_COMMENT' && value.kind === 'ignore') {
       context.warnings.push({ line: value.line, warning: 'W_UNUSED_IGNORE' });
     }
