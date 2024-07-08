@@ -27,8 +27,8 @@ function parseConfig(input: Schema, configDir: string): Schema {
   }
 
   if (rc.projectId !== undefined) {
-    const projectId = Number(rc.projectId); // Number("") returns 0
-    if (!Number.isInteger(projectId) || projectId <= 0) {
+    rc.projectId = Number(rc.projectId); // Number("") returns 0
+    if (!Number.isInteger(rc.projectId) || rc.projectId <= 0) {
       throw new Error(
         'Invalid config: projectId should be an integer representing your project Id'
       );

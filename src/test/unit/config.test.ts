@@ -81,4 +81,14 @@ describe('.tolgeerc', () => {
       expect(path).toContain('/validTolgeeRc/');
     });
   });
+
+  it('converts projectId to number', async () => {
+    const path = fileURLToPath(
+      new URL('./validTolgeeRc/withProjectIdString.json', FIXTURES_PATH)
+    );
+
+    const cfg = (await loadTolgeeRc(path))!;
+
+    expect(cfg.projectId).toBe(1337);
+  });
 });
