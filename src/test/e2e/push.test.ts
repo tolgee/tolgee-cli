@@ -122,11 +122,9 @@ describe('project 3', () => {
     const out = await run([
       '--config',
       PROJECT_3_CONFIG,
-      'push',
       '--api-key',
       pak,
-      '--force-mode',
-      'override',
+      'push',
     ]);
     expect(out.code).toBe(0);
 
