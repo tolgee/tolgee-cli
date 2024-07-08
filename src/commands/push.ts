@@ -208,6 +208,7 @@ export default (config: Schema) =>
       )
         .choices(['OVERRIDE', 'KEEP', 'NO_FORCE'])
         .argParser((v) => v.toUpperCase())
+        .default(config.push?.forceMode)
     )
     .addOption(
       new Option(

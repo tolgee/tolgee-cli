@@ -1,35 +1,36 @@
 {
-  "$schema": "../../../schema.json",
+  "$schema": "../../../../schema.json",
   "push": {
     "files": [
       {
-        "path": "./en.json",
+        "path": "./i18n/en.json",
         "language": "en"
       },
       {
-        "path": "./fr.json",
+        "path": "./i18n/fr.json",
         "language": "fr"
       },
       {
-        "path": "./drinks/en.json",
+        "path": "./i18n/drinks/en.json",
         "language": "en",
         "namespace": "drinks"
       },
       {
-        "path": "./drinks/fr.json",
+        "path": "./i18n/drinks/fr.json",
         "language": "fr",
         "namespace": "drinks"
       },
       {
-        "path": "./food/en.json",
+        "path": "./i18n/food/en.json",
         "language": "en",
         "namespace": "food"
       },
       {
-        "path": "./food/fr.json",
+        "path": "./i18n/food/fr.json",
         "language": "fr",
         "namespace": "food"
       }
-    ]
+    ],
+    "forceMode": "OVERRIDE"
   }
 }
