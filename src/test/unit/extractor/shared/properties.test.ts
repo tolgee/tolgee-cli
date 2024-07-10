@@ -72,7 +72,7 @@ describe('Plain JavaScript', () => {
       expect(extractValue(dict.value.defaultValue)).toBe('def');
     });
 
-    it('extracts object when keys is strings', async () => {
+    it('extracts object when keys are strings', async () => {
       const dict = await getObject(
         `const a = { "key": "key1", 'defaultValue': "def value1" }`,
         FILE_NAME,
