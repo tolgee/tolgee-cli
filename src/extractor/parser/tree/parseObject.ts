@@ -57,7 +57,7 @@ export function parseObject(context: ParserContext<any>): GeneralNode {
 
     switch (state) {
       case S.ExpectProperty:
-        if (type === 'object.key') {
+        if (type === 'object.key' || type === 'string') {
           state = S.ExpectDoubleColon;
           lastKey = token.token;
         } else if (type === 'variable') {
