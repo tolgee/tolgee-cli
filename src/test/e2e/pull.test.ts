@@ -14,6 +14,7 @@ import { TolgeeClient } from '../../client/TolgeeClient.js';
 import { PROJECT_1 } from './utils/api/project1.js';
 import { PROJECT_3 } from './utils/api/project3.js';
 import { NESTED_KEYS_PROJECT } from './utils/api/nestedKeysProject.js';
+import { NESTED_ARRAY_KEYS_PROJECT } from './utils/api/nestedArrayKeysProject.js';
 
 const FIXTURES_PATH = new URL('../__fixtures__/', import.meta.url);
 const PROJECT_1_DATA = fileURLToPath(
@@ -345,5 +346,86 @@ describe('Nested keys project', () => {
     expect(readJsonFile(join(TMP_FOLDER, 'en.json'))).toEqual({
       nested: { keyboard: 'Keyboard' },
     });
+  });
+
+  it('pulls nested structure with arrays', async () => {
+    const out = await run([
+      'pull',
+      '--support-arrays',
+      '--delimiter',
+      '.',
+      '--api-key',
+      pak,
+      '--path',
+      TMP_FOLDER,
+    ]);
+
+    expect(out.code).toBe(0);
+    expect(readJsonFile(join(TMP_FOLDER, 'en.json'))).toEqual({
+      nested: { keyboard: 'Keyboard' },
+    });
+  });
+});
+
+describe('Nested array keys project', () => {
+  setupTemporaryFolder();
+  beforeEach(async () => {
+    client = await createProjectWithClient(
+      'Nested array keys project',
+      NESTED_ARRAY_KEYS_PROJECT
+    );
+    pak = await createPak(client);
+  });
+  afterEach(async () => {
+    deleteProject(client);
+  });
+
+  it('pulls nested structure with arrays', async () => {
+    const out = await run([
+      'pull',
+      '--support-arrays',
+      '--format',
+      'JSON_ICU',
+      '--delimiter',
+      '.',
+      '--api-key',
+      pak,
+      '--path',
+      TMP_FOLDER,
+    ]);
+
+    expect(out.code).toBe(0);
+    expect(readJsonFile(join(TMP_FOLDER, 'en.json'))).toEqual({
+      nested: [
+        {
+          keyboard: 'Keyboard 0',
+        },
+        {
+          keyboard: 'Keyboard 1',
+        },
+      ],
+    });
+  });
+
+  it('pulls nested structure with arrays', async () => {
+    const out = await run([
+      'pull',
+      '--support-arrays',
+      '--format',
+      'YAML_ICU',
+      '--delimiter',
+      '.',
+      '--api-key',
+      pak,
+      '--path',
+      TMP_FOLDER,
+    ]);
+
+    expect(out.code).toBe(0);
+    expect(readFileSync(join(TMP_FOLDER, 'en.yaml')).toString()).toContain(
+      `nested:
+- keyboard: "Keyboard 0"
+- keyboard: "Keyboard 1"`
+    );
   });
 });

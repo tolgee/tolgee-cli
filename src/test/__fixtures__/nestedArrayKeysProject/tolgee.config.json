@@ -1,0 +1,14 @@
+{
+  "$schema": "../../../../schema.json",
+  "pull": {
+    "delimiter": "."
+  },
+  "push": {
+    "files": [
+      {
+        "path": "./en.json",
+        "language": "en"
+      }
+    ]
+  }
+}
