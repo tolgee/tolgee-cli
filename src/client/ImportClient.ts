@@ -23,13 +23,13 @@ export const createImportClient = ({ apiClient }: ImportClientProps) => {
     async import(data: ImportProps) {
       const body = new FormData();
       for (const file of data.files) {
-        // converting paths to possix, so it's correctly matched on the server
+        // converting paths to possix style, so it's correctly matched on the server
         body.append('files', file.data, { filepath: pathToPossix(file.name) });
       }
 
       data.params.fileMappings = data.params.fileMappings.map((i) => ({
         ...i,
-        // converting paths to possix, so it's correctly matched on the server
+        // converting paths to possix style, so it's correctly matched on the server
         fileName: pathToPossix(i.fileName),
       }));
 
