@@ -2,6 +2,7 @@ import type { BodyOf } from './internal/schema.utils.js';
 
 import FormData from 'form-data';
 import type { ApiClient } from './ApiClient.js';
+import { pathToPossix } from '../utils/pathToPossix.js';
 
 type ImportRequest = BodyOf<
   '/v2/projects/{projectId}/single-step-import',
@@ -22,8 +23,15 @@ export const createImportClient = ({ apiClient }: ImportClientProps) => {
     async import(data: ImportProps) {
       const body = new FormData();
       for (const file of data.files) {
-        body.append('files', file.data, { filepath: file.name });
+        // converting paths to possix, so it's correctly matched on the server
+        body.append('files', file.data, { filepath: pathToPossix(file.name) });
       }
+
+      data.params.fileMappings = data.params.fileMappings.map((i) => ({
+        ...i,
+        // converting paths to possix, so it's correctly matched on the server
+        fileName: pathToPossix(i.fileName),
+      }));
 
       body.append('params', JSON.stringify(data.params));
 
