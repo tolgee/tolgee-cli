@@ -15,6 +15,7 @@ import { PROJECT_1 } from './utils/api/project1.js';
 import { PROJECT_3 } from './utils/api/project3.js';
 import { NESTED_KEYS_PROJECT } from './utils/api/nestedKeysProject.js';
 import { NESTED_ARRAY_KEYS_PROJECT } from './utils/api/nestedArrayKeysProject.js';
+import { FULL_LANGUAGE_NAMES_PROJECT } from './utils/api/fullLanguageNamesProject.js';
 
 const FIXTURES_PATH = new URL('../__fixtures__/', import.meta.url);
 const PROJECT_1_DATA = fileURLToPath(
@@ -427,5 +428,80 @@ describe('Nested array keys project', () => {
 - keyboard: "Keyboard 0"
 - keyboard: "Keyboard 1"`
     );
+  });
+
+  it('pulls nested structure with arrays', async () => {
+    const out = await run([
+      'pull',
+      '--support-arrays',
+      '--format',
+      'YAML_ICU',
+      '--delimiter',
+      '.',
+      '--api-key',
+      pak,
+      '--path',
+      TMP_FOLDER,
+    ]);
+
+    expect(out.code).toBe(0);
+    expect(readFileSync(join(TMP_FOLDER, 'en.yaml')).toString()).toContain(
+      `nested:
+- keyboard: "Keyboard 0"
+- keyboard: "Keyboard 1"`
+    );
+  });
+});
+
+describe('Full language names project', () => {
+  setupTemporaryFolder();
+  beforeEach(async () => {
+    client = await createProjectWithClient(
+      'Full language names project',
+      FULL_LANGUAGE_NAMES_PROJECT,
+      {
+        languages: [
+          {
+            name: 'English',
+            originalName: 'English',
+            tag: 'en-GB',
+            flagEmoji: '🇬🇧',
+          },
+          {
+            name: 'French',
+            originalName: 'French',
+            tag: 'fr-FR',
+            flagEmoji: '🇫🇷',
+          },
+        ],
+      }
+    );
+    pak = await createPak(client);
+  });
+  afterEach(async () => {
+    deleteProject(client);
+  });
+
+  it('honors files template structure (language tags with regions)', async () => {
+    const out = await run([
+      'pull',
+      '--api-key',
+      pak,
+      '--exclude-tags',
+      'soda_tag',
+      '--file-structure-template',
+      '{namespace}/{androidLanguageTag}-{languageTag}-{snakeLanguageTag}.{extension}',
+      '--path',
+      TMP_FOLDER,
+    ]);
+
+    expect(out.code).toBe(0);
+    await expect(TMP_FOLDER).toMatchStructure(`
+├── en-rGB-en-GB-en_GB.json
+└── fr-rFR-fr-FR-fr_FR.json
+`);
+    const content = (await import(join(TMP_FOLDER, 'en-rGB-en-GB-en_GB.json')))
+      .default;
+    expect(content).toEqual({ water: 'Water' });
   });
 });
