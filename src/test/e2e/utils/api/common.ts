@@ -44,9 +44,14 @@ export async function deleteProject(client: TolgeeClient) {
   });
 }
 
+type Options = {
+  languages?: components['schemas']['LanguageRequest'][];
+};
+
 export async function createProjectWithClient(
   name: string,
-  data: components['schemas']['ImportKeysResolvableDto']
+  data: components['schemas']['ImportKeysResolvableDto'],
+  options?: Options
 ) {
   const userToken = await userLogin();
   let client = createClient(userToken!);
@@ -56,7 +61,7 @@ export async function createProjectWithClient(
     body: {
       name: name,
       organizationId: organizations.data!._embedded!.organizations![0].id,
-      languages: languagesTestData,
+      languages: options?.languages ?? languagesTestData,
       icuPlaceholders: true,
     },
   });
