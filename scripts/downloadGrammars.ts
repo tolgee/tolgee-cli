@@ -38,8 +38,12 @@ for (const entry of Object.entries(downloaded) as [GrammarName, string][]) {
     );
   }
 
-  // Convert to json is necessary, minify
-  grammar = JSON.stringify(TextMate.parseRawGrammar(grammar));
+  // Convert to json if necessary, minify
+  if (grammar[0] !== '{') {
+    grammar = JSON.stringify(TextMate.parseRawGrammar(grammar));
+  } else {
+    grammar = JSON.stringify(JSON.parse(grammar))
+  }
 
   // Add comment
   grammar = grammar.replace(
