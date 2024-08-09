@@ -28,7 +28,7 @@ jobs:
     strategy:
       matrix:
         # TODO: migrate to macOS latest once GitHub has M3-powered runners (nested virtualization)
-        os: [ubuntu-latest, windows-latest, macos-13]
+        os: [ubuntu-latest, windows-latest, macos-12]
         node: [18, 20, 22]
 
     name: Unit Tests
@@ -42,7 +42,7 @@ jobs:
       - name: Setup docker (Missing on macOS)
         if: runner.os == 'macos'
         run: |
-          brew install docker
+          brew install colima docker
           colima start
 
       - uses: actions/checkout@v4
@@ -64,7 +64,7 @@ jobs:
     strategy:
       matrix:
         # TODO: migrate to macOS latest once GitHub has M3-powered runners (nested virtualization)
-        os: [ubuntu-latest, windows-latest, macos-13]
+        os: [ubuntu-latest, windows-latest, macos-12]
         node: [18, 20, 22]
 
     name: E2E Tests
@@ -78,7 +78,7 @@ jobs:
       - name: Setup docker (Missing on macOS)
         if: runner.os == 'macos'
         run: |
-          brew install docker
+          brew install colima docker
           colima start
 
       - uses: actions/checkout@v4
