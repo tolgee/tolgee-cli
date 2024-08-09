@@ -21,7 +21,7 @@ function parseConfig(input: Schema, configDir: string): Schema {
   if (rc.apiUrl !== undefined) {
     try {
       new URL(rc.apiUrl);
-    } catch (e) {
+    } catch {
       throw new Error('Invalid config: apiUrl is an invalid URL');
     }
   }

@@ -14,11 +14,11 @@ These are the runnable scripts with `npm run`:
 
 General:
 
-- `run-dev`: Run the CLI (with `ts-node`). Use `--` to pass arguments to the CLI rather than NPM: \
+- `run-dev`: Run the CLI (with [`tsx`](https://github.com/privatenumber/tsx)). Use `--` to pass arguments to the CLI rather than NPM: \
   `npm run run-dev -- extract print --extractor react src/**/*.tsx`
 - `build`: Build the CLI.
-- `prettier`: Run Prettier.
-- `lint`: Run Prettier but does not update files (report-only).
+- `eslint`: Run ESLint.
+- `format`: Run ESLint with --fix.
 - `schema`: Generate REST API schemas (see [REST Client](#rest-client))
 
 Tests:
@@ -69,7 +69,7 @@ The Tolgee Extractor/Code Analyzer is one of the biggest components of the CLI, 
 
 #### Adding new TextMate grammars
 
-To add new TextMate grammars, **do not do it manually**! Modify the `scripts/grammars.js` file following these
+To add new TextMate grammars, **do not do it manually**! Modify the `scripts/grammars.ts` file following these
 steps:
 
 - Add the URL to the grammar file to the `Grammars` dictionary.

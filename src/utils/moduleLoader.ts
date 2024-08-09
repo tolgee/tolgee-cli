@@ -1,19 +1,18 @@
 import { extname } from 'path';
-import type { Service } from 'ts-node';
 
-let tsService: Service;
+let tsService: any;
 
 async function registerTsNode() {
   if (!tsService) {
-    try {
-      const tsNode = await import('ts-node');
-      tsService = tsNode.register({ compilerOptions: { module: 'CommonJS' } });
-    } catch (e: any) {
-      if (e.code === 'ERR_MODULE_NOT_FOUND') {
-        throw new Error('ts-node is required to load TypeScript files.');
-      }
-      throw e;
-    }
+    // try {
+    //   const tsNode = await import('ts-node');
+    //   tsService = tsNode.register({ compilerOptions: { module: 'CommonJS' } });
+    // } catch (e: any) {
+    //   if (e.code === 'ERR_MODULE_NOT_FOUND') {
+    //     throw new Error('ts-node is required to load TypeScript files.');
+    //   }
+    //   throw e;
+    // }
   }
 }
 

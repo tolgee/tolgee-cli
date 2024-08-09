@@ -93,8 +93,8 @@ export function compareKeys(
     return a.namespace! > b.namespace!
       ? 1
       : a.namespace! < b.namespace!
-      ? -1
-      : 0;
+        ? -1
+        : 0;
   });
 
   return result;
