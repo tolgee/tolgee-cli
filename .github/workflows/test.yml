@@ -27,24 +27,12 @@ jobs:
   test-unit:
     strategy:
       matrix:
-        # TODO: migrate to macOS latest once GitHub has M3-powered runners (nested virtualization)
-        os: [ubuntu-latest, windows-latest, macos-12]
+        os: [ubuntu-latest, windows-latest, macos-latest]
         node: [18, 20, 22]
 
     name: Unit Tests
     runs-on: ${{ matrix.os }}
     steps:
-      # This step requires support of nested virtualization.
-      # https://developer.apple.com/documentation/virtualization/vzgenericplatformconfiguration/4360553-isnestedvirtualizationsupported
-      #
-      # GitHub provided images don't come with Docker installed due to licensing issues.
-      # https://github.com/actions/runner-images/issues/2150
-      - name: Setup docker (Missing on macOS)
-        if: runner.os == 'macos'
-        run: |
-          brew install colima docker
-          colima start
-
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
@@ -63,24 +51,12 @@ jobs:
   test-e2e:
     strategy:
       matrix:
-        # TODO: migrate to macOS latest once GitHub has M3-powered runners (nested virtualization)
-        os: [ubuntu-latest, windows-latest, macos-12]
+        os: [ubuntu-latest] # TODO: windows-latest, macos-12 (or latest if M3-powered) -- broken Docker support... :(
         node: [18, 20, 22]
 
     name: E2E Tests
     runs-on: ${{ matrix.os }}
     steps:
-      # This step requires support of nested virtualization.
-      # https://developer.apple.com/documentation/virtualization/vzgenericplatformconfiguration/4360553-isnestedvirtualizationsupported
-      #
-      # GitHub provided images don't come with Docker installed due to licensing issues.
-      # https://github.com/actions/runner-images/issues/2150
-      - name: Setup docker (Missing on macOS)
-        if: runner.os == 'macos'
-        run: |
-          brew install colima docker
-          colima start
-
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
