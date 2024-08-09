@@ -1,5 +1,6 @@
+import type { paths } from './internal/schema.generated.js';
+
 import createClient, { ParseAs } from 'openapi-fetch';
-import { paths } from './internal/schema.generated.js';
 import base32Decode from 'base32-decode';
 import { API_KEY_PAK_PREFIX, USER_AGENT } from '../constants.js';
 import { getApiKeyInformation } from './getApiKeyInformation.js';
@@ -73,21 +74,20 @@ export function createApiClient({
   });
 
   apiClient.use({
-    onRequest: (req, options) => {
-      debug(`[HTTP] Requesting: ${req.method} ${req.url}`);
-      return undefined;
+    onRequest: ({ request }) => {
+      debug(`[HTTP] Requesting: ${request.method} ${request.url}`);
     },
-    onResponse: async (res, options) => {
-      debug(`[HTTP] Response: ${res.url} [${res.status}]`);
-      if (autoThrow && !res.ok) {
-        const loadable = await parseResponse(res, options.parseAs);
+    onResponse: async ({ response, options }) => {
+      debug(`[HTTP] Response: ${response.url} [${response.status}]`);
+
+      if (autoThrow && !response.ok) {
+        const loadable = await parseResponse(response, options.parseAs);
         throw new Error(
-          `Tolgee request error ${res.url} ${errorFromLoadable(
+          `Tolgee request error ${response.url} ${errorFromLoadable(
             loadable as any
           )}`
         );
       }
-      return undefined;
     },
   });
 

@@ -31,7 +31,8 @@ const lintHandler = (config: Schema) =>
         console.log('%s:', relFile);
         for (const warning of warnings) {
           if (warning.warning in WarningMessages) {
-            const { name } = WarningMessages[warning.warning];
+            const warn = warning.warning as keyof typeof WarningMessages;
+            const { name } = WarningMessages[warn];
             console.log('\tline %d: %s', warning.line, name);
           } else {
             console.log('\tline %d: %s', warning.line, warning.warning);
