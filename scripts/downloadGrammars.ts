@@ -42,7 +42,7 @@ for (const entry of Object.entries(downloaded) as [GrammarName, string][]) {
   if (grammar[0] !== '{') {
     grammar = JSON.stringify(TextMate.parseRawGrammar(grammar));
   } else {
-    grammar = JSON.stringify(JSON.parse(grammar))
+    grammar = JSON.stringify(JSON.parse(grammar));
   }
 
   // Add comment

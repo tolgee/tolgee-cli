@@ -78,7 +78,7 @@ describe('.tolgeerc', () => {
       ...cfg.patterns!,
       ...cfg.push!.files!.map((f) => f.path),
     ].forEach((path) => {
-      expect(path).toContain('/validTolgeeRc/');
+      expect(path).toMatch(/[/\\]validTolgeeRc[/\\]/);
     });
   });
 
