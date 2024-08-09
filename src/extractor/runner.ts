@@ -4,7 +4,7 @@ import type {
   ParserType,
   VerboseOption,
 } from './index.js';
-import { glob } from 'fast-glob';
+import glob from 'fast-glob';
 import { extname } from 'path';
 
 import { callWorker } from './worker.js';

@@ -69,7 +69,7 @@ describe('Project 1', () => {
     pak = await createPak(client);
   });
   afterEach(async () => {
-    if (client) await deleteProject(client);
+    await deleteProject(client);
   });
 
   it('pulls strings from Tolgee', async () => {
@@ -104,7 +104,7 @@ describe('Project 3', () => {
     pak = await createPak(client);
   });
   afterEach(async () => {
-    if (client) await deleteProject(client);
+    await deleteProject(client);
   });
 
   it('pulls strings with all namespaces from Tolgee', async () => {
@@ -278,7 +278,7 @@ describe('Nested keys project', () => {
     pak = await createPak(client);
   });
   afterEach(async () => {
-    if (client) await deleteProject(client);
+    await deleteProject(client);
   });
 
   it('pulls flat structure with config delmiter: null', async () => {
@@ -378,7 +378,7 @@ describe('Nested array keys project', () => {
     pak = await createPak(client);
   });
   afterEach(async () => {
-    if (client) await deleteProject(client);
+    await deleteProject(client);
   });
 
   it('pulls nested structure with arrays', async () => {
@@ -479,7 +479,7 @@ describe('Full language names project', () => {
     pak = await createPak(client);
   });
   afterEach(async () => {
-    if (client) await deleteProject(client);
+    await deleteProject(client);
   });
 
   it('honors files template structure (language tags with regions)', async () => {

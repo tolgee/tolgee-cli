@@ -41,7 +41,7 @@ describe('Project 1', () => {
   });
 
   afterEach(async () => {
-    if (client) await deleteProject(client);
+    await deleteProject(client);
   });
 
   it('says projects are in sync when they do match', async () => {
@@ -161,7 +161,7 @@ describe('Project 3', () => {
     pak = await createPak(client);
   });
   afterEach(async () => {
-    if (client) await deleteProject(client);
+    await deleteProject(client);
   });
 
   it('handles namespaces properly', async () => {

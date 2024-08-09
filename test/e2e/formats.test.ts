@@ -85,7 +85,7 @@ describe('push and pull with different formats', () => {
     pak = await createPak(client);
   });
   afterEach(async () => {
-    if (client) await deleteProject(client);
+    await deleteProject(client);
   });
 
   it('works with tolgee icu format', async () => {

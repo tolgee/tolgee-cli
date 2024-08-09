@@ -35,9 +35,9 @@ export function createClient(
   return client;
 }
 
-export async function deleteProject(client: TolgeeClient) {
-  await client.DELETE('/v2/projects/{projectId}', {
-    params: { path: { projectId: client.getProjectId() } },
+export async function deleteProject(client: TolgeeClient | undefined) {
+  await client?.DELETE('/v2/projects/{projectId}', {
+    params: { path: { projectId: client?.getProjectId() } },
   });
 }
 
