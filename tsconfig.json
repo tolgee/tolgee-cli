@@ -1,12 +1,7 @@
 {
-  "extends": ["@tsconfig/recommended", "@tsconfig/node18"],
+  "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "types": ["vitest/globals"],
-    "resolveJsonModule": true,
-
-    "declaration": true,
-    "declarationDir": "dist-types",
-    "outDir": "dist"
+    "rootDir": ".",
   },
   "include": ["./src/**/*", "./test/**/*", "./scripts/**/*"],
   "exclude": ["./test/__fixtures__"]

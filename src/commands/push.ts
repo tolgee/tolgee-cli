@@ -156,6 +156,7 @@ const pushHandler = (config: Schema) =>
     }
 
     const params: ImportProps['params'] = {
+      createNewKeys: true,
       forceMode: opts.forceMode,
       overrideKeyDescriptions: opts.overrideKeyDescriptions,
       convertPlaceholdersToIcu: opts.convertPlaceholdersToIcu,
