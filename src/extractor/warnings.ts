@@ -73,7 +73,8 @@ export function dumpWarnings(extractionResult: ExtractionResults) {
       for (const warning of warnings) {
         const warnText =
           warning.warning in WarningMessages
-            ? WarningMessages[warning.warning]!.name
+            ? WarningMessages[warning.warning as keyof typeof WarningMessages]!
+                .name
             : warning.warning;
 
         console.error('\tline %d: %s', warning.line, warnText);
@@ -101,7 +102,8 @@ export function emitGitHubWarning(warning: string, file: string, line: number) {
   file = relative(process.env.GITHUB_WORKSPACE ?? process.cwd(), file);
 
   if (warning in WarningMessages) {
-    const { name, description } = WarningMessages[warning]!;
+    const warn = warning as keyof typeof WarningMessages;
+    const { name, description } = WarningMessages[warn]!;
 
     const encodedDescription = description
       .replaceAll('%', '%25')

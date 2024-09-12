@@ -1,0 +1,11 @@
+{
+  "extends": ["@tsconfig/recommended", "@tsconfig/node18"],
+  "compilerOptions": {
+    "types": ["vitest/globals"],
+    "resolveJsonModule": true,
+
+    "declaration": true,
+    "declarationDir": "dist-types",
+    "outDir": "dist"
+  },
+}

@@ -132,8 +132,8 @@ const preHandler = (config: Schema) =>
           opts.projectId !== undefined
             ? Number(opts.projectId)
             : config.projectId !== undefined
-            ? Number(config.projectId)
-            : undefined,
+              ? Number(config.projectId)
+              : undefined,
       });
 
       cmd.setOptionValue('client', client);

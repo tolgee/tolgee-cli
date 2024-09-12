@@ -3,7 +3,7 @@ import type { BaseOptions } from '../options.js';
 import { extname, join } from 'path';
 import { readdir, readFile, stat } from 'fs/promises';
 import { Command, Option } from 'commander';
-import { glob } from 'glob';
+import glob from 'fast-glob';
 
 import {
   loading,
@@ -156,6 +156,7 @@ const pushHandler = (config: Schema) =>
     }
 
     const params: ImportProps['params'] = {
+      createNewKeys: true,
       forceMode: opts.forceMode,
       overrideKeyDescriptions: opts.overrideKeyDescriptions,
       convertPlaceholdersToIcu: opts.convertPlaceholdersToIcu,

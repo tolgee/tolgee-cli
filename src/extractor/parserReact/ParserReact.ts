@@ -37,7 +37,7 @@ export type ReactToken = Token<ReactTokenType>;
 
 export const ParserReact = () => {
   return Parser<ReactTokenType>({
-    mappers: [generalMapper, reactMapper],
+    mappers: reactMappers,
     blocks: {
       ...DEFAULT_BLOCKS,
     },
