@@ -4,6 +4,7 @@ import { Token } from './parser/types.js';
 import { tokensList } from './visualizers/printTokens.js';
 import { visualizeRules } from './visualizers/visualizeRules.js';
 import { ParserVue } from './parserVue/ParserVue.js';
+import { ParserNgx } from './parserNgx/ParserNgx.js';
 import { ParserSvelte } from './parserSvelte/ParserSvelte.js';
 import { ExtractOptions, ExtractionResult, ParserType } from './index.js';
 import { IteratorListener } from './parser/iterator.js';
@@ -16,6 +17,8 @@ function pickParser(format: ParserType) {
       return ParserVue();
     case 'svelte':
       return ParserSvelte();
+    case 'ngx':
+      return ParserNgx();
   }
 }
 
@@ -48,10 +51,16 @@ export async function extractTreeAndReport(
   });
 
   if (debug) {
-    console.log(JSON.stringify(result.tree, null, 2));
-    console.log(tokensList(tokensMerged));
-    console.log(visualizeRules(tokensMerged, code));
-    console.log(visualizeRules(tokensWithRules, code));
+    console.log(
+      JSON.stringify(result.tree, null, 2) +
+        '\n' +
+        tokensList(tokensMerged) +
+        '\n' +
+        visualizeRules(tokensMerged, code) +
+        '\n' +
+        visualizeRules(tokensWithRules, code) +
+        '\n'
+    );
   }
 
   return result;
