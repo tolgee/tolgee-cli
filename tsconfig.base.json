@@ -3,7 +3,6 @@
   "compilerOptions": {
     "types": ["vitest/globals"],
     "resolveJsonModule": true,
-    "rootDir": "./src",
     "declaration": true,
     "declarationDir": "dist-types",
     "outDir": "dist"

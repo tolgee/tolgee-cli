@@ -1,9 +1,9 @@
-import { parseGeneral } from '#cli/extractor/parser/tree/parseGeneral.js';
+import { parseGeneral } from '../../../../extractor/parser/tree/parseGeneral.js';
 import {
   ArrayNode,
   ParserContext,
   Token,
-} from '#cli/extractor/parser/types.js';
+} from '../../../../extractor/parser/types.js';
 import { NgxTokenType } from '../../ParserNgx.js';
 
 /*

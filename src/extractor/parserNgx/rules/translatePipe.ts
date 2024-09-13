@@ -1,4 +1,4 @@
-import { isString } from '#cli/extractor/parser/nodeUtils.js';
+import { isString } from '../../../extractor/parser/nodeUtils.js';
 import { parseGeneral } from '../../parser/tree/parseGeneral.js';
 import {
   GeneralNode,
