@@ -9,7 +9,7 @@ export const ngxMapper = (token: Token) => {
     case 'punctuation.definition.tag.end.html':
       return token.token === '/>' ? 'tag.self-closing.end' : 'tag.regular.end';
 
-    case 'entity.name.tag.html':
+    case 'html-template.tag.html':
       return 'tag.name';
 
     case 'entity.other.attribute-name.html':
@@ -34,23 +34,20 @@ export const ngxMapper = (token: Token) => {
     case 'comment.block.html':
       return 'comment.block';
 
-    // `export default` is needed to track down setup function
-    case 'keyword.control.export.ts':
-      return 'keyword.export';
-    case 'keyword.control.default.ts':
-      return 'keyword.default';
+    // pipeline operators
+    case 'html-template.ng.expression.operator.logical':
+      return 'operator.logical';
+    case 'html-template.ng.expression.operator.navigator':
+      return 'operator.navigator';
 
-    // curly brackets - blocks
-    case 'punctuation.definition.block.ts':
-      switch (token.token) {
-        case '{':
-          return 'block.begin';
-        case '}':
-          return 'block.end';
-        case '{{':
-          return 'expression.template.begin';
-        case '}}':
-          return 'expression.template.end';
-      }
+    case 'variable.other.property.ts':
+    case 'entity.name.function.pipe.ng':
+      return 'function.call.pipe';
+
+    // angular interpolation
+    case 'html-template.ng.interpolation.begin':
+      return 'expression.template.begin';
+    case 'html-template.ng.interpolation.end':
+      return 'expression.template.end';
   }
 };

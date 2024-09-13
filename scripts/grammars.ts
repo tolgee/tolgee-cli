@@ -28,18 +28,8 @@ export const Grammars: Record<string, UrlString> = {
   Svelte:
     'https://raw.githubusercontent.com/sveltejs/language-tools/master/packages/svelte-vscode/syntaxes/svelte.tmLanguage.src.yaml',
   Vue: 'https://raw.githubusercontent.com/vuejs/language-tools/master/extensions/vscode/syntaxes/vue.tmLanguage.json',
-  AngularExpression:
-    'https://raw.githubusercontent.com/shikijs/textmate-grammars-themes/main/packages/tm-grammars/grammars/angular-expression.json',
   AngularHtml:
-    'https://raw.githubusercontent.com/shikijs/textmate-grammars-themes/main/packages/tm-grammars/grammars/angular-html.json',
-  AngularInlineTemplate:
-    'https://raw.githubusercontent.com/shikijs/textmate-grammars-themes/main/packages/tm-grammars/grammars/angular-inline-template.json',
-  AngularLetDeclaration:
-    'https://raw.githubusercontent.com/shikijs/textmate-grammars-themes/main/packages/tm-grammars/grammars/angular-let-declaration.json',
-  AngularTemplateBlocks:
-    'https://raw.githubusercontent.com/shikijs/textmate-grammars-themes/main/packages/tm-grammars/grammars/angular-template-blocks.json',
-  AngularTemplate:
-    'https://raw.githubusercontent.com/shikijs/textmate-grammars-themes/main/packages/tm-grammars/grammars/angular-template.json',
+    'https://raw.githubusercontent.com/ghaschel/vscode-angular-html/master/syntaxes/html-template.ng.json',
   HTML: 'https://raw.githubusercontent.com/textmate/html.tmbundle/master/Syntaxes/HTML.plist',
 };
 
@@ -60,14 +50,7 @@ export const Licenses: LicenseInformation[] = [
       'https://raw.githubusercontent.com/vuejs/language-tools/master/extensions/vscode/LICENSE',
   },
   {
-    grammars: [
-      'AngularExpression',
-      'AngularHtml',
-      'AngularInlineTemplate',
-      'AngularLetDeclaration',
-      'AngularTemplateBlocks',
-      'AngularTemplate',
-    ],
+    grammars: ['AngularHtml'],
     license:
       'https://raw.githubusercontent.com/ghaschel/vscode-angular-html/master/LICENSE',
   },
@@ -87,20 +70,6 @@ export const Transformers: Record<string, Transformer> = {
     });
   },
   Svelte: (self) => {
-    return JSON.stringify(load(self)).replaceAll('"source.js"', '"source.ts"');
-  },
-  AngularHtml: (self) => {
-    const parsed: any = load(self);
-    // including angular templates
-    parsed.patterns.push({ include: 'expression.ng' });
-    parsed.patterns.push({ include: 'inline-template.ng' });
-    parsed.patterns.push({ include: 'template.let.ng' });
-    parsed.patterns.push({ include: 'template.ng' });
-    parsed.patterns.push({ include: 'template.blocks.ng' });
-
-    return JSON.stringify(parsed);
-  },
-  AngularTemplateBlocks: (self) => {
     return JSON.stringify(load(self)).replaceAll('"source.js"', '"source.ts"');
   },
   Vue: (self) => {

@@ -70,12 +70,7 @@ SOFTWARE.
 
 ---
 Licensing information for the following files:
- - AngularExpression.tmLanguage
  - AngularHtml.tmLanguage
- - AngularInlineTemplate.tmLanguage
- - AngularLetDeclaration.tmLanguage
- - AngularTemplateBlocks.tmLanguage
- - AngularTemplate.tmLanguage
 
 Copyright for portions of project vscode-angular-html are held by [Clay Dunston, 2018]
 as part of project vscode-angular-syntax. All other copyright for project

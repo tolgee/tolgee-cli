@@ -13,13 +13,7 @@ const enum Grammar {
   TYPESCRIPT_TSX = 'source.tsx',
   SVELTE = 'source.svelte',
   VUE = 'source.vue',
-  ANGULAR_EXPRESSION = 'expression.ng',
-  ANGULAR_HTML = 'text.html.derivative.ng',
-  ANGULAR_INLINE_TEMPLATE = 'inline-template.ng',
-  ANGULAR_LET_DECLARATION = 'template.let.ng',
-  ANGULAR_TEMPLATE = 'template.ng',
-  ANGULAR_TEMPLATE_BLOCKS = 'template.blocks.ng',
-  // ANGULAR_HTML_BASIC = 'text.html.basic',
+  ANGULAR_HTML = 'html-template.ng',
   HTML = 'text.html.basic',
   HTML_D = 'text.html.derivative',
 }
@@ -30,27 +24,7 @@ const GrammarFiles: Record<Grammar, URL> = {
   [Grammar.TYPESCRIPT_TSX]: new URL('TypeScriptReact.tmLanguage', GRAMMAR_PATH),
   [Grammar.SVELTE]: new URL('Svelte.tmLanguage', GRAMMAR_PATH),
   [Grammar.VUE]: new URL('Vue.tmLanguage', GRAMMAR_PATH),
-  [Grammar.ANGULAR_EXPRESSION]: new URL(
-    'AngularExpression.tmLanguage',
-    GRAMMAR_PATH
-  ),
   [Grammar.ANGULAR_HTML]: new URL('AngularHtml.tmLanguage', GRAMMAR_PATH),
-  [Grammar.ANGULAR_INLINE_TEMPLATE]: new URL(
-    'AngularInlineTemplate.tmLanguage',
-    GRAMMAR_PATH
-  ),
-  [Grammar.ANGULAR_LET_DECLARATION]: new URL(
-    'AngularLetDeclaration.tmLanguage',
-    GRAMMAR_PATH
-  ),
-  [Grammar.ANGULAR_TEMPLATE]: new URL(
-    'AngularTemplate.tmLanguage',
-    GRAMMAR_PATH
-  ),
-  [Grammar.ANGULAR_TEMPLATE_BLOCKS]: new URL(
-    'AngularTemplateBlocks.tmLanguage',
-    GRAMMAR_PATH
-  ),
   [Grammar.HTML]: new URL('HTML.tmLanguage', GRAMMAR_PATH),
   [Grammar.HTML_D]: new URL('HTML.tmLanguage', GRAMMAR_PATH),
 };

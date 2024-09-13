@@ -3,11 +3,12 @@ import { NgxMappedTokenType } from '../ParserNgx.js';
 
 export const enum S {
   Idle,
-  ExpectT,
+  ExpectName,
+  ExpectTParam,
 }
 
-// <T
-export const tComponentMerger = {
+// <div ... t
+export const componentWithTMerger = {
   initial: S.Idle,
   step: (state, t, end) => {
     const type = t.customType;
@@ -15,14 +16,25 @@ export const tComponentMerger = {
     switch (state) {
       case S.Idle:
         if (type === 'tag.regular.begin') {
-          return S.ExpectT;
+          return S.ExpectName;
         }
         break;
-      case S.ExpectT:
+      case S.ExpectName:
         if (type === 'tag.name') {
-          return end.MERGE_ALL;
+          return S.ExpectTParam;
         }
+        break;
+      case S.ExpectTParam:
+        if (type === 'tag.attribute.name' && t.token === 't') {
+          return end.REPLACE_FIRST;
+        } else if (
+          type === 'tag.self-closing.end' ||
+          type === 'tag.regular.end'
+        ) {
+          return undefined;
+        }
+        return S.ExpectTParam;
     }
   },
-  customType: 'trigger.component',
+  customType: 'trigger.component.with.t',
 } as const satisfies MachineType<NgxMappedTokenType, S>;

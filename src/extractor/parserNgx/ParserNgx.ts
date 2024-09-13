@@ -5,16 +5,10 @@ import { IterableItem, Token } from '../parser/types.js';
 import { GeneralTokenType, generalMapper } from '../parser/generalMapper.js';
 import { ngxMapper } from './ngxMapper.js';
 
-// import { createElementMerger } from './tokenMergers/createElementMerger.js';
-import { tComponentMerger } from './tokenMergers/elementMerger.js';
-import { generalComponent } from './rules/generalComponent.js';
-// import { tFunctionMerger } from './tokenMergers/tFunctionMerger.js';
-// import { useTranslateMerger } from './tokenMergers/useTranslateMerger.js';
-
-// import { ngxCreateElement } from './rules/createElement.js';
-// import { tComponent } from './rules/tComponent.js';
-// import { tFunction } from './rules/tFunction.js';
-// import { useTranslate } from './rules/useTranslate.js';
+import { componentWithTMerger } from './tokenMergers/elementMerger.js';
+import { componentWithT } from './rules/componentWithT.js';
+import { pipeMerger } from './tokenMergers/pipeMerger.js';
+import { translatePipe } from './rules/translatePipe.js';
 
 const ngxMappers = [ngxMapper, generalMapper];
 
@@ -24,10 +18,8 @@ export type NgxMappedTokenType = NonNullable<
 
 export const ngxMergers = pipeMachines([
   ...DEFAULT_MERGERERS,
-  // createElementMerger,
-  // useTranslateMerger,
-  // tFunctionMerger,
-  tComponentMerger,
+  componentWithTMerger,
+  pipeMerger,
 ]);
 
 export type NgxTokenType =
@@ -42,10 +34,7 @@ export const ParserNgx = () => {
     blocks: {
       ...DEFAULT_BLOCKS,
     },
-    rules: [
-      generalComponent,
-      // ngxCreateElement, tComponent, tFunction, useTranslate
-    ],
+    rules: [componentWithT, translatePipe],
     merger: ngxMergers,
   });
 };

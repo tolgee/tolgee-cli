@@ -8,13 +8,14 @@ import {
 } from '../../parser/types.js';
 import type { NgxTokenType } from '../ParserNgx.js';
 
-// <T keyName="test">Default</T>
-// ^^-----------------------^^^^
-export const generalComponent = {
-  trigger: 'trigger.component',
+// <div t key="test"></div>
+// ^-----------------^^^^^^
+export const componentWithT = {
+  trigger: 'trigger.component.with.t',
   call(context) {
     const { getCurrentLine } = context as ParserContext<GeneralTokenType>;
     const line = getCurrentLine();
+    context.tokens.next();
     const { props, child } = parseTag(context);
 
     if (props.type !== 'dict' || !props.value['t']) {

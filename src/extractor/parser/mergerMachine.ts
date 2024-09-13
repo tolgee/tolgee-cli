@@ -21,10 +21,12 @@ function defaultResultToken<T extends string | undefined>(matched: Token<T>[]) {
 
 const MERGE_ALL = Symbol('MERGE_ALL');
 const MERGE_WITHOUT_LAST = Symbol('MERGE_WITHOUT_LAST');
+const REPLACE_FIRST = Symbol('REPLACE_FIRST');
 
 export const endOptions = {
   MERGE_ALL,
   MERGE_WITHOUT_LAST,
+  REPLACE_FIRST,
 };
 
 function createNewToken(
@@ -72,21 +74,32 @@ export function createMachine<M extends MachineType<any, any, any>>(
         continue;
       } else if (
         newState === endOptions.MERGE_ALL ||
-        newState === endOptions.MERGE_WITHOUT_LAST
+        newState === endOptions.MERGE_WITHOUT_LAST ||
+        newState === endOptions.REPLACE_FIRST
       ) {
-        const lastToken =
-          newState === endOptions.MERGE_WITHOUT_LAST ? stack.pop() : undefined;
+        let toMerge: Token[];
+        let after: Token[];
+        if (newState === endOptions.MERGE_ALL) {
+          toMerge = stack;
+          after = [];
+        } else if (newState === endOptions.MERGE_WITHOUT_LAST) {
+          after = [stack.pop()!];
+          toMerge = stack;
+        } else {
+          toMerge = [stack.shift()!];
+          after = stack;
+        }
         const newToken = createNewToken(
-          stack,
+          toMerge,
           machine.customType,
           machine.resultToken ?? defaultResultToken
         );
-        state = machine.initial;
-        stack = [];
         yield newToken;
-        if (lastToken) {
-          yield lastToken;
+        for (const result of after) {
+          yield result;
         }
+        stack = [];
+        state = machine.initial;
         continue;
       } else {
         state = newState;
