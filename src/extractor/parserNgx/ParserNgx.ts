@@ -9,6 +9,7 @@ import { componentWithTMerger } from './tokenMergers/elementMerger.js';
 import { componentWithT } from './rules/componentWithT.js';
 import { pipeMerger } from './tokenMergers/pipeMerger.js';
 import { translatePipe } from './rules/translatePipe.js';
+import { ngxTreeTransform } from './ngxTreeTransform.js';
 
 const ngxMappers = [ngxMapper, generalMapper];
 
@@ -36,5 +37,6 @@ export const ParserNgx = () => {
     },
     rules: [componentWithT, translatePipe],
     merger: ngxMergers,
+    treeTransform: ngxTreeTransform,
   });
 };

@@ -3,7 +3,6 @@ import { NgxMappedTokenType } from '../ParserNgx.js';
 
 export const enum S {
   Idle,
-  ExpectPipe,
   ExpectTranslate,
 }
 
@@ -15,21 +14,14 @@ export const pipeMerger = {
 
     switch (state) {
       case S.Idle:
-        if (type === 'expression.template.begin') {
-          return S.ExpectPipe;
-        }
-        break;
-      case S.ExpectPipe:
-        if (type === 'expression.template.end') {
-          return undefined;
-        } else if (type === 'operator.logical') {
+        if (type === 'operator.logical') {
           return S.ExpectTranslate;
         }
-        return S.ExpectPipe;
+        break;
 
       case S.ExpectTranslate:
         if (type === 'function.call.pipe' && t.token === 'translate') {
-          return end.REPLACE_FIRST;
+          return end.MERGE_ALL;
         }
     }
   },

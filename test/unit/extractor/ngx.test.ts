@@ -1,7 +1,7 @@
 import { extractTreeAndReport } from '#cli/extractor/extractor.js';
 import { ExtractOptions } from '#cli/extractor/index.js';
 
-const VERBOSE = true;
+const VERBOSE = false;
 
 async function extractVueKeys(
   code: string,
@@ -102,6 +102,48 @@ describe('translate pipe', () => {
     const extracted = await extractVueKeys(code, 'test.component.html');
     expect(extracted.warnings).toEqual([]);
     expect(extracted.keys).toEqual([{ keyName: 'key1', line: 3 }]);
+  });
+
+  it('is not confused by key in parentheses', async () => {
+    const code = `
+      <template>
+        {{ ('key1') | translate:{ params: { key: 'not_key1' } } }}
+      </template>
+    `;
+
+    const extracted = await extractVueKeys(code, 'test.component.html');
+    expect(extracted.warnings).toEqual([]);
+    expect(extracted.keys).toEqual([{ keyName: 'key1', line: 3 }]);
+  });
+
+  it('handles nested pipe', async () => {
+    const code = `
+      <template>
+        {{ ('key1' | translate:{ params: { key: 'not_key1' } }) }}
+      </template>
+    `;
+
+    const extracted = await extractVueKeys(code, 'test.component.html');
+    expect(extracted.warnings).toEqual([]);
+    expect(extracted.keys).toEqual([{ keyName: 'key1', line: 3 }]);
+  });
+
+  it('handles multiple pipes', async () => {
+    const code = `
+      <template>
+        {{
+          ('key1' | translate:{ params: { key: 'not_key1' } })
+          + ('key2' | translate:{ params: { key: 'not_key1' } })
+        }}
+      </template>
+    `;
+
+    const extracted = await extractVueKeys(code, 'test.component.html');
+    expect(extracted.warnings).toEqual([]);
+    expect(extracted.keys).toEqual([
+      { keyName: 'key1', line: 4 },
+      { keyName: 'key2', line: 5 },
+    ]);
   });
 
   describe('dynamic data', () => {
