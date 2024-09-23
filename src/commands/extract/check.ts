@@ -23,7 +23,7 @@ const lintHandler = (config: Schema) =>
     let warningCount = 0;
     let filesCount = 0;
     for (const [file, { warnings }] of extracted) {
-      if (warnings.length) {
+      if (warnings?.length) {
         warningCount += warnings.length;
         filesCount++;
 
