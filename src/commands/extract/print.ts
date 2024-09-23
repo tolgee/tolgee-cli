@@ -41,7 +41,7 @@ const printHandler = (config: Schema) =>
         }
       }
 
-      if (warnings.length) {
+      if (warnings?.length) {
         warningCount += warnings.length;
         console.log(
           '%d warning%s %s emitted during extraction:',
@@ -60,7 +60,7 @@ const printHandler = (config: Schema) =>
         }
       }
 
-      if (keys.length || warnings.length) {
+      if (keys.length || warnings?.length) {
         console.log();
       }
     }

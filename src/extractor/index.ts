@@ -28,9 +28,6 @@ export type Extractor = (
   options: ExtractOptions
 ) => ExtractionResult;
 
-export type ExtractionResult = { keys: ExtractedKey[]; warnings: Warning[] };
+export type ExtractionResult = { keys: ExtractedKey[]; warnings?: Warning[] };
 
-export type ExtractionResults = Map<
-  string,
-  { keys: ExtractedKey[]; warnings: Warning[] }
->;
+export type ExtractionResults = Map<string, ExtractionResult>;

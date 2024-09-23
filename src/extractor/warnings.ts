@@ -64,7 +64,7 @@ export function dumpWarnings(extractionResult: ExtractionResults) {
   let warningCount = 0;
 
   for (const [file, { warnings }] of extractionResult.entries()) {
-    if (warnings.length) {
+    if (warnings?.length) {
       if (!warningCount) {
         console.error('Warnings were emitted during extraction.');
       }
