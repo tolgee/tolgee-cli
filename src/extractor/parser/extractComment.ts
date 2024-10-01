@@ -50,10 +50,6 @@ function isValidKeyOverride(data: any): data is KeyOverride {
   return true;
 }
 
-function getEndLine(token: TokenType) {
-  return token.line + (token.token.match(/\n/gm)?.length ?? 0);
-}
-
 type TokenType = {
   token: string;
   line: number;
@@ -62,12 +58,12 @@ type TokenType = {
 export function extractComment(
   token: TokenType
 ): MagicCommentEvent | undefined {
-  const comment = token.token.trim();
+  const comment = token.token.replaceAll(/[^\n]([\w]*\*+)/g, '').trim();
   if (comment.startsWith('@tolgee-ignore')) {
     return {
       type: 'MAGIC_COMMENT',
       kind: 'ignore',
-      line: getEndLine(token),
+      line: token.line,
     };
   }
 
@@ -80,7 +76,7 @@ export function extractComment(
         type: 'MAGIC_COMMENT',
         kind: 'key',
         keyName: data.slice(1),
-        line: getEndLine(token),
+        line: token.line,
       };
     }
 
@@ -93,7 +89,7 @@ export function extractComment(
           return {
             type: 'WARNING',
             kind: 'W_INVALID_KEY_OVERRIDE',
-            line: getEndLine(token),
+            line: token.line,
           };
         } else {
           return {
@@ -102,14 +98,14 @@ export function extractComment(
             keyName: key.key,
             namespace: key.ns,
             defaultValue: key.defaultValue,
-            line: getEndLine(token),
+            line: token.line,
           };
         }
       } catch {
         return {
           type: 'WARNING',
           kind: 'W_MALFORMED_KEY_OVERRIDE',
-          line: getEndLine(token),
+          line: token.line,
         };
       }
     }
@@ -117,7 +113,7 @@ export function extractComment(
       type: 'MAGIC_COMMENT',
       kind: 'key',
       keyName: data,
-      line: getEndLine(token),
+      line: token.line,
     };
   }
 }

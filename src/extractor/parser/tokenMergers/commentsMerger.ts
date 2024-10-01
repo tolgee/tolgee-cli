@@ -41,6 +41,7 @@ export const commentsMerger = {
         .filter((t) => t.customType && t.customType !== 'comment.definition')
         .map((t) => t.token)
         .join(''),
+      line: matched[matched.length - 1].line,
     };
   },
   customType: 'comment',

@@ -647,6 +647,11 @@ describe('magic comments', () => {
             // @tolgee-ignore
             this.translateService.translate('hello-world');
 
+            /* 
+             * @tolgee-ignore
+             */
+            this.translateService.translate('hello-world');
+
             /* @tolgee-ignore */
             this.translateService.translate('hello-world');
 
