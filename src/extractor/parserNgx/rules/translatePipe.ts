@@ -16,6 +16,9 @@ export const translatePipe = {
       'operator.logical',
       'expression.template.end',
       'expression.end',
+      'tag.regular.end',
+      'tag.self-closing.end',
+      'tag.attribute.name',
     ]);
     const keyNode: KeyInfoNode = {
       type: 'keyInfo',
