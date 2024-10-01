@@ -17,9 +17,9 @@ export const generalMapper = (token: Token) => {
 
     // plain strings
     case 'punctuation.definition.string.begin.ts':
-      return 'string.begin';
+      return 'string.quote';
     case 'punctuation.definition.string.end.ts':
-      return 'string.end';
+      return 'string.quote';
     case 'string.quoted.single.ts':
     case 'string.quoted.double.ts':
       return 'string.body';
@@ -28,9 +28,9 @@ export const generalMapper = (token: Token) => {
 
     // template strings
     case 'punctuation.definition.string.template.begin.ts':
-      return 'string.teplate.begin';
+      return 'string.teplate.quote';
     case 'punctuation.definition.string.template.end.ts':
-      return 'string.template.end';
+      return 'string.template.quote';
     case 'string.template.ts':
       return 'string.template.body';
 

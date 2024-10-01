@@ -36,7 +36,7 @@ export const componentWithT = {
           case 'key':
             result.keyName = value;
             break;
-          case 'defaultValue':
+          case 'default':
             result.defaultValue = value;
             break;
           case 'ns':

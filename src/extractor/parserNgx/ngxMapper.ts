@@ -2,7 +2,7 @@ import { Token } from '../parser/types.js';
 
 export const ngxMapper = (token: Token) => {
   switch (token.type) {
-    // vue template tags
+    // ngx template tags
     case 'punctuation.definition.tag.begin.html':
       return token.token === '</' ? 'tag.closing.begin' : 'tag.regular.begin';
 
@@ -12,6 +12,12 @@ export const ngxMapper = (token: Token) => {
     case 'html-template.tag.html':
       return 'tag.name';
 
+    case 'html-template.ng.attributes.generic':
+      return 'tag.attribute.name';
+
+    case 'punctuation.separator.key-value.html-template.ng':
+      return 'operator.assignment';
+
     case 'entity.other.attribute-name.html':
       return 'tag.attribute.name';
     case 'punctuation.separator.key-value.html':
@@ -19,16 +25,32 @@ export const ngxMapper = (token: Token) => {
 
     // html string attributes
     case 'punctuation.definition.string.begin.html':
-      return 'string.begin';
+      return 'string.quote';
     case 'punctuation.definition.string.end.html':
-      return 'string.end';
+      return 'string.quote';
     case 'string.quoted.single.html':
     case 'string.quoted.double.html':
-      return 'string.body';
+      if (token.token === '"' || token.token === "'") {
+        // ignoring qotes around strings and expressions, they are redundant
+        return 'ignore';
+      } else {
+        return 'string';
+      }
     case 'string.unquoted.html':
       return 'string';
 
+    case 'html-template.ng.attributes.input-binding.first-level':
+    case 'html-template.ng.attributes.event-handler':
+      return 'tag.attribute.name';
+
+    case 'punctuation.definition.ng-binding-name.begin.html':
+    case 'punctuation.definition.ng-binding-name.end.html':
+      // ignoring binding brackets, irrelevant for us
+      return 'ignore';
+
     // html comments
+    case 'punctuation.definition.comment.begin.html':
+    case 'punctuation.definition.comment.end.html':
     case 'punctuation.definition.comment.html':
       return 'comment.definition';
     case 'comment.block.html':

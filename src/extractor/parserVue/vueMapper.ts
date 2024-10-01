@@ -28,9 +28,9 @@ export const vueMapper = (token: Token) => {
 
     // html string attributes
     case 'punctuation.definition.string.begin.html':
-      return 'string.begin';
+      return 'string.quote';
     case 'punctuation.definition.string.end.html':
-      return 'string.end';
+      return 'string.quote';
     case 'string.quoted.single.html':
     case 'string.quoted.double.html':
       return 'string.body';

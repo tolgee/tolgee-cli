@@ -14,9 +14,9 @@ export const stringMerger = {
     const type = token.customType;
     switch (state) {
       case S.Idle:
-        if (type === 'string.begin') {
+        if (type === 'string.quote') {
           return S.RegularString;
-        } else if (type === 'string.teplate.begin') {
+        } else if (type === 'string.teplate.quote') {
           return S.TemplateString;
         }
         break;
@@ -25,7 +25,7 @@ export const stringMerger = {
           return S.RegularString;
         } else if (type === 'escaped.character') {
           return S.RegularString;
-        } else if (type === 'string.end') {
+        } else if (type === 'string.quote') {
           return end.MERGE_ALL;
         }
         break;
@@ -34,7 +34,7 @@ export const stringMerger = {
           return S.TemplateString;
         } else if (type === 'escaped.character') {
           return S.TemplateString;
-        } else if (type === 'string.template.end') {
+        } else if (type === 'string.template.quote') {
           return end.MERGE_ALL;
         }
         break;

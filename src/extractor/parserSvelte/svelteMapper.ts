@@ -4,9 +4,9 @@ export const svelteMapper = (token: Token) => {
   switch (token.type) {
     // strings
     case 'punctuation.definition.string.begin.svelte':
-      return 'string.begin';
+      return 'string.quote';
     case 'punctuation.definition.string.end.svelte':
-      return 'string.end';
+      return 'string.quote';
     case 'string.quoted.svelte':
       return 'string.body';
     case 'string.unquoted.svelte':
