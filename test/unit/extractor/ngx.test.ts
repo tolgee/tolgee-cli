@@ -462,7 +462,7 @@ describe('translate service', () => {
 
     const extracted = await extractNgxKeys(code, 'test.ts');
     expect(extracted.warnings).toEqual([]);
-    expect(extracted.keys).toEqual([{ keyName: 'key1', line: 7 }]);
+    expect(extracted.keys).toEqual([{ keyName: 'key1', line: 9 }]);
   });
 
   it('allows for `translationService`', async () => {
