@@ -37,6 +37,8 @@ describe('translate pipe', () => {
         <div [innerHTML]="'key2' | translate" attr></div>
         <div [innerHTML]="'key3' | translate" attr="test"></div>
         <div [innerHTML]="'key4' | translate" />
+        <div [(test.test)]="'key5' | translate" />
+        <div [(argument.test)]="test" [innerHTML]="'key6' | translate" [(another.argument)]="test" />
       </div>
     `;
 
@@ -47,6 +49,8 @@ describe('translate pipe', () => {
       { keyName: 'key2', line: 4 },
       { keyName: 'key3', line: 5 },
       { keyName: 'key4', line: 6 },
+      { keyName: 'key5', line: 7 },
+      { keyName: 'key6', line: 8 },
     ]);
   });
 
