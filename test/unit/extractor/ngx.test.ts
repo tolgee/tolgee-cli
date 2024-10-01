@@ -30,6 +30,26 @@ describe('translate pipe', () => {
     expect(extracted.keys).toEqual([{ keyName: 'key1', line: 3 }]);
   });
 
+  it('extracts use of translate in the attribute', async () => {
+    const code = `
+      <div>
+        <div [innerHTML]="'key1' | translate"></div>
+        <div [innerHTML]="'key2' | translate" attr></div>
+        <div [innerHTML]="'key3' | translate" attr="test"></div>
+        <div [innerHTML]="'key4' | translate" />
+      </div>
+    `;
+
+    const extracted = await extractNgxKeys(code, 'test.component.html');
+    expect(extracted.warnings).toEqual([]);
+    expect(extracted.keys).toEqual([
+      { keyName: 'key1', line: 3 },
+      { keyName: 'key2', line: 4 },
+      { keyName: 'key3', line: 5 },
+      { keyName: 'key4', line: 6 },
+    ]);
+  });
+
   it('extracts use of translate in parameter', async () => {
     const code = `
       <div>
