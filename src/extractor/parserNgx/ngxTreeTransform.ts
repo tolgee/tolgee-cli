@@ -11,7 +11,15 @@ function transformRecursive(root?: GeneralNode) {
     case 'array':
       root.values.forEach((item, i) => {
         if (item.type === 'keyInfo' && item.keyName === undefined) {
-          item.keyName = simplifyNode(root.values[i - 1]);
+          const nodeBefore = simplifyNode(root.values[i - 1]);
+          if (nodeBefore.type === 'dict') {
+            item.keyName = nodeBefore.value['key'];
+            item.namespace = nodeBefore.value['ns'] ?? item.namespace;
+            item.defaultValue =
+              nodeBefore.value['defaultValue'] ?? item.defaultValue;
+          } else {
+            item.keyName = nodeBefore;
+          }
         }
         transformRecursive(item);
       });

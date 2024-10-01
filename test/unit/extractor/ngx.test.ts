@@ -50,6 +50,25 @@ describe('translate pipe', () => {
     ]);
   });
 
+  it('extracts use of translate with object as input', async () => {
+    const code = `
+      <div>
+        {{ { key: 'key1', ns: 'namespace', defaultValue: 'Default value' } | translate }}
+      </div>
+    `;
+
+    const extracted = await extractNgxKeys(code, 'test.component.html');
+    expect(extracted.warnings).toEqual([]);
+    expect(extracted.keys).toEqual([
+      {
+        keyName: 'key1',
+        defaultValue: 'Default value',
+        namespace: 'namespace',
+        line: 3,
+      },
+    ]);
+  });
+
   it('extracts use of translate in parameter', async () => {
     const code = `
       <div>
