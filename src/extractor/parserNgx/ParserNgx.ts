@@ -4,12 +4,15 @@ import { IterableItem, Token } from '../parser/types.js';
 
 import { GeneralTokenType, generalMapper } from '../parser/generalMapper.js';
 import { ngxMapper } from './ngxMapper.js';
+import { ngxTreeTransform } from './ngxTreeTransform.js';
 
 import { componentWithTMerger } from './tokenMergers/elementMerger.js';
-import { componentWithT } from './rules/componentWithT.js';
+import { translateMerger } from './tokenMergers/translateMerger.js';
 import { pipeMerger } from './tokenMergers/pipeMerger.js';
+
+import { componentWithT } from './rules/componentWithT.js';
 import { translatePipe } from './rules/translatePipe.js';
-import { ngxTreeTransform } from './ngxTreeTransform.js';
+import { translateFunction } from './rules/translateFunction.js';
 
 const ngxMappers = [ngxMapper, generalMapper];
 
@@ -21,6 +24,7 @@ export const ngxMergers = pipeMachines([
   ...DEFAULT_MERGERERS,
   componentWithTMerger,
   pipeMerger,
+  translateMerger,
 ]);
 
 export type NgxTokenType =
@@ -35,7 +39,7 @@ export const ParserNgx = () => {
     blocks: {
       ...DEFAULT_BLOCKS,
     },
-    rules: [componentWithT, translatePipe],
+    rules: [componentWithT, translatePipe, translateFunction],
     merger: ngxMergers,
     treeTransform: ngxTreeTransform,
   });

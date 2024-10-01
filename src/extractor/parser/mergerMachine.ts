@@ -1,5 +1,11 @@
 import { Token } from './types.js';
 
+export type MergeResult<T extends string | undefined> = {
+  before: Token<T>[];
+  toMerge: Token<T>[];
+  after: Token<T>[];
+};
+
 export type MachineType<
   TokenType extends string | undefined,
   State,
@@ -12,28 +18,28 @@ export type MachineType<
     end: typeof endOptions
   ) => State | symbol | undefined;
   customType: CustomTokenType;
-  resultToken?: (matched: Token<TokenType>[]) => string;
+  resultToken?: (matched: Token<TokenType>[]) => Partial<Token>;
+  customMerge?: (tokens: Token<TokenType>[]) => MergeResult<TokenType>;
 };
-
-function defaultResultToken<T extends string | undefined>(matched: Token<T>[]) {
-  return matched.map((t) => t.token).join('');
-}
 
 const MERGE_ALL = Symbol('MERGE_ALL');
 const MERGE_WITHOUT_LAST = Symbol('MERGE_WITHOUT_LAST');
 const REPLACE_FIRST = Symbol('REPLACE_FIRST');
+const MERGE_CUSTOM = Symbol('MERGE_CUSTOM');
 
 export const endOptions = {
   MERGE_ALL,
   MERGE_WITHOUT_LAST,
   REPLACE_FIRST,
+  MERGE_CUSTOM,
 };
 
 function createNewToken(
   tokens: Token[],
   customType: string,
-  merger: (matched: Token[]) => string
+  merger: ((matched: Token[]) => Partial<Token>) | undefined
 ) {
+  const mergerData = merger?.(tokens);
   return {
     customType,
     type: 'custom',
@@ -41,7 +47,8 @@ function createNewToken(
     endIndex: tokens[tokens.length - 1].endIndex,
     scopes: [],
     line: tokens[0].line,
-    token: merger(tokens),
+    token: tokens.map((t) => t.token).join(''),
+    ...mergerData,
   } satisfies Token;
 }
 
@@ -75,8 +82,10 @@ export function createMachine<M extends MachineType<any, any, any>>(
       } else if (
         newState === endOptions.MERGE_ALL ||
         newState === endOptions.MERGE_WITHOUT_LAST ||
-        newState === endOptions.REPLACE_FIRST
+        newState === endOptions.REPLACE_FIRST ||
+        newState === endOptions.MERGE_CUSTOM
       ) {
+        let before: Token[] = [];
         let toMerge: Token[];
         let after: Token[];
         if (newState === endOptions.MERGE_ALL) {
@@ -85,15 +94,26 @@ export function createMachine<M extends MachineType<any, any, any>>(
         } else if (newState === endOptions.MERGE_WITHOUT_LAST) {
           after = [stack.pop()!];
           toMerge = stack;
-        } else {
+        } else if (newState === endOptions.REPLACE_FIRST) {
           toMerge = [stack.shift()!];
           after = stack;
+        } else {
+          if (!machine.customMerge) {
+            throw new Error('No custom merge cpecified');
+          }
+          const result = machine.customMerge(stack);
+          before = result.before;
+          toMerge = result.toMerge;
+          after = result.after;
         }
         const newToken = createNewToken(
           toMerge,
           machine.customType,
-          machine.resultToken ?? defaultResultToken
+          machine.resultToken
         );
+        for (const result of before) {
+          yield result;
+        }
         yield newToken;
         for (const result of after) {
           yield result;

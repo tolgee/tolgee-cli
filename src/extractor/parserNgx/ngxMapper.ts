@@ -66,6 +66,9 @@ export const ngxMapper = (token: Token) => {
     case 'entity.name.function.pipe.ng':
       return 'function.call.pipe';
 
+    case 'variable.other.object.property.ts':
+      return 'variable';
+
     // angular interpolation
     case 'html-template.ng.interpolation.begin':
       return 'expression.template.begin';

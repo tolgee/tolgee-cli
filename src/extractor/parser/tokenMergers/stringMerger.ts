@@ -55,6 +55,6 @@ export const stringMerger = {
         }
       })
       .join('');
-    return unescape(escaped);
+    return { token: unescape(escaped) };
   },
 } as const satisfies MachineType<GeneralTokenType, S>;
