@@ -508,21 +508,6 @@ describe('translate service', () => {
     expect(extracted.keys).toEqual([{ keyName: 'key1', line: 9 }]);
   });
 
-  it('allows for `translationService`', async () => {
-    const code = `
-      class AppComponent {
-        constructor(private translationService: TranslateService) {}
-        async ngOnInit(): Promise<void> {
-          this.translationService.translate('key1');
-        }
-      }
-    `;
-
-    const extracted = await extractNgxKeys(code, 'test.ts');
-    expect(extracted.warnings).toEqual([]);
-    expect(extracted.keys).toEqual([{ keyName: 'key1', line: 5 }]);
-  });
-
   it('extracts namespace and default value', async () => {
     const code = `
       class AppComponent {

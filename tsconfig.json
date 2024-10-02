@@ -1,8 +1,5 @@
 {
   "extends": "./tsconfig.base.json",
   "include": ["./src/**/*", "./test/**/*", "./scripts/**/*"],
-  "compilerOptions": {
-    "rootDir": "./src"
-  },
   "exclude": ["./test/__fixtures__"]
 }

@@ -116,7 +116,7 @@ export const DEFAULT_NAMESPACE = new Option(
 export const PARSER = new Option(
   '--parser <parser>',
   'Override parser detection.'
-).choices(['react', 'vue', 'svelte']);
+).choices(['react', 'vue', 'svelte', 'ngx']);
 
 export const VERBOSE = new Option(
   '-v, --verbose [rules...]',

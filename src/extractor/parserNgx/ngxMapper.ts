@@ -31,7 +31,10 @@ export const ngxMapper = (token: Token) => {
     case 'string.quoted.single.html':
     case 'string.quoted.double.html':
       if (token.token === '"' || token.token === "'") {
-        // ignoring qotes around strings and expressions, they are redundant
+        // ignoring qotes around strings and expressions
+        // we can just take the content without them
+        // as otherwise we would need to distinguish if it's an expression or string
+        // (angular grammar doesn't do this for some reason)
         return 'ignore';
       } else {
         return 'string';

@@ -1,7 +1,7 @@
 import { GeneralTokenType } from '../../parser/generalMapper.js';
 import { MachineType } from '../../parser/mergerMachine.js';
 
-const SERVICE_NAME_POSSIBILITIES = ['translateService', 'translationService'];
+const SERVICE_NAME_POSSIBILITIES = ['translateService'];
 
 const TRANSLATE_FUNCTION_NAMES = ['translate', 'instant', 'get'];
 
