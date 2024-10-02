@@ -1,5 +1,3 @@
-import { Schema } from '#cli/schema.js';
-
 export type Key = {
   keyName: string;
   defaultValue?: string;
@@ -22,7 +20,7 @@ export type ExtractOptions = {
   defaultNamespace: string | undefined;
 };
 
-export type ParserType = NonNullable<Schema['parser']>;
+export type ParserType = 'react' | 'vue' | 'svelte' | 'ngx';
 
 export type Extractor = (
   fileContents: string,
