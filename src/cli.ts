@@ -100,6 +100,13 @@ function loadProjectId(cmd: Command) {
 
 function validateOptions(cmd: Command) {
   const opts = cmd.optsWithGlobals();
+
+  if (!opts.apiKey) {
+    exitWithError(
+      'No API key has been provided. You must either provide one via --api-key, or login via `tolgee login`.'
+    );
+  }
+
   if (opts.projectId === -1) {
     error(
       'No Project ID have been specified. You must either provide one via --project-id, or by setting up a `.tolgeerc` file.'
@@ -108,12 +115,6 @@ function validateOptions(cmd: Command) {
       'Learn more about configuring the CLI here: https://tolgee.io/tolgee-cli/project-configuration'
     );
     process.exit(1);
-  }
-
-  if (!opts.apiKey) {
-    exitWithError(
-      'No API key has been provided. You must either provide one via --api-key, or login via `tolgee login`.'
-    );
   }
 }
 
