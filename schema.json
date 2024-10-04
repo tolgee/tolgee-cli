@@ -33,7 +33,7 @@
     },
     "parser": {
       "description": "Override parser detection.",
-      "enum": ["react", "vue", "svelte"]
+      "enum": ["react", "vue", "svelte", "ngx"]
     },
     "push": {
       "type": "object",

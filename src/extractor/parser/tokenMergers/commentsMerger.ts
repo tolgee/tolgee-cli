@@ -21,7 +21,7 @@ export const commentsMerger = {
       case S.CommentStart:
         if (type === 'comment.line') {
           return end.MERGE_ALL;
-        } else if (type === 'comment.block') {
+        } else if (type === 'comment.block' || token.token === '\n') {
           return S.CommentBlock;
         }
         break;
@@ -36,10 +36,13 @@ export const commentsMerger = {
     }
   },
   resultToken: (matched) => {
-    return matched
-      .filter((t) => t.customType && t.customType !== 'comment.definition')
-      .map((t) => t.token)
-      .join('');
+    return {
+      token: matched
+        .filter((t) => t.customType && t.customType !== 'comment.definition')
+        .map((t) => t.token)
+        .join(''),
+      line: matched[matched.length - 1].line,
+    };
   },
   customType: 'comment',
 } as const satisfies MachineType<GeneralTokenType, S>;

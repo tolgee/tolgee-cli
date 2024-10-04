@@ -20,7 +20,7 @@ export type ExtractOptions = {
   defaultNamespace: string | undefined;
 };
 
-export type ParserType = 'react' | 'vue' | 'svelte';
+export type ParserType = 'react' | 'vue' | 'svelte' | 'ngx';
 
 export type Extractor = (
   fileContents: string,

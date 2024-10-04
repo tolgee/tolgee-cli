@@ -31,6 +31,6 @@ export const closingTagMerger = {
   },
   customType: 'tag.closing',
   resultToken: (matched) => {
-    return matched[1].token;
+    return { token: matched[1].token };
   },
 } as const satisfies MachineType<ReactMappedTokenType, S>;

@@ -60,6 +60,6 @@ export const templateStringMerger = {
       }
     }
 
-    return result.join('').trim();
+    return { token: result.join('').trim() };
   },
 } as const satisfies MachineType<ReactMappedTokenType, S>;

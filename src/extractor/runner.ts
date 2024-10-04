@@ -37,7 +37,15 @@ export async function extractKeysFromFile(
 
 export function findPossibleFrameworks(fileNames: string[]) {
   const possibleFrameworks: ParserType[] = [];
-  const extensions = new Set(fileNames.map((name) => extname(name)));
+  const extensions = new Set(
+    fileNames.map((name) => {
+      if (name.endsWith('.component.html')) {
+        return '.component.html';
+      } else {
+        return extname(name);
+      }
+    })
+  );
 
   if (extensions.has('.jsx') || extensions.has('.tsx')) {
     possibleFrameworks.push('react');
@@ -47,6 +55,9 @@ export function findPossibleFrameworks(fileNames: string[]) {
   }
   if (extensions.has('.svelte')) {
     possibleFrameworks.push('svelte');
+  }
+  if (extensions.has('.component.html')) {
+    possibleFrameworks.push('ngx');
   }
   return possibleFrameworks;
 }

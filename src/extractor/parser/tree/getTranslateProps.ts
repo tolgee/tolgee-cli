@@ -1,6 +1,6 @@
 import { ArrayNode, DictNode, GeneralNode } from '../types.js';
 
-function getCombinedOptions(
+export function getCombinedOptions(
   {
     ns,
     noWrap,

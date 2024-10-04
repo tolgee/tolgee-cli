@@ -28,7 +28,8 @@ export const Grammars: Record<string, UrlString> = {
   Svelte:
     'https://raw.githubusercontent.com/sveltejs/language-tools/master/packages/svelte-vscode/syntaxes/svelte.tmLanguage.src.yaml',
   Vue: 'https://raw.githubusercontent.com/vuejs/language-tools/master/extensions/vscode/syntaxes/vue.tmLanguage.json',
-
+  AngularHtml:
+    'https://raw.githubusercontent.com/ghaschel/vscode-angular-html/master/syntaxes/html-template.ng.json',
   HTML: 'https://raw.githubusercontent.com/textmate/html.tmbundle/master/Syntaxes/HTML.plist',
 };
 
@@ -47,6 +48,11 @@ export const Licenses: LicenseInformation[] = [
     grammars: ['Vue'],
     license:
       'https://raw.githubusercontent.com/vuejs/language-tools/master/extensions/vscode/LICENSE',
+  },
+  {
+    grammars: ['AngularHtml'],
+    license:
+      'https://raw.githubusercontent.com/ghaschel/vscode-angular-html/master/LICENSE',
   },
 ];
 

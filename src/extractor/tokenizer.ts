@@ -13,6 +13,7 @@ const enum Grammar {
   TYPESCRIPT_TSX = 'source.tsx',
   SVELTE = 'source.svelte',
   VUE = 'source.vue',
+  ANGULAR_HTML = 'html-template.ng',
   HTML = 'text.html.basic',
   HTML_D = 'text.html.derivative',
 }
@@ -23,6 +24,7 @@ const GrammarFiles: Record<Grammar, URL> = {
   [Grammar.TYPESCRIPT_TSX]: new URL('TypeScriptReact.tmLanguage', GRAMMAR_PATH),
   [Grammar.SVELTE]: new URL('Svelte.tmLanguage', GRAMMAR_PATH),
   [Grammar.VUE]: new URL('Vue.tmLanguage', GRAMMAR_PATH),
+  [Grammar.ANGULAR_HTML]: new URL('AngularHtml.tmLanguage', GRAMMAR_PATH),
   [Grammar.HTML]: new URL('HTML.tmLanguage', GRAMMAR_PATH),
   [Grammar.HTML_D]: new URL('HTML.tmLanguage', GRAMMAR_PATH),
 };
@@ -53,8 +55,9 @@ async function loadGrammar(scope: Grammar) {
   return JSON.parse(grammar);
 }
 
-function extnameToGrammar(extname: string) {
-  switch (extname) {
+function fileNameToGrammar(fileName: string) {
+  const ext = extname(fileName);
+  switch (ext) {
     case '.js':
     case '.mjs':
     case '.cjs':
@@ -70,7 +73,11 @@ function extnameToGrammar(extname: string) {
     case '.svelte':
       return Grammar.SVELTE;
     case '.html':
-      return Grammar.HTML;
+      if (/.*\.component\.html/.test(fileName)) {
+        return Grammar.ANGULAR_HTML;
+      } else {
+        return Grammar.HTML;
+      }
   }
 }
 
@@ -129,10 +136,9 @@ export default async function (code: string, fileName: string) {
     });
   }
 
-  const fileType = extname(fileName);
-  const grammarName = extnameToGrammar(fileType);
+  const grammarName = fileNameToGrammar(fileName);
   if (!grammarName) {
-    throw new Error(`Cannot find grammar for file type ${fileType}`);
+    throw new Error(`Cannot find grammar for file type ${fileName}`);
   }
 
   const grammar = await registry.loadGrammar(grammarName);
