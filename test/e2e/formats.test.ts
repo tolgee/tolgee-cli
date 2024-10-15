@@ -153,4 +153,11 @@ describe('push and pull with different formats', () => {
   it('works with flutter-arb icu format', async () => {
     await testWithConfig({ config: 'flutter-arb', fileLocation: 'app_en.arb' });
   });
+
+  it('works with json-i18next format', async () => {
+    await testWithConfig({
+      config: 'json-i18next',
+      inFile: 'You have {{count}} items',
+    });
+  });
 });

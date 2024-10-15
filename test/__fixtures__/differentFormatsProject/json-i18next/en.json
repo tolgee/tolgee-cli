@@ -1,0 +1,8 @@
+{
+  "controller": "You have {{count}} items",
+  "desk": "Desk",
+  "keyboard": "Keyboard",
+  "mouse": "Mouse",
+  "remote": "Remote",
+  "screen": "Screen"
+}
