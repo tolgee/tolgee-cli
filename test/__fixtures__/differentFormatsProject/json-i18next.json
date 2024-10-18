@@ -1,0 +1,7 @@
+{
+  "$schema": "../../../schema.json",
+  "format": "JSON_I18NEXT",
+  "push": {
+    "files": [{ "path": "./json-i18next/en.json", "language": "en" }]
+  }
+}

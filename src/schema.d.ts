@@ -11,6 +11,7 @@
 export type Format =
   | "JSON_TOLGEE"
   | "JSON_ICU"
+  | "JSON_I18NEXT"
   | "JSON_JAVA"
   | "JSON_PHP"
   | "JSON_RUBY"
@@ -26,6 +27,10 @@ export type Format =
   | "PROPERTIES_JAVA"
   | "ANDROID_XML"
   | "FLUTTER_ARB"
+  | "CSV_ICU"
+  | "CSV_JAVA"
+  | "CSV_PHP"
+  | "CSV_RUBY"
   | "YAML_RUBY"
   | "YAML_JAVA"
   | "YAML_ICU"

@@ -29,6 +29,8 @@ export const mapExportFormat = (format: Schema['format']): FormatResult => {
       return { format: 'JSON', messageFormat: 'PHP_SPRINTF' };
     case 'JSON_RUBY':
       return { format: 'JSON', messageFormat: 'RUBY_SPRINTF' };
+    case 'JSON_I18NEXT':
+      return { format: 'JSON_I18NEXT', messageFormat: 'I18NEXT' };
     case 'JSON_TOLGEE':
       return { format: 'JSON_TOLGEE', messageFormat: 'ICU' };
     case 'PO_C':
@@ -64,6 +66,14 @@ export const mapExportFormat = (format: Schema['format']): FormatResult => {
       return { format: 'YAML', messageFormat: 'PHP_SPRINTF' };
     case 'YAML_RUBY':
       return { format: 'YAML_RUBY', messageFormat: 'RUBY_SPRINTF' };
+    case 'CSV_ICU':
+      return { format: 'CSV', messageFormat: 'ICU' };
+    case 'CSV_JAVA':
+      return { format: 'CSV', messageFormat: 'JAVA_STRING_FORMAT' };
+    case 'CSV_PHP':
+      return { format: 'CSV', messageFormat: 'PHP_SPRINTF' };
+    case 'CSV_RUBY':
+      return { format: 'CSV', messageFormat: 'RUBY_SPRINTF' };
     case undefined:
       return { format: 'JSON_TOLGEE', messageFormat: 'ICU' };
   }
