@@ -3,7 +3,7 @@ import type { BaseOptions } from '../options.js';
 import { extname, join } from 'path';
 import { readdir, readFile, stat } from 'fs/promises';
 import { Command, Option } from 'commander';
-import glob from 'fast-glob';
+import { glob } from 'glob';
 
 import {
   loading,
