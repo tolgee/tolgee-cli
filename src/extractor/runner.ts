@@ -4,7 +4,7 @@ import type {
   ParserType,
   VerboseOption,
 } from './index.js';
-import glob from 'fast-glob';
+import { glob } from 'glob';
 import { extname } from 'path';
 
 import { callWorker } from './worker.js';
@@ -94,7 +94,7 @@ export async function extractKeysOfFiles(opts: Opts) {
     exitWithError("Missing '--patterns' or 'config.patterns' option");
   }
 
-  const files = await glob(opts.patterns, { onlyFiles: true });
+  const files = await glob(opts.patterns, { nodir: true });
 
   if (files.length === 0) {
     exitWithError('No files were matched for extraction');
