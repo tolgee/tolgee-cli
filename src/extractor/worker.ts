@@ -13,6 +13,8 @@ import internalExtractor from './extractor.js';
 import { loadModule } from '../utils/moduleLoader.js';
 import { type Deferred, createDeferred } from '../utils/deferred.js';
 
+const FILE_TIME_LIMIT = 60 * 1000; // one minute
+
 export type WorkerParams = {
   extractor?: string;
   file: string;
@@ -81,8 +83,10 @@ function createWorker() {
     currentDeferred = job[1];
     timeout = setTimeout(() => {
       worker.terminate();
-      currentDeferred.reject(new Error('aborted'));
-    }, 10e3);
+      currentDeferred.reject(
+        new Error(`Time limit for parsing ${job[0].file} exceeded`)
+      );
+    }, FILE_TIME_LIMIT);
   }
 
   worker.on('message', (msg) => {
