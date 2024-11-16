@@ -23,16 +23,27 @@ function parseVerbose(v: VerboseOption[] | boolean | undefined) {
 
 export async function extractKeysFromFile(
   file: string,
-  parserType: ParserType,
+  parserType: ParserType | undefined,
   options: ExtractOptions,
-  extractor?: string
+  extractor: string | undefined
 ) {
-  return callWorker({
-    extractor: extractor,
-    parserType,
-    file: file,
-    options,
-  });
+  if (typeof extractor !== 'undefined') {
+    return callWorker({
+      extractor,
+      file,
+      options,
+    });
+  } else if (typeof parserType !== 'undefined') {
+    return callWorker({
+      parserType,
+      file,
+      options,
+    });
+  }
+
+  throw new Error(
+    'Internal error: neither the parser type nor a custom extractors have been defined! Please report this.'
+  );
 }
 
 export function findPossibleFrameworks(fileNames: string[]) {
@@ -103,8 +114,7 @@ export async function extractKeysOfFiles(opts: Opts) {
   }
 
   let parserType = opts.parser;
-
-  if (!parserType) {
+  if (!parserType && !opts.extractor) {
     parserType = detectParserType(files);
   }
 
