@@ -4,11 +4,11 @@ import type {
   ParserType,
   VerboseOption,
 } from './index.js';
+import { glob } from 'tinyglobby';
 import { extname } from 'path';
 
 import { callWorker } from './worker.js';
 import { exitWithError } from '../utils/logger.js';
-import { windowsCompatibleGlob } from '../utils/windowsCompatibleGlob.js';
 
 export const NullNamespace = Symbol('namespace.null');
 
@@ -105,9 +105,7 @@ export async function extractKeysOfFiles(opts: Opts) {
     exitWithError("Missing '--patterns' or 'config.patterns' option");
   }
 
-  const files = await windowsCompatibleGlob(opts.patterns, {
-    nodir: true,
-  });
+  const files = await glob(opts.patterns, { onlyFiles: true });
 
   if (files.length === 0) {
     exitWithError('No files were matched for extraction');
