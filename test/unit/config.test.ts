@@ -2,6 +2,7 @@ import { fileURLToPath } from 'url';
 import { MockInstance, vi } from 'vitest';
 
 import loadTolgeeRc from '#cli/config/tolgeerc.js';
+import { glob } from 'glob';
 
 const FIXTURES_PATH = new URL('../__fixtures__/', import.meta.url);
 
@@ -73,13 +74,18 @@ describe('.tolgeerc', () => {
     const cfg = (await loadTolgeeRc(path))!;
 
     // make sure all paths in the config file are expanded relatively to the config location
-    [
+    for (const path of [
       cfg.extractor,
       ...cfg.patterns!,
       ...cfg.push!.files!.map((f) => f.path),
-    ].forEach((path) => {
-      expect(path).toMatch(/[/\\]validTolgeeRc[/\\]/);
-    });
+    ]) {
+      expect(path).toMatch(/[^/\\][/\\]validTolgeeRc[/\\][^/\\]/);
+      expect(
+        await glob(path!, {
+          windowsPathsNoEscape: process.platform === 'win32',
+        })
+      ).length.above(0);
+    }
   });
 
   it('converts projectId to number', async () => {

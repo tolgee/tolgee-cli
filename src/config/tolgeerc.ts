@@ -60,6 +60,7 @@ function parseConfig(input: Schema, configDir: string): Schema {
     }));
   }
 
+  // convert relative paths in config to absolute
   if (rc.pull?.path !== undefined) {
     rc.pull.path = resolve(configDir, rc.pull.path);
   }

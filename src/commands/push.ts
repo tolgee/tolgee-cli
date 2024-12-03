@@ -46,7 +46,9 @@ type PushOptions = BaseOptions & {
 
 async function allInPattern(pattern: string) {
   const files: File[] = [];
-  const items = await glob(pattern);
+  const items = await glob(pattern, {
+    windowsPathsNoEscape: process.platform === 'win32',
+  });
   for (const item of items) {
     if ((await stat(item)).isDirectory()) {
       files.push(...(await readDirectory(item)));
