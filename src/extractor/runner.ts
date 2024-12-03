@@ -96,7 +96,7 @@ export async function extractKeysOfFiles(opts: Opts) {
 
   const files = await glob(opts.patterns, {
     nodir: true,
-    windowsPathsNoEscape: true,
+    windowsPathsNoEscape: process.platform === 'win32',
   });
 
   if (files.length === 0) {
