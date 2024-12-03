@@ -1,4 +1,5 @@
 import type { Jiti } from 'jiti';
+import { pathToFileURL } from 'url';
 
 let jiti: Jiti;
 
@@ -28,7 +29,8 @@ export async function loadModule(module: string) {
     return importTypeScript(module);
   }
 
-  const mdl = await import(module);
+  const fileUrl = pathToFileURL(module);
+  const mdl = await import(fileUrl.href);
   if (mdl.default?.default) {
     return mdl.default;
   }

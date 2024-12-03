@@ -18,6 +18,7 @@ it('successfully uses a custom extractor written in JS', async () => {
     50e3
   );
 
+  console.log(out.stdout);
   expect(out.code).toBe(0);
   expect(out.stdout).toContain('STR_CRUDE');
   expect(out.stdout).toContain('STR_WORKING');
