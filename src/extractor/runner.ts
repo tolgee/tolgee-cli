@@ -94,7 +94,10 @@ export async function extractKeysOfFiles(opts: Opts) {
     exitWithError("Missing '--patterns' or 'config.patterns' option");
   }
 
-  const files = await glob(opts.patterns, { nodir: true });
+  const files = await glob(opts.patterns, {
+    nodir: true,
+    windowsPathsNoEscape: true,
+  });
 
   if (files.length === 0) {
     exitWithError('No files were matched for extraction');
