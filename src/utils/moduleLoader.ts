@@ -1,33 +1,26 @@
-import { extname } from 'path';
+import type { Jiti } from 'jiti';
 
-let tsService: any;
+let jiti: Jiti;
 
-async function registerTsNode() {
-  if (!tsService) {
-    // try {
-    //   const tsNode = await import('ts-node');
-    //   tsService = tsNode.register({ compilerOptions: { module: 'CommonJS' } });
-    // } catch (e: any) {
-    //   if (e.code === 'ERR_MODULE_NOT_FOUND') {
-    //     throw new Error('ts-node is required to load TypeScript files.');
-    //   }
-    //   throw e;
-    // }
-  }
-}
-
+// https://github.com/eslint/eslint/blob/6f37b0747a14dfa9a9e3bdebc5caed1f39b6b0e2/lib/config/config-loader.js#L164-L197
 async function importTypeScript(file: string) {
-  if (extname(import.meta.url) === '.ts') {
+  // @ts-ignore
+  if (!!globalThis.Bun || !!globalThis.Deno) {
+    // We're in an env that natively supports TS
     return import(file);
   }
 
-  await registerTsNode();
+  if (!jiti) {
+    const { createJiti } = await import('jiti').catch(() => {
+      throw new Error(
+        "The 'jiti' library is required for loading TypeScript extractors. Make sure to install it."
+      );
+    });
 
-  tsService.enabled(true);
-  const mdl = await import(file);
-  tsService.enabled(false);
+    jiti = createJiti(import.meta.url);
+  }
 
-  return mdl;
+  return jiti.import(file);
 }
 
 export async function loadModule(module: string) {

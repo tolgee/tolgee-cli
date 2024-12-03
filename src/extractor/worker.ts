@@ -1,49 +1,52 @@
 import type {
-  ExtractOptions,
   ExtractionResult,
+  ExtractOptions,
   Extractor,
   ParserType,
 } from './index.js';
 import { fileURLToPath } from 'url';
-import { resolve, extname } from 'path';
-import { Worker, isMainThread, parentPort } from 'worker_threads';
-import { readFile } from 'fs/promises';
+import { extname, resolve } from 'path';
+import { isMainThread, parentPort, SHARE_ENV, Worker } from 'worker_threads';
+import { readFileSync } from 'fs';
 
 import internalExtractor from './extractor.js';
 import { loadModule } from '../utils/moduleLoader.js';
-import { type Deferred, createDeferred } from '../utils/deferred.js';
+import { createDeferred, type Deferred } from '../utils/deferred.js';
 
 const FILE_TIME_LIMIT = 60 * 1000; // one minute
 
-export type WorkerParams = {
-  extractor?: string;
-  file: string;
-  parserType: ParserType;
-  options: ExtractOptions;
-};
+export type WorkerParams =
+  | {
+      file: string;
+      parserType: ParserType;
+      options: ExtractOptions;
+    }
+  | {
+      extractor: string;
+      file: string;
+      options: ExtractOptions;
+    };
 
-const IS_TS_NODE = extname(import.meta.url) === '.ts';
+const IS_TSX = extname(import.meta.url) === '.ts';
 
 // --- Worker functions
 
-let loadedExtractor: string | undefined | symbol = Symbol('unloaded');
 let extractor: Extractor;
 
 async function handleJob(args: WorkerParams): Promise<ExtractionResult> {
   const file = resolve(args.file);
-  const code = await readFile(file, 'utf8');
-  if (args.extractor) {
-    if (args.extractor !== loadedExtractor) {
-      loadedExtractor = args.extractor;
+  const code = readFileSync(file, 'utf8');
+  if ('extractor' in args) {
+    if (!extractor) {
       extractor = await loadModule(args.extractor).then((mdl) => mdl.default);
     }
     return extractor(code, file, args.options);
-  } else {
-    return internalExtractor(code, file, args.parserType, args.options);
   }
+
+  return internalExtractor(code, file, args.parserType, args.options);
 }
 
-async function workerInit() {
+function workerInit() {
   parentPort!.on('message', (params) => {
     handleJob(params)
       .then((res) => parentPort!.postMessage({ data: res }))
@@ -59,15 +62,20 @@ let worker: Worker;
 const jobQueue: Array<[WorkerParams, Deferred]> = [];
 
 function createWorker() {
-  const worker = IS_TS_NODE
-    ? new Worker(
-        fileURLToPath(new URL(import.meta.url)).replace('.ts', '.js'),
-        {
-          // ts-node workaround
-          execArgv: ['--require', 'ts-node/register'],
-        }
-      )
-    : new Worker(fileURLToPath(new URL(import.meta.url)));
+  let worker: Worker;
+  if (IS_TSX) {
+    worker = new Worker(
+      `import('tsx/esm/api').then(({ register }) => { register(); import('${fileURLToPath(new URL(import.meta.url))}') })`,
+      {
+        env: SHARE_ENV,
+        eval: true,
+      }
+    );
+  } else {
+    worker = new Worker(fileURLToPath(new URL(import.meta.url)), {
+      env: SHARE_ENV,
+    });
+  }
 
   let timeout: NodeJS.Timeout;
   let currentDeferred: Deferred;

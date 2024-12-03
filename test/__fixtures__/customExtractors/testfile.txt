@@ -1,0 +1,7 @@
+Hey this is a very STR_CRUDE test
+to see if the custom extractors are STR_WORKING
+properly.
+
+Hopefully, this will catch any STR_NEW
+issue that may happen before it makes its
+way to STR_PRODUCTION!
