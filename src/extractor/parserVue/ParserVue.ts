@@ -18,6 +18,7 @@ import { useTranslate } from './rules/useTranslate.js';
 import { tComponent } from './rules/tComponent.js';
 import { scriptTag } from './rules/scriptTag.js';
 import { exportDefaultObject } from './rules/exportDefaultObject.js';
+import { hyphenPropsMerger } from './tokenMergers/hyphenPropsMerger.js';
 
 const vueMappers = [generalMapper, vueMapper];
 
@@ -27,6 +28,7 @@ export type VueMappedTokenType = NonNullable<
 
 export const vueMergers = pipeMachines([
   ...DEFAULT_MERGERERS,
+  hyphenPropsMerger,
   globalTFunctionMerger,
   tFunctionMerger,
   useTranslateMerger,
