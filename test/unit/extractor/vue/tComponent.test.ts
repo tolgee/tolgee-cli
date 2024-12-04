@@ -1,7 +1,7 @@
 import { extractTreeAndReport } from '#cli/extractor/extractor.js';
 import { ExtractOptions } from '#cli/extractor/index.js';
 
-const VERBOSE = true;
+const VERBOSE = false;
 
 async function extractVueKeys(
   code: string,
