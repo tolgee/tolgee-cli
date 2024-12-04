@@ -6,7 +6,7 @@ export const enum S {
   ExpectT,
 }
 
-// <T key-name="my_key" /> -> <T keyName="key" />
+// <T key-name="my_key" /> -> <T keyName="my_key" />
 //    ^^^^^^^^                   ^^^^^^^
 export const hyphenPropsMerger = {
   initial: S.Idle,
