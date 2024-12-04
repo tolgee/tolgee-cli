@@ -1,8 +1,8 @@
 import { fileURLToPath } from 'url';
 import { MockInstance, vi } from 'vitest';
 
+import { glob } from 'tinyglobby';
 import loadTolgeeRc from '#cli/config/tolgeerc.js';
-import { windowsCompatibleGlob } from '#cli/utils/windowsCompatibleGlob.js';
 
 const FIXTURES_PATH = new URL('../__fixtures__/', import.meta.url);
 
@@ -80,7 +80,7 @@ describe('.tolgeerc', () => {
       ...cfg.push!.files!.map((f) => f.path),
     ]) {
       expect(path).toMatch(/[^/\\][/\\]validTolgeeRc[/\\][^/\\]/);
-      expect(await windowsCompatibleGlob(path!)).length.above(0);
+      expect(await glob(path!)).length.above(0);
     }
   });
 

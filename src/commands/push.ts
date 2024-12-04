@@ -3,6 +3,7 @@ import type { BaseOptions } from '../options.js';
 import { extname, join } from 'path';
 import { readdir, readFile, stat } from 'fs/promises';
 import { Command, Option } from 'commander';
+import { glob } from 'tinyglobby';
 
 import {
   loading,
@@ -16,7 +17,6 @@ import { askString } from '../utils/ask.js';
 import { mapImportFormat } from '../utils/mapImportFormat.js';
 import { TolgeeClient, handleLoadableError } from '../client/TolgeeClient.js';
 import { BodyOf } from '../client/internal/schema.utils.js';
-import { windowsCompatibleGlob } from '../utils/windowsCompatibleGlob.js';
 
 type ImportRequest = BodyOf<
   '/v2/projects/{projectId}/single-step-import',
@@ -46,7 +46,7 @@ type PushOptions = BaseOptions & {
 
 async function allInPattern(pattern: string) {
   const files: File[] = [];
-  const items = await windowsCompatibleGlob(pattern);
+  const items = await glob(pattern);
   for (const item of items) {
     if ((await stat(item)).isDirectory()) {
       files.push(...(await readDirectory(item)));

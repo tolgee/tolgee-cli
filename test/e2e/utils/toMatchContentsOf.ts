@@ -40,7 +40,7 @@ async function recursiveReaddir(path: string, base = '') {
 async function getStructure(path: string) {
   return (
     (await tree({ base: path, l: 100, f: true })).report
-      .split('\n')
+      .split(/\r?\n/g)
       // remove first line with folder name and last few lines with statistics
       .slice(1, -4)
       .join('\n')
