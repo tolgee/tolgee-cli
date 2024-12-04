@@ -22,7 +22,7 @@ describe('<T>', () => {
     const expected = [{ keyName: 'key1', line: 3 }];
 
     const code = `
-      <template> <!-- @tolgee/vue -->
+      <template>
         <T keyName='key1'/>
       </template>
     `;
@@ -36,7 +36,7 @@ describe('<T>', () => {
     const expected = [{ keyName: 'key1', line: 3 }];
 
     const code = `
-      <template> <!-- @tolgee/vue -->
+      <template>
         <T :keyName="'key1'"/>
       </template>
     `;
@@ -52,8 +52,24 @@ describe('<T>', () => {
     ];
 
     const code = `
-      <template> <!-- @tolgee/vue -->
+      <template>
         <T keyName='key1' defaultValue='default value1'/>
+      </template>
+    `;
+
+    const extracted = await extractVueKeys(code, 'App.vue');
+    expect(extracted.warnings).toEqual([]);
+    expect(extracted.keys).toEqual(expected);
+  });
+
+  it('extracts key and default value from props with hyphenated props', async () => {
+    const expected = [
+      { keyName: 'key1', defaultValue: 'default value1', line: 3 },
+    ];
+
+    const code = `
+      <template>
+        <T key-name='key1' default-value='default value1'/>
       </template>
     `;
 
@@ -66,7 +82,7 @@ describe('<T>', () => {
     const expected = [{ keyName: 'key1', namespace: 'ns1', line: 3 }];
 
     const code = `
-      <template> <!-- @tolgee/vue -->
+      <template>
         <T keyName='key1' ns='ns1'/>
       </template>
     `;
@@ -80,7 +96,7 @@ describe('<T>', () => {
     const expected = [{ keyName: 'key1', line: 4 }];
 
     const code = `
-      <template> <!-- @tolgee/vue -->
+      <template>
         <div keyName='not key1'>
           <T keyName='key1'/>
         </div>
@@ -96,7 +112,7 @@ describe('<T>', () => {
     const expected = [{ keyName: 'key1', defaultValue: 'value', line: 3 }];
 
     const code = `
-      <template> <!-- @tolgee/vue -->
+      <template>
         <T defaultValue='value' :properties="{ a: 'b' }" keyName='key1' />
       </template>
     `;
@@ -117,7 +133,7 @@ describe('<T>', () => {
     ];
 
     const code = `
-      <template> <!-- @tolgee/vue -->
+      <template>
         <T
           keyName='key1'
           ns='ns1'
@@ -142,7 +158,7 @@ describe('<T>', () => {
       ];
 
       const code = `
-        <template> <!-- @tolgee/vue -->
+        <template>
           <T :keyName="\`dynamic-key-\${i}\`" />
           <T :keyName="'dynamic-key-' + i" />
           <T :keyName="key" />
@@ -166,7 +182,7 @@ describe('<T>', () => {
       ];
 
       const code = `
-        <template> <!-- @tolgee/vue -->
+        <template>
           <T keyName='key1' :ns="\`dynamic-ns-\${i}\`" />
           <T keyName='key2' :ns="'dynamic-ns-' + i" />
           <T keyName='key2' :ns={ns} />
@@ -196,7 +212,7 @@ describe('<T>', () => {
       ];
 
       const code = `
-        <template> <!-- @tolgee/vue -->
+        <template>
           <T keyName='key1' :defaultValue="someValue"/>
           <T keyName='key2' :defaultValue="'dynamic-' + i"/>
           <T keyName='key3' :defaultValue="\`dynamic-\${i}\`"/>
