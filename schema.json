@@ -167,6 +167,13 @@
         "removeUnused": {
           "description": "Delete unused keys from the Tolgee project",
           "type": "boolean"
+        },
+        "namespaces": {
+          "description": "Specifies which namespaces should be synchronized.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },

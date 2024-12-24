@@ -24,6 +24,7 @@ type Options = BaseOptions & {
   backup?: string | false;
   removeUnused?: boolean;
   continueOnWarning?: boolean;
+  namespaces?: string[];
   yes?: boolean;
   tagNewKeys?: string[];
 };
@@ -80,6 +81,16 @@ const syncHandler = (config: Schema) =>
     }
 
     const localKeys = filterExtractionResult(rawKeys);
+    console.dir({ localKeys });
+
+    if (opts.namespaces?.length) {
+      for (const namespace of Object.keys(localKeys)) {
+        if (!opts.namespaces?.includes(namespace)) {
+          localKeys[namespace].clear();
+        }
+      }
+    }
+
     const allKeysLoadable = await opts.client.GET(
       '/v2/projects/{projectId}/all-keys',
       {
@@ -89,9 +100,19 @@ const syncHandler = (config: Schema) =>
 
     handleLoadableError(allKeysLoadable);
 
-    const remoteKeys = allKeysLoadable.data?._embedded?.keys ?? [];
+    let remoteKeys = allKeysLoadable.data?._embedded?.keys ?? [];
+    console.dir({ remoteKeys });
+
+    if (opts.namespaces?.length) {
+      remoteKeys = remoteKeys.filter(
+        (key) => key.namespace && opts.namespaces?.includes(key.namespace ?? '')
+      );
+    }
 
     const diff = compareKeys(localKeys, remoteKeys);
+
+    console.log('diff', JSON.stringify(diff, null, 2));
+
     if (!diff.added.length && !diff.removed.length) {
       console.log(
         ansi.green(
@@ -222,6 +243,12 @@ export default (config: Schema) =>
         '--continue-on-warning',
         'Set this flag to continue the sync if warnings are detected during string extraction. By default, as warnings may indicate an invalid extraction, the CLI will abort the sync.'
       ).default(config.sync?.continueOnWarning ?? false)
+    )
+    .addOption(
+      new Option(
+        '-n, --namespaces <namespaces...>',
+        'Specifies which namespaces should be synchronized.'
+      ).default(config.sync?.namespaces)
     )
     .addOption(
       new Option(
