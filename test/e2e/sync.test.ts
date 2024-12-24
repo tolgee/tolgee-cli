@@ -126,6 +126,40 @@ describe('Project 2', () => {
     expect(keys.data?.page?.totalElements).toBe(0);
   }, 30e3);
 
+  it('does not delete keys are not managed by the current namespace configuration', async () => {
+    const pakWithDelete = await createPak(client, [
+      ...DEFAULT_SCOPES,
+      'keys.delete',
+    ]);
+
+    const out = await run(
+      [
+        'sync',
+        '--yes',
+        '--remove-unused',
+        '--api-key',
+        pakWithDelete,
+        '--patterns',
+        CODE_PROJECT_2_DELETED,
+        '--namespaces',
+        'bird',
+      ],
+      undefined,
+      20e3
+    );
+
+    expect(out.code).toBe(0);
+
+    const keys = await client.GET('/v2/projects/{projectId}/translations', {
+      params: {
+        path: { projectId: client.getProjectId() },
+        query: { filterKeyName: ['bird-name', 'bird-sound'] },
+      },
+    });
+
+    expect(keys.data?.page?.totalElements).toBe(2);
+  }, 30e3);
+
   it('does a proper backup', async () => {
     const out = await run(
       [
@@ -213,5 +247,35 @@ describe('Project 3', () => {
         en: 'Welcome!',
       },
     });
+  }, 30e3);
+
+  it('synchronizes the defined namespaces only', async () => {
+    const out = await run(
+      [
+        'sync',
+        '--yes',
+        '--api-key',
+        pak,
+        '--patterns',
+        CODE_PROJECT_3,
+        '--namespaces',
+        'drinks',
+      ],
+      undefined,
+      20e3
+    );
+
+    expect(out.code).toBe(0);
+
+    const keys = await client.GET('/v2/projects/{projectId}/translations', {
+      params: {
+        path: { projectId: client.getProjectId() },
+      },
+    });
+
+    const stored = tolgeeDataToDict(keys.data);
+
+    expect(Object.keys(stored)).toContain('table');
+    expect(Object.keys(stored)).not.toContain('welcome');
   }, 30e3);
 });

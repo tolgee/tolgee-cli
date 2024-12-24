@@ -166,6 +166,10 @@ export interface Schema {
      * Delete unused keys from the Tolgee project
      */
     removeUnused?: boolean;
+    /*
+     * Specifies which namespaces should be synchronized. By default all available namespaces are synchronized.
+    */
+    namespaces: string[];
     /**
      * Skip prompts and automatically say yes to them. You will not be asked for confirmation before creating/deleting keys.
      */
