@@ -43,6 +43,7 @@ export async function deleteProject(client: TolgeeClient | undefined) {
 
 type Options = {
   languages?: components['schemas']['LanguageRequest'][];
+  icuEnabled?: boolean;
 };
 
 export async function createProjectWithClient(
@@ -64,6 +65,21 @@ export async function createProjectWithClient(
   });
 
   client = createClient(userToken, { projectId: project.data!.id });
+
+  if (options?.icuEnabled) {
+    client.PUT('/v2/projects/{projectId}', {
+      params: {
+        path: {
+          projectId: client.getProjectId(),
+        },
+      },
+      body: {
+        name,
+        icuPlaceholders: true,
+        useNamespaces: true,
+      },
+    });
+  }
 
   await client.POST('/v2/projects/{projectId}/keys/import-resolvable', {
     params: { path: { projectId: client.getProjectId() } },
