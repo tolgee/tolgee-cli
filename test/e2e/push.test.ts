@@ -111,7 +111,9 @@ describe('project 1', () => {
 
 describe('project 3', () => {
   beforeEach(async () => {
-    client = await createProjectWithClient('Project 3', PROJECT_3);
+    client = await createProjectWithClient('Project 3', PROJECT_3, {
+      icuEnabled: true,
+    });
     pak = await createPak(client);
   });
   afterEach(async () => {
