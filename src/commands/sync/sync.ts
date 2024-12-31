@@ -1,10 +1,11 @@
 import type { BaseOptions } from '../../options.js';
-import { Command } from 'commander';
+import { Command, Option } from 'commander';
 import ansi from 'ansi-colors';
 
 import {
   extractKeysOfFiles,
   filterExtractionResult,
+  NullNamespace,
 } from '../../extractor/runner.js';
 import { dumpWarnings } from '../../extractor/warnings.js';
 import { type PartialKey, compareKeys, printKey } from './syncUtils.js';
@@ -21,9 +22,10 @@ import {
 } from '../../client/TolgeeClient.js';
 
 type Options = BaseOptions & {
-  backup?: string;
+  backup?: string | false;
   removeUnused?: boolean;
   continueOnWarning?: boolean;
+  namespaces?: string[];
   yes?: boolean;
 };
 
@@ -79,6 +81,25 @@ const syncHandler = (config: Schema) =>
     }
 
     const localKeys = filterExtractionResult(rawKeys);
+
+    if (
+      opts.namespaces &&
+      Array.isArray(opts.namespaces) &&
+      opts.namespaces.length
+    ) {
+      for (const namespace of Reflect.ownKeys(localKeys)) {
+        if (
+          typeof namespace === 'string' &&
+          !opts.namespaces?.includes(namespace)
+        ) {
+          localKeys[namespace].clear();
+          // if namespaces are managed explicitly, there should be no non-namespaced keys
+        } else if (namespace === NullNamespace) {
+          localKeys[NullNamespace].clear();
+        }
+      }
+    }
+
     const allKeysLoadable = await opts.client.GET(
       '/v2/projects/{projectId}/all-keys',
       {
@@ -88,7 +109,17 @@ const syncHandler = (config: Schema) =>
 
     handleLoadableError(allKeysLoadable);
 
-    const remoteKeys = allKeysLoadable.data?._embedded?.keys ?? [];
+    let remoteKeys = allKeysLoadable.data?._embedded?.keys ?? [];
+
+    if (
+      opts.namespaces &&
+      Array.isArray(opts.namespaces) &&
+      opts.namespaces.length
+    ) {
+      remoteKeys = remoteKeys.filter(
+        (key) => key.namespace && opts.namespaces?.includes(key.namespace)
+      );
+    }
 
     const diff = compareKeys(localKeys, remoteKeys);
     if (!diff.added.length && !diff.removed.length) {
@@ -209,20 +240,34 @@ export default (config: Schema) =>
     .description(
       'Synchronizes the keys in your code project and in the Tolgee project, by creating missing keys and optionally deleting unused ones. For a dry-run, use `tolgee compare`.'
     )
-    .option(
-      '-B, --backup <path>',
-      'Store translation files backup (only translation files, not states, comments, tags, etc.). If something goes wrong, the backup can be used to restore the project to its previous state.'
+    .addOption(
+      new Option(
+        '-B, --backup <path>',
+        'Store translation files backup (only translation files, not states, comments, tags, etc.). If something goes wrong, the backup can be used to restore the project to its previous state.'
+      ).default(config.sync?.backup ?? false)
     )
-    .option(
-      '--continue-on-warning',
-      'Set this flag to continue the sync if warnings are detected during string extraction. By default, as warnings may indicate an invalid extraction, the CLI will abort the sync.'
+    .addOption(
+      new Option(
+        '--continue-on-warning',
+        'Set this flag to continue the sync if warnings are detected during string extraction. By default, as warnings may indicate an invalid extraction, the CLI will abort the sync.'
+      ).default(config.sync?.continueOnWarning ?? false)
     )
-    .option(
-      '-Y, --yes',
-      'Skip prompts and automatically say yes to them. You will not be asked for confirmation before creating/deleting keys.'
+    .addOption(
+      new Option(
+        '-n, --namespaces <namespaces...>',
+        'Specifies which namespaces should be synchronized.'
+      ).default(config.push?.namespaces)
     )
-    .option(
-      '--remove-unused',
-      'Also delete unused keys from the Tolgee project.'
+    .addOption(
+      new Option(
+        '-Y, --yes',
+        'Skip prompts and automatically say yes to them. You will not be asked for confirmation before creating/deleting keys.'
+      ).default(config.sync?.yes ?? false)
+    )
+    .addOption(
+      new Option(
+        '--remove-unused',
+        'Delete unused keys from the Tolgee project.'
+      ).default(config.sync?.removeUnused ?? false)
     )
     .action(syncHandler(config));
