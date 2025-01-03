@@ -1,6 +1,11 @@
 import { Token } from '../parser/types.js';
 
 export const ngxMapper = (token: Token) => {
+  // custom tag names have dynamic token names
+  if (token.type?.startsWith('entity.name.tag.html.ng.')) {
+    return 'tag.name';
+  }
+
   switch (token.type) {
     // ngx template tags
     case 'punctuation.definition.tag.begin.html':

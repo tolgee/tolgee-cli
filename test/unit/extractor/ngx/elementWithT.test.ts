@@ -1,7 +1,7 @@
 import { extractTreeAndReport } from '#cli/extractor/extractor.js';
 import { ExtractOptions } from '#cli/extractor/index.js';
 
-const VERBOSE = false;
+const VERBOSE = true;
 
 async function extractNgxKeys(
   code: string,
@@ -22,6 +22,18 @@ describe('element with t param', () => {
     const code = `
     <template>
       <h1 t key="key1"></h1>
+    </template>
+    `;
+
+    const extracted = await extractNgxKeys(code, 'test.component.html');
+    expect(extracted.warnings).toEqual([]);
+    expect(extracted.keys).toEqual([{ keyName: 'key1', line: 3 }]);
+  });
+
+  it('extracts calls to t from custom element', async () => {
+    const code = `
+    <template>
+      <mat-error t key="key1"></mat-error>
     </template>
     `;
 
