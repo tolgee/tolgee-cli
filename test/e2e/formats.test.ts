@@ -110,7 +110,7 @@ describe('push and pull with different formats', () => {
       config: 'xliff-java',
       inPlatform: 'You have {0} items',
       fileLocation: 'en.xliff',
-      inFile: 'You have %s items',
+      inFile: 'You have %1$s items',
     });
   });
 
@@ -146,7 +146,7 @@ describe('push and pull with different formats', () => {
       config: 'android-xml',
       inPlatform: 'You have {0} items',
       fileLocation: 'values-en/strings.xml',
-      inFile: 'You have %s items',
+      inFile: 'You have %1$s items',
     });
   });
 

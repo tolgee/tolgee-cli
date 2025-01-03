@@ -30,6 +30,18 @@ describe('element with t param', () => {
     expect(extracted.keys).toEqual([{ keyName: 'key1', line: 3 }]);
   });
 
+  it('extracts calls to t from custom element', async () => {
+    const code = `
+    <template>
+      <mat-error t key="key1"></mat-error>
+    </template>
+    `;
+
+    const extracted = await extractNgxKeys(code, 'test.component.html');
+    expect(extracted.warnings).toEqual([]);
+    expect(extracted.keys).toEqual([{ keyName: 'key1', line: 3 }]);
+  });
+
   it('extracts keys specified binded properties', async () => {
     const expected = [{ keyName: 'key1', line: 3 }];
 
