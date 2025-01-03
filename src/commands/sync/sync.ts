@@ -25,6 +25,7 @@ type Options = BaseOptions & {
   removeUnused?: boolean;
   continueOnWarning?: boolean;
   yes?: boolean;
+  tagNewKeys?: string[];
 };
 
 async function backup(client: TolgeeClient, dest: string) {
@@ -136,6 +137,7 @@ const syncHandler = (config: Schema) =>
         translations: key.defaultValue
           ? { [baseLanguage.tag]: key.defaultValue }
           : {},
+        tags: opts.tagNewKeys,
       }));
 
       const loadable = await loading(
@@ -224,5 +226,9 @@ export default (config: Schema) =>
     .option(
       '--remove-unused',
       'Also delete unused keys from the Tolgee project.'
+    )
+    .option(
+      '--tag-new-keys <tags...>',
+      'Specify tags that will be added to newly created keys.'
     )
     .action(syncHandler(config));
