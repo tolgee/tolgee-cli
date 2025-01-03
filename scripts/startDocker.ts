@@ -36,6 +36,8 @@ async function main() {
 
   const ARGS = [
     'run',
+    '--platform',
+    'linux/amd64',
     '--rm',
     '--name',
     'tolgee_cli_e2e',
