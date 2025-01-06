@@ -93,6 +93,50 @@ describe('Project 2', () => {
     });
   }, 30e3);
 
+  it('tags new keys', async () => {
+    const out = await run(
+      [
+        'sync',
+        '--yes',
+        '--api-key',
+        pak,
+        '--tag-new-keys',
+        'new',
+        'keys',
+        '-pt',
+        CODE_PROJECT_2_ADDED,
+      ],
+      undefined,
+      20e3
+    );
+
+    expect(out.code).toBe(0);
+    expect(out.stdout).toContain('+ 2 strings');
+
+    const keys = await client.GET('/v2/projects/{projectId}/translations', {
+      params: {
+        path: { projectId: client.getProjectId() },
+        query: {
+          filterTag: ['new', 'keys'],
+        },
+      },
+    });
+
+    expect(keys.data?._embedded?.keys).toHaveLength(2);
+
+    const stored = tolgeeDataToDict(keys!.data);
+    expect(stored).toEqual({
+      'mouse-name': {
+        __ns: null,
+        en: 'Mouse',
+      },
+      'mouse-sound': {
+        __ns: null,
+        en: 'Squeek',
+      },
+    });
+  }, 30e3);
+
   it('deletes keys that no longer exist', async () => {
     const pakWithDelete = await createPak(client, [
       ...DEFAULT_SCOPES,
