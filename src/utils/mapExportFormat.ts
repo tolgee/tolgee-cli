@@ -17,6 +17,8 @@ export const mapExportFormat = (format: Schema['format']): FormatResult => {
       };
     case 'APPLE_XLIFF':
       return { format: 'APPLE_XLIFF', messageFormat: 'APPLE_SPRINTF' };
+    case 'COMPOSE_XML':
+      return { format: 'COMPOSE_XML', messageFormat: 'JAVA_STRING_FORMAT' };
     case 'FLUTTER_ARB':
       return { format: 'FLUTTER_ARB', messageFormat: 'ICU' };
     case 'JSON_C':
