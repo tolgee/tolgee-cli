@@ -50,6 +50,8 @@ export const mapExportFormat = (format: Schema['format']): FormatResult => {
       };
     case 'PROPERTIES_JAVA':
       return { format: 'PROPERTIES', messageFormat: 'JAVA_STRING_FORMAT' };
+    case 'RESX_XML':
+      return { format: 'RESX_XML', messageFormat: 'ICU' };
     case 'XLIFF_ICU':
       return { format: 'XLIFF', messageFormat: 'ICU' };
     case 'XLIFF_JAVA':

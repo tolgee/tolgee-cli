@@ -26,6 +26,7 @@ export type Format =
   | "PROPERTIES_ICU"
   | "PROPERTIES_JAVA"
   | "ANDROID_XML"
+  | "RESX_XML"
   | "FLUTTER_ARB"
   | "CSV_ICU"
   | "CSV_JAVA"
