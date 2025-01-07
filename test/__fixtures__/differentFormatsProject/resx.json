@@ -1,10 +1,10 @@
 {
   "$schema": "../../../schema.json",
-  "format": "RESX_XML",
+  "format": "RESX_ICU",
   "push": {
     "files": [
       {
-        "path": "./resx-xml/en.resx",
+        "path": "./resx/en.resx",
         "language": "en"
       }
     ]
