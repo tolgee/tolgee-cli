@@ -160,4 +160,13 @@ describe('push and pull with different formats', () => {
       inFile: 'You have {{count}} items',
     });
   });
+
+  it('works with resx icu format', async () => {
+    await testWithConfig({
+      config: 'resx',
+      inPlatform: 'You have {0} items',
+      fileLocation: 'en.xml',
+      inFile: 'You have {0} items',
+    });
+  });
 });

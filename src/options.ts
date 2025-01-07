@@ -71,6 +71,7 @@ export const FORMAT_OPT = new Option(
 ).choices([
   'JSON_TOLGEE',
   'JSON_ICU',
+  'JSON_I18NEXT',
   'JSON_JAVA',
   'JSON_PHP',
   'JSON_RUBY',
@@ -85,7 +86,12 @@ export const FORMAT_OPT = new Option(
   'PROPERTIES_ICU',
   'PROPERTIES_JAVA',
   'ANDROID_XML',
+  'COMPOSE_XML',
   'FLUTTER_ARB',
+  'CSV_ICU',
+  'CSV_JAVA',
+  'CSV_PHP',
+  'CSV_RUBY',
   'YAML_RUBY',
   'YAML_JAVA',
   'YAML_ICU',
@@ -94,6 +100,7 @@ export const FORMAT_OPT = new Option(
   'XLIFF_JAVA',
   'XLIFF_PHP',
   'XLIFF_RUBY',
+  'RESX_ICU'
 ]);
 
 export const FILE_PATTERNS = new Option(
