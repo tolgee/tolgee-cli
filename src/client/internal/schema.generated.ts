@@ -3991,6 +3991,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/public/invitation_info/{code}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Info about invitation */
+        get: operations["invitationInfo"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/public/configuration": {
         parameters: {
             query?: never;
@@ -4268,16 +4285,10 @@ export interface components {
             /** @enum {string} */
             origin: "ORGANIZATION_BASE" | "DIRECT" | "ORGANIZATION_OWNER" | "NONE" | "SERVER_ADMIN";
             /**
-             * @deprecated
-             * @description Deprecated (use translateLanguageIds).
-             *
-             *     List of languages current user has TRANSLATE permission to. If null, all languages edition is permitted.
-             * @example [
-             *       200001,
-             *       200004
-             *     ]
+             * @description The user's permission type. This field is null if uses granular permissions
+             * @enum {string}
              */
-            permittedLanguageIds?: number[];
+            type?: "NONE" | "VIEW" | "TRANSLATE" | "REVIEW" | "EDIT" | "MANAGE";
             /**
              * @description List of languages user can view. If null, all languages view is permitted.
              * @example [
@@ -4286,6 +4297,14 @@ export interface components {
              *     ]
              */
             viewLanguageIds?: number[];
+            /**
+             * @description Granted scopes to the user. When user has type permissions, this field contains permission scopes of the type.
+             * @example [
+             *       "KEYS_EDIT",
+             *       "TRANSLATIONS_VIEW"
+             *     ]
+             */
+            scopes: ("translations.view" | "translations.edit" | "keys.edit" | "screenshots.upload" | "screenshots.delete" | "screenshots.view" | "activity.view" | "languages.edit" | "admin" | "project.edit" | "members.view" | "members.edit" | "translation-comments.add" | "translation-comments.edit" | "translation-comments.set-state" | "translations.state-edit" | "keys.view" | "keys.delete" | "keys.create" | "batch-jobs.view" | "batch-jobs.cancel" | "translations.batch-by-tm" | "translations.batch-machine" | "content-delivery.manage" | "content-delivery.publish" | "webhooks.manage" | "tasks.view" | "tasks.edit")[];
             /**
              * @description List of languages user can translate to. If null, all languages editing is permitted.
              * @example [
@@ -4303,18 +4322,16 @@ export interface components {
              */
             stateChangeLanguageIds?: number[];
             /**
-             * @description Granted scopes to the user. When user has type permissions, this field contains permission scopes of the type.
+             * @deprecated
+             * @description Deprecated (use translateLanguageIds).
+             *
+             *     List of languages current user has TRANSLATE permission to. If null, all languages edition is permitted.
              * @example [
-             *       "KEYS_EDIT",
-             *       "TRANSLATIONS_VIEW"
+             *       200001,
+             *       200004
              *     ]
              */
-            scopes: ("translations.view" | "translations.edit" | "keys.edit" | "screenshots.upload" | "screenshots.delete" | "screenshots.view" | "activity.view" | "languages.edit" | "admin" | "project.edit" | "members.view" | "members.edit" | "translation-comments.add" | "translation-comments.edit" | "translation-comments.set-state" | "translations.state-edit" | "keys.view" | "keys.delete" | "keys.create" | "batch-jobs.view" | "batch-jobs.cancel" | "translations.batch-by-tm" | "translations.batch-machine" | "content-delivery.manage" | "content-delivery.publish" | "webhooks.manage" | "tasks.view" | "tasks.edit")[];
-            /**
-             * @description The user's permission type. This field is null if uses granular permissions
-             * @enum {string}
-             */
-            type?: "NONE" | "VIEW" | "TRANSLATE" | "REVIEW" | "EDIT" | "MANAGE";
+            permittedLanguageIds?: number[];
         };
         LanguageModel: {
             /** Format: int64 */
@@ -4950,6 +4967,7 @@ export interface components {
             invitedUserName?: string;
             invitedUserEmail?: string;
             permission: components["schemas"]["PermissionWithAgencyModel"];
+            createdBy?: components["schemas"]["SimpleUserAccountModel"];
         };
         AzureContentStorageConfigDto: {
             connectionString?: string;
@@ -5017,7 +5035,7 @@ export interface components {
              * @description Format to export to
              * @enum {string}
              */
-            format: "JSON" | "JSON_TOLGEE" | "XLIFF" | "PO" | "APPLE_STRINGS_STRINGSDICT" | "APPLE_XLIFF" | "ANDROID_XML" | "FLUTTER_ARB" | "PROPERTIES" | "YAML_RUBY" | "YAML" | "JSON_I18NEXT" | "CSV";
+            format: "JSON" | "JSON_TOLGEE" | "XLIFF" | "PO" | "APPLE_STRINGS_STRINGSDICT" | "APPLE_XLIFF" | "ANDROID_XML" | "COMPOSE_XML" | "FLUTTER_ARB" | "PROPERTIES" | "YAML_RUBY" | "YAML" | "JSON_I18NEXT" | "CSV" | "RESX_ICU";
             /** @description Delimiter to structure file content.
              *
              *     e.g. For key "home.header.title" would result in {"home": {"header": "title": {"Hello"}}} structure.
@@ -5095,7 +5113,7 @@ export interface components {
              * @description Format to export to
              * @enum {string}
              */
-            format: "JSON" | "JSON_TOLGEE" | "XLIFF" | "PO" | "APPLE_STRINGS_STRINGSDICT" | "APPLE_XLIFF" | "ANDROID_XML" | "FLUTTER_ARB" | "PROPERTIES" | "YAML_RUBY" | "YAML" | "JSON_I18NEXT" | "CSV";
+            format: "JSON" | "JSON_TOLGEE" | "XLIFF" | "PO" | "APPLE_STRINGS_STRINGSDICT" | "APPLE_XLIFF" | "ANDROID_XML" | "COMPOSE_XML" | "FLUTTER_ARB" | "PROPERTIES" | "YAML_RUBY" | "YAML" | "JSON_I18NEXT" | "CSV" | "RESX_ICU";
             /** @description Delimiter to structure file content.
              *
              *     e.g. For key "home.header.title" would result in {"home": {"header": "title": {"Hello"}}} structure.
@@ -5194,12 +5212,12 @@ export interface components {
             createNewKeys: boolean;
         };
         ImportSettingsModel: {
-            /** @description If true, key descriptions will be overridden by the import */
-            overrideKeyDescriptions: boolean;
-            /** @description If true, placeholders from other formats will be converted to ICU when possible */
-            convertPlaceholdersToIcu: boolean;
             /** @description If false, only updates keys, skipping the creation of new keys */
             createNewKeys: boolean;
+            /** @description If true, placeholders from other formats will be converted to ICU when possible */
+            convertPlaceholdersToIcu: boolean;
+            /** @description If true, key descriptions will be overridden by the import */
+            overrideKeyDescriptions: boolean;
         };
         TranslationCommentModel: {
             /**
@@ -5377,16 +5395,16 @@ export interface components {
         RevealedPatModel: {
             token: string;
             /** Format: int64 */
-            lastUsedAt?: number;
-            /** Format: int64 */
-            expiresAt?: number;
+            id: number;
             /** Format: int64 */
             createdAt: number;
             /** Format: int64 */
             updatedAt: number;
             description: string;
             /** Format: int64 */
-            id: number;
+            lastUsedAt?: number;
+            /** Format: int64 */
+            expiresAt?: number;
         };
         SetOrganizationRoleDto: {
             /** @enum {string} */
@@ -5454,6 +5472,7 @@ export interface components {
             createdAt: string;
             invitedUserName?: string;
             invitedUserEmail?: string;
+            createdBy?: components["schemas"]["SimpleUserAccountModel"];
         };
         SetLicenseKeyDto: {
             licenseKey: string;
@@ -5530,19 +5549,19 @@ export interface components {
         RevealedApiKeyModel: {
             /** @description Resulting user's api key */
             key: string;
+            /** Format: int64 */
+            id: number;
             userFullName?: string;
-            projectName: string;
+            username?: string;
+            description: string;
             /** Format: int64 */
             lastUsedAt?: number;
-            scopes: string[];
             /** Format: int64 */
             expiresAt?: number;
             /** Format: int64 */
             projectId: number;
-            username?: string;
-            description: string;
-            /** Format: int64 */
-            id: number;
+            scopes: string[];
+            projectName: string;
         };
         SuperTokenRequest: {
             /** @description Has to be provided when TOTP enabled */
@@ -5861,7 +5880,7 @@ export interface components {
              *     It is recommended to provide these values to prevent any issues with format detection.
              * @enum {string}
              */
-            format?: "CSV_ICU" | "CSV_JAVA" | "CSV_PHP" | "CSV_RUBY" | "JSON_I18NEXT" | "JSON_ICU" | "JSON_JAVA" | "JSON_PHP" | "JSON_RUBY" | "JSON_C" | "PO_PHP" | "PO_C" | "PO_JAVA" | "PO_ICU" | "PO_RUBY" | "STRINGS" | "STRINGSDICT" | "APPLE_XLIFF" | "PROPERTIES_ICU" | "PROPERTIES_JAVA" | "PROPERTIES_UNKNOWN" | "ANDROID_XML" | "FLUTTER_ARB" | "YAML_RUBY" | "YAML_JAVA" | "YAML_ICU" | "YAML_PHP" | "YAML_UNKNOWN" | "XLIFF_ICU" | "XLIFF_JAVA" | "XLIFF_PHP" | "XLIFF_RUBY";
+            format?: "CSV_ICU" | "CSV_JAVA" | "CSV_PHP" | "CSV_RUBY" | "JSON_I18NEXT" | "JSON_ICU" | "JSON_JAVA" | "JSON_PHP" | "JSON_RUBY" | "JSON_C" | "PO_PHP" | "PO_C" | "PO_JAVA" | "PO_ICU" | "PO_RUBY" | "STRINGS" | "STRINGSDICT" | "APPLE_XLIFF" | "PROPERTIES_ICU" | "PROPERTIES_JAVA" | "PROPERTIES_UNKNOWN" | "ANDROID_XML" | "COMPOSE_XML" | "FLUTTER_ARB" | "YAML_RUBY" | "YAML_JAVA" | "YAML_ICU" | "YAML_PHP" | "YAML_UNKNOWN" | "XLIFF_ICU" | "XLIFF_JAVA" | "XLIFF_PHP" | "XLIFF_RUBY" | "RESX_ICU";
             /** @description The existing language tag in the Tolgee platform to which the imported language should be mapped.
              *
              *     When null, Tolgee will try to guess the language from the file contents or file name. */
@@ -5981,7 +6000,7 @@ export interface components {
              * @description Format to export to
              * @enum {string}
              */
-            format: "JSON" | "JSON_TOLGEE" | "XLIFF" | "PO" | "APPLE_STRINGS_STRINGSDICT" | "APPLE_XLIFF" | "ANDROID_XML" | "FLUTTER_ARB" | "PROPERTIES" | "YAML_RUBY" | "YAML" | "JSON_I18NEXT" | "CSV";
+            format: "JSON" | "JSON_TOLGEE" | "XLIFF" | "PO" | "APPLE_STRINGS_STRINGSDICT" | "APPLE_XLIFF" | "ANDROID_XML" | "COMPOSE_XML" | "FLUTTER_ARB" | "PROPERTIES" | "YAML_RUBY" | "YAML" | "JSON_I18NEXT" | "CSV" | "RESX_ICU";
             /** @description Delimiter to structure file content.
              *
              *     e.g. For key "home.header.title" would result in {"home": {"header": "title": {"Hello"}}} structure.
@@ -6392,7 +6411,10 @@ export interface components {
             /** @example Features organization has enabled */
             enabledFeatures: ("GRANULAR_PERMISSIONS" | "PRIORITIZED_FEATURE_REQUESTS" | "PREMIUM_SUPPORT" | "DEDICATED_SLACK_CHANNEL" | "ASSISTED_UPDATES" | "DEPLOYMENT_ASSISTANCE" | "BACKUP_CONFIGURATION" | "TEAM_TRAINING" | "ACCOUNT_MANAGER" | "STANDARD_SUPPORT" | "PROJECT_LEVEL_CONTENT_STORAGES" | "WEBHOOKS" | "MULTIPLE_CONTENT_DELIVERY_CONFIGS" | "AI_PROMPT_CUSTOMIZATION" | "SLACK_INTEGRATION" | "TASKS" | "SSO" | "ORDER_TRANSLATION")[];
             quickStart?: components["schemas"]["QuickStartModel"];
-            basePermissions: components["schemas"]["PermissionModel"];
+            /** @example Beautiful organization */
+            name: string;
+            /** Format: int64 */
+            id: number;
             /**
              * @description The role of currently authorized user.
              *
@@ -6400,15 +6422,12 @@ export interface components {
              * @enum {string}
              */
             currentUserRole?: "MEMBER" | "OWNER";
+            basePermissions: components["schemas"]["PermissionModel"];
+            /** @example This is a beautiful organization full of beautiful and clever people */
+            description?: string;
             avatar?: components["schemas"]["Avatar"];
             /** @example btforg */
             slug: string;
-            /** @example This is a beautiful organization full of beautiful and clever people */
-            description?: string;
-            /** @example Beautiful organization */
-            name: string;
-            /** Format: int64 */
-            id: number;
         };
         PublicBillingConfigurationDTO: {
             enabled: boolean;
@@ -6465,15 +6484,15 @@ export interface components {
         };
         ExportFormatModel: {
             /** @enum {string} */
-            format: "JSON" | "JSON_TOLGEE" | "XLIFF" | "PO" | "APPLE_STRINGS_STRINGSDICT" | "APPLE_XLIFF" | "ANDROID_XML" | "FLUTTER_ARB" | "PROPERTIES" | "YAML_RUBY" | "YAML" | "JSON_I18NEXT" | "CSV";
+            format: "JSON" | "JSON_TOLGEE" | "XLIFF" | "PO" | "APPLE_STRINGS_STRINGSDICT" | "APPLE_XLIFF" | "ANDROID_XML" | "COMPOSE_XML" | "FLUTTER_ARB" | "PROPERTIES" | "YAML_RUBY" | "YAML" | "JSON_I18NEXT" | "CSV" | "RESX_ICU";
             extension: string;
             mediaType: string;
             defaultFileStructureTemplate: string;
         };
         DocItem: {
-            description?: string;
             name: string;
             displayName?: string;
+            description?: string;
         };
         PagedModelProjectModel: {
             _embedded?: {
@@ -6570,23 +6589,23 @@ export interface components {
             formalitySupported: boolean;
         };
         KeySearchResultView: {
-            baseTranslation?: string;
-            translation?: string;
-            description?: string;
-            namespace?: string;
             name: string;
             /** Format: int64 */
             id: number;
+            baseTranslation?: string;
+            description?: string;
+            namespace?: string;
+            translation?: string;
         };
         KeySearchSearchResultModel: {
             view?: components["schemas"]["KeySearchResultView"];
-            baseTranslation?: string;
-            translation?: string;
-            description?: string;
-            namespace?: string;
             name: string;
             /** Format: int64 */
             id: number;
+            baseTranslation?: string;
+            description?: string;
+            namespace?: string;
+            translation?: string;
         };
         PagedModelKeySearchSearchResultModel: {
             _embedded?: {
@@ -7138,16 +7157,16 @@ export interface components {
         PatWithUserModel: {
             user: components["schemas"]["SimpleUserAccountModel"];
             /** Format: int64 */
-            lastUsedAt?: number;
-            /** Format: int64 */
-            expiresAt?: number;
+            id: number;
             /** Format: int64 */
             createdAt: number;
             /** Format: int64 */
             updatedAt: number;
             description: string;
             /** Format: int64 */
-            id: number;
+            lastUsedAt?: number;
+            /** Format: int64 */
+            expiresAt?: number;
         };
         PagedModelOrganizationModel: {
             _embedded?: {
@@ -7265,19 +7284,19 @@ export interface components {
              * @description Languages for which user has translate permission.
              */
             permittedLanguageIds?: number[];
+            /** Format: int64 */
+            id: number;
             userFullName?: string;
-            projectName: string;
+            username?: string;
+            description: string;
             /** Format: int64 */
             lastUsedAt?: number;
-            scopes: string[];
             /** Format: int64 */
             expiresAt?: number;
             /** Format: int64 */
             projectId: number;
-            username?: string;
-            description: string;
-            /** Format: int64 */
-            id: number;
+            scopes: string[];
+            projectName: string;
         };
         PagedModelUserAccountModel: {
             _embedded?: {
@@ -7296,6 +7315,14 @@ export interface components {
             globalServerRole: "USER" | "ADMIN";
             deleted: boolean;
             disabled: boolean;
+        };
+        PublicInvitationModel: {
+            /** Format: int64 */
+            id: number;
+            code: string;
+            createdBy?: components["schemas"]["SimpleUserAccountModel"];
+            projectName?: string;
+            organizationName?: string;
         };
         UserTotpDisableRequestDto: {
             password: string;
@@ -16885,7 +16912,7 @@ export interface operations {
                  */
                 languages?: string[];
                 /** @description Format to export to */
-                format?: "JSON" | "JSON_TOLGEE" | "XLIFF" | "PO" | "APPLE_STRINGS_STRINGSDICT" | "APPLE_XLIFF" | "ANDROID_XML" | "FLUTTER_ARB" | "PROPERTIES" | "YAML_RUBY" | "YAML" | "JSON_I18NEXT" | "CSV";
+                format?: "JSON" | "JSON_TOLGEE" | "XLIFF" | "PO" | "APPLE_STRINGS_STRINGSDICT" | "APPLE_XLIFF" | "ANDROID_XML" | "COMPOSE_XML" | "FLUTTER_ARB" | "PROPERTIES" | "YAML_RUBY" | "YAML" | "JSON_I18NEXT" | "CSV" | "RESX_ICU";
                 /** @description Delimiter to structure file content.
                  *
                  *     e.g. For key "home.header.title" would result in {"home": {"header": "title": {"Hello"}}} structure.
@@ -23394,6 +23421,64 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
+    invitationInfo: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicInvitationModel"];
+                };
             };
             /** @description Bad Request */
             400: {

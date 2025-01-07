@@ -26,6 +26,7 @@ export type Format =
   | "PROPERTIES_ICU"
   | "PROPERTIES_JAVA"
   | "ANDROID_XML"
+  | "COMPOSE_XML"
   | "FLUTTER_ARB"
   | "CSV_ICU"
   | "CSV_JAVA"
@@ -38,7 +39,8 @@ export type Format =
   | "XLIFF_ICU"
   | "XLIFF_JAVA"
   | "XLIFF_PHP"
-  | "XLIFF_RUBY";
+  | "XLIFF_RUBY"
+  | "RESX_ICU";
 /**
  * File glob specifying which files to include.
  */

@@ -17,6 +17,8 @@ export const mapExportFormat = (format: Schema['format']): FormatResult => {
       };
     case 'APPLE_XLIFF':
       return { format: 'APPLE_XLIFF', messageFormat: 'APPLE_SPRINTF' };
+    case 'COMPOSE_XML':
+      return { format: 'COMPOSE_XML', messageFormat: 'JAVA_STRING_FORMAT' };
     case 'FLUTTER_ARB':
       return { format: 'FLUTTER_ARB', messageFormat: 'ICU' };
     case 'JSON_C':
@@ -50,6 +52,8 @@ export const mapExportFormat = (format: Schema['format']): FormatResult => {
       };
     case 'PROPERTIES_JAVA':
       return { format: 'PROPERTIES', messageFormat: 'JAVA_STRING_FORMAT' };
+    case 'RESX_ICU':
+      return { format: 'RESX_ICU', messageFormat: 'ICU' };
     case 'XLIFF_ICU':
       return { format: 'XLIFF', messageFormat: 'ICU' };
     case 'XLIFF_JAVA':
