@@ -100,7 +100,7 @@ export const FORMAT_OPT = new Option(
   'XLIFF_JAVA',
   'XLIFF_PHP',
   'XLIFF_RUBY',
-  'RESX_ICU'
+  'RESX_ICU',
 ]);
 
 export const FILE_PATTERNS = new Option(
