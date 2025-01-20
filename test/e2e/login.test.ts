@@ -1,6 +1,6 @@
 import { tmpdir } from 'os';
 import { join } from 'path';
-import { rm, readFile } from 'fs/promises';
+import { rm, readFile, mkdtemp, writeFile } from 'fs/promises';
 import { run } from './utils/run.js';
 import { TolgeeClient } from '#cli/client/TolgeeClient.js';
 import { PROJECT_1 } from './utils/api/project1.js';
@@ -10,6 +10,7 @@ import {
   createProjectWithClient,
   deleteProject,
 } from './utils/api/common.js';
+import { Schema } from '#cli/schema.js';
 
 const AUTH_FILE_PATH = join(tmpdir(), '.tolgee-e2e', 'authentication.json');
 
@@ -86,4 +87,46 @@ describe('Project 1', () => {
     const authFile = await readFile(AUTH_FILE_PATH, 'utf8');
     expect(authFile).not.toContain(pat);
   });
+
+  it('allows to specify api key through config', async () => {
+    const pak = await createPak(client);
+    const { tempFolder, configFile } = await createTmpFolderWithConfig({
+      apiKey: pak,
+      pull: {
+        path: './data',
+      },
+    });
+    const englishFile = join(tempFolder, 'data', 'en.json');
+
+    const out = await run(['-c', configFile, 'pull']);
+
+    expect(out.code).toBe(0);
+    expect(out.stderr).toBe('');
+
+    const enFile = JSON.parse((await readFile(englishFile)).toString());
+    expect(enFile.controller).toEqual('Controller');
+  });
+
+  it('ignores login, when apiKey defined in config', async () => {
+    const pak = await createPak(client);
+    const pat = await createPat(client);
+    const loginOut = await run(['login', pat]);
+    expect(loginOut.code).toBe(0);
+
+    const { configFile } = await createTmpFolderWithConfig({
+      apiKey: pak,
+      pull: {
+        path: './data',
+      },
+    });
+    const out = await run(['-c', configFile, 'pull']);
+    expect(out.code).toBe(0);
+  });
+
+  async function createTmpFolderWithConfig(config: Schema) {
+    const tempFolder = await mkdtemp(join(tmpdir(), 'cli-project-'));
+    const configFile = join(tempFolder, '.tolgeerc.json');
+    await writeFile(configFile, JSON.stringify(config, null, 2));
+    return { tempFolder, configFile };
+  }
 });
