@@ -81,6 +81,7 @@ export const FORMAT_OPT = new Option(
   'PO_JAVA',
   'PO_ICU',
   'PO_RUBY',
+  'PO_PYTHON',
   'APPLE_STRINGS',
   'APPLE_XLIFF',
   'PROPERTIES_ICU',

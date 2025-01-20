@@ -45,6 +45,8 @@ export const mapExportFormat = (format: Schema['format']): FormatResult => {
       return { format: 'PO', messageFormat: 'PHP_SPRINTF' };
     case 'PO_RUBY':
       return { format: 'PO', messageFormat: 'RUBY_SPRINTF' };
+    case 'PO_PYTHON':
+      return { format: 'PO', messageFormat: 'PYTHON_PERCENT' };
     case 'PROPERTIES_ICU':
       return {
         format: 'PROPERTIES',
