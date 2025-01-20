@@ -65,8 +65,11 @@ export interface Schema {
   apiUrl?: string;
   /**
    * Api key to Tolgee Platform.
+   *
    * WARNING: Make sure you don't leak your API key
-   * In most cases it's better to use one-time login command or set it via the TOLGEE_API_KEY environment variable.
+   * Use `apiKey` only if you are loading it from an environment or other secured source (supported in .js or .yml files) or your config is not public.
+   *
+   * In most cases, it's better to use a one-time `login` command or set it via the `TOLGEE_API_KEY` environment variable.
    */
   apiKey?: string;
   format?: Format;

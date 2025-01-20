@@ -10,7 +10,7 @@
       "type": "string"
     },
     "apiKey": {
-      "description": "Api key to Tolgee Platform.\nWARNING: Make sure you don't leak your API key\nIn most cases it's better to use one-time login command or set it via the TOLGEE_API_KEY environment variable.",
+      "description": "Api key to Tolgee Platform.\n\nWARNING: Make sure you don't leak your API key\nUse `apiKey` only if you are loading it from an environment or other secured source (supported in .js or .yml files) or your config is not public.\n\nIn most cases, it's better to use a one-time `login` command or set it via the `TOLGEE_API_KEY` environment variable.",
       "type": "string"
     },
     "format": {
