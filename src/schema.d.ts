@@ -63,6 +63,11 @@ export interface Schema {
    * The url of Tolgee API.
    */
   apiUrl?: string;
+  /**
+   * Api key to Tolgee Platform.
+   * WARNING: Don't pass the value directly, but rather through environment variable (in .js files)
+   */
+  apiKey?: string;
   format?: Format;
   /**
    * A path to a custom extractor to use instead of the default one.

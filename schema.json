@@ -9,6 +9,10 @@
       "description": "The url of Tolgee API.",
       "type": "string"
     },
+    "apiKey": {
+      "description": "Api key to Tolgee Platform.\nWARNING: Don't pass the value directly, but rather through environment variable (in .js files)",
+      "type": "string"
+    },
     "format": {
       "$ref": "#/$defs/format"
     },
