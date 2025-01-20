@@ -78,6 +78,14 @@ export const mapExportFormat = (format: Schema['format']): FormatResult => {
       return { format: 'CSV', messageFormat: 'PHP_SPRINTF' };
     case 'CSV_RUBY':
       return { format: 'CSV', messageFormat: 'RUBY_SPRINTF' };
+    case 'XLSX_ICU':
+      return { format: 'XLSX', messageFormat: 'ICU' };
+    case 'XLSX_JAVA':
+      return { format: 'XLSX', messageFormat: 'JAVA_STRING_FORMAT' };
+    case 'XLSX_PHP':
+      return { format: 'XLSX', messageFormat: 'PHP_SPRINTF' };
+    case 'XLSX_RUBY':
+      return { format: 'XLSX', messageFormat: 'RUBY_SPRINTF' };
     case undefined:
       return { format: 'JSON_TOLGEE', messageFormat: 'ICU' };
   }

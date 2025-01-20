@@ -4290,22 +4290,6 @@ export interface components {
              */
             type?: "NONE" | "VIEW" | "TRANSLATE" | "REVIEW" | "EDIT" | "MANAGE";
             /**
-             * @description List of languages user can view. If null, all languages view is permitted.
-             * @example [
-             *       200001,
-             *       200004
-             *     ]
-             */
-            viewLanguageIds?: number[];
-            /**
-             * @description Granted scopes to the user. When user has type permissions, this field contains permission scopes of the type.
-             * @example [
-             *       "KEYS_EDIT",
-             *       "TRANSLATIONS_VIEW"
-             *     ]
-             */
-            scopes: ("translations.view" | "translations.edit" | "keys.edit" | "screenshots.upload" | "screenshots.delete" | "screenshots.view" | "activity.view" | "languages.edit" | "admin" | "project.edit" | "members.view" | "members.edit" | "translation-comments.add" | "translation-comments.edit" | "translation-comments.set-state" | "translations.state-edit" | "keys.view" | "keys.delete" | "keys.create" | "batch-jobs.view" | "batch-jobs.cancel" | "translations.batch-by-tm" | "translations.batch-machine" | "content-delivery.manage" | "content-delivery.publish" | "webhooks.manage" | "tasks.view" | "tasks.edit")[];
-            /**
              * @description List of languages user can translate to. If null, all languages editing is permitted.
              * @example [
              *       200001,
@@ -4332,6 +4316,22 @@ export interface components {
              *     ]
              */
             permittedLanguageIds?: number[];
+            /**
+             * @description Granted scopes to the user. When user has type permissions, this field contains permission scopes of the type.
+             * @example [
+             *       "KEYS_EDIT",
+             *       "TRANSLATIONS_VIEW"
+             *     ]
+             */
+            scopes: ("translations.view" | "translations.edit" | "keys.edit" | "screenshots.upload" | "screenshots.delete" | "screenshots.view" | "activity.view" | "languages.edit" | "admin" | "project.edit" | "members.view" | "members.edit" | "translation-comments.add" | "translation-comments.edit" | "translation-comments.set-state" | "translations.state-edit" | "keys.view" | "keys.delete" | "keys.create" | "batch-jobs.view" | "batch-jobs.cancel" | "translations.batch-by-tm" | "translations.batch-machine" | "content-delivery.manage" | "content-delivery.publish" | "webhooks.manage" | "tasks.view" | "tasks.edit")[];
+            /**
+             * @description List of languages user can view. If null, all languages view is permitted.
+             * @example [
+             *       200001,
+             *       200004
+             *     ]
+             */
+            viewLanguageIds?: number[];
         };
         LanguageModel: {
             /** Format: int64 */
@@ -4985,9 +4985,9 @@ export interface components {
             secretKey?: string;
             endpoint: string;
             signingRegion: string;
+            enabled?: boolean;
             /** @enum {string} */
             contentStorageType?: "S3" | "AZURE";
-            enabled?: boolean;
         };
         AzureContentStorageConfigModel: {
             containerName?: string;
@@ -5035,7 +5035,7 @@ export interface components {
              * @description Format to export to
              * @enum {string}
              */
-            format: "JSON" | "JSON_TOLGEE" | "XLIFF" | "PO" | "APPLE_STRINGS_STRINGSDICT" | "APPLE_XLIFF" | "ANDROID_XML" | "COMPOSE_XML" | "FLUTTER_ARB" | "PROPERTIES" | "YAML_RUBY" | "YAML" | "JSON_I18NEXT" | "CSV" | "RESX_ICU";
+            format: "JSON" | "JSON_TOLGEE" | "XLIFF" | "PO" | "APPLE_STRINGS_STRINGSDICT" | "APPLE_XLIFF" | "ANDROID_XML" | "COMPOSE_XML" | "FLUTTER_ARB" | "PROPERTIES" | "YAML_RUBY" | "YAML" | "JSON_I18NEXT" | "CSV" | "RESX_ICU" | "XLSX";
             /** @description Delimiter to structure file content.
              *
              *     e.g. For key "home.header.title" would result in {"home": {"header": "title": {"Hello"}}} structure.
@@ -5113,7 +5113,7 @@ export interface components {
              * @description Format to export to
              * @enum {string}
              */
-            format: "JSON" | "JSON_TOLGEE" | "XLIFF" | "PO" | "APPLE_STRINGS_STRINGSDICT" | "APPLE_XLIFF" | "ANDROID_XML" | "COMPOSE_XML" | "FLUTTER_ARB" | "PROPERTIES" | "YAML_RUBY" | "YAML" | "JSON_I18NEXT" | "CSV" | "RESX_ICU";
+            format: "JSON" | "JSON_TOLGEE" | "XLIFF" | "PO" | "APPLE_STRINGS_STRINGSDICT" | "APPLE_XLIFF" | "ANDROID_XML" | "COMPOSE_XML" | "FLUTTER_ARB" | "PROPERTIES" | "YAML_RUBY" | "YAML" | "JSON_I18NEXT" | "CSV" | "RESX_ICU" | "XLSX";
             /** @description Delimiter to structure file content.
              *
              *     e.g. For key "home.header.title" would result in {"home": {"header": "title": {"Hello"}}} structure.
@@ -5212,12 +5212,12 @@ export interface components {
             createNewKeys: boolean;
         };
         ImportSettingsModel: {
-            /** @description If false, only updates keys, skipping the creation of new keys */
-            createNewKeys: boolean;
             /** @description If true, placeholders from other formats will be converted to ICU when possible */
             convertPlaceholdersToIcu: boolean;
             /** @description If true, key descriptions will be overridden by the import */
             overrideKeyDescriptions: boolean;
+            /** @description If false, only updates keys, skipping the creation of new keys */
+            createNewKeys: boolean;
         };
         TranslationCommentModel: {
             /**
@@ -5397,14 +5397,14 @@ export interface components {
             /** Format: int64 */
             id: number;
             /** Format: int64 */
+            expiresAt?: number;
+            /** Format: int64 */
+            lastUsedAt?: number;
+            /** Format: int64 */
             createdAt: number;
             /** Format: int64 */
             updatedAt: number;
             description: string;
-            /** Format: int64 */
-            lastUsedAt?: number;
-            /** Format: int64 */
-            expiresAt?: number;
         };
         SetOrganizationRoleDto: {
             /** @enum {string} */
@@ -5551,17 +5551,17 @@ export interface components {
             key: string;
             /** Format: int64 */
             id: number;
-            userFullName?: string;
-            username?: string;
-            description: string;
-            /** Format: int64 */
-            lastUsedAt?: number;
             /** Format: int64 */
             expiresAt?: number;
             /** Format: int64 */
+            lastUsedAt?: number;
+            /** Format: int64 */
             projectId: number;
             scopes: string[];
+            username?: string;
+            description: string;
             projectName: string;
+            userFullName?: string;
         };
         SuperTokenRequest: {
             /** @description Has to be provided when TOTP enabled */
@@ -5880,7 +5880,7 @@ export interface components {
              *     It is recommended to provide these values to prevent any issues with format detection.
              * @enum {string}
              */
-            format?: "CSV_ICU" | "CSV_JAVA" | "CSV_PHP" | "CSV_RUBY" | "JSON_I18NEXT" | "JSON_ICU" | "JSON_JAVA" | "JSON_PHP" | "JSON_RUBY" | "JSON_C" | "PO_PHP" | "PO_C" | "PO_JAVA" | "PO_ICU" | "PO_RUBY" | "STRINGS" | "STRINGSDICT" | "APPLE_XLIFF" | "PROPERTIES_ICU" | "PROPERTIES_JAVA" | "PROPERTIES_UNKNOWN" | "ANDROID_XML" | "COMPOSE_XML" | "FLUTTER_ARB" | "YAML_RUBY" | "YAML_JAVA" | "YAML_ICU" | "YAML_PHP" | "YAML_UNKNOWN" | "XLIFF_ICU" | "XLIFF_JAVA" | "XLIFF_PHP" | "XLIFF_RUBY" | "RESX_ICU";
+            format?: "CSV_ICU" | "CSV_JAVA" | "CSV_PHP" | "CSV_RUBY" | "JSON_I18NEXT" | "JSON_ICU" | "JSON_JAVA" | "JSON_PHP" | "JSON_RUBY" | "JSON_C" | "PO_PHP" | "PO_C" | "PO_JAVA" | "PO_ICU" | "PO_RUBY" | "STRINGS" | "STRINGSDICT" | "APPLE_XLIFF" | "PROPERTIES_ICU" | "PROPERTIES_JAVA" | "PROPERTIES_UNKNOWN" | "ANDROID_XML" | "COMPOSE_XML" | "FLUTTER_ARB" | "YAML_RUBY" | "YAML_JAVA" | "YAML_ICU" | "YAML_PHP" | "YAML_UNKNOWN" | "XLIFF_ICU" | "XLIFF_JAVA" | "XLIFF_PHP" | "XLIFF_RUBY" | "RESX_ICU" | "XLSX_ICU" | "XLSX_JAVA" | "XLSX_PHP" | "XLSX_RUBY";
             /** @description The existing language tag in the Tolgee platform to which the imported language should be mapped.
              *
              *     When null, Tolgee will try to guess the language from the file contents or file name. */
@@ -6000,7 +6000,7 @@ export interface components {
              * @description Format to export to
              * @enum {string}
              */
-            format: "JSON" | "JSON_TOLGEE" | "XLIFF" | "PO" | "APPLE_STRINGS_STRINGSDICT" | "APPLE_XLIFF" | "ANDROID_XML" | "COMPOSE_XML" | "FLUTTER_ARB" | "PROPERTIES" | "YAML_RUBY" | "YAML" | "JSON_I18NEXT" | "CSV" | "RESX_ICU";
+            format: "JSON" | "JSON_TOLGEE" | "XLIFF" | "PO" | "APPLE_STRINGS_STRINGSDICT" | "APPLE_XLIFF" | "ANDROID_XML" | "COMPOSE_XML" | "FLUTTER_ARB" | "PROPERTIES" | "YAML_RUBY" | "YAML" | "JSON_I18NEXT" | "CSV" | "RESX_ICU" | "XLSX";
             /** @description Delimiter to structure file content.
              *
              *     e.g. For key "home.header.title" would result in {"home": {"header": "title": {"Hello"}}} structure.
@@ -6415,6 +6415,11 @@ export interface components {
             name: string;
             /** Format: int64 */
             id: number;
+            avatar?: components["schemas"]["Avatar"];
+            /** @example btforg */
+            slug: string;
+            /** @example This is a beautiful organization full of beautiful and clever people */
+            description?: string;
             /**
              * @description The role of currently authorized user.
              *
@@ -6423,11 +6428,6 @@ export interface components {
              */
             currentUserRole?: "MEMBER" | "OWNER";
             basePermissions: components["schemas"]["PermissionModel"];
-            /** @example This is a beautiful organization full of beautiful and clever people */
-            description?: string;
-            avatar?: components["schemas"]["Avatar"];
-            /** @example btforg */
-            slug: string;
         };
         PublicBillingConfigurationDTO: {
             enabled: boolean;
@@ -6484,7 +6484,7 @@ export interface components {
         };
         ExportFormatModel: {
             /** @enum {string} */
-            format: "JSON" | "JSON_TOLGEE" | "XLIFF" | "PO" | "APPLE_STRINGS_STRINGSDICT" | "APPLE_XLIFF" | "ANDROID_XML" | "COMPOSE_XML" | "FLUTTER_ARB" | "PROPERTIES" | "YAML_RUBY" | "YAML" | "JSON_I18NEXT" | "CSV" | "RESX_ICU";
+            format: "JSON" | "JSON_TOLGEE" | "XLIFF" | "PO" | "APPLE_STRINGS_STRINGSDICT" | "APPLE_XLIFF" | "ANDROID_XML" | "COMPOSE_XML" | "FLUTTER_ARB" | "PROPERTIES" | "YAML_RUBY" | "YAML" | "JSON_I18NEXT" | "CSV" | "RESX_ICU" | "XLSX";
             extension: string;
             mediaType: string;
             defaultFileStructureTemplate: string;
@@ -6592,20 +6592,20 @@ export interface components {
             name: string;
             /** Format: int64 */
             id: number;
-            baseTranslation?: string;
-            description?: string;
-            namespace?: string;
             translation?: string;
+            namespace?: string;
+            description?: string;
+            baseTranslation?: string;
         };
         KeySearchSearchResultModel: {
             view?: components["schemas"]["KeySearchResultView"];
             name: string;
             /** Format: int64 */
             id: number;
-            baseTranslation?: string;
-            description?: string;
-            namespace?: string;
             translation?: string;
+            namespace?: string;
+            description?: string;
+            baseTranslation?: string;
         };
         PagedModelKeySearchSearchResultModel: {
             _embedded?: {
@@ -7159,14 +7159,14 @@ export interface components {
             /** Format: int64 */
             id: number;
             /** Format: int64 */
+            expiresAt?: number;
+            /** Format: int64 */
+            lastUsedAt?: number;
+            /** Format: int64 */
             createdAt: number;
             /** Format: int64 */
             updatedAt: number;
             description: string;
-            /** Format: int64 */
-            lastUsedAt?: number;
-            /** Format: int64 */
-            expiresAt?: number;
         };
         PagedModelOrganizationModel: {
             _embedded?: {
@@ -7286,17 +7286,17 @@ export interface components {
             permittedLanguageIds?: number[];
             /** Format: int64 */
             id: number;
-            userFullName?: string;
-            username?: string;
-            description: string;
-            /** Format: int64 */
-            lastUsedAt?: number;
             /** Format: int64 */
             expiresAt?: number;
             /** Format: int64 */
+            lastUsedAt?: number;
+            /** Format: int64 */
             projectId: number;
             scopes: string[];
+            username?: string;
+            description: string;
             projectName: string;
+            userFullName?: string;
         };
         PagedModelUserAccountModel: {
             _embedded?: {
@@ -11824,6 +11824,10 @@ export interface operations {
                 filterFailedKeysOfJob?: number;
                 /** @description Select only keys which are in specified task */
                 filterTaskNumber?: number[];
+                /** @description Filter task keys which are `not done` */
+                filterTaskKeysNotDone?: boolean;
+                /** @description Filter task keys which are `done` */
+                filterTaskKeysDone?: boolean;
                 /** @description Zero-based page index (0..N) */
                 page?: number;
                 /** @description The size of the page to be returned */
@@ -15214,6 +15218,8 @@ export interface operations {
                 filterAgency?: number[];
                 /** @description Exclude "done" tasks which are older than specified timestamp */
                 filterDoneMinClosedAt?: number;
+                /** @description Exclude tasks which were closed before specified timestamp */
+                filterNotClosedBefore?: number;
                 /** @description Zero-based page index (0..N) */
                 page?: number;
                 /** @description The size of the page to be returned */
@@ -16912,7 +16918,7 @@ export interface operations {
                  */
                 languages?: string[];
                 /** @description Format to export to */
-                format?: "JSON" | "JSON_TOLGEE" | "XLIFF" | "PO" | "APPLE_STRINGS_STRINGSDICT" | "APPLE_XLIFF" | "ANDROID_XML" | "COMPOSE_XML" | "FLUTTER_ARB" | "PROPERTIES" | "YAML_RUBY" | "YAML" | "JSON_I18NEXT" | "CSV" | "RESX_ICU";
+                format?: "JSON" | "JSON_TOLGEE" | "XLIFF" | "PO" | "APPLE_STRINGS_STRINGSDICT" | "APPLE_XLIFF" | "ANDROID_XML" | "COMPOSE_XML" | "FLUTTER_ARB" | "PROPERTIES" | "YAML_RUBY" | "YAML" | "JSON_I18NEXT" | "CSV" | "RESX_ICU" | "XLSX";
                 /** @description Delimiter to structure file content.
                  *
                  *     e.g. For key "home.header.title" would result in {"home": {"header": "title": {"Hello"}}} structure.
@@ -18830,6 +18836,8 @@ export interface operations {
                 filterAgency?: number[];
                 /** @description Exclude "done" tasks which are older than specified timestamp */
                 filterDoneMinClosedAt?: number;
+                /** @description Exclude tasks which were closed before specified timestamp */
+                filterNotClosedBefore?: number;
                 /** @description Zero-based page index (0..N) */
                 page?: number;
                 /** @description The size of the page to be returned */
@@ -21433,6 +21441,10 @@ export interface operations {
                 filterFailedKeysOfJob?: number;
                 /** @description Select only keys which are in specified task */
                 filterTaskNumber?: number[];
+                /** @description Filter task keys which are `not done` */
+                filterTaskKeysNotDone?: boolean;
+                /** @description Filter task keys which are `done` */
+                filterTaskKeysDone?: boolean;
             };
             header?: never;
             path: {
@@ -21556,6 +21568,10 @@ export interface operations {
                 filterFailedKeysOfJob?: number;
                 /** @description Select only keys which are in specified task */
                 filterTaskNumber?: number[];
+                /** @description Filter task keys which are `not done` */
+                filterTaskKeysNotDone?: boolean;
+                /** @description Filter task keys which are `done` */
+                filterTaskKeysDone?: boolean;
             };
             header?: never;
             path: {

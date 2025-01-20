@@ -40,7 +40,11 @@ export type Format =
   | "XLIFF_JAVA"
   | "XLIFF_PHP"
   | "XLIFF_RUBY"
-  | "RESX_ICU";
+  | "RESX_ICU"
+  | "XLSX_ICU"
+  | "XLSX_JAVA"
+  | "XLSX_PHP"
+  | "XLSX_RUBY";
 /**
  * File glob specifying which files to include.
  */

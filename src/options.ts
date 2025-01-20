@@ -101,6 +101,10 @@ export const FORMAT_OPT = new Option(
   'XLIFF_PHP',
   'XLIFF_RUBY',
   'RESX_ICU',
+  'XLSX_ICU',
+  'XLSX_JAVA',
+  'XLSX_PHP',
+  'XLSX_RUBY',
 ]);
 
 export const FILE_PATTERNS = new Option(
