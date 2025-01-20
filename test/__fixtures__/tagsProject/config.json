@@ -1,5 +1,5 @@
 {
-  "$schema": "../../../../schema.json",
+  "$schema": "../../../schema.json",
   "apiUrl": "http://localhost:22222",
   "patterns": [
     "./react.tsx"
