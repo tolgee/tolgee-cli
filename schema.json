@@ -136,6 +136,23 @@
           "type": ["string", "null"]
         }
       }
+    },
+    "sync": {
+      "type": "object",
+      "properties": {
+        "backup": {
+          "description": "Store translation files backup (only translation files, not states, comments, tags, etc.). If something goes wrong, the backup can be used to restore the project to its previous state.",
+          "type": "string"
+        },
+        "continueOnWarning": {
+          "description": "Continue the sync regardless of whether warnings are detected during string extraction. By default, as warnings may indicate an invalid extraction, the CLI will abort the sync.",
+          "type": "boolean"
+        },
+        "removeUnused": {
+          "description": "Delete unused keys from the Tolgee project",
+          "type": "boolean"
+        }
+      }
     }
   },
   "$defs": {
