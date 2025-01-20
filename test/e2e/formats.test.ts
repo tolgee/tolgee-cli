@@ -150,6 +150,15 @@ describe('push and pull with different formats', () => {
     });
   });
 
+  it('works with compose-multiplatform-xml icu format', async () => {
+    await testWithConfig({
+      config: 'compose-multiplatform-xml icu',
+      inPlatform: 'You have {0} items',
+      fileLocation: 'values-en/strings.xml',
+      inFile: 'You have %1$s items',
+    });
+  });
+
   it('works with flutter-arb icu format', async () => {
     await testWithConfig({ config: 'flutter-arb', fileLocation: 'app_en.arb' });
   });
@@ -165,7 +174,7 @@ describe('push and pull with different formats', () => {
     await testWithConfig({
       config: 'resx',
       inPlatform: 'You have {0} items',
-      fileLocation: 'en.xml',
+      fileLocation: 'en.resx',
       inFile: 'You have {0} items',
     });
   });
