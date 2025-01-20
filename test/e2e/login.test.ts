@@ -1,6 +1,6 @@
 import { tmpdir } from 'os';
 import { join } from 'path';
-import { rm, readFile, mkdtemp, writeFile } from 'fs/promises';
+import { rm, readFile } from 'fs/promises';
 import { run } from './utils/run.js';
 import { TolgeeClient } from '#cli/client/TolgeeClient.js';
 import { PROJECT_1 } from './utils/api/project1.js';
@@ -10,11 +10,12 @@ import {
   createProjectWithClient,
   deleteProject,
 } from './utils/api/common.js';
-import { Schema } from '#cli/schema.js';
+import { createTmpFolderWithConfig, removeTmpFolder } from './utils/tmp.js';
 
 const AUTH_FILE_PATH = join(tmpdir(), '.tolgee-e2e', 'authentication.json');
 
 afterEach(async () => {
+  await removeTmpFolder();
   try {
     await rm(AUTH_FILE_PATH);
   } catch (e: any) {
@@ -122,11 +123,4 @@ describe('Project 1', () => {
     const out = await run(['-c', configFile, 'pull']);
     expect(out.code).toBe(0);
   });
-
-  async function createTmpFolderWithConfig(config: Schema) {
-    const tempFolder = await mkdtemp(join(tmpdir(), 'cli-project-'));
-    const configFile = join(tempFolder, '.tolgeerc.json');
-    await writeFile(configFile, JSON.stringify(config, null, 2));
-    return { tempFolder, configFile };
-  }
 });

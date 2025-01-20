@@ -227,7 +227,7 @@ export default (config: Schema) =>
       new Option(
         '-Y, --yes',
         'Skip prompts and automatically say yes to them. You will not be asked for confirmation before creating/deleting keys.'
-      ).default(config.sync?.yes ?? false)
+      ).default(false)
     )
     .addOption(
       new Option(
