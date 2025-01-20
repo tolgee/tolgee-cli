@@ -162,6 +162,24 @@ export interface Schema {
      */
     delimiter?: string | null;
   };
+  sync?: {
+    /**
+     * Store translation files backup (only translation files, not states, comments, tags, etc.). If something goes wrong, the backup can be used to restore the project to its previous state.
+     */
+    backup?: string;
+    /**
+     * Continue the sync regardless of whether warnings are detected during string extraction. By default, as warnings may indicate an invalid extraction, the CLI will abort the sync.
+     */
+    continueOnWarning?: boolean;
+    /**
+     * Delete unused keys from the Tolgee project
+     */
+    removeUnused?: boolean;
+    /**
+     * Skip prompts and automatically say yes to them. You will not be asked for confirmation before creating/deleting keys.
+     */
+    yes?: boolean;
+  }
 }
 export interface FileMatch {
   path: Path;
