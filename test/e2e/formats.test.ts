@@ -152,7 +152,7 @@ describe('push and pull with different formats', () => {
 
   it('works with compose-multiplatform-xml icu format', async () => {
     await testWithConfig({
-      config: 'compose-multiplatform-xml icu',
+      config: 'compose-multiplatform-xml',
       inPlatform: 'You have {0} items',
       fileLocation: 'values-en/strings.xml',
       inFile: 'You have %1$s items',
