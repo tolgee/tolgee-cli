@@ -11,20 +11,36 @@ import { TolgeeClient } from '#cli/client/TolgeeClient.js';
 import { PROJECT_1 } from './utils/api/project1.js';
 import { PROJECT_3 } from './utils/api/project3.js';
 import { PROJECT_2 } from './utils/api/project2.js';
+import { createTmpFolderWithConfig, removeTmpFolder } from './utils/tmp.js';
+import { FileMatch } from '#cli/schema.js';
 
 const FIXTURES_PATH = new URL('../__fixtures__/', import.meta.url);
-const PROJECT_1_CONFIG = fileURLToPath(
-  new URL('./updatedProject1/tolgeerc.mjs', FIXTURES_PATH)
+
+const PROJECT_1_DIR = new URL('./updatedProject1/', FIXTURES_PATH);
+
+const PROJECT_2_DIR = new URL('./updatedProject2WithConflicts/', FIXTURES_PATH);
+const PROJECT_3_DIR = new URL('./updatedProject3/', FIXTURES_PATH);
+const PROJECT_3_DEPRECATED_DIR = new URL(
+  './updatedProject3DeprecatedKeys/',
+  FIXTURES_PATH
 );
-const PROJECT_2_CONFIG = fileURLToPath(
-  new URL('./updatedProject2WithConflicts/.tolgeerc', FIXTURES_PATH)
-);
-const PROJECT_3_CONFIG = fileURLToPath(
-  new URL('./updatedProject3/.tolgeerc', FIXTURES_PATH)
-);
-const PROJECT_3_DEPRECATED_CONFIG = fileURLToPath(
-  new URL('./updatedProject3DeprecatedKeys/.tolgeerc', FIXTURES_PATH)
-);
+
+function pushFilesConfig(base: URL, namespaces: string[] = ['']) {
+  const result: FileMatch[] = [];
+  for (const ns of namespaces) {
+    result.push({
+      path: fileURLToPath(new URL(`./${ns}/en.json`, base)),
+      language: 'en',
+      namespace: ns,
+    });
+    result.push({
+      path: fileURLToPath(new URL(`./${ns}/fr.json`, base)),
+      language: 'fr',
+      namespace: ns,
+    });
+  }
+  return result;
+}
 
 let client: TolgeeClient;
 let pak: string;
@@ -36,12 +52,16 @@ describe('project 1', () => {
   });
   afterEach(async () => {
     await deleteProject(client);
+    await removeTmpFolder();
   });
 
   it('pushes updated strings to Tolgee', async () => {
+    const { configFile } = await createTmpFolderWithConfig({
+      push: { files: pushFilesConfig(PROJECT_1_DIR) },
+    });
     const out = await run([
       '--config',
-      PROJECT_1_CONFIG,
+      configFile,
       '--api-key',
       pak,
       'push',
@@ -74,16 +94,53 @@ describe('project 1', () => {
     });
   });
 
-  it('pushes only selected languages', async () => {
+  it('pushes only selected languages (args)', async () => {
+    const config = {
+      push: { files: pushFilesConfig(PROJECT_1_DIR) },
+    };
+    const { configFile } = await createTmpFolderWithConfig(config);
     const out = await run([
       '--config',
-      PROJECT_1_CONFIG,
+      configFile,
       '--api-key',
       pak,
       'push',
       '-l',
       'fr',
     ]);
+
+    expect(out.code).toBe(0);
+
+    const keys = await client.GET('/v2/projects/{projectId}/translations', {
+      params: {
+        path: { projectId: client.getProjectId() },
+        query: { search: 'wire' },
+      },
+    });
+    expect(keys.data?.page?.totalElements).toBe(2);
+
+    const stored = tolgeeDataToDict(keys.data);
+    expect(stored).toEqual({
+      wired: {
+        __ns: null,
+        fr: 'Filaire',
+      },
+      wireless: {
+        __ns: null,
+        fr: 'Sans-fil',
+      },
+    });
+  });
+
+  it('pushes only selected languages (config)', async () => {
+    const { configFile } = await createTmpFolderWithConfig({
+      apiKey: pak,
+      push: {
+        files: pushFilesConfig(PROJECT_1_DIR),
+        languages: ['fr'],
+      },
+    });
+    const out = await run(['--config', configFile, 'push']);
 
     expect(out.code).toBe(0);
 
@@ -118,16 +175,17 @@ describe('project 3', () => {
   });
   afterEach(async () => {
     await deleteProject(client);
+    await removeTmpFolder();
   });
 
   it('pushes to Tolgee with correct namespaces', async () => {
-    const out = await run([
-      '--config',
-      PROJECT_3_CONFIG,
-      '--api-key',
-      pak,
-      'push',
-    ]);
+    const { configFile } = await createTmpFolderWithConfig({
+      push: {
+        files: pushFilesConfig(PROJECT_3_DIR, ['', 'drinks', 'food']),
+        forceMode: 'OVERRIDE',
+      },
+    });
+    const out = await run(['--config', configFile, '--api-key', pak, 'push']);
     expect(out.code).toBe(0);
 
     const keys = await client.GET('/v2/projects/{projectId}/translations', {
@@ -154,10 +212,16 @@ describe('project 3', () => {
     });
   });
 
-  it('pushes only selected namespaces and languages', async () => {
+  it('pushes only selected namespaces and languages (args)', async () => {
+    const { configFile } = await createTmpFolderWithConfig({
+      push: {
+        files: pushFilesConfig(PROJECT_3_DIR, ['', 'drinks', 'food']),
+        forceMode: 'OVERRIDE',
+      },
+    });
     const out = await run([
       '--config',
-      PROJECT_3_CONFIG,
+      configFile,
       'push',
       '--api-key',
       pak,
@@ -187,19 +251,88 @@ describe('project 3', () => {
     });
   });
 
-  it('removes other keys', async () => {
+  it('pushes only selected namespaces and languages (config)', async () => {
+    const { configFile } = await createTmpFolderWithConfig({
+      apiKey: pak,
+      push: {
+        files: pushFilesConfig(PROJECT_3_DIR, ['', 'drinks', 'food']),
+        forceMode: 'OVERRIDE',
+        namespaces: ['drinks'],
+      },
+    });
+    const out = await run(['--config', configFile, 'push']);
+    expect(out.code).toBe(0);
+
+    const keys = await client.GET('/v2/projects/{projectId}/translations', {
+      params: {
+        path: { projectId: client.getProjectId() },
+        query: { filterKeyName: ['water', 'glass'] },
+      },
+    });
+
+    expect(keys.data?.page?.totalElements).toBe(1);
+
+    const stored = tolgeeDataToDict(keys.data);
+    expect(stored).toEqual({
+      water: {
+        __ns: 'drinks',
+        en: 'Dihydrogen monoxide',
+        fr: 'Monoxyde de dihydrogène',
+      },
+    });
+  });
+
+  it('removes other keys (args)', async () => {
     const pakWithDelete = await createPak(client, [
       ...DEFAULT_SCOPES,
       'keys.delete',
     ]);
+    const { configFile } = await createTmpFolderWithConfig({
+      push: {
+        files: pushFilesConfig(PROJECT_3_DEPRECATED_DIR, ['', 'drinks']),
+      },
+    });
     const out = await run([
       '--config',
-      PROJECT_3_DEPRECATED_CONFIG,
+      configFile,
       'push',
       '--api-key',
       pakWithDelete,
       '--remove-other-keys',
     ]);
+
+    expect(out.code).toEqual(0);
+
+    const keys = await client.GET('/v2/projects/{projectId}/translations', {
+      params: {
+        path: { projectId: client.getProjectId() },
+      },
+    });
+
+    const stored = tolgeeDataToDict(keys.data);
+
+    expect(Object.keys(stored)).toEqual([
+      'table',
+      'chair',
+      'plate',
+      'fork',
+      'water',
+    ]);
+  });
+
+  it('removes other keys (config)', async () => {
+    const pakWithDelete = await createPak(client, [
+      ...DEFAULT_SCOPES,
+      'keys.delete',
+    ]);
+    const { configFile } = await createTmpFolderWithConfig({
+      apiKey: pakWithDelete,
+      push: {
+        files: pushFilesConfig(PROJECT_3_DEPRECATED_DIR, ['', 'drinks']),
+        removeOtherKeys: true,
+      },
+    });
+    const out = await run(['--config', configFile, 'push']);
 
     expect(out.code).toEqual(0);
 
@@ -228,12 +361,16 @@ describe('project 2', () => {
   });
   afterEach(async () => {
     await deleteProject(client);
+    await removeTmpFolder();
   });
 
   it('does not push strings to Tolgee if there are conflicts', async () => {
+    const { configFile } = await createTmpFolderWithConfig({
+      push: { files: pushFilesConfig(PROJECT_2_DIR) },
+    });
     const out = await run([
       '--config',
-      PROJECT_2_CONFIG,
+      configFile,
       'push',
       '--api-key',
       pak,
@@ -261,10 +398,13 @@ describe('project 2', () => {
     });
   });
 
-  it('does preserve the remote strings when using KEEP', async () => {
+  it('does preserve the remote strings when using KEEP (args)', async () => {
+    const { configFile } = await createTmpFolderWithConfig({
+      push: { files: pushFilesConfig(PROJECT_2_DIR) },
+    });
     const out = await run([
       '--config',
-      PROJECT_2_CONFIG,
+      configFile,
       'push',
       '--api-key',
       pak,
@@ -298,9 +438,45 @@ describe('project 2', () => {
     });
   });
 
+  it('does preserve the remote strings when using KEEP (config)', async () => {
+    const { configFile } = await createTmpFolderWithConfig({
+      apiKey: pak,
+      push: { files: pushFilesConfig(PROJECT_2_DIR), forceMode: 'KEEP' },
+    });
+    const out = await run(['--config', configFile, 'push']);
+
+    expect(out.code).toBe(0);
+
+    const keys = await client.GET('/v2/projects/{projectId}/translations', {
+      params: {
+        path: { projectId: client.getProjectId() },
+        query: { filterKeyName: ['cat-name', 'fox-name'] },
+      },
+    });
+
+    expect(keys.data?.page?.totalElements).toBe(2);
+
+    const stored = tolgeeDataToDict(keys.data);
+    expect(stored).toEqual({
+      'cat-name': {
+        __ns: null,
+        en: 'Cat',
+        fr: 'Chat',
+      },
+      'fox-name': {
+        __ns: null,
+        en: 'Fox',
+        fr: 'Renard',
+      },
+    });
+  });
+
   it('asks for confirmation when there are conflicts', async () => {
+    const { configFile } = await createTmpFolderWithConfig({
+      push: { files: pushFilesConfig(PROJECT_2_DIR) },
+    });
     const out = await runWithStdin(
-      ['--config', PROJECT_2_CONFIG, 'push', '--api-key', pak],
+      ['--config', configFile, 'push', '--api-key', pak],
       'OVERRIDE'
     );
 
@@ -330,16 +506,51 @@ describe('project 2', () => {
     });
   });
 
-  it('does override the remote strings when using OVERRIDE', async () => {
+  it('does override the remote strings when using OVERRIDE (args)', async () => {
+    const { configFile } = await createTmpFolderWithConfig({
+      push: { files: pushFilesConfig(PROJECT_2_DIR) },
+    });
     const out = await run([
       '--config',
-      PROJECT_2_CONFIG,
+      configFile,
       'push',
       '--api-key',
       pak,
       '--force-mode',
       'OVERRIDE',
     ]);
+
+    expect(out.code).toBe(0);
+
+    const keys = await client.GET('/v2/projects/{projectId}/translations', {
+      params: {
+        path: { projectId: client.getProjectId() },
+        query: { filterKeyName: ['cat-name', 'fox-name'] },
+      },
+    });
+    expect(keys.data?.page?.totalElements).toBe(2);
+
+    const stored = tolgeeDataToDict(keys.data);
+    expect(stored).toEqual({
+      'cat-name': {
+        __ns: null,
+        en: 'Kitty',
+        fr: 'Chaton',
+      },
+      'fox-name': {
+        __ns: null,
+        en: 'Fox',
+        fr: 'Renard',
+      },
+    });
+  });
+
+  it('does override the remote strings when using OVERRIDE (config)', async () => {
+    const { configFile } = await createTmpFolderWithConfig({
+      apiKey: pak,
+      push: { files: pushFilesConfig(PROJECT_2_DIR), forceMode: 'OVERRIDE' },
+    });
+    const out = await run(['--config', configFile, 'push']);
 
     expect(out.code).toBe(0);
 

@@ -74,6 +74,10 @@
           "items": {
             "type": "string"
           }
+        },
+        "removeOtherKeys": {
+          "description": "Remove keys which are not present in the import.",
+          "type": "boolean"
         }
       }
     },

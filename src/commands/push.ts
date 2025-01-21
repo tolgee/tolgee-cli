@@ -245,6 +245,6 @@ export default (config: Schema) =>
       new Option(
         '--remove-other-keys',
         'Remove keys which are not present in the import.'
-      ).default(false)
+      ).default(config.push?.removeOtherKeys)
     )
     .action(pushHandler(config));

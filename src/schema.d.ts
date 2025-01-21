@@ -119,6 +119,10 @@ export interface Schema {
      * Specify tags that will be added to newly created keys.
      */
     tagNewKeys?: string[];
+    /**
+     * Remove keys which are not present in the import.
+     */
+    removeOtherKeys?: boolean;
   };
   pull?: {
     /**

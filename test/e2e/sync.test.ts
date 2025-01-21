@@ -205,7 +205,7 @@ describe('Project 2', () => {
     expect(keys.data?.page?.totalElements).toBe(0);
   }, 30e3);
 
-  it('does a proper backup', async () => {
+  it('does a proper backup (args)', async () => {
     const out = await run(
       [
         'sync',
@@ -225,7 +225,7 @@ describe('Project 2', () => {
     await expect(TMP_FOLDER).toMatchContentsOf(PROJECT_2_DATA);
   }, 30e3);
 
-  it('does a proper backup via .togeerc', async () => {
+  it('does a proper backup (config)', async () => {
     const { configFile } = await createTmpFolderWithConfig({
       apiKey: pak,
       sync: {
@@ -250,7 +250,7 @@ describe('Project 2', () => {
     expect(out.stderr).toContain('Warnings were emitted');
   }, 30e3);
 
-  it('continues when there are warnings and --continue-on-warning is set', async () => {
+  it('continues when there are warnings and --continue-on-warning is set (args)', async () => {
     const out = await run(
       [
         'sync',
@@ -269,7 +269,7 @@ describe('Project 2', () => {
     expect(out.stderr).toContain('Warnings were emitted');
   }, 30e3);
 
-  it('continues when there are warnings and continueOnWarning is set in config', async () => {
+  it('continues when there are warnings and --continue-on-warning is set (config)', async () => {
     const { configFile } = await createTmpFolderWithConfig({
       apiKey: pak,
       sync: {
@@ -294,12 +294,40 @@ describe('Project 3', () => {
     await deleteProject(client);
   });
 
-  it('handles namespaces properly', async () => {
+  it('handles namespaces properly (args)', async () => {
     const out = await run(
       ['sync', '--yes', '--api-key', pak, '--patterns', CODE_PROJECT_3],
       undefined,
       20e3
     );
+
+    expect(out.code).toBe(0);
+    expect(out.stdout).toContain('+ 1 string');
+
+    const keys = await client.GET('/v2/projects/{projectId}/translations', {
+      params: {
+        path: { projectId: client.getProjectId() },
+        query: { filterKeyName: ['welcome'] },
+      },
+    });
+
+    expect(keys.data?.page?.totalElements).toBe(1);
+
+    const stored = tolgeeDataToDict(keys.data);
+    expect(stored).toEqual({
+      welcome: {
+        __ns: 'greeting',
+        en: 'Welcome!',
+      },
+    });
+  }, 30e3);
+
+  it('handles namespaces properly (config)', async () => {
+    const { configFile } = await createTmpFolderWithConfig({
+      apiKey: pak,
+      patterns: [CODE_PROJECT_3],
+    });
+    const out = await run(['-c', configFile, 'sync', '--yes'], undefined, 20e3);
 
     expect(out.code).toBe(0);
     expect(out.stdout).toContain('+ 1 string');
