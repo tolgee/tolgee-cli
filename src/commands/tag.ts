@@ -71,40 +71,47 @@ export default (config: Schema) =>
       new Option(
         '--filter-extracted',
         'Extract keys from code and filter by it.'
-      )
+      ).default(config.tag?.filterExtracted)
     )
     .addOption(
       new Option(
         '--filter-not-extracted',
         'Extract keys from code and filter them out.'
-      )
+      ).default(config.tag?.filterNotExtracted)
     )
     .addOption(
       new Option(
         '--filter-tag <tags...>',
         'Filter only keys with tag. Use * as a wildcard.'
-      )
+      ).default(config.tag?.filterTag)
     )
     .addOption(
       new Option(
         '--filter-no-tag <tags...>',
         'Filter only keys without tag. Use * as a wildcard.'
+      ).default(config.tag?.filterNoTag)
+    )
+    .addOption(
+      new Option('--tag <tags...>', 'Add tag to filtered keys.').default(
+        config.tag?.tag
       )
     )
-    .addOption(new Option('--tag <tags...>', 'Add tag to filtered keys.'))
     .addOption(
-      new Option('--tag-other <tags...>', 'Tag keys which are not filtered.')
+      new Option(
+        '--tag-other <tags...>',
+        'Tag keys which are not filtered.'
+      ).default(config.tag?.tagOther)
     )
     .addOption(
       new Option(
         '--untag <tags...>',
         'Remove tag from filtered keys. Use * as a wildcard.'
-      )
+      ).default(config.tag?.untag)
     )
     .addOption(
       new Option(
         '--untag-other <tags...>',
         'Remove tag from keys which are not filtered. Use * as a wildcard.'
-      )
+      ).default(config.tag?.untagOther)
     )
     .action(tagHandler(config));

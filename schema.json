@@ -157,6 +157,61 @@
           "type": "boolean"
         }
       }
+    },
+    "tag": {
+      "type": "object",
+      "properties": {
+        "filterExtracted": {
+          "description": "Extract keys from code and filter by it.",
+          "type": "boolean"
+        },
+        "filterNotExtracted": {
+          "description": "Extract keys from code and filter them out.",
+          "type": "boolean"
+        },
+        "filterTag": {
+          "description": "Filter only keys with tag. Use * as a wildcard.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "filterNoTag": {
+          "description": "Filter only keys without tag. Use * as a wildcard.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "tag": {
+          "description": "Add tag to filtered keys.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "tagOther": {
+          "description": "Tag keys which are not filtered.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "untag": {
+          "description": "Remove tag from filtered keys. Use * as a wildcard.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "untagOther": {
+          "description": "Remove tag from keys which are not filtered. Use * as a wildcard.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
     }
   },
   "$defs": {

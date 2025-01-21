@@ -180,6 +180,40 @@ export interface Schema {
      */
     removeUnused?: boolean;
   };
+  tag?: {
+    /**
+     * Extract keys from code and filter by it.
+     */
+    filterExtracted?: boolean;
+    /**
+     * Extract keys from code and filter them out.
+     */
+    filterNotExtracted?: boolean;
+    /**
+     * Filter only keys with tag. Use * as a wildcard.
+     */
+    filterTag?: string[];
+    /**
+     * Filter only keys without tag. Use * as a wildcard.
+     */
+    filterNoTag?: string[];
+    /**
+     * Add tag to filtered keys.
+     */
+    tag?: string[];
+    /**
+     * Tag keys which are not filtered.
+     */
+    tagOther?: string[];
+    /**
+     * Remove tag from filtered keys. Use * as a wildcard.
+     */
+    untag?: string[];
+    /**
+     * Remove tag from keys which are not filtered. Use * as a wildcard.
+     */
+    untagOther?: string[];
+  };
 }
 export interface FileMatch {
   path: Path;
