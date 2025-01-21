@@ -21,11 +21,13 @@ export type Format =
   | "PO_JAVA"
   | "PO_ICU"
   | "PO_RUBY"
+  | "PO_PYTHON"
   | "APPLE_STRINGS"
   | "APPLE_XLIFF"
   | "PROPERTIES_ICU"
   | "PROPERTIES_JAVA"
   | "ANDROID_XML"
+  | "COMPOSE_XML"
   | "FLUTTER_ARB"
   | "CSV_ICU"
   | "CSV_JAVA"
@@ -38,7 +40,12 @@ export type Format =
   | "XLIFF_ICU"
   | "XLIFF_JAVA"
   | "XLIFF_PHP"
-  | "XLIFF_RUBY";
+  | "XLIFF_RUBY"
+  | "RESX_ICU"
+  | "XLSX_ICU"
+  | "XLSX_JAVA"
+  | "XLSX_PHP"
+  | "XLSX_RUBY";
 /**
  * File glob specifying which files to include.
  */

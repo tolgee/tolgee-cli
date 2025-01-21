@@ -1,0 +1,12 @@
+{
+  "$schema": "../../../schema.json",
+  "format": "COMPOSE_XML",
+  "push": {
+    "files": [
+      {
+        "path": "./compose-multiplatform-xml/values-en/**",
+        "language": "en"
+      }
+    ]
+  }
+}

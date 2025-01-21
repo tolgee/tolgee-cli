@@ -17,6 +17,8 @@ export const mapExportFormat = (format: Schema['format']): FormatResult => {
       };
     case 'APPLE_XLIFF':
       return { format: 'APPLE_XLIFF', messageFormat: 'APPLE_SPRINTF' };
+    case 'COMPOSE_XML':
+      return { format: 'COMPOSE_XML', messageFormat: 'JAVA_STRING_FORMAT' };
     case 'FLUTTER_ARB':
       return { format: 'FLUTTER_ARB', messageFormat: 'ICU' };
     case 'JSON_C':
@@ -43,6 +45,8 @@ export const mapExportFormat = (format: Schema['format']): FormatResult => {
       return { format: 'PO', messageFormat: 'PHP_SPRINTF' };
     case 'PO_RUBY':
       return { format: 'PO', messageFormat: 'RUBY_SPRINTF' };
+    case 'PO_PYTHON':
+      return { format: 'PO', messageFormat: 'PYTHON_PERCENT' };
     case 'PROPERTIES_ICU':
       return {
         format: 'PROPERTIES',
@@ -50,6 +54,8 @@ export const mapExportFormat = (format: Schema['format']): FormatResult => {
       };
     case 'PROPERTIES_JAVA':
       return { format: 'PROPERTIES', messageFormat: 'JAVA_STRING_FORMAT' };
+    case 'RESX_ICU':
+      return { format: 'RESX_ICU', messageFormat: 'ICU' };
     case 'XLIFF_ICU':
       return { format: 'XLIFF', messageFormat: 'ICU' };
     case 'XLIFF_JAVA':
@@ -74,6 +80,14 @@ export const mapExportFormat = (format: Schema['format']): FormatResult => {
       return { format: 'CSV', messageFormat: 'PHP_SPRINTF' };
     case 'CSV_RUBY':
       return { format: 'CSV', messageFormat: 'RUBY_SPRINTF' };
+    case 'XLSX_ICU':
+      return { format: 'XLSX', messageFormat: 'ICU' };
+    case 'XLSX_JAVA':
+      return { format: 'XLSX', messageFormat: 'JAVA_STRING_FORMAT' };
+    case 'XLSX_PHP':
+      return { format: 'XLSX', messageFormat: 'PHP_SPRINTF' };
+    case 'XLSX_RUBY':
+      return { format: 'XLSX', messageFormat: 'RUBY_SPRINTF' };
     case undefined:
       return { format: 'JSON_TOLGEE', messageFormat: 'ICU' };
   }
