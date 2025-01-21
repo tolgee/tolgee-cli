@@ -1,7 +1,12 @@
 import { fileURLToPath } from 'url';
 import { mkdir, readFile, rm, writeFile } from 'fs/promises';
 import { readFileSync } from 'fs';
-import { TMP_FOLDER, setupTemporaryFolder } from './utils/tmp.js';
+import {
+  TMP_FOLDER,
+  createTmpFolderWithConfig,
+  removeTmpFolder,
+  setupTemporaryFolder,
+} from './utils/tmp.js';
 import { run } from './utils/run.js';
 import './utils/toMatchContentsOf.js';
 import { dirname, join } from 'path';
@@ -26,14 +31,6 @@ const PROJECT_3_DATA = fileURLToPath(
 );
 const PROJECT_3_DATA_ONLY_FOOD = fileURLToPath(
   new URL('./tolgeeImportData/test3-only-food', FIXTURES_PATH)
-);
-
-const NESTED_KEYS_PROJECT_FLAT_CONFIG = fileURLToPath(
-  new URL('./nestedKeysProject/tolgee.config.flat.json', FIXTURES_PATH)
-);
-
-const NESTED_KEYS_PROJECT_NESTED_CONFIG = fileURLToPath(
-  new URL('./nestedKeysProject/tolgee.config.nested.json', FIXTURES_PATH)
 );
 
 let client: TolgeeClient;
@@ -70,10 +67,24 @@ describe('Project 1', () => {
   });
   afterEach(async () => {
     await deleteProject(client);
+    await removeTmpFolder();
   });
 
-  it('pulls strings from Tolgee', async () => {
+  it('pulls strings from Tolgee with --path', async () => {
     const out = await run(['pull', '--api-key', pak, '--path', TMP_FOLDER]);
+
+    expect(out.code).toBe(0);
+    await expect(TMP_FOLDER).toMatchContentsOf(PROJECT_1_DATA);
+  });
+
+  it('pulls strings from Tolgee with config', async () => {
+    const { configFile } = await createTmpFolderWithConfig({
+      apiKey: pak,
+      pull: {
+        path: TMP_FOLDER,
+      },
+    });
+    const out = await run(['-c', configFile, 'pull']);
 
     expect(out.code).toBe(0);
     await expect(TMP_FOLDER).toMatchContentsOf(PROJECT_1_DATA);
@@ -95,6 +106,22 @@ describe('Project 1', () => {
     expect(out.code).toBe(0);
     await expect(TMP_FOLDER).toMatchContentsOf(PROJECT_1_DATA);
   });
+
+  it('does empty existing folder if asked to (config)', async () => {
+    await mkdir(TMP_FOLDER);
+    const existingFile = join(TMP_FOLDER, 'test');
+    await writeFile(existingFile, 'test');
+    const { configFile } = await createTmpFolderWithConfig({
+      apiKey: pak,
+      pull: {
+        path: TMP_FOLDER,
+        emptyDir: true,
+      },
+    });
+    const out = await run(['-c', configFile, 'pull']);
+    expect(out.code).toBe(0);
+    await expect(TMP_FOLDER).toMatchContentsOf(PROJECT_1_DATA);
+  });
 });
 
 describe('Project 3', () => {
@@ -105,6 +132,7 @@ describe('Project 3', () => {
   });
   afterEach(async () => {
     await deleteProject(client);
+    await removeTmpFolder();
   });
 
   it('pulls strings with all namespaces from Tolgee', async () => {
@@ -114,7 +142,7 @@ describe('Project 3', () => {
     await expect(TMP_FOLDER).toMatchContentsOf(PROJECT_3_DATA);
   });
 
-  it('pulls strings only from the specified namespaces', async () => {
+  it('pulls strings only from the specified namespaces (arg)', async () => {
     const namespaceFolder = 'food';
     const out = await run([
       'pull',
@@ -126,6 +154,20 @@ describe('Project 3', () => {
       namespaceFolder,
     ]);
 
+    expect(out.code).toBe(0);
+    await expect(TMP_FOLDER).toMatchContentsOf(PROJECT_3_DATA_ONLY_FOOD);
+  });
+
+  it('pulls strings only from the specified namespaces (config)', async () => {
+    const namespaceFolder = 'food';
+    const { configFile } = await createTmpFolderWithConfig({
+      apiKey: pak,
+      pull: {
+        path: TMP_FOLDER,
+        namespaces: [namespaceFolder],
+      },
+    });
+    const out = await run(['-c', configFile, 'pull']);
     expect(out.code).toBe(0);
     await expect(TMP_FOLDER).toMatchContentsOf(PROJECT_3_DATA_ONLY_FOOD);
   });
@@ -144,7 +186,7 @@ describe('Project 3', () => {
     await expect(TMP_FOLDER).toMatchStructureOf(PROJECT_3_DATA);
   });
 
-  it('filters by languages', async () => {
+  it('filters by languages (arg)', async () => {
     await mkdir(TMP_FOLDER);
     const out = await run([
       'pull',
@@ -165,7 +207,27 @@ describe('Project 3', () => {
    └── en.json`);
   });
 
-  it('filters by namespace', async () => {
+  it('filters by languages (config)', async () => {
+    await mkdir(TMP_FOLDER);
+    const { configFile } = await createTmpFolderWithConfig({
+      apiKey: pak,
+      pull: {
+        path: TMP_FOLDER,
+        languages: ['en'],
+      },
+    });
+    const out = await run(['-c', configFile, 'pull']);
+
+    expect(out.code).toBe(0);
+    await expect(TMP_FOLDER).toMatchStructure(`
+├── drinks/
+|  └── en.json
+├── en.json
+└── food/
+   └── en.json`);
+  });
+
+  it('filters by namespace (arg)', async () => {
     await mkdir(TMP_FOLDER);
     const out = await run([
       'pull',
@@ -184,7 +246,25 @@ describe('Project 3', () => {
    └── fr.json`);
   });
 
-  it('filters by tag', async () => {
+  it('filters by namespace (config)', async () => {
+    await mkdir(TMP_FOLDER);
+    const { configFile } = await createTmpFolderWithConfig({
+      apiKey: pak,
+      pull: {
+        path: TMP_FOLDER,
+        namespaces: ['food'],
+      },
+    });
+    const out = await run(['-c', configFile, 'pull']);
+
+    expect(out.code).toBe(0);
+    await expect(TMP_FOLDER).toMatchStructure(`
+└── food/
+   ├── en.json
+   └── fr.json`);
+  });
+
+  it('filters by tag (arg)', async () => {
     await prepareTags(client);
     await mkdir(TMP_FOLDER);
     const out = await run([
@@ -208,7 +288,31 @@ describe('Project 3', () => {
     expect(content).toEqual({ soda: 'Soda' });
   });
 
-  it('filters negatively by tag', async () => {
+  it('filters by tag (config)', async () => {
+    await prepareTags(client);
+    await mkdir(TMP_FOLDER);
+
+    const { configFile } = await createTmpFolderWithConfig({
+      apiKey: pak,
+      pull: {
+        path: TMP_FOLDER,
+        tags: ['soda_tag'],
+      },
+    });
+    const out = await run(['-c', configFile, 'pull']);
+
+    expect(out.code).toBe(0);
+    await expect(TMP_FOLDER).toMatchStructure(`
+└── drinks/
+   ├── en.json
+   └── fr.json`);
+
+    const content = (await import(join(TMP_FOLDER, 'drinks', 'en.json')))
+      .default;
+    expect(content).toEqual({ soda: 'Soda' });
+  });
+
+  it('filters negatively by tag (arg)', async () => {
     await prepareTags(client);
     await mkdir(TMP_FOLDER);
     const out = await run([
@@ -237,7 +341,36 @@ describe('Project 3', () => {
     expect(content).toEqual({ water: 'Water' });
   });
 
-  it('honors files template structure', async () => {
+  it('filters negatively by tag (config)', async () => {
+    await prepareTags(client);
+    await mkdir(TMP_FOLDER);
+
+    const { configFile } = await createTmpFolderWithConfig({
+      apiKey: pak,
+      pull: {
+        path: TMP_FOLDER,
+        excludeTags: ['soda_tag'],
+      },
+    });
+    const out = await run(['-c', configFile, 'pull']);
+
+    expect(out.code).toBe(0);
+    await expect(TMP_FOLDER).toMatchStructure(`
+├── drinks/
+|  ├── en.json
+|  └── fr.json
+├── en.json
+├── food/
+|  ├── en.json
+|  └── fr.json
+└── fr.json`);
+
+    const content = (await import(join(TMP_FOLDER, 'drinks', 'en.json')))
+      .default;
+    expect(content).toEqual({ water: 'Water' });
+  });
+
+  it('honors files template structure (arg)', async () => {
     await prepareTags(client);
     await mkdir(TMP_FOLDER);
     const out = await run([
@@ -266,6 +399,35 @@ describe('Project 3', () => {
       .default;
     expect(content).toEqual({ water: 'Water' });
   });
+
+  it('honors files template structure (config)', async () => {
+    await prepareTags(client);
+    await mkdir(TMP_FOLDER);
+
+    const { configFile } = await createTmpFolderWithConfig({
+      apiKey: pak,
+      pull: {
+        path: TMP_FOLDER,
+        excludeTags: ['soda_tag'],
+        fileStructureTemplate: '{namespace}/lang-{languageTag}.{extension}',
+      },
+    });
+    const out = await run(['-c', configFile, 'pull']);
+
+    expect(out.code).toBe(0);
+    await expect(TMP_FOLDER).toMatchStructure(`
+├── drinks/
+|  ├── lang-en.json
+|  └── lang-fr.json
+├── food/
+|  ├── lang-en.json
+|  └── lang-fr.json
+├── lang-en.json
+└── lang-fr.json`);
+    const content = (await import(join(TMP_FOLDER, 'drinks', 'lang-en.json')))
+      .default;
+    expect(content).toEqual({ water: 'Water' });
+  });
 });
 
 describe('Nested keys project', () => {
@@ -279,26 +441,10 @@ describe('Nested keys project', () => {
   });
   afterEach(async () => {
     await deleteProject(client);
+    await removeTmpFolder();
   });
 
-  it('pulls flat structure with config delmiter: null', async () => {
-    const out = await run([
-      'pull',
-      '-c',
-      NESTED_KEYS_PROJECT_FLAT_CONFIG,
-      '--api-key',
-      pak,
-      '--path',
-      TMP_FOLDER,
-    ]);
-
-    expect(out.code).toBe(0);
-    expect(readJsonFile(join(TMP_FOLDER, 'en.json'))).toEqual({
-      'nested.keyboard': 'Keyboard',
-    });
-  });
-
-  it('pulls flat structure with delimiter in parameter', async () => {
+  it('pulls flat structure with delimiter (arg)', async () => {
     const out = await run([
       'pull',
       // simulating empty string e.g. `--delimiter ""`, which somehow can't be passed here
@@ -315,24 +461,23 @@ describe('Nested keys project', () => {
     });
   });
 
-  it('pulls nested structure with delmiter: "."', async () => {
-    const out = await run([
-      'pull',
-      '-c',
-      NESTED_KEYS_PROJECT_NESTED_CONFIG,
-      '--api-key',
-      pak,
-      '--path',
-      TMP_FOLDER,
-    ]);
+  it('pulls flat structure with delmiter: null (config)', async () => {
+    const { configFile } = await createTmpFolderWithConfig({
+      apiKey: pak,
+      pull: {
+        delimiter: null,
+        path: TMP_FOLDER,
+      },
+    });
+    const out = await run(['-c', configFile, 'pull']);
 
     expect(out.code).toBe(0);
     expect(readJsonFile(join(TMP_FOLDER, 'en.json'))).toEqual({
-      nested: { keyboard: 'Keyboard' },
+      'nested.keyboard': 'Keyboard',
     });
   });
 
-  it('pulls nested structure with delimiter in parameter', async () => {
+  it('pulls nested structure with delimiter (arg)', async () => {
     const out = await run([
       'pull',
       '--delimiter',
@@ -349,7 +494,24 @@ describe('Nested keys project', () => {
     });
   });
 
-  it('pulls nested structure with arrays', async () => {
+  it('pulls nested structure with delimiter (config)', async () => {
+    const { configFile } = await createTmpFolderWithConfig({
+      apiKey: pak,
+      pull: {
+        path: TMP_FOLDER,
+        delimiter: '.',
+      },
+    });
+
+    const out = await run(['-c', configFile, 'pull']);
+
+    expect(out.code).toBe(0);
+    expect(readJsonFile(join(TMP_FOLDER, 'en.json'))).toEqual({
+      nested: { keyboard: 'Keyboard' },
+    });
+  });
+
+  it('pulls nested structure with arrays (arg)', async () => {
     const out = await run([
       'pull',
       '--support-arrays',
@@ -360,6 +522,24 @@ describe('Nested keys project', () => {
       '--path',
       TMP_FOLDER,
     ]);
+
+    expect(out.code).toBe(0);
+    expect(readJsonFile(join(TMP_FOLDER, 'en.json'))).toEqual({
+      nested: { keyboard: 'Keyboard' },
+    });
+  });
+
+  it('pulls nested structure with arrays (config)', async () => {
+    const { configFile } = await createTmpFolderWithConfig({
+      apiKey: pak,
+      pull: {
+        path: TMP_FOLDER,
+        delimiter: '.',
+        supportArrays: true,
+      },
+    });
+
+    const out = await run(['-c', configFile, 'pull']);
 
     expect(out.code).toBe(0);
     expect(readJsonFile(join(TMP_FOLDER, 'en.json'))).toEqual({
@@ -379,9 +559,10 @@ describe('Nested array keys project', () => {
   });
   afterEach(async () => {
     await deleteProject(client);
+    await removeTmpFolder();
   });
 
-  it('pulls nested structure with arrays', async () => {
+  it('pulls nested structure with arrays for json (arg)', async () => {
     const out = await run([
       'pull',
       '--support-arrays',
@@ -408,29 +589,33 @@ describe('Nested array keys project', () => {
     });
   });
 
-  it('pulls nested structure with arrays', async () => {
-    const out = await run([
-      'pull',
-      '--support-arrays',
-      '--format',
-      'YAML_ICU',
-      '--delimiter',
-      '.',
-      '--api-key',
-      pak,
-      '--path',
-      TMP_FOLDER,
-    ]);
+  it('pulls nested structure with arrays for json (config)', async () => {
+    const { configFile } = await createTmpFolderWithConfig({
+      apiKey: pak,
+      format: 'JSON_ICU',
+      pull: {
+        path: TMP_FOLDER,
+        delimiter: '.',
+        supportArrays: true,
+      },
+    });
+
+    const out = await run(['-c', configFile, 'pull']);
 
     expect(out.code).toBe(0);
-    expect(readFileSync(join(TMP_FOLDER, 'en.yaml')).toString()).toContain(
-      `nested:
-- keyboard: "Keyboard 0"
-- keyboard: "Keyboard 1"`
-    );
+    expect(readJsonFile(join(TMP_FOLDER, 'en.json'))).toEqual({
+      nested: [
+        {
+          keyboard: 'Keyboard 0',
+        },
+        {
+          keyboard: 'Keyboard 1',
+        },
+      ],
+    });
   });
 
-  it('pulls nested structure with arrays', async () => {
+  it('pulls nested structure with arrays for yaml', async () => {
     const out = await run([
       'pull',
       '--support-arrays',

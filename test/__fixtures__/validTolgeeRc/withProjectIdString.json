@@ -1,4 +1,4 @@
 {
-  "$schema": "../../../../schema.json",
+  "$schema": "../../../schema.json",
   "projectId": "1337"
 }

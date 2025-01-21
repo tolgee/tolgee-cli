@@ -1,4 +1,5 @@
 import { TolgeeClient } from '#cli/client/TolgeeClient.js';
+import { join } from 'path';
 import {
   createPak,
   createProjectWithClient,
@@ -8,10 +9,29 @@ import { PROJECT_1 } from './utils/api/project1.js';
 import { ORIGINAL_TAGS, createTestTags, getTagsMap } from './utils/api/tags.js';
 import { run } from './utils/run.js';
 import { fileURLToPathSlash } from './utils/toFilePath.js';
+import { Schema } from '#cli/schema.js';
+import { createTmpFolderWithConfig, removeTmpFolder } from './utils/tmp.js';
+
+const TAGS_PROJECT_DIR = fileURLToPathSlash(
+  new URL('../__fixtures__/tagsProject/', import.meta.url)
+);
 
 const TAGS_PROJECT_CONFIG = fileURLToPathSlash(
   new URL('../__fixtures__/tagsProject/config.json', import.meta.url)
 );
+
+const PROJECT_CONFIG_BASE = {
+  apiUrl: 'http://localhost:22222',
+  patterns: [join(TAGS_PROJECT_DIR, './react.tsx')],
+  push: {
+    files: [
+      {
+        path: join(TAGS_PROJECT_DIR, './testfiles/en.json'),
+        language: 'en',
+      },
+    ],
+  },
+} as const satisfies Schema;
 
 let client: TolgeeClient;
 let pak: string;
@@ -23,12 +43,14 @@ beforeEach(async () => {
 });
 afterEach(async () => {
   await deleteProject(client);
+  await removeTmpFolder();
 });
 
-it('updates production tags from extracted', async () => {
+it('updates production tags from extracted (args)', async () => {
+  const { configFile } = await createTmpFolderWithConfig(PROJECT_CONFIG_BASE);
   const out = await run([
     '-c',
-    TAGS_PROJECT_CONFIG,
+    configFile,
     '--api-key',
     pak,
     'tag',
@@ -47,10 +69,31 @@ it('updates production tags from extracted', async () => {
   });
 });
 
-it('marks as deprecated', async () => {
+it('updates production tags from extracted (config)', async () => {
+  const { configFile } = await createTmpFolderWithConfig({
+    ...PROJECT_CONFIG_BASE,
+    apiKey: pak,
+    tag: {
+      filterExtracted: true,
+      tag: ['production-v13'],
+      untag: ['production-*'],
+    },
+  });
+  const out = await run(['-c', configFile, 'tag']);
+
+  expect(out.code).toBe(0);
+
+  expect(await getTagsMap(client)).toEqual({
+    ...ORIGINAL_TAGS,
+    controller: ['production-v13'],
+  });
+});
+
+it('marks as deprecated (args)', async () => {
+  const { configFile } = await createTmpFolderWithConfig(PROJECT_CONFIG_BASE);
   const out = await run([
     '-c',
-    TAGS_PROJECT_CONFIG,
+    configFile,
     '--api-key',
     pak,
     'tag',
@@ -71,10 +114,32 @@ it('marks as deprecated', async () => {
   });
 });
 
-it('marks newly created keys as drafts', async () => {
+it('marks as deprecated (config)', async () => {
+  const { configFile } = await createTmpFolderWithConfig({
+    ...PROJECT_CONFIG_BASE,
+    apiKey: pak,
+    tag: {
+      filterNotExtracted: true,
+      filterTag: ['production-*'],
+      tag: ['deprecated-v13'],
+      untag: ['production-*'],
+    },
+  });
+  const out = await run(['-c', configFile, 'tag']);
+
+  expect(out.code).toBe(0);
+
+  expect(await getTagsMap(client)).toEqual({
+    ...ORIGINAL_TAGS,
+    desk: ['deprecated-v13'],
+  });
+});
+
+it('marks newly created keys as drafts (args)', async () => {
+  const { configFile } = await createTmpFolderWithConfig(PROJECT_CONFIG_BASE);
   const out = await run([
     '-c',
-    TAGS_PROJECT_CONFIG,
+    configFile,
     '--api-key',
     pak,
     'push',
@@ -88,10 +153,28 @@ it('marks newly created keys as drafts', async () => {
   });
 });
 
-it('marks other keys', async () => {
+it('marks newly created keys as drafts (config)', async () => {
+  const { configFile } = await createTmpFolderWithConfig({
+    ...PROJECT_CONFIG_BASE,
+    apiKey: pak,
+    push: {
+      ...PROJECT_CONFIG_BASE.push,
+      tagNewKeys: ['draft-another-branch'],
+    },
+  });
+  const out = await run(['-c', configFile, 'push']);
+  expect(out.code).toBe(0);
+  expect(await getTagsMap(client)).toEqual({
+    ...ORIGINAL_TAGS,
+    new: ['draft-another-branch'],
+  });
+});
+
+it('marks other keys (args)', async () => {
+  const { configFile } = await createTmpFolderWithConfig(PROJECT_CONFIG_BASE);
   const out = await run([
     '-c',
-    TAGS_PROJECT_CONFIG,
+    configFile,
     '--api-key',
     pak,
     'tag',
@@ -102,6 +185,26 @@ it('marks other keys', async () => {
     '--tag-other',
     'other',
   ]);
+
+  expect(out.code).toBe(0);
+
+  expect(await getTagsMap(client)).toEqual({
+    ...ORIGINAL_TAGS,
+    keyboard: ['other'],
+    remote: ['other'],
+  });
+});
+
+it('marks other keys (config)', async () => {
+  const { configFile } = await createTmpFolderWithConfig({
+    ...PROJECT_CONFIG_BASE,
+    apiKey: pak,
+    tag: {
+      filterTag: ['production-*', 'draft-*', 'deprecated-*'],
+      tagOther: ['other'],
+    },
+  });
+  const out = await run(['-c', configFile, 'tag']);
 
   expect(out.code).toBe(0);
 

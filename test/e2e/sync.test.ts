@@ -1,6 +1,11 @@
 import { fileURLToPath } from 'url';
 import { fileURLToPathSlash } from './utils/toFilePath.js';
-import { TMP_FOLDER, setupTemporaryFolder } from './utils/tmp.js';
+import {
+  TMP_FOLDER,
+  createTmpFolderWithConfig,
+  removeTmpFolder,
+  setupTemporaryFolder,
+} from './utils/tmp.js';
 import { tolgeeDataToDict } from './utils/data.js';
 import { run } from './utils/run.js';
 import './utils/toMatchContentsOf';
@@ -41,6 +46,7 @@ describe('Project 2', () => {
 
   afterEach(async () => {
     await deleteProject(client);
+    await removeTmpFolder();
   });
 
   it('says projects are in sync when they do match', async () => {
@@ -137,7 +143,7 @@ describe('Project 2', () => {
     });
   }, 30e3);
 
-  it('deletes keys that no longer exist', async () => {
+  it('deletes keys that no longer exist via --remove-unused', async () => {
     const pakWithDelete = await createPak(client, [
       ...DEFAULT_SCOPES,
       'keys.delete',
@@ -170,7 +176,36 @@ describe('Project 2', () => {
     expect(keys.data?.page?.totalElements).toBe(0);
   }, 30e3);
 
-  it('does a proper backup', async () => {
+  it('deletes keys that no longer exist via config', async () => {
+    const pakWithDelete = await createPak(client, [
+      ...DEFAULT_SCOPES,
+      'keys.delete',
+    ]);
+
+    const { configFile } = await createTmpFolderWithConfig({
+      apiKey: pakWithDelete,
+      sync: {
+        removeUnused: true,
+      },
+      patterns: [CODE_PROJECT_2_DELETED],
+    });
+
+    const out = await run(['-c', configFile, 'sync', '--yes'], undefined, 20e3);
+
+    expect(out.code).toBe(0);
+    expect(out.stdout).toContain('- 2 strings');
+
+    const keys = await client.GET('/v2/projects/{projectId}/translations', {
+      params: {
+        path: { projectId: client.getProjectId() },
+        query: { filterKeyName: ['bird-name', 'bird-sound'] },
+      },
+    });
+
+    expect(keys.data?.page?.totalElements).toBe(0);
+  }, 30e3);
+
+  it('does a proper backup (args)', async () => {
     const out = await run(
       [
         'sync',
@@ -190,6 +225,20 @@ describe('Project 2', () => {
     await expect(TMP_FOLDER).toMatchContentsOf(PROJECT_2_DATA);
   }, 30e3);
 
+  it('does a proper backup (config)', async () => {
+    const { configFile } = await createTmpFolderWithConfig({
+      apiKey: pak,
+      sync: {
+        backup: TMP_FOLDER,
+      },
+      patterns: [CODE_PROJECT_2_DELETED],
+    });
+    const out = await run(['-c', configFile, 'sync'], undefined, 20e3);
+
+    expect(out.code).toBe(0);
+    await expect(TMP_FOLDER).toMatchContentsOf(PROJECT_2_DATA);
+  }, 30e3);
+
   it('logs warnings to stderr and aborts', async () => {
     const out = await run(
       ['sync', '--yes', '--api-key', pak, '--patterns', CODE_PROJECT_2_WARNING],
@@ -201,7 +250,7 @@ describe('Project 2', () => {
     expect(out.stderr).toContain('Warnings were emitted');
   }, 30e3);
 
-  it('continues when there are warnings and --continue-on-warning is set', async () => {
+  it('continues when there are warnings and --continue-on-warning is set (args)', async () => {
     const out = await run(
       [
         'sync',
@@ -219,6 +268,20 @@ describe('Project 2', () => {
     expect(out.code).toBe(0);
     expect(out.stderr).toContain('Warnings were emitted');
   }, 30e3);
+
+  it('continues when there are warnings and --continue-on-warning is set (config)', async () => {
+    const { configFile } = await createTmpFolderWithConfig({
+      apiKey: pak,
+      sync: {
+        continueOnWarning: true,
+      },
+      patterns: [CODE_PROJECT_2_WARNING],
+    });
+    const out = await run(['-c', configFile, 'sync'], undefined, 20e3);
+
+    expect(out.code).toBe(0);
+    expect(out.stderr).toContain('Warnings were emitted');
+  }, 30e3);
 });
 
 describe('Project 3', () => {
@@ -231,12 +294,40 @@ describe('Project 3', () => {
     await deleteProject(client);
   });
 
-  it('handles namespaces properly', async () => {
+  it('handles namespaces properly (args)', async () => {
     const out = await run(
       ['sync', '--yes', '--api-key', pak, '--patterns', CODE_PROJECT_3],
       undefined,
       20e3
     );
+
+    expect(out.code).toBe(0);
+    expect(out.stdout).toContain('+ 1 string');
+
+    const keys = await client.GET('/v2/projects/{projectId}/translations', {
+      params: {
+        path: { projectId: client.getProjectId() },
+        query: { filterKeyName: ['welcome'] },
+      },
+    });
+
+    expect(keys.data?.page?.totalElements).toBe(1);
+
+    const stored = tolgeeDataToDict(keys.data);
+    expect(stored).toEqual({
+      welcome: {
+        __ns: 'greeting',
+        en: 'Welcome!',
+      },
+    });
+  }, 30e3);
+
+  it('handles namespaces properly (config)', async () => {
+    const { configFile } = await createTmpFolderWithConfig({
+      apiKey: pak,
+      patterns: [CODE_PROJECT_3],
+    });
+    const out = await run(['-c', configFile, 'sync', '--yes'], undefined, 20e3);
 
     expect(out.code).toBe(0);
     expect(out.stdout).toContain('+ 1 string');

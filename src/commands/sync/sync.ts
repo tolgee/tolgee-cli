@@ -1,5 +1,5 @@
 import type { BaseOptions } from '../../options.js';
-import { Command } from 'commander';
+import { Command, Option } from 'commander';
 import ansi from 'ansi-colors';
 
 import {
@@ -21,7 +21,7 @@ import {
 } from '../../client/TolgeeClient.js';
 
 type Options = BaseOptions & {
-  backup?: string;
+  backup?: string | false;
   removeUnused?: boolean;
   continueOnWarning?: boolean;
   yes?: boolean;
@@ -211,21 +211,29 @@ export default (config: Schema) =>
     .description(
       'Synchronizes the keys in your code project and in the Tolgee project, by creating missing keys and optionally deleting unused ones. For a dry-run, use `tolgee compare`.'
     )
-    .option(
-      '-B, --backup <path>',
-      'Store translation files backup (only translation files, not states, comments, tags, etc.). If something goes wrong, the backup can be used to restore the project to its previous state.'
+    .addOption(
+      new Option(
+        '-B, --backup <path>',
+        'Store translation files backup (only translation files, not states, comments, tags, etc.). If something goes wrong, the backup can be used to restore the project to its previous state.'
+      ).default(config.sync?.backup ?? false)
     )
-    .option(
-      '--continue-on-warning',
-      'Set this flag to continue the sync if warnings are detected during string extraction. By default, as warnings may indicate an invalid extraction, the CLI will abort the sync.'
+    .addOption(
+      new Option(
+        '--continue-on-warning',
+        'Set this flag to continue the sync if warnings are detected during string extraction. By default, as warnings may indicate an invalid extraction, the CLI will abort the sync.'
+      ).default(config.sync?.continueOnWarning ?? false)
     )
-    .option(
-      '-Y, --yes',
-      'Skip prompts and automatically say yes to them. You will not be asked for confirmation before creating/deleting keys.'
+    .addOption(
+      new Option(
+        '-Y, --yes',
+        'Skip prompts and automatically say yes to them. You will not be asked for confirmation before creating/deleting keys.'
+      ).default(false)
     )
-    .option(
-      '--remove-unused',
-      'Also delete unused keys from the Tolgee project.'
+    .addOption(
+      new Option(
+        '--remove-unused',
+        'Delete unused keys from the Tolgee project.'
+      ).default(config.sync?.removeUnused ?? false)
     )
     .option(
       '--tag-new-keys <tags...>',

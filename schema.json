@@ -74,6 +74,10 @@
           "items": {
             "type": "string"
           }
+        },
+        "removeOtherKeys": {
+          "description": "Remove keys which are not present in the import.",
+          "type": "boolean"
         }
       }
     },
@@ -134,6 +138,78 @@
         "delimiter": {
           "description": "Structure delimiter to use. By default, Tolgee interprets `.` as a nested structure. You can change the delimiter, or disable structure formatting by not specifying any value to the option.",
           "type": ["string", "null"]
+        }
+      }
+    },
+    "sync": {
+      "type": "object",
+      "properties": {
+        "backup": {
+          "description": "Store translation files backup (only translation files, not states, comments, tags, etc.). If something goes wrong, the backup can be used to restore the project to its previous state.",
+          "type": "string"
+        },
+        "continueOnWarning": {
+          "description": "Continue the sync regardless of whether warnings are detected during string extraction. By default, as warnings may indicate an invalid extraction, the CLI will abort the sync.",
+          "type": "boolean"
+        },
+        "removeUnused": {
+          "description": "Delete unused keys from the Tolgee project",
+          "type": "boolean"
+        }
+      }
+    },
+    "tag": {
+      "type": "object",
+      "properties": {
+        "filterExtracted": {
+          "description": "Extract keys from code and filter by it.",
+          "type": "boolean"
+        },
+        "filterNotExtracted": {
+          "description": "Extract keys from code and filter them out.",
+          "type": "boolean"
+        },
+        "filterTag": {
+          "description": "Filter only keys with tag. Use * as a wildcard.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "filterNoTag": {
+          "description": "Filter only keys without tag. Use * as a wildcard.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "tag": {
+          "description": "Add tag to filtered keys.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "tagOther": {
+          "description": "Tag keys which are not filtered.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "untag": {
+          "description": "Remove tag from filtered keys. Use * as a wildcard.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "untagOther": {
+          "description": "Remove tag from keys which are not filtered. Use * as a wildcard.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     }

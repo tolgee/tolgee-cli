@@ -119,6 +119,10 @@ export interface Schema {
      * Specify tags that will be added to newly created keys.
      */
     tagNewKeys?: string[];
+    /**
+     * Remove keys which are not present in the import.
+     */
+    removeOtherKeys?: boolean;
   };
   pull?: {
     /**
@@ -161,6 +165,54 @@ export interface Schema {
      * Structure delimiter to use. By default, Tolgee interprets `.` as a nested structure. You can change the delimiter, or disable structure formatting by not specifying any value to the option.
      */
     delimiter?: string | null;
+  };
+  sync?: {
+    /**
+     * Store translation files backup (only translation files, not states, comments, tags, etc.). If something goes wrong, the backup can be used to restore the project to its previous state.
+     */
+    backup?: string;
+    /**
+     * Continue the sync regardless of whether warnings are detected during string extraction. By default, as warnings may indicate an invalid extraction, the CLI will abort the sync.
+     */
+    continueOnWarning?: boolean;
+    /**
+     * Delete unused keys from the Tolgee project
+     */
+    removeUnused?: boolean;
+  };
+  tag?: {
+    /**
+     * Extract keys from code and filter by it.
+     */
+    filterExtracted?: boolean;
+    /**
+     * Extract keys from code and filter them out.
+     */
+    filterNotExtracted?: boolean;
+    /**
+     * Filter only keys with tag. Use * as a wildcard.
+     */
+    filterTag?: string[];
+    /**
+     * Filter only keys without tag. Use * as a wildcard.
+     */
+    filterNoTag?: string[];
+    /**
+     * Add tag to filtered keys.
+     */
+    tag?: string[];
+    /**
+     * Tag keys which are not filtered.
+     */
+    tagOther?: string[];
+    /**
+     * Remove tag from filtered keys. Use * as a wildcard.
+     */
+    untag?: string[];
+    /**
+     * Remove tag from keys which are not filtered. Use * as a wildcard.
+     */
+    untagOther?: string[];
   };
 }
 export interface FileMatch {
