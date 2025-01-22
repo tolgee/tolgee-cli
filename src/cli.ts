@@ -119,7 +119,7 @@ function validateOptions(cmd: Command) {
       `Not authenticated for host ${ansi.blue(opts.apiUrl.hostname)} and project ${ansi.blue(opts.projectId)}.`
     );
     info(
-      `You must either login via \`tolgee login\` (for correct host and project) or provide api key via --api-key.`
+      `You must either provide api key via --api-key or login via \`tolgee login\` (for correct api url and project)`
     );
     process.exit(1);
   }
