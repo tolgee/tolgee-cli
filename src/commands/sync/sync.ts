@@ -81,7 +81,6 @@ const syncHandler = (config: Schema) =>
     }
 
     const localKeys = filterExtractionResult(rawKeys);
-    console.dir({ localKeys });
 
     if (opts.namespaces?.length) {
       for (const namespace of Object.keys(localKeys)) {
@@ -101,7 +100,6 @@ const syncHandler = (config: Schema) =>
     handleLoadableError(allKeysLoadable);
 
     let remoteKeys = allKeysLoadable.data?._embedded?.keys ?? [];
-    console.dir({ remoteKeys });
 
     if (opts.namespaces?.length) {
       remoteKeys = remoteKeys.filter(
@@ -110,8 +108,6 @@ const syncHandler = (config: Schema) =>
     }
 
     const diff = compareKeys(localKeys, remoteKeys);
-
-    console.log('diff', JSON.stringify(diff, null, 2));
 
     if (!diff.added.length && !diff.removed.length) {
       console.log(
