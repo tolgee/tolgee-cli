@@ -54,7 +54,7 @@ describe('Project 1', () => {
 
     expect(out.code).toBe(0);
     expect(out.stdout).toMatch(
-      'Logged in as admin on localhost for project Project 1'
+      /Logged in as admin on localhost for project [\d]+ \(Project 1\)/gm
     );
     expect(out.stderr).toBe('');
 
