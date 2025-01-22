@@ -1,4 +1,5 @@
 import { Command } from 'commander';
+import ansi from 'ansi-colors';
 
 import {
   saveApiKey,
@@ -23,8 +24,8 @@ async function loginHandler(this: Command, key: string) {
   await saveApiKey(opts.apiUrl, keyInfo);
   success(
     keyInfo.type === 'PAK'
-      ? `Logged in as ${keyInfo.username} on ${opts.apiUrl.hostname} for project ${keyInfo.project.name} (#${keyInfo.project.id}). Welcome back!`
-      : `Logged in as ${keyInfo.username} on ${opts.apiUrl.hostname}. Welcome back!`
+      ? `Logged in as ${keyInfo.username} on ${ansi.blue(opts.apiUrl.hostname)} for project ${ansi.blue(String(keyInfo.project.id))} (${keyInfo.project.name}). Welcome back!`
+      : `Logged in as ${keyInfo.username} on ${ansi.blue(opts.apiUrl.hostname)}. Welcome back!`
   );
 }
 
