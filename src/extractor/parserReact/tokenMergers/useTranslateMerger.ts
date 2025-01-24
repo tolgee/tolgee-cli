@@ -15,7 +15,10 @@ export const useTranslateMerger = {
 
     switch (state) {
       case S.Idle:
-        if (type === 'function.call' && token === 'useTranslate') {
+        if (
+          type === 'function.call' &&
+          (token === 'useTranslate' || token === 'getTranslate')
+        ) {
           return S.ExpectBracket;
         }
         break;
