@@ -45,9 +45,6 @@ export default function App() {
             <T keyName="tomato" ns="food" />
           </li>
           <li>
-            <T keyName="onions" ns="food" />
-          </li>
-          <li>
             <T keyName="cookies" ns="food" />
           </li>
         </ul>
