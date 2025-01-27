@@ -20,13 +20,29 @@ async function extractReactKeys(
 describe.each(['js', 'ts', 'jsx', 'tsx'])('useTranslate (.%s)', (ext) => {
   const FILE_NAME = `test.${ext}`;
 
-  it('extracts from the t call with signature t(string))', async () => {
+  it('extracts from the t call with signature t(string) and useTranslate', async () => {
     const expected = [{ keyName: 'key1', line: 5 }];
 
     const code = `
       import '@tolgee/react'
       function Test () {
         const { t } = useTranslate()
+        t('key1')
+      }
+    `;
+
+    const extracted = await extractReactKeys(code, FILE_NAME);
+    expect(extracted.warnings).toEqual([]);
+    expect(extracted.keys).toEqual(expected);
+  });
+
+  it('extracts from the t call with signature t(string) and getTranslate', async () => {
+    const expected = [{ keyName: 'key1', line: 5 }];
+
+    const code = `
+      import '@tolgee/react'
+      async function Test () {
+        const t = await getTranslate()
         t('key1')
       }
     `;
