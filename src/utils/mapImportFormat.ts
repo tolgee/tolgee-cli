@@ -8,6 +8,8 @@ export const mapImportFormat = (
   extension: string
 ): FormatResult => {
   switch (format) {
+    case 'APPLE_XCSTRINGS':
+      return 'XCSTRINGS';
     case 'APPLE_STRINGS': {
       // apple separates translations to two separate files
       // we keep it under one format for the cli

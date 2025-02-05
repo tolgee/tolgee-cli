@@ -4639,7 +4639,7 @@ export interface components {
              * @description Format to export to
              * @enum {string}
              */
-            format: "JSON" | "JSON_TOLGEE" | "XLIFF" | "PO" | "APPLE_STRINGS_STRINGSDICT" | "APPLE_XLIFF" | "ANDROID_XML" | "COMPOSE_XML" | "FLUTTER_ARB" | "PROPERTIES" | "YAML_RUBY" | "YAML" | "JSON_I18NEXT" | "CSV" | "RESX_ICU" | "XLSX";
+            format: "JSON" | "JSON_TOLGEE" | "XLIFF" | "PO" | "APPLE_STRINGS_STRINGSDICT" | "APPLE_XLIFF" | "APPLE_XCSTRINGS" | "ANDROID_XML" | "COMPOSE_XML" | "FLUTTER_ARB" | "PROPERTIES" | "YAML_RUBY" | "YAML" | "JSON_I18NEXT" | "CSV" | "RESX_ICU" | "XLSX";
             /** Format: int64 */
             id: number;
             /**
@@ -4723,7 +4723,7 @@ export interface components {
              * @description Format to export to
              * @enum {string}
              */
-            format: "JSON" | "JSON_TOLGEE" | "XLIFF" | "PO" | "APPLE_STRINGS_STRINGSDICT" | "APPLE_XLIFF" | "ANDROID_XML" | "COMPOSE_XML" | "FLUTTER_ARB" | "PROPERTIES" | "YAML_RUBY" | "YAML" | "JSON_I18NEXT" | "CSV" | "RESX_ICU" | "XLSX";
+            format: "JSON" | "JSON_TOLGEE" | "XLIFF" | "PO" | "APPLE_STRINGS_STRINGSDICT" | "APPLE_XLIFF" | "APPLE_XCSTRINGS" | "ANDROID_XML" | "COMPOSE_XML" | "FLUTTER_ARB" | "PROPERTIES" | "YAML_RUBY" | "YAML" | "JSON_I18NEXT" | "CSV" | "RESX_ICU" | "XLSX";
             /**
              * @description Languages to be contained in export.
              *
@@ -4973,7 +4973,7 @@ export interface components {
             defaultFileStructureTemplate: string;
             extension: string;
             /** @enum {string} */
-            format: "JSON" | "JSON_TOLGEE" | "XLIFF" | "PO" | "APPLE_STRINGS_STRINGSDICT" | "APPLE_XLIFF" | "ANDROID_XML" | "COMPOSE_XML" | "FLUTTER_ARB" | "PROPERTIES" | "YAML_RUBY" | "YAML" | "JSON_I18NEXT" | "CSV" | "RESX_ICU" | "XLSX";
+            format: "JSON" | "JSON_TOLGEE" | "XLIFF" | "PO" | "APPLE_STRINGS_STRINGSDICT" | "APPLE_XLIFF" | "APPLE_XCSTRINGS" | "ANDROID_XML" | "COMPOSE_XML" | "FLUTTER_ARB" | "PROPERTIES" | "YAML_RUBY" | "YAML" | "JSON_I18NEXT" | "CSV" | "RESX_ICU" | "XLSX";
             mediaType: string;
         };
         ExportParams: {
@@ -5013,7 +5013,7 @@ export interface components {
              * @description Format to export to
              * @enum {string}
              */
-            format: "JSON" | "JSON_TOLGEE" | "XLIFF" | "PO" | "APPLE_STRINGS_STRINGSDICT" | "APPLE_XLIFF" | "ANDROID_XML" | "COMPOSE_XML" | "FLUTTER_ARB" | "PROPERTIES" | "YAML_RUBY" | "YAML" | "JSON_I18NEXT" | "CSV" | "RESX_ICU" | "XLSX";
+            format: "JSON" | "JSON_TOLGEE" | "XLIFF" | "PO" | "APPLE_STRINGS_STRINGSDICT" | "APPLE_XLIFF" | "APPLE_XCSTRINGS" | "ANDROID_XML" | "COMPOSE_XML" | "FLUTTER_ARB" | "PROPERTIES" | "YAML_RUBY" | "YAML" | "JSON_I18NEXT" | "CSV" | "RESX_ICU" | "XLSX";
             /**
              * @description Languages to be contained in export.
              *
@@ -5091,7 +5091,7 @@ export interface components {
              *     It is recommended to provide these values to prevent any issues with format detection.
              * @enum {string}
              */
-            format?: "CSV_ICU" | "CSV_JAVA" | "CSV_PHP" | "CSV_RUBY" | "JSON_I18NEXT" | "JSON_ICU" | "JSON_JAVA" | "JSON_PHP" | "JSON_RUBY" | "JSON_C" | "PO_PHP" | "PO_C" | "PO_JAVA" | "PO_ICU" | "PO_RUBY" | "PO_PYTHON" | "STRINGS" | "STRINGSDICT" | "APPLE_XLIFF" | "PROPERTIES_ICU" | "PROPERTIES_JAVA" | "PROPERTIES_UNKNOWN" | "ANDROID_XML" | "COMPOSE_XML" | "FLUTTER_ARB" | "YAML_RUBY" | "YAML_JAVA" | "YAML_ICU" | "YAML_PHP" | "YAML_UNKNOWN" | "XLIFF_ICU" | "XLIFF_JAVA" | "XLIFF_PHP" | "XLIFF_RUBY" | "RESX_ICU" | "XLSX_ICU" | "XLSX_JAVA" | "XLSX_PHP" | "XLSX_RUBY";
+            format?: "CSV_ICU" | "CSV_JAVA" | "CSV_PHP" | "CSV_RUBY" | "JSON_I18NEXT" | "JSON_ICU" | "JSON_JAVA" | "JSON_PHP" | "JSON_RUBY" | "JSON_C" | "PO_PHP" | "PO_C" | "PO_JAVA" | "PO_ICU" | "PO_RUBY" | "PO_PYTHON" | "STRINGS" | "STRINGSDICT" | "APPLE_XLIFF" | "XCSTRINGS" | "PROPERTIES_ICU" | "PROPERTIES_JAVA" | "PROPERTIES_UNKNOWN" | "ANDROID_XML" | "COMPOSE_XML" | "FLUTTER_ARB" | "YAML_RUBY" | "YAML_JAVA" | "YAML_ICU" | "YAML_PHP" | "YAML_UNKNOWN" | "XLIFF_ICU" | "XLIFF_JAVA" | "XLIFF_PHP" | "XLIFF_RUBY" | "RESX_ICU" | "XLSX_ICU" | "XLSX_JAVA" | "XLSX_PHP" | "XLSX_RUBY";
             /** @description The existing language tag in the Tolgee platform to which the imported language should be mapped.
              *
              *     When null, Tolgee will try to guess the language from the file contents or file name. */
@@ -6595,6 +6595,8 @@ export interface components {
             id: number;
             keyReferences: components["schemas"]["KeyInScreenshotModel"][];
             location?: string;
+            middleSized?: string;
+            middleSizedUrl?: string;
             /** @description Thumbnail file name, which may be downloaded from the screenshot path.
              *
              *     When images are secured. Encrypted timestamp is appended to the filename.
@@ -13928,7 +13930,7 @@ export interface operations {
                  */
                 languages?: string[];
                 /** @description Format to export to */
-                format?: "JSON" | "JSON_TOLGEE" | "XLIFF" | "PO" | "APPLE_STRINGS_STRINGSDICT" | "APPLE_XLIFF" | "ANDROID_XML" | "COMPOSE_XML" | "FLUTTER_ARB" | "PROPERTIES" | "YAML_RUBY" | "YAML" | "JSON_I18NEXT" | "CSV" | "RESX_ICU" | "XLSX";
+                format?: "JSON" | "JSON_TOLGEE" | "XLIFF" | "PO" | "APPLE_STRINGS_STRINGSDICT" | "APPLE_XLIFF" | "APPLE_XCSTRINGS" | "ANDROID_XML" | "COMPOSE_XML" | "FLUTTER_ARB" | "PROPERTIES" | "YAML_RUBY" | "YAML" | "JSON_I18NEXT" | "CSV" | "RESX_ICU" | "XLSX";
                 /** @description Delimiter to structure file content.
                  *
                  *     e.g. For key "home.header.title" would result in {"home": {"header": "title": {"Hello"}}} structure.

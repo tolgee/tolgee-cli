@@ -24,6 +24,7 @@ export type Format =
   | "PO_PYTHON"
   | "APPLE_STRINGS"
   | "APPLE_XLIFF"
+  | "APPLE_XCSTRINGS"
   | "PROPERTIES_ICU"
   | "PROPERTIES_JAVA"
   | "ANDROID_XML"

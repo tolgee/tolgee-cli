@@ -141,6 +141,15 @@ describe('push and pull with different formats', () => {
     });
   });
 
+  it('works with Apple xcstrings (StringCatalog) format', async () => {
+    await testWithConfig({
+      config: 'apple-xcstrings',
+      inPlatform: 'This is my mom!',
+      fileLocation: 'Localizable.strings',
+      inFile: 'I have %%lli dogs.',
+    });
+  });
+
   it('works with android-xml icu format', async () => {
     await testWithConfig({
       config: 'android-xml',
