@@ -6,13 +6,7 @@ import ansi from 'ansi-colors';
 import { getApiKey, savePak, savePat } from './config/credentials.js';
 import loadTolgeeRc from './config/tolgeerc.js';
 
-import {
-  setDebug,
-  info,
-  error,
-  exitWithError,
-  isDebugEnabled,
-} from './utils/logger.js';
+import { setDebug, info, error, exitWithError } from './utils/logger.js';
 
 import {
   API_KEY_OPT,
