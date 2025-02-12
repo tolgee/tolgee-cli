@@ -211,9 +211,6 @@ async function run() {
     //  - The error should be handled in the command but isn't
     //  - Something went wrong with the code
     error('An unexpected error occurred while running the command.');
-    if (!isDebugEnabled()) {
-      error('Use --verbose argument to get more info');
-    }
     error(
       'Please report this to our issue tracker: https://github.com/tolgee/tolgee-cli/issues'
     );

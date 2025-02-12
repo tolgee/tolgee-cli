@@ -109,6 +109,9 @@ export function exitWithError(err: string | Error): never {
       console.log(getStackTrace());
     }
   }
+  if (!isDebugEnabled()) {
+    console.log('\nHINT: Use `--verbose` parameter to get full stack trace');
+  }
   process.exit(1);
 }
 
