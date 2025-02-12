@@ -1,3 +1,4 @@
+import { stdout } from 'process';
 import { getStackTrace } from './getStackTrace.js';
 
 const SYMBOLS = ['      🐁', '    🐁  ', '  🐁    ', '🐁      '];
@@ -69,21 +70,41 @@ export function error(msg: string) {
   console.log(`🔴 ${msg}`);
 }
 
-export function exitWithError(err: string | Error): never {
+export function printError(err: Error | any, level = 0) {
   let message: string;
   let stack: string | undefined;
+  let cause: unknown;
 
   if (err instanceof Error) {
     message = err.message;
     stack = err.stack;
+    cause = err.cause as any;
   } else {
     message = err;
-    stack = getStackTrace();
   }
 
-  error(message);
-  if (debugEnabled && stack) {
-    console.log(stack);
+  if (level === 0) {
+    error(message);
+  } else {
+    stdout.write('[cause] ');
+  }
+
+  if (debugEnabled) {
+    console.log(stack || message);
+    if (cause && level <= 3) {
+      printError(cause as any, level + 1);
+    }
+  }
+}
+
+export function exitWithError(err: string | Error): never {
+  if (err instanceof Error) {
+    printError(err);
+  } else {
+    error(err);
+    if (debugEnabled) {
+      console.log(getStackTrace());
+    }
   }
   process.exit(1);
 }

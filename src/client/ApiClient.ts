@@ -4,7 +4,7 @@ import createClient, { ParseAs } from 'openapi-fetch';
 import base32Decode from 'base32-decode';
 import { API_KEY_PAK_PREFIX, USER_AGENT } from '../constants.js';
 import { getApiKeyInformation } from './getApiKeyInformation.js';
-import { debug } from '../utils/logger.js';
+import { debug, isDebugEnabled } from '../utils/logger.js';
 import { errorFromLoadable } from './errorFromLoadable.js';
 
 async function parseResponse(response: Response, parseAs: ParseAs) {
