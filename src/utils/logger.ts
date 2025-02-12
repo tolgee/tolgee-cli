@@ -71,14 +71,14 @@ export function error(msg: string) {
 }
 
 export function printError(err: Error | any, level = 0) {
-  let message: string;
+  let message: any;
   let stack: string | undefined;
   let cause: unknown;
 
   if (err instanceof Error) {
     message = err.message;
     stack = err.stack;
-    cause = err.cause as any;
+    cause = err.cause;
   } else {
     message = err;
   }
@@ -89,11 +89,14 @@ export function printError(err: Error | any, level = 0) {
     stdout.write('[cause] ');
   }
 
-  if (debugEnabled) {
-    console.log(stack || message);
-    if (cause && level <= 3) {
-      printError(cause as any, level + 1);
-    }
+  if (debugEnabled && stack) {
+    console.log(stack);
+  } else if (level !== 0) {
+    console.log(message);
+  }
+
+  if (cause && level < 3) {
+    printError(cause, level + 1);
   }
 }
 
