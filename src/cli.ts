@@ -6,7 +6,13 @@ import ansi from 'ansi-colors';
 import { getApiKey, savePak, savePat } from './config/credentials.js';
 import loadTolgeeRc from './config/tolgeerc.js';
 
-import { setDebug, info, error, exitWithError } from './utils/logger.js';
+import {
+  setDebug,
+  info,
+  error,
+  exitWithError,
+  isDebugEnabled,
+} from './utils/logger.js';
 
 import {
   API_KEY_OPT,
@@ -205,6 +211,9 @@ async function run() {
     //  - The error should be handled in the command but isn't
     //  - Something went wrong with the code
     error('An unexpected error occurred while running the command.');
+    if (!isDebugEnabled()) {
+      error('Use --verbose argument to get more info');
+    }
     error(
       'Please report this to our issue tracker: https://github.com/tolgee/tolgee-cli/issues'
     );
