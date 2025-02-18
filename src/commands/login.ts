@@ -5,16 +5,26 @@ import {
   removeApiKeys,
   clearAuthStore,
 } from '../config/credentials.js';
-import { success } from '../utils/logger.js';
+import { exitWithError, success } from '../utils/logger.js';
 import { createTolgeeClient } from '../client/TolgeeClient.js';
+import { printApiKeyLists } from '#cli/utils/apiKeyList.js';
 
 type Options = {
   apiUrl: URL;
   all: boolean;
+  list: boolean;
 };
 
-async function loginHandler(this: Command, key: string) {
+async function loginHandler(this: Command, key?: string) {
   const opts: Options = this.optsWithGlobals();
+
+  if (opts.list) {
+    printApiKeyLists();
+    return;
+  } else if (!key) {
+    exitWithError('Missing argument [API Key]');
+  }
+
   const keyInfo = await createTolgeeClient({
     baseUrl: opts.apiUrl.toString(),
     apiKey: key,
@@ -48,8 +58,9 @@ export const Login = new Command()
   .description(
     'Login to Tolgee with an API key. You can be logged into multiple Tolgee instances at the same time by using --api-url'
   )
+  .option('-l, --list', 'List existing api keys')
   .argument(
-    '<API Key>',
+    '[API Key]',
     'The API key. Can be either a personal access token, or a project key'
   )
   .action(loginHandler);

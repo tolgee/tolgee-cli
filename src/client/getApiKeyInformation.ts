@@ -5,6 +5,11 @@ import { paths } from './internal/schema.generated.js';
 import { handleLoadableError } from './TolgeeClient.js';
 import { exitWithError } from './../utils/logger.js';
 
+export type ApiKeyProject = {
+  name: string;
+  id: number;
+};
+
 export type ApiKeyInfoPat = {
   type: 'PAT';
   key: string;
@@ -16,7 +21,7 @@ export type ApiKeyInfoPak = {
   type: 'PAK';
   key: string;
   username: string;
-  project: { id: number; name: string };
+  project: ApiKeyProject;
   expires: number;
 };
 
