@@ -1,6 +1,6 @@
 import ansi from 'ansi-colors';
 
-import { loadStore, ProjectDetails, Token } from '#cli/config/credentials.js';
+import { loadStore, ProjectDetails, Token } from '../config/credentials.js';
 
 function getProjectName(
   projectId: string,
