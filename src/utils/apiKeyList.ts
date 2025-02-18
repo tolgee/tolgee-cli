@@ -37,7 +37,13 @@ function printToken(
 
 export async function printApiKeyLists() {
   const store = await loadStore();
-  for (const [origin, server] of Object.entries(store)) {
+  const list = Object.entries(store);
+
+  if (list.length === 0) {
+    console.log(ansi.gray('No records\n'));
+  }
+
+  for (const [origin, server] of list) {
     console.log(ansi.white('[') + ansi.red(origin) + ansi.white(']'));
     if (server.user) {
       printToken('PAT', server.user);

@@ -41,6 +41,7 @@ import { getSingleOption } from './utils/getSingleOption.js';
 import { Schema } from './schema.js';
 import { createTolgeeClient } from './client/TolgeeClient.js';
 import { projectIdFromKey } from './client/ApiClient.js';
+import { printApiKeyLists } from './utils/apiKeyList.js';
 
 const NO_KEY_COMMANDS = ['login', 'logout', 'extract'];
 
@@ -98,7 +99,7 @@ function loadProjectId(cmd: Command) {
   }
 }
 
-function validateOptions(cmd: Command) {
+async function validateOptions(cmd: Command) {
   const opts = cmd.optsWithGlobals();
 
   if (opts.projectId === -1) {
@@ -121,7 +122,10 @@ function validateOptions(cmd: Command) {
     info(
       `You must either provide api key via --api-key or login via \`tolgee login\` (for correct api url and project)`
     );
-    info(`List existing api keys with \`tolgee login --list\``);
+
+    console.log('\nYou are logged into these projects:');
+    await printApiKeyLists();
+
     process.exit(1);
   }
 }
