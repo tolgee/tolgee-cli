@@ -87,21 +87,9 @@ async function storePak(
 }
 
 async function removePak(store: Store, instance: URL, projectId: number) {
-  const data: Store = {
-    ...store,
-    [instance.hostname]: {
-      ...(store[instance.hostname] || {}),
-      projects: {
-        ...(store[instance.hostname]?.projects || {}),
-      },
-      projectDetails: {
-        ...(store[instance.hostname]?.projectDetails || {}),
-      },
-    },
-  };
-  delete data[instance.hostname].projects?.[projectId.toString(10)];
-  delete data[instance.hostname].projectDetails?.[projectId.toString(10)];
-  return saveStore(data);
+  delete store[instance.hostname].projects?.[projectId.toString(10)];
+  delete store[instance.hostname].projectDetails?.[projectId.toString(10)];
+  return saveStore(store);
 }
 
 export async function savePat(instance: URL, pat?: Token) {
@@ -179,10 +167,9 @@ export async function saveApiKey(instance: URL, token: ApiKeyInfo) {
 
 export async function removeApiKeys(api: URL) {
   const store = await loadStore();
-  return saveStore({
-    ...store,
-    [api.hostname]: {},
-  });
+  delete store[api.hostname];
+
+  return saveStore(store);
 }
 
 export async function clearAuthStore() {

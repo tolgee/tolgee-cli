@@ -121,6 +121,7 @@ function validateOptions(cmd: Command) {
     info(
       `You must either provide api key via --api-key or login via \`tolgee login\` (for correct api url and project)`
     );
+    info(`List existing api keys with \`tolgee login --list\``);
     process.exit(1);
   }
 }
