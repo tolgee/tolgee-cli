@@ -7,7 +7,7 @@ import {
 } from '../config/credentials.js';
 import { exitWithError, success } from '../utils/logger.js';
 import { createTolgeeClient } from '../client/TolgeeClient.js';
-import { printApiKeyLists } from '#cli/utils/apiKeyList.js';
+import { printApiKeyLists } from '../utils/apiKeyList.js';
 
 type Options = {
   apiUrl: URL;
