@@ -1,17 +1,22 @@
 import { join, dirname } from 'path';
 import { mkdir, readFile, writeFile } from 'fs/promises';
 
-import type { ApiKeyInfo } from '../client/getApiKeyInformation.js';
+import type {
+  ApiKeyInfo,
+  ApiKeyProject,
+} from '../client/getApiKeyInformation.js';
 import { warn } from '../utils/logger.js';
 import { CONFIG_PATH } from '../constants.js';
 
-type Token = { token: string; expires: number };
+export type Token = { token: string; expires: number };
+export type ProjectDetails = { name: string };
 
-type Store = {
+export type Store = {
   [scope: string]: {
     user?: Token;
     // keys cannot be numeric values in JSON
     projects?: Record<string, Token | undefined>;
+    projectDetails?: Record<string, ProjectDetails>;
   };
 };
 
@@ -27,7 +32,7 @@ async function ensureConfigPath() {
   }
 }
 
-async function loadStore(): Promise<Store> {
+export async function loadStore(): Promise<Store> {
   try {
     await ensureConfigPath();
     const storeData = await readFile(API_TOKENS_FILE, 'utf8');
@@ -62,7 +67,7 @@ async function storePat(store: Store, instance: URL, pat?: Token) {
 async function storePak(
   store: Store,
   instance: URL,
-  projectId: number,
+  project: ApiKeyProject,
   pak?: Token
 ) {
   return saveStore({
@@ -71,10 +76,20 @@ async function storePak(
       ...(store[instance.hostname] || {}),
       projects: {
         ...(store[instance.hostname]?.projects || {}),
-        [projectId.toString(10)]: pak,
+        [project.id.toString(10)]: pak,
+      },
+      projectDetails: {
+        ...(store[instance.hostname]?.projectDetails || {}),
+        [project.id.toString(10)]: { name: project.name },
       },
     },
   });
+}
+
+async function removePak(store: Store, instance: URL, projectId: number) {
+  delete store[instance.hostname].projects?.[projectId.toString(10)];
+  delete store[instance.hostname].projectDetails?.[projectId.toString(10)];
+  return saveStore(store);
 }
 
 export async function savePat(instance: URL, pat?: Token) {
@@ -82,9 +97,13 @@ export async function savePat(instance: URL, pat?: Token) {
   return storePat(store, instance, pat);
 }
 
-export async function savePak(instance: URL, projectId: number, pak?: Token) {
+export async function savePak(
+  instance: URL,
+  project: ApiKeyProject,
+  pak?: Token
+) {
   const store = await loadStore();
-  return storePak(store, instance, projectId, pak);
+  return storePak(store, instance, project, pak);
 }
 
 export async function getApiKey(
@@ -120,7 +139,7 @@ export async function getApiKey(
       warn(
         `Your project API key for project #${projectId} on ${instance.hostname} expired.`
       );
-      await storePak(store, instance, projectId, undefined);
+      await removePak(store, instance, projectId);
       return null;
     }
 
@@ -140,7 +159,7 @@ export async function saveApiKey(instance: URL, token: ApiKeyInfo) {
     });
   }
 
-  return storePak(store, instance, token.project.id, {
+  return storePak(store, instance, token.project, {
     token: token.key,
     expires: token.expires,
   });
@@ -148,10 +167,9 @@ export async function saveApiKey(instance: URL, token: ApiKeyInfo) {
 
 export async function removeApiKeys(api: URL) {
   const store = await loadStore();
-  return saveStore({
-    ...store,
-    [api.hostname]: {},
-  });
+  delete store[api.hostname];
+
+  return saveStore(store);
 }
 
 export async function clearAuthStore() {

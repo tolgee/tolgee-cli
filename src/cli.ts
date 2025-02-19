@@ -41,6 +41,7 @@ import { getSingleOption } from './utils/getSingleOption.js';
 import { Schema } from './schema.js';
 import { createTolgeeClient } from './client/TolgeeClient.js';
 import { projectIdFromKey } from './client/ApiClient.js';
+import { printApiKeyLists } from './utils/apiKeyList.js';
 
 const NO_KEY_COMMANDS = ['login', 'logout', 'extract'];
 
@@ -98,22 +99,33 @@ function loadProjectId(cmd: Command) {
   }
 }
 
-function validateOptions(cmd: Command) {
+async function validateOptions(cmd: Command) {
   const opts = cmd.optsWithGlobals();
-
-  if (!opts.apiKey) {
-    exitWithError(
-      'No API key has been provided. You must either provide one via --api-key, or login via `tolgee login`.'
-    );
-  }
 
   if (opts.projectId === -1) {
     error(
       'No Project ID have been specified. You must either provide one via --project-id, or by setting up a `.tolgeerc` file.'
     );
     info(
+      'If you provide Project Api Key (PAK) via `--api-key`, Project ID is derived automatically.'
+    );
+    info(
       'Learn more about configuring the CLI here: https://tolgee.io/tolgee-cli/project-configuration'
     );
+    process.exit(1);
+  }
+
+  if (!opts.apiKey) {
+    error(
+      `Not authenticated for host ${ansi.blue(opts.apiUrl.hostname)} and project ${ansi.blue(opts.projectId)}.`
+    );
+    info(
+      `You must either provide api key via --api-key or login via \`tolgee login\` (for correct api url and project)`
+    );
+
+    console.log('\nYou are logged into these projects:');
+    await printApiKeyLists();
+
     process.exit(1);
   }
 }
