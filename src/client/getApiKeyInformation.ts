@@ -34,7 +34,9 @@ export const getApiKeyInformation = async (
   if (key.startsWith(API_KEY_PAK_PREFIX)) {
     const loadable = await client.GET('/v2/api-keys/current');
     if (loadable.response.status === 401) {
-      exitWithError("Couldn't log in: the API key you provided is invalid.");
+      exitWithError(
+        `Couldn't log in: the API key you provided is invalid (${new URL(loadable.response.url).host}).`
+      );
     }
     handleLoadableError(loadable);
 
@@ -54,7 +56,9 @@ export const getApiKeyInformation = async (
   } else {
     const loadable = await client.GET('/v2/pats/current');
     if (loadable.response.status === 401) {
-      exitWithError("Couldn't log in: the API key you provided is invalid.");
+      exitWithError(
+        `Couldn't log in: the API key you provided is invalid (${new URL(loadable.response.url).host}).`
+      );
     }
     handleLoadableError(loadable);
 
