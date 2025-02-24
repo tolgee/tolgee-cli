@@ -99,6 +99,9 @@ export function createApiClient({
     getApiKeyInfo() {
       return getApiKeyInformation(apiClient, apiKey!);
     },
+    getSettings(): ApiClientProps {
+      return { baseUrl, apiKey, projectId, autoThrow };
+    },
   };
 }
 
