@@ -136,7 +136,11 @@ const pushHandler = (config: Schema) =>
     }
 
     const filteredMatchers = config.push.files.filter((r) => {
-      if (opts.languages && !opts.languages.includes(r.language)) {
+      if (
+        r.language &&
+        opts.languages &&
+        !opts.languages.includes(r.language)
+      ) {
         return false;
       }
       if (opts.namespaces && !opts.namespaces.includes(r.namespace ?? '')) {
@@ -168,10 +172,20 @@ const pushHandler = (config: Schema) =>
           format: format,
           languageTag: f.language,
           namespace: f.namespace ?? '',
+          languageTagsToImport: opts.languages,
         };
       }),
       removeOtherKeys: opts.removeOtherKeys,
     };
+
+    console.log(JSON.stringify(params, null, 2));
+    console.log(
+      JSON.stringify(
+        files.map((f) => f.name),
+        null,
+        2
+      )
+    );
 
     const attempt1 = await loading(
       'Importing...',

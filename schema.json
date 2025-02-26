@@ -219,10 +219,13 @@
       "type": "object",
       "properties": {
         "path": { "$ref": "#/$defs/path" },
-        "language": { "type": "string" },
+        "language": {
+          "description": "Explicitly map file to language.\n\nIf not provided backend will try to detect language from language name or it's content.",
+          "type": "string"
+        },
         "namespace": { "type": "string" }
       },
-      "required": ["path", "language"]
+      "required": ["path"]
     },
     "forceMode": {
       "description": "Specifies how to solve potential conflicts in the pushed data.\n\nOptions:\n\n  `OVERRIDE` - update everything according to local files\n  `KEEP` - create only non-existent strings, don't touch existing ones\n  `NO_FORCE` - throw an error, if there are any conflict",

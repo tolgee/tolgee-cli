@@ -4,8 +4,7 @@
   "push": {
     "files": [
       {
-        "path": "./apple-xcstrings/Localizable.xcstrings",
-        "language": "en"
+        "path": "./apple-xcstrings/Localizable.xcstrings"
       }
     ]
   }

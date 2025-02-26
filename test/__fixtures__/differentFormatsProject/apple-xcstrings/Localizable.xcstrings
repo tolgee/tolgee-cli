@@ -1,75 +1,19 @@
 {
   "sourceLanguage" : "cs",
   "strings" : {
-    "dog_count" : {
-      "localizations" : {
-        "cs" : {
-          "variations" : {
-            "plural" : {
-              "few" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Já mám %lli psi."
-                }
-              },
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Já mám jednoho psa."
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Já mám %lli psů."
-                }
-              }
-            }
-          }
-        },
-        "en" : {
-          "variations" : {
-            "plural" : {
-              "other" : {
-                "stringUnit" : {
-                  "state" : "needs_review",
-                  "value" : "I have %%lli dogs."
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "my_mom" : {
+    "controller" : {
       "extractionState" : "manual",
       "localizations" : {
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tohle je moje máma!"
+            "value" : "Máš %lld položek"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "This is my mom!"
-          }
-        }
-      }
-    },
-    "test_key" : {
-      "localizations" : {
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "O muj boze!"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Oh my god!"
+            "value" : "You have %lld items"
           }
         }
       }

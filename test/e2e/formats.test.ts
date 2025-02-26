@@ -7,11 +7,7 @@ import { join } from 'path';
 import { readFileSync } from 'fs';
 import { TolgeeClient } from '#cli/client/TolgeeClient.js';
 import { PROJECT_1 } from './utils/api/project1.js';
-import {
-  createPak,
-  createProjectWithClient,
-  deleteProject,
-} from './utils/api/common.js';
+import { createPak, createProjectWithClient } from './utils/api/common.js';
 
 const FIXTURES_PATH = new URL('../__fixtures__/', import.meta.url);
 
@@ -85,7 +81,7 @@ describe('push and pull with different formats', () => {
     pak = await createPak(client);
   });
   afterEach(async () => {
-    await deleteProject(client);
+    // await deleteProject(client);
   });
 
   it('works with tolgee icu format', async () => {
@@ -144,9 +140,9 @@ describe('push and pull with different formats', () => {
   it('works with Apple xcstrings (StringCatalog) format', async () => {
     await testWithConfig({
       config: 'apple-xcstrings',
-      inPlatform: 'This is my mom!',
-      fileLocation: 'Localizable.strings',
-      inFile: 'I have %%lli dogs.',
+      inPlatform: 'You have {0, number} items',
+      fileLocation: 'Localizable.xcstrings',
+      inFile: 'You have %lld items',
     });
   });
 

@@ -73,10 +73,8 @@ function runProcess(
     }, timeoutTime);
 
     cliProcess.on('exit', (code) => {
-      if (DEBUG_ENABLED) {
-        console.log('::group::stdout\n%s\n::endgroup::', stdout);
-        console.log('::group::stderr\n%s\n::endgroup::', stderr);
-      }
+      console.log('::group::stdout\n%s\n::endgroup::', stdout);
+      console.log('::group::stderr\n%s\n::endgroup::', stderr);
 
       if (killed) return;
       clearTimeout(timeout);
