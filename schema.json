@@ -220,7 +220,7 @@
       "properties": {
         "path": { "$ref": "#/$defs/path" },
         "language": {
-          "description": "Explicitly map file to language.\n\nIf not provided backend will try to detect language from language name or it's content.",
+          "description": "Explicitly map file to language.\n\nIf not provided, backend will try to detect language from language name or it's content.",
           "type": "string"
         },
         "namespace": { "type": "string" }
