@@ -11,12 +11,15 @@ import {
   error,
   warn,
   exitWithError,
+  info,
 } from '../utils/logger.js';
 import { ForceMode, Format, Schema, FileMatch } from '../schema.js';
 import { askString } from '../utils/ask.js';
 import { mapImportFormat } from '../utils/mapImportFormat.js';
 import { TolgeeClient, handleLoadableError } from '../client/TolgeeClient.js';
 import { BodyOf } from '../client/internal/schema.utils.js';
+import { exit } from 'process';
+import { components } from '#cli/client/internal/schema.generated.js';
 
 type ImportRequest = BodyOf<
   '/v2/projects/{projectId}/single-step-import',
@@ -27,6 +30,8 @@ export type File = { name: string; data: string | Buffer | Blob };
 export type ImportProps = Omit<ImportRequest, 'files'> & {
   files: Array<File>;
 };
+
+type ImportFileMapping = components['schemas']['ImportFileMapping'];
 
 type FileRecord = File & {
   language?: string;
@@ -127,6 +132,18 @@ async function readRecords(matchers: FileMatch[]) {
   return result;
 }
 
+function handleMappingError(fileMappings: ImportFileMapping[]): never {
+  error('Not able to map files to existing languages in the platform');
+  console.log(`Pushed files:`);
+  fileMappings.forEach(({ fileName, languageTag }) => {
+    console.log(`"${fileName}"${languageTag ? ` => "${languageTag}"` : ''}`);
+  });
+  console.log(
+    '\nYou can use `push.files[*].language` property in `tolgeerc` file to map language correctly'
+  );
+  exit(1);
+}
+
 const pushHandler = (config: Schema) =>
   async function (this: Command) {
     const opts: PushOptions = this.optsWithGlobals();
@@ -178,15 +195,6 @@ const pushHandler = (config: Schema) =>
       removeOtherKeys: opts.removeOtherKeys,
     };
 
-    console.log(JSON.stringify(params, null, 2));
-    console.log(
-      JSON.stringify(
-        files.map((f) => f.name),
-        null,
-        2
-      )
-    );
-
     const attempt1 = await loading(
       'Importing...',
       importData(opts.client, {
@@ -196,6 +204,9 @@ const pushHandler = (config: Schema) =>
     );
 
     if (attempt1.error) {
+      if (attempt1.error.code === 'existing_language_not_selected') {
+        handleMappingError(params.fileMappings);
+      }
       if (attempt1.error.code !== 'conflict_is_not_resolved') {
         handleLoadableError(attempt1);
       }
