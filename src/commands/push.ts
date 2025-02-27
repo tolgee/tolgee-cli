@@ -11,15 +11,14 @@ import {
   error,
   warn,
   exitWithError,
-  info,
 } from '../utils/logger.js';
 import { ForceMode, Format, Schema, FileMatch } from '../schema.js';
 import { askString } from '../utils/ask.js';
 import { mapImportFormat } from '../utils/mapImportFormat.js';
 import { TolgeeClient, handleLoadableError } from '../client/TolgeeClient.js';
 import { BodyOf } from '../client/internal/schema.utils.js';
+import { components } from '../client/internal/schema.generated.js';
 import { exit } from 'process';
-import { components } from '#cli/client/internal/schema.generated.js';
 
 type ImportRequest = BodyOf<
   '/v2/projects/{projectId}/single-step-import',
