@@ -4,6 +4,7 @@ import { extname, join } from 'path';
 import { readdir, readFile, stat } from 'fs/promises';
 import { Command, Option } from 'commander';
 import { glob } from 'tinyglobby';
+import { exit } from 'process';
 
 import {
   loading,
@@ -18,7 +19,6 @@ import { mapImportFormat } from '../utils/mapImportFormat.js';
 import { TolgeeClient, handleLoadableError } from '../client/TolgeeClient.js';
 import { BodyOf } from '../client/internal/schema.utils.js';
 import { components } from '../client/internal/schema.generated.js';
-import { exit } from 'process';
 
 type ImportRequest = BodyOf<
   '/v2/projects/{projectId}/single-step-import',
