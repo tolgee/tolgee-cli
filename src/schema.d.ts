@@ -186,6 +186,10 @@ export interface Schema {
      * Delete unused keys from the Tolgee project
      */
     removeUnused?: boolean;
+    /**
+     * Specifies which namespaces should be synchronized.
+     */
+    namespaces?: string[];
   };
   tag?: {
     /**
