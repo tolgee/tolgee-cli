@@ -576,4 +576,91 @@ describe('project 2', () => {
       },
     });
   });
+
+  it('does push correctly when language is not specified', async () => {
+    const files = [
+      { path: fileURLToPath(new URL(`./en.json`, PROJECT_2_DIR)) },
+      { path: fileURLToPath(new URL(`./fr.json`, PROJECT_2_DIR)) },
+    ];
+    const { configFile } = await createTmpFolderWithConfig({
+      apiKey: pak,
+      push: { files, forceMode: 'OVERRIDE' },
+    });
+    const out = await run(['--config', configFile, 'push']);
+
+    expect(out.code).toBe(0);
+
+    const keys = await client.GET('/v2/projects/{projectId}/translations', {
+      params: {
+        path: { projectId: client.getProjectId() },
+        query: { filterKeyName: ['cat-name', 'fox-name'] },
+      },
+    });
+    expect(keys.data?.page?.totalElements).toBe(2);
+
+    const stored = tolgeeDataToDict(keys.data);
+    expect(stored).toEqual({
+      'cat-name': {
+        __ns: null,
+        en: 'Kitty',
+        fr: 'Chaton',
+      },
+      'fox-name': {
+        __ns: null,
+        en: 'Fox',
+        fr: 'Renard',
+      },
+    });
+  });
+
+  it('does push only selected languages even if langauges are not specified', async () => {
+    const files = [
+      { path: fileURLToPath(new URL(`./en.json`, PROJECT_2_DIR)) },
+      { path: fileURLToPath(new URL(`./fr.json`, PROJECT_2_DIR)) },
+    ];
+    const { configFile } = await createTmpFolderWithConfig({
+      apiKey: pak,
+      push: { files, forceMode: 'OVERRIDE' },
+    });
+    const out = await run(['--config', configFile, 'push', '-l', 'en']);
+
+    expect(out.code).toBe(0);
+
+    const keys = await client.GET('/v2/projects/{projectId}/translations', {
+      params: {
+        path: { projectId: client.getProjectId() },
+        query: { filterKeyName: ['cat-name', 'fox-name'] },
+      },
+    });
+    expect(keys.data?.page?.totalElements).toBe(2);
+
+    const stored = tolgeeDataToDict(keys.data);
+    expect(stored).toEqual({
+      'cat-name': {
+        __ns: null,
+        en: 'Kitty',
+        fr: 'Chat',
+      },
+      'fox-name': {
+        __ns: null,
+        en: 'Fox',
+      },
+    });
+  });
+
+  it('does print a nice error when languages mapped incorrectly', async () => {
+    const files = [
+      { path: fileURLToPath(new URL(`./invalid.json`, PROJECT_2_DIR)) },
+    ];
+    const { configFile } = await createTmpFolderWithConfig({
+      apiKey: pak,
+      push: { files, forceMode: 'OVERRIDE' },
+    });
+    const out = await run(['--config', configFile, 'push']);
+
+    expect(out.code).toBe(1);
+    expect(out.stdout).to.contain(
+      'Not able to map files to existing languages in the platform'
+    );
+  });
 });

@@ -24,6 +24,7 @@ export type Format =
   | "PO_PYTHON"
   | "APPLE_STRINGS"
   | "APPLE_XLIFF"
+  | "APPLE_XCSTRINGS"
   | "PROPERTIES_ICU"
   | "PROPERTIES_JAVA"
   | "ANDROID_XML"
@@ -224,6 +225,11 @@ export interface Schema {
 }
 export interface FileMatch {
   path: Path;
-  language: string;
+  /**
+   * Explicitly map file to language.
+   *
+   * If not provided, backend will try to detect language from language name or it's content.
+   */
+  language?: string;
   namespace?: string;
 }
