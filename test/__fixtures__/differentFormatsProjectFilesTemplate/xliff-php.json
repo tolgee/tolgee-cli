@@ -1,0 +1,7 @@
+{
+  "$schema": "../../../schema.json",
+  "format": "XLIFF_PHP",
+  "push": {
+    "filesTemplate": "./xliff-php/{language}.xliff"
+  }
+}

@@ -15,7 +15,7 @@ const explorer = cosmiconfig('tolgee', {
   },
 });
 
-function parseConfig(input: Schema, configDir: string): Schema {
+function parseConfig(input: Schema, configDir: string) {
   const rc = { ...input };
 
   if (rc.apiUrl !== undefined) {
@@ -58,6 +58,14 @@ function parseConfig(input: Schema, configDir: string): Schema {
       ...r,
       path: resolve(configDir, r.path).replace(/\\/g, '/'),
     }));
+  }
+
+  // convert relative paths in config to absolute
+  if (rc.push?.filesTemplate) {
+    rc.push.filesTemplate = resolve(configDir, rc.push.filesTemplate).replace(
+      /\\/g,
+      '/'
+    );
   }
 
   // convert relative paths in config to absolute

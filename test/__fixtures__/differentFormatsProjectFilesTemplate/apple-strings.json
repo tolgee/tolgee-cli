@@ -1,0 +1,7 @@
+{
+  "$schema": "../../../schema.json",
+  "format": "APPLE_STRINGS",
+  "push": {
+    "filesTemplate": "./apple-strings/{language}.lproj/**"
+  }
+}

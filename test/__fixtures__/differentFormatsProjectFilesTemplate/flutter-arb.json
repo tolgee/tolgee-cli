@@ -1,0 +1,7 @@
+{
+  "$schema": "../../../schema.json",
+  "format": "FLUTTER_ARB",
+  "push": {
+    "filesTemplate": "./flutter-arb/app_{language}.arb"
+  }
+}

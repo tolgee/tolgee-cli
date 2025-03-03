@@ -103,6 +103,10 @@ export interface Schema {
   parser?: "react" | "vue" | "svelte" | "ngx";
   push?: {
     /**
+     * Define, which files should be pushed and attach with a template.
+     */
+    filesTemplate?: string;
+    /**
      * Define, which files should be pushed and attach language/namespace to them. By default Tolgee pushes all files specified here, you can filter them by languages and namespaces properties.
      */
     files?: FileMatch[];

@@ -19,6 +19,7 @@ import { mapImportFormat } from '../utils/mapImportFormat.js';
 import { TolgeeClient, handleLoadableError } from '../client/TolgeeClient.js';
 import { BodyOf } from '../client/internal/schema.utils.js';
 import { components } from '../client/internal/schema.generated.js';
+import { findFilesByTemplate } from '../utils/filesTemplate.js';
 
 type ImportRequest = BodyOf<
   '/v2/projects/{projectId}/single-step-import',
@@ -147,11 +148,25 @@ const pushHandler = (config: Schema) =>
   async function (this: Command) {
     const opts: PushOptions = this.optsWithGlobals();
 
-    if (!config.push?.files) {
-      exitWithError('Missing option `push.files` in configuration file.');
+    let allMatchers: FileMatch[] = [];
+
+    const filesTemplate = config.push?.filesTemplate;
+
+    if (!filesTemplate && !config.push?.files?.length) {
+      exitWithError(
+        'Missing option `push.files` or `push.filesTemplate` in configuration file.'
+      );
     }
 
-    const filteredMatchers = config.push.files.filter((r) => {
+    if (filesTemplate) {
+      allMatchers = allMatchers.concat(
+        ...(await findFilesByTemplate(filesTemplate))
+      );
+    }
+
+    allMatchers = allMatchers.concat(...(config.push?.files || []));
+
+    const filteredMatchers = allMatchers.filter((r) => {
       if (
         r.language &&
         opts.languages &&
@@ -226,6 +241,11 @@ export default (config: Schema) =>
   new Command()
     .name('push')
     .description('Pushes translations to Tolgee')
+    .addOption(
+      new Option('-ft, --files-template <template>').default(
+        config.push?.filesTemplate
+      )
+    )
     .addOption(
       new Option(
         '-f, --force-mode <mode>',
