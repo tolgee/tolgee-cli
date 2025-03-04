@@ -155,9 +155,7 @@ const pushHandler = (config: Schema) =>
     const filesTemplate = opts.filesTemplate;
 
     if (!filesTemplate && !config.push?.files?.length) {
-      exitWithError(
-        'Missing option `push.files` or `push.filesTemplate` in configuration file.'
-      );
+      exitWithError('Missing option `push.filesTemplate` or `push.files`.');
     }
 
     if (filesTemplate) {
@@ -246,9 +244,10 @@ export default (config: Schema) =>
     .name('push')
     .description('Pushes translations to Tolgee')
     .addOption(
-      new Option('-ft, --files-template <templates...>').default(
-        valueToArray(config.push?.filesTemplate)
-      )
+      new Option(
+        '-ft, --files-template <templates...>',
+        'A template that describes the structure of the local files and their location with file structure template format (more at: https://docs.tolgee.io/tolgee-cli/push-pull-strings#file-structure-template-format).\n\nExample: `./public/{namespace}/{languageTag}.json`\n\n'
+      ).default(valueToArray(config.push?.filesTemplate))
     )
     .addOption(
       new Option(

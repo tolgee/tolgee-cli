@@ -43,7 +43,7 @@
       "type": "object",
       "properties": {
         "filesTemplate": {
-          "description": "Define, which files should be pushed with a template.\nThe template is a string that can contain the following placeholders: {namespace}, {languageTag}, {androidLanguageTag}, {snakeLanguageTag}.\n\nFor example, when you use JSON with the template ./i18n/{namespace}/{languageTag}.json, the English translations of the home namespace will be loaded from in ./i18n/home/en.json.\n\nRead more in documentation https://docs.tolgee.io/tolgee-cli/push-pull-strings#file-structure-template-format.",
+          "description": "A template that describes the structure of the local files and their location with file [structure template format](https://docs.tolgee.io/tolgee-cli/push-pull-strings#file-structure-template-format).\n\nExample: `./public/{namespace}/{languageTag}.json`",
           "anyOf": [
             {
               "type": "string"

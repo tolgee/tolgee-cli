@@ -103,12 +103,9 @@ export interface Schema {
   parser?: "react" | "vue" | "svelte" | "ngx";
   push?: {
     /**
-     * Define, which files should be pushed with a template.
-     * The template is a string that can contain the following placeholders: {namespace}, {languageTag}, {androidLanguageTag}, {snakeLanguageTag}.
+     * A template that describes the structure of the local files and their location with file [structure template format](https://docs.tolgee.io/tolgee-cli/push-pull-strings#file-structure-template-format).
      *
-     * For example, when you use JSON with the template ./i18n/{namespace}/{languageTag}.json, the English translations of the home namespace will be loaded from in ./i18n/home/en.json.
-     *
-     * Read more in documentation https://docs.tolgee.io/tolgee-cli/push-pull-strings#file-structure-template-format.
+     * Example: `./public/{namespace}/{languageTag}.json`
      */
     filesTemplate?: string | string[];
     /**
