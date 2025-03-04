@@ -79,6 +79,15 @@ export function getFileMatcher(file: string, template: string) {
   for (const [variable, value] of Object.entries(allVariables)) {
     if (variable === 'languageTag') {
       result.language = value;
+    } else if (variable === 'snakeLanguageTag') {
+      result.language = value.replaceAll('_', '-');
+    } else if (variable === 'androidLanguageTag') {
+      if (value[3] === 'r') {
+        result.language =
+          value.substring(0, 3) + value.substring(4, value.length);
+      } else {
+        result.language = value;
+      }
     } else if (variable === 'namespace') {
       result.namespace = value;
     } else if (

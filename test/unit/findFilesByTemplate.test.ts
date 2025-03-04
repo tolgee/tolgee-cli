@@ -5,7 +5,7 @@ import {
 } from '#cli/utils/filesTemplate.js';
 
 describe('filesTemplate', () => {
-  it('supports language variable', () => {
+  it('supports languageTag variable', () => {
     const sanitized = sanitizeTemplate('./i18n/{languageTag}.json');
     const globPattern = getGlobPattern(sanitized);
     expect(globPattern).toEqual('./i18n/*.json');
@@ -15,7 +15,53 @@ describe('filesTemplate', () => {
     });
   });
 
-  it('supports language and namespace variables', () => {
+  it('supports snakeLanguageTag variable', () => {
+    const sanitized = sanitizeTemplate('./i18n/{snakeLanguageTag}.json');
+    const globPattern = getGlobPattern(sanitized);
+    expect(globPattern).toEqual('./i18n/*.json');
+    expect(getFileMatcher('./i18n/en.json', sanitized)).toEqual({
+      path: './i18n/en.json',
+      language: 'en',
+    });
+
+    expect(getFileMatcher('./i18n/en_US.json', sanitized)).toEqual({
+      path: './i18n/en_US.json',
+      language: 'en-US',
+    });
+  });
+
+  it('supports snakeLanguageTag variable', () => {
+    const sanitized = sanitizeTemplate('./i18n/{snakeLanguageTag}.json');
+    const globPattern = getGlobPattern(sanitized);
+    expect(globPattern).toEqual('./i18n/*.json');
+    expect(getFileMatcher('./i18n/en.json', sanitized)).toEqual({
+      path: './i18n/en.json',
+      language: 'en',
+    });
+
+    expect(getFileMatcher('./i18n/en_US.json', sanitized)).toEqual({
+      path: './i18n/en_US.json',
+      language: 'en-US',
+    });
+  });
+
+  it('supports androidLanguageTag variable', () => {
+    const sanitized = sanitizeTemplate('./i18n/{androidLanguageTag}.json');
+    const globPattern = getGlobPattern(sanitized);
+    expect(globPattern).toEqual('./i18n/*.json');
+
+    expect(getFileMatcher('./i18n/en.json', sanitized)).toEqual({
+      path: './i18n/en.json',
+      language: 'en',
+    });
+
+    expect(getFileMatcher('./i18n/en-rUS.json', sanitized)).toEqual({
+      path: './i18n/en-rUS.json',
+      language: 'en-US',
+    });
+  });
+
+  it('supports languageTag and namespace variables', () => {
     const sanitized = sanitizeTemplate('./i18n/{namespace}/{languageTag}.json');
     const globPattern = getGlobPattern(sanitized);
     expect(globPattern).toEqual('./i18n/*/*.json');
