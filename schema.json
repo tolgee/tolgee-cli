@@ -55,7 +55,7 @@
           ]
         },
         "files": {
-          "description": "A template that describes the structure of the local files and their location with [file structure template format](http://localhost:3001/tolgee-cli/push-pull-strings#file-structure-template-format).\n\nExample: `./public/{namespace}/{languageTag}.json`",
+          "description": "More explicit alternative to `filesTemplate`, Define, which files should be pushed and attach language/namespace to them. By default Tolgee pushes all files specified here, you can filter them by languages and namespaces properties.",
           "type": "array",
           "items": { "$ref": "#/$defs/fileMatch" }
         },
