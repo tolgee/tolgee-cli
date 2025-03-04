@@ -6,8 +6,8 @@ const GLOB_EXISTING_DOUBLE_STAR = /(\*\*)/g;
 const GLOB_EXISTING_STAR = /(\*)/g;
 const GLOB_EXISTING_ENUM = /\{([^}]*?,[^}]*?)\}/g;
 
-const PLACEHOLDER_DOUBLE_STAR = '__double_star';
-const PLACEHOLDER_STAR = '__star';
+const PLACEHOLDER_DOUBLE_ASTERISK = '__double_asterisk';
+const PLACEHOLDER_ASTERISK = '__asterisk';
 const PLACEHOLDER_ENUM_PREFIX = '__enum:';
 
 export class FileMatcherException extends Error {
@@ -39,9 +39,12 @@ export function sanitizeTemplate(template: string) {
   });
   value = value.replaceAll(
     GLOB_EXISTING_DOUBLE_STAR,
-    '{' + PLACEHOLDER_DOUBLE_STAR + '}'
+    '{' + PLACEHOLDER_DOUBLE_ASTERISK + '}'
   );
-  value = value.replaceAll(GLOB_EXISTING_STAR, '{' + PLACEHOLDER_STAR + '}');
+  value = value.replaceAll(
+    GLOB_EXISTING_STAR,
+    '{' + PLACEHOLDER_ASTERISK + '}'
+  );
   return value;
 }
 
@@ -92,7 +95,7 @@ export function getFileMatcher(file: string, template: string) {
       result.namespace = value;
     } else if (
       variable !== 'extension' &&
-      ![PLACEHOLDER_STAR, PLACEHOLDER_DOUBLE_STAR].includes(variable) &&
+      ![PLACEHOLDER_ASTERISK, PLACEHOLDER_DOUBLE_ASTERISK].includes(variable) &&
       !variable.startsWith(PLACEHOLDER_ENUM_PREFIX)
     ) {
       throw new FileMatcherException(`Unknown variable "${variable}"`);
@@ -102,14 +105,17 @@ export function getFileMatcher(file: string, template: string) {
 }
 
 export function getGlobPattern(template: string) {
-  let value = template.replaceAll(GLOB_EXISTING_DOUBLE_STAR, '{__double_star}');
-  value = value.replaceAll(GLOB_EXISTING_STAR, '{__star}');
+  let value = template.replaceAll(
+    GLOB_EXISTING_DOUBLE_STAR,
+    '{__double_asterisk}'
+  );
+  value = value.replaceAll(GLOB_EXISTING_STAR, '{__asterisk}');
   const parts = splitToParts(value);
   const globPattern = parts
     .map((part) => {
       const variableName = getVariableName(part);
       if (variableName) {
-        if (variableName === PLACEHOLDER_DOUBLE_STAR) {
+        if (variableName === PLACEHOLDER_DOUBLE_ASTERISK) {
           return '**';
         } else if (variableName.startsWith(PLACEHOLDER_ENUM_PREFIX)) {
           return (

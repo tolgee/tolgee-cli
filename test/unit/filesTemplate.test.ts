@@ -74,7 +74,7 @@ describe('filesTemplate', () => {
 
   it('supports combination with a wildcard *', () => {
     const sanitized = sanitizeTemplate('./i18n/{namespace}/{languageTag}.*');
-    expect(sanitized).toEqual('./i18n/{namespace}/{languageTag}.{__star}');
+    expect(sanitized).toEqual('./i18n/{namespace}/{languageTag}.{__asterisk}');
     const globPattern = getGlobPattern(sanitized);
     expect(globPattern).toEqual('./i18n/*/*.*');
     expect(getFileMatcher('./i18n/common/en.json', sanitized)).toEqual({
@@ -87,7 +87,7 @@ describe('filesTemplate', () => {
   it('supports combination with a wildcard **', () => {
     const sanitized = sanitizeTemplate('./**/{namespace}/{languageTag}.*');
     expect(sanitized).toEqual(
-      './{__double_star}/{namespace}/{languageTag}.{__star}'
+      './{__double_asterisk}/{namespace}/{languageTag}.{__asterisk}'
     );
     const globPattern = getGlobPattern(sanitized);
     expect(globPattern).toEqual('./**/*/*.*');
@@ -122,7 +122,7 @@ describe('filesTemplate', () => {
 
   it('throws error on unknown variable', () => {
     const sanitized = sanitizeTemplate('./i18n/{unknown}.*');
-    expect(sanitized).toEqual('./i18n/{unknown}.{__star}');
+    expect(sanitized).toEqual('./i18n/{unknown}.{__asterisk}');
     const globPattern = getGlobPattern(sanitized);
     expect(globPattern).toEqual('./i18n/*.*');
     expect(() => getFileMatcher('./i18n/common/en.json', sanitized)).toThrow(
@@ -132,9 +132,9 @@ describe('filesTemplate', () => {
 
   it('throws error on invalid template', () => {
     const sanitized = sanitizeTemplate('./i18n/{languageTag}*');
-    expect(sanitized).toEqual('./i18n/{languageTag}{__star}');
+    expect(sanitized).toEqual('./i18n/{languageTag}{__asterisk}');
     expect(() => getFileMatcher('./i18n/common/en.json', sanitized)).toThrow(
-      `Can't have two variables without separator ({languageTag} + {__star})`
+      `Can't have two variables without separator ({languageTag} + {__asterisk})`
     );
   });
 });
