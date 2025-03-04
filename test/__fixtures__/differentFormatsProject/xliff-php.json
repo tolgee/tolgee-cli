@@ -2,6 +2,6 @@
   "$schema": "../../../schema.json",
   "format": "XLIFF_PHP",
   "push": {
-    "files": [{ "path": "./xliff-php/en.xliff", "language": "en" }]
+    "filesTemplate": "./xliff-php/{languageTag}.xliff"
   }
 }

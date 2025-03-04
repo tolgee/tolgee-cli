@@ -2,10 +2,6 @@
   "$schema": "../../../schema.json",
   "format": "APPLE_XCSTRINGS",
   "push": {
-    "files": [
-      {
-        "path": "./apple-xcstrings/Localizable.xcstrings"
-      }
-    ]
+    "filesTemplate": "./apple-xcstrings/Localizable.xcstrings"
   }
 }

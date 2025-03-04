@@ -1,7 +1,0 @@
-{
-  "$schema": "../../../schema.json",
-  "format": "JSON_ICU",
-  "push": {
-    "filesTemplate": "./tolgee-json/{languageTag}.json"
-  }
-}

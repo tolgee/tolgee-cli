@@ -78,7 +78,7 @@ async function testWithConfig({
   );
 }
 
-describe('push and pull with different formats', () => {
+describe('push and pull with different formats (with filesTemplate used)', () => {
   setupTemporaryFolder();
   beforeEach(async () => {
     client = await createProjectWithClient('Project 1', PROJECT_1);

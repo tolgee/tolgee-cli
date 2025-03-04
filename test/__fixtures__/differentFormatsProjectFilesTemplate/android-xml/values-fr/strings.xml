@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-  <string name="controller">Manette</string>
-  <string name="desk">Bureau</string>
-  <string name="keyboard">Clavier</string>
-  <string name="mouse">Souris</string>
-  <string name="remote">Télécommande</string>
-  <string name="screen">Écran</string>
-</resources>

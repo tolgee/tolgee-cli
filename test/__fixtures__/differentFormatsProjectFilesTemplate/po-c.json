@@ -1,7 +1,0 @@
-{
-  "$schema": "../../../schema.json",
-  "format": "PO_C",
-  "push": {
-    "filesTemplate": "./po-c/{languageTag}.po"
-  }
-}

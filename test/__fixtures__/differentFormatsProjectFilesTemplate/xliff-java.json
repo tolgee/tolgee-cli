@@ -1,7 +1,0 @@
-{
-  "$schema": "../../../schema.json",
-  "format": "XLIFF_JAVA",
-  "push": {
-    "filesTemplate": "./xliff-java/{languageTag}.xliff"
-  }
-}

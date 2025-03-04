@@ -1,7 +1,0 @@
-{
-  "$schema": "../../../schema.json",
-  "format": "XLIFF_ICU",
-  "push": {
-    "filesTemplate": "./xliff-icu/{languageTag}.xliff"
-  }
-}

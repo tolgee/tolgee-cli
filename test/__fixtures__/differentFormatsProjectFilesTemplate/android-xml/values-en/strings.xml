@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-  <string name="controller">You have %s items</string>
-  <string name="desk">Desk</string>
-  <string name="keyboard">Keyboard</string>
-  <string name="mouse">Mouse</string>
-  <string name="remote">Remote</string>
-  <string name="screen">Screen</string>
-</resources>

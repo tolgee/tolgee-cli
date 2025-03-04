@@ -1,7 +1,0 @@
-{
-  "$schema": "../../../schema.json",
-  "format": "RESX_ICU",
-  "push": {
-    "filesTemplate": "./resx/{languageTag}.resx"
-  }
-}

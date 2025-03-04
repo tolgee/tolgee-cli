@@ -2,6 +2,6 @@
   "$schema": "../../../schema.json",
   "format": "PO_C",
   "push": {
-    "files": [{ "path": "./po-c/en.po", "language": "en" }]
+    "filesTemplate": "./po-c/{languageTag}.po"
   }
 }
