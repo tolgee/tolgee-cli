@@ -77,7 +77,7 @@ export function getFileMatcher(file: string, template: string) {
 
   const result: FileMatch = { path: file };
   for (const [variable, value] of Object.entries(allVariables)) {
-    if (variable === 'language') {
+    if (variable === 'languageTag') {
       result.language = value;
     } else if (variable === 'namespace') {
       result.namespace = value;

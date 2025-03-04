@@ -6,7 +6,7 @@ import {
 
 describe('filesTemplate', () => {
   it('supports language variable', () => {
-    const sanitized = sanitizeTemplate('./i18n/{language}.json');
+    const sanitized = sanitizeTemplate('./i18n/{languageTag}.json');
     const globPattern = getGlobPattern(sanitized);
     expect(globPattern).toEqual('./i18n/*.json');
     expect(getFileMatcher('./i18n/en.json', sanitized)).toEqual({
@@ -16,7 +16,7 @@ describe('filesTemplate', () => {
   });
 
   it('supports language and namespace variables', () => {
-    const sanitized = sanitizeTemplate('./i18n/{namespace}/{language}.json');
+    const sanitized = sanitizeTemplate('./i18n/{namespace}/{languageTag}.json');
     const globPattern = getGlobPattern(sanitized);
     expect(globPattern).toEqual('./i18n/*/*.json');
     expect(getFileMatcher('./i18n/common/en.json', sanitized)).toEqual({
@@ -27,8 +27,8 @@ describe('filesTemplate', () => {
   });
 
   it('supports combination with a wildcard *', () => {
-    const sanitized = sanitizeTemplate('./i18n/{namespace}/{language}.*');
-    expect(sanitized).toEqual('./i18n/{namespace}/{language}.{__star}');
+    const sanitized = sanitizeTemplate('./i18n/{namespace}/{languageTag}.*');
+    expect(sanitized).toEqual('./i18n/{namespace}/{languageTag}.{__star}');
     const globPattern = getGlobPattern(sanitized);
     expect(globPattern).toEqual('./i18n/*/*.*');
     expect(getFileMatcher('./i18n/common/en.json', sanitized)).toEqual({
@@ -39,9 +39,9 @@ describe('filesTemplate', () => {
   });
 
   it('supports combination with a wildcard **', () => {
-    const sanitized = sanitizeTemplate('./**/{namespace}/{language}.*');
+    const sanitized = sanitizeTemplate('./**/{namespace}/{languageTag}.*');
     expect(sanitized).toEqual(
-      './{__double_star}/{namespace}/{language}.{__star}'
+      './{__double_star}/{namespace}/{languageTag}.{__star}'
     );
     const globPattern = getGlobPattern(sanitized);
     expect(globPattern).toEqual('./**/*/*.*');
@@ -53,8 +53,8 @@ describe('filesTemplate', () => {
   });
 
   it('supports enum wildcards', () => {
-    const sanitized = sanitizeTemplate('./i18n/{language}.{json,yaml}');
-    expect(sanitized).toEqual('./i18n/{language}.{__enum:json,yaml}');
+    const sanitized = sanitizeTemplate('./i18n/{languageTag}.{json,yaml}');
+    expect(sanitized).toEqual('./i18n/{languageTag}.{__enum:json,yaml}');
     const globPattern = getGlobPattern(sanitized);
     expect(globPattern).toEqual('./i18n/*.{json,yaml}');
     expect(getFileMatcher('./i18n/en.json', sanitized)).toEqual({
@@ -74,10 +74,10 @@ describe('filesTemplate', () => {
   });
 
   it('throws error on invalid template', () => {
-    const sanitized = sanitizeTemplate('./i18n/{language}*');
-    expect(sanitized).toEqual('./i18n/{language}{__star}');
+    const sanitized = sanitizeTemplate('./i18n/{languageTag}*');
+    expect(sanitized).toEqual('./i18n/{languageTag}{__star}');
     expect(() => getFileMatcher('./i18n/common/en.json', sanitized)).toThrow(
-      `Can't have two variables without separator ({language} + {__star})`
+      `Can't have two variables without separator ({languageTag} + {__star})`
     );
   });
 });

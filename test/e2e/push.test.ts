@@ -44,7 +44,7 @@ describe('project 1', () => {
       'push',
       '--verbose',
       '--files-template',
-      fileURLToPath(new URL(`./{language}.json`, PROJECT_1_DIR)),
+      fileURLToPath(new URL(`./{languageTag}.json`, PROJECT_1_DIR)),
     ]);
 
     expect(out.code).toBe(0);
@@ -81,7 +81,7 @@ describe('project 1', () => {
       '-l',
       'fr',
       '--files-template',
-      fileURLToPath(new URL(`./{language}.json`, PROJECT_1_DIR)),
+      fileURLToPath(new URL(`./{languageTag}.json`, PROJECT_1_DIR)),
     ]);
 
     expect(out.code).toBe(0);
@@ -112,7 +112,7 @@ describe('project 1', () => {
       apiKey: pak,
       push: {
         filesTemplate: fileURLToPath(
-          new URL(`./{language}.json`, PROJECT_1_DIR)
+          new URL(`./{languageTag}.json`, PROJECT_1_DIR)
         ),
         languages: ['fr'],
       },
@@ -161,8 +161,8 @@ describe('project 3', () => {
       pak,
       'push',
       '--files-template',
-      fileURLToPath(new URL(`./{language}.json`, PROJECT_3_DIR)),
-      fileURLToPath(new URL(`./{namespace}/{language}.json`, PROJECT_3_DIR)),
+      fileURLToPath(new URL(`./{languageTag}.json`, PROJECT_3_DIR)),
+      fileURLToPath(new URL(`./{namespace}/{languageTag}.json`, PROJECT_3_DIR)),
       '--force-mode',
       'OVERRIDE',
     ]);
@@ -196,9 +196,9 @@ describe('project 3', () => {
     const { configFile } = await createTmpFolderWithConfig({
       push: {
         filesTemplate: [
-          fileURLToPath(new URL(`./{language}.json`, PROJECT_3_DIR)),
+          fileURLToPath(new URL(`./{languageTag}.json`, PROJECT_3_DIR)),
           fileURLToPath(
-            new URL(`./{namespace}/{language}.json`, PROJECT_3_DIR)
+            new URL(`./{namespace}/{languageTag}.json`, PROJECT_3_DIR)
           ),
         ],
         forceMode: 'OVERRIDE',
@@ -241,9 +241,9 @@ describe('project 3', () => {
       apiKey: pak,
       push: {
         filesTemplate: [
-          fileURLToPath(new URL(`./{language}.json`, PROJECT_3_DIR)),
+          fileURLToPath(new URL(`./{languageTag}.json`, PROJECT_3_DIR)),
           fileURLToPath(
-            new URL(`./{namespace}/{language}.json`, PROJECT_3_DIR)
+            new URL(`./{namespace}/{languageTag}.json`, PROJECT_3_DIR)
           ),
         ],
         forceMode: 'OVERRIDE',
@@ -280,9 +280,14 @@ describe('project 3', () => {
     const { configFile } = await createTmpFolderWithConfig({
       push: {
         filesTemplate: [
-          fileURLToPath(new URL(`./{language}.json`, PROJECT_3_DEPRECATED_DIR)),
           fileURLToPath(
-            new URL(`./{namespace}/{language}.json`, PROJECT_3_DEPRECATED_DIR)
+            new URL(`./{languageTag}.json`, PROJECT_3_DEPRECATED_DIR)
+          ),
+          fileURLToPath(
+            new URL(
+              `./{namespace}/{languageTag}.json`,
+              PROJECT_3_DEPRECATED_DIR
+            )
           ),
         ],
       },
@@ -324,9 +329,14 @@ describe('project 3', () => {
       apiKey: pakWithDelete,
       push: {
         filesTemplate: [
-          fileURLToPath(new URL(`./{language}.json`, PROJECT_3_DEPRECATED_DIR)),
           fileURLToPath(
-            new URL(`./{namespace}/{language}.json`, PROJECT_3_DEPRECATED_DIR)
+            new URL(`./{languageTag}.json`, PROJECT_3_DEPRECATED_DIR)
+          ),
+          fileURLToPath(
+            new URL(
+              `./{namespace}/{languageTag}.json`,
+              PROJECT_3_DEPRECATED_DIR
+            )
           ),
         ],
         removeOtherKeys: true,
@@ -368,7 +378,7 @@ describe('project 2', () => {
     const { configFile } = await createTmpFolderWithConfig({
       push: {
         filesTemplate: fileURLToPath(
-          new URL(`./{language}.json`, PROJECT_2_DIR)
+          new URL(`./{languageTag}.json`, PROJECT_2_DIR)
         ),
       },
     });
@@ -406,7 +416,7 @@ describe('project 2', () => {
     const { configFile } = await createTmpFolderWithConfig({
       push: {
         filesTemplate: fileURLToPath(
-          new URL(`./{language}.json`, PROJECT_2_DIR)
+          new URL(`./{languageTag}.json`, PROJECT_2_DIR)
         ),
         languages: ['en', 'fr'],
       },
@@ -452,7 +462,7 @@ describe('project 2', () => {
       apiKey: pak,
       push: {
         filesTemplate: fileURLToPath(
-          new URL(`./{language}.json`, PROJECT_2_DIR)
+          new URL(`./{languageTag}.json`, PROJECT_2_DIR)
         ),
         forceMode: 'KEEP',
         languages: ['en', 'fr'],
@@ -490,7 +500,7 @@ describe('project 2', () => {
     const { configFile } = await createTmpFolderWithConfig({
       push: {
         filesTemplate: fileURLToPath(
-          new URL(`./{language}.json`, PROJECT_2_DIR)
+          new URL(`./{languageTag}.json`, PROJECT_2_DIR)
         ),
         languages: ['en', 'fr'],
       },
@@ -530,7 +540,7 @@ describe('project 2', () => {
     const { configFile } = await createTmpFolderWithConfig({
       push: {
         filesTemplate: fileURLToPath(
-          new URL(`./{language}.json`, PROJECT_2_DIR)
+          new URL(`./{languageTag}.json`, PROJECT_2_DIR)
         ),
         languages: ['en', 'fr'],
       },
@@ -575,7 +585,7 @@ describe('project 2', () => {
       apiKey: pak,
       push: {
         filesTemplate: fileURLToPath(
-          new URL(`./{language}.json`, PROJECT_2_DIR)
+          new URL(`./{languageTag}.json`, PROJECT_2_DIR)
         ),
         forceMode: 'OVERRIDE',
         languages: ['en', 'fr'],

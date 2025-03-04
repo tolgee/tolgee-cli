@@ -2,6 +2,6 @@
   "$schema": "../../../schema.json",
   "format": "APPLE_XLIFF",
   "push": {
-    "filesTemplate": "./apple-xliff/{language}.xliff"
+    "filesTemplate": "./apple-xliff/{languageTag}.xliff"
   }
 }
