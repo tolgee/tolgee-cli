@@ -53,6 +53,7 @@
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^22.10.1",
     "@types/yauzl": "^2.10.3",
+    "axios": "^1.8.1",
     "cross-env": "^7.0.3",
     "eslint": "^9.16.0",
     "eslint-config-prettier": "^9.1.0",
