@@ -43,7 +43,7 @@
       "type": "object",
       "properties": {
         "filesTemplate": {
-          "description": "Define, which files should be pushed and attach with a template.",
+          "description": "Define, which files should be pushed with a template.\nThe template is a string that can contain the following placeholders: {namespace}, {languageTag}, {androidLanguageTag}, {snakeLanguageTag}.\n\nFor example, when you use JSON with the template ./i18n/{namespace}/{languageTag}.json, the English translations of the home namespace will be loaded from in ./i18n/home/en.json.\n\nRead more in documentation https://docs.tolgee.io/tolgee-cli/push-pull-strings#file-structure-template-format.",
           "anyOf": [
             {
               "type": "string"
@@ -55,7 +55,7 @@
           ]
         },
         "files": {
-          "description": "Define, which files should be pushed and attach language/namespace to them. By default Tolgee pushes all files specified here, you can filter them by languages and namespaces properties.",
+          "description": "A template that describes the structure of the local files and their location with [file structure template format](http://localhost:3001/tolgee-cli/push-pull-strings#file-structure-template-format).\n\nExample: `./public/{namespace}/{languageTag}.json`",
           "type": "array",
           "items": { "$ref": "#/$defs/fileMatch" }
         },
@@ -140,7 +140,7 @@
           "type": "boolean"
         },
         "fileStructureTemplate": {
-          "description": "Defines exported file structure: https://tolgee.io/tolgee-cli/push-pull-strings#file-structure-template-format",
+          "description": "Defines exported file structure: https://docs.tolgee.io/tolgee-cli/push-pull-strings#file-structure-template-format",
           "type": "string"
         },
         "emptyDir": {

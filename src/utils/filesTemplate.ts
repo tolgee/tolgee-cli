@@ -91,6 +91,7 @@ export function getFileMatcher(file: string, template: string) {
     } else if (variable === 'namespace') {
       result.namespace = value;
     } else if (
+      variable !== 'extension' &&
       ![PLACEHOLDER_STAR, PLACEHOLDER_DOUBLE_STAR].includes(variable) &&
       !variable.startsWith(PLACEHOLDER_ENUM_PREFIX)
     ) {

@@ -9,44 +9,44 @@
  * Localization files format for push and pull operations.
  */
 export type Format =
-  | 'JSON_TOLGEE'
-  | 'JSON_ICU'
-  | 'JSON_I18NEXT'
-  | 'JSON_JAVA'
-  | 'JSON_PHP'
-  | 'JSON_RUBY'
-  | 'JSON_C'
-  | 'PO_PHP'
-  | 'PO_C'
-  | 'PO_JAVA'
-  | 'PO_ICU'
-  | 'PO_RUBY'
-  | 'PO_PYTHON'
-  | 'APPLE_STRINGS'
-  | 'APPLE_XLIFF'
-  | 'APPLE_XCSTRINGS'
-  | 'PROPERTIES_ICU'
-  | 'PROPERTIES_JAVA'
-  | 'ANDROID_XML'
-  | 'COMPOSE_XML'
-  | 'FLUTTER_ARB'
-  | 'CSV_ICU'
-  | 'CSV_JAVA'
-  | 'CSV_PHP'
-  | 'CSV_RUBY'
-  | 'YAML_RUBY'
-  | 'YAML_JAVA'
-  | 'YAML_ICU'
-  | 'YAML_PHP'
-  | 'XLIFF_ICU'
-  | 'XLIFF_JAVA'
-  | 'XLIFF_PHP'
-  | 'XLIFF_RUBY'
-  | 'RESX_ICU'
-  | 'XLSX_ICU'
-  | 'XLSX_JAVA'
-  | 'XLSX_PHP'
-  | 'XLSX_RUBY';
+  | "JSON_TOLGEE"
+  | "JSON_ICU"
+  | "JSON_I18NEXT"
+  | "JSON_JAVA"
+  | "JSON_PHP"
+  | "JSON_RUBY"
+  | "JSON_C"
+  | "PO_PHP"
+  | "PO_C"
+  | "PO_JAVA"
+  | "PO_ICU"
+  | "PO_RUBY"
+  | "PO_PYTHON"
+  | "APPLE_STRINGS"
+  | "APPLE_XLIFF"
+  | "APPLE_XCSTRINGS"
+  | "PROPERTIES_ICU"
+  | "PROPERTIES_JAVA"
+  | "ANDROID_XML"
+  | "COMPOSE_XML"
+  | "FLUTTER_ARB"
+  | "CSV_ICU"
+  | "CSV_JAVA"
+  | "CSV_PHP"
+  | "CSV_RUBY"
+  | "YAML_RUBY"
+  | "YAML_JAVA"
+  | "YAML_ICU"
+  | "YAML_PHP"
+  | "XLIFF_ICU"
+  | "XLIFF_JAVA"
+  | "XLIFF_PHP"
+  | "XLIFF_RUBY"
+  | "RESX_ICU"
+  | "XLSX_ICU"
+  | "XLSX_JAVA"
+  | "XLSX_PHP"
+  | "XLSX_RUBY";
 /**
  * File glob specifying which files to include.
  */
@@ -60,7 +60,7 @@ export type Path = string;
  *   `KEEP` - create only non-existent strings, don't touch existing ones
  *   `NO_FORCE` - throw an error, if there are any conflict
  */
-export type ForceMode = 'OVERRIDE' | 'KEEP' | 'NO_FORCE';
+export type ForceMode = "OVERRIDE" | "KEEP" | "NO_FORCE";
 
 export interface Schema {
   /**
@@ -100,14 +100,21 @@ export interface Schema {
   /**
    * Override parser detection.
    */
-  parser?: 'react' | 'vue' | 'svelte' | 'ngx';
+  parser?: "react" | "vue" | "svelte" | "ngx";
   push?: {
     /**
      * Define, which files should be pushed with a template.
+     * The template is a string that can contain the following placeholders: {namespace}, {languageTag}, {androidLanguageTag}, {snakeLanguageTag}.
+     *
+     * For example, when you use JSON with the template ./i18n/{namespace}/{languageTag}.json, the English translations of the home namespace will be loaded from in ./i18n/home/en.json.
+     *
+     * Read more in documentation https://docs.tolgee.io/tolgee-cli/push-pull-strings#file-structure-template-format.
      */
     filesTemplate?: string | string[];
     /**
-     * Define, which files should be pushed and attach language/namespace to them. By default Tolgee pushes all files specified here, you can filter them by languages and namespaces properties.
+     * A template that describes the structure of the local files and their location with [file structure template format](http://localhost:3001/tolgee-cli/push-pull-strings#file-structure-template-format).
+     *
+     * Example: `./public/{namespace}/{languageTag}.json`
      */
     files?: FileMatch[];
     /**
@@ -152,7 +159,7 @@ export interface Schema {
     /**
      * List of translation states to include. Defaults all except untranslated.
      */
-    states?: ('UNTRANSLATED' | 'TRANSLATED' | 'REVIEWED')[];
+    states?: ("UNTRANSLATED" | "TRANSLATED" | "REVIEWED")[];
     /**
      * List of tags which to include.
      */
@@ -166,7 +173,7 @@ export interface Schema {
      */
     supportArrays?: boolean;
     /**
-     * Defines exported file structure: https://tolgee.io/tolgee-cli/push-pull-strings#file-structure-template-format
+     * Defines exported file structure: https://docs.tolgee.io/tolgee-cli/push-pull-strings#file-structure-template-format
      */
     fileStructureTemplate?: string;
     /**

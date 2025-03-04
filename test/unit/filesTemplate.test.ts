@@ -109,6 +109,17 @@ describe('filesTemplate', () => {
     });
   });
 
+  it('ignores {extension} variable', () => {
+    const sanitized = sanitizeTemplate('./i18n/{languageTag}.{extension}');
+    expect(sanitized).toEqual('./i18n/{languageTag}.{extension}');
+    const globPattern = getGlobPattern(sanitized);
+    expect(globPattern).toEqual('./i18n/*.*');
+    expect(getFileMatcher('./i18n/en.json', sanitized)).toEqual({
+      path: './i18n/en.json',
+      language: 'en',
+    });
+  });
+
   it('throws error on unknown variable', () => {
     const sanitized = sanitizeTemplate('./i18n/{unknown}.*');
     expect(sanitized).toEqual('./i18n/{unknown}.{__star}');
