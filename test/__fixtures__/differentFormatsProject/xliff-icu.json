@@ -2,6 +2,6 @@
   "$schema": "../../../schema.json",
   "format": "XLIFF_ICU",
   "push": {
-    "files": [{ "path": "./xliff-icu/en.xliff", "language": "en" }]
+    "filesTemplate": "./xliff-icu/{languageTag}.xliff"
   }
 }

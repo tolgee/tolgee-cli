@@ -103,7 +103,15 @@ export interface Schema {
   parser?: "react" | "vue" | "svelte" | "ngx";
   push?: {
     /**
-     * Define, which files should be pushed and attach language/namespace to them. By default Tolgee pushes all files specified here, you can filter them by languages and namespaces properties.
+     * A template that describes the structure of the local files and their location with file [structure template format](https://docs.tolgee.io/tolgee-cli/push-pull-strings#file-structure-template-format).
+     *
+     * Example: `./public/{namespace}/{languageTag}.json`
+     */
+    filesTemplate?: string | string[];
+    /**
+     * A template that describes the structure of the local files and their location with [file structure template format](http://localhost:3001/tolgee-cli/push-pull-strings#file-structure-template-format).
+     *
+     * Example: `./public/{namespace}/{languageTag}.json`
      */
     files?: FileMatch[];
     /**
@@ -162,7 +170,7 @@ export interface Schema {
      */
     supportArrays?: boolean;
     /**
-     * Defines exported file structure: https://tolgee.io/tolgee-cli/push-pull-strings#file-structure-template-format
+     * Defines exported file structure: https://docs.tolgee.io/tolgee-cli/push-pull-strings#file-structure-template-format
      */
     fileStructureTemplate?: string;
     /**

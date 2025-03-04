@@ -2,11 +2,6 @@
   "$schema": "../../../schema.json",
   "format": "RESX_ICU",
   "push": {
-    "files": [
-      {
-        "path": "./resx/en.resx",
-        "language": "en"
-      }
-    ]
+    "filesTemplate": "./resx/{languageTag}.resx"
   }
 }

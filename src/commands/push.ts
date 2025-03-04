@@ -19,6 +19,8 @@ import { mapImportFormat } from '../utils/mapImportFormat.js';
 import { TolgeeClient, handleLoadableError } from '../client/TolgeeClient.js';
 import { BodyOf } from '../client/internal/schema.utils.js';
 import { components } from '../client/internal/schema.generated.js';
+import { findFilesByTemplate } from '../utils/filesTemplate.js';
+import { valueToArray } from '../utils/valueToArray.js';
 
 type ImportRequest = BodyOf<
   '/v2/projects/{projectId}/single-step-import',
@@ -46,6 +48,7 @@ type PushOptions = BaseOptions & {
   namespaces?: string[];
   tagNewKeys?: string[];
   removeOtherKeys?: boolean;
+  filesTemplate?: string[];
 };
 
 async function allInPattern(pattern: string) {
@@ -147,11 +150,25 @@ const pushHandler = (config: Schema) =>
   async function (this: Command) {
     const opts: PushOptions = this.optsWithGlobals();
 
-    if (!config.push?.files) {
-      exitWithError('Missing option `push.files` in configuration file.');
+    let allMatchers: FileMatch[] = [];
+
+    const filesTemplate = opts.filesTemplate;
+
+    if (!filesTemplate && !config.push?.files?.length) {
+      exitWithError('Missing option `push.filesTemplate` or `push.files`.');
     }
 
-    const filteredMatchers = config.push.files.filter((r) => {
+    if (filesTemplate) {
+      for (const template of filesTemplate) {
+        allMatchers = allMatchers.concat(
+          ...(await findFilesByTemplate(template))
+        );
+      }
+    }
+
+    allMatchers = allMatchers.concat(...(config.push?.files || []));
+
+    const filteredMatchers = allMatchers.filter((r) => {
       if (
         r.language &&
         opts.languages &&
@@ -226,6 +243,12 @@ export default (config: Schema) =>
   new Command()
     .name('push')
     .description('Pushes translations to Tolgee')
+    .addOption(
+      new Option(
+        '-ft, --files-template <templates...>',
+        'A template that describes the structure of the local files and their location with file structure template format (more at: https://docs.tolgee.io/tolgee-cli/push-pull-strings#file-structure-template-format).\n\nExample: `./public/{namespace}/{languageTag}.json`\n\n'
+      ).default(valueToArray(config.push?.filesTemplate))
+    )
     .addOption(
       new Option(
         '-f, --force-mode <mode>',

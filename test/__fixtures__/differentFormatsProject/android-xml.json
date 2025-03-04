@@ -2,11 +2,6 @@
   "$schema": "../../../schema.json",
   "format": "ANDROID_XML",
   "push": {
-    "files": [
-      {
-        "path": "./android-xml/values-en/**",
-        "language": "en"
-      }
-    ]
+    "filesTemplate": "./android-xml/values-{languageTag}/**"
   }
 }

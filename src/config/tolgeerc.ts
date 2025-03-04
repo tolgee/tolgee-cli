@@ -8,6 +8,7 @@ import { CosmiconfigResult } from 'cosmiconfig/dist/types.js';
 import { error, exitWithError } from '../utils/logger.js';
 import { existsSync } from 'fs';
 import { Schema } from '../schema.js';
+import { valueToArray } from '../utils/valueToArray.js';
 
 const explorer = cosmiconfig('tolgee', {
   loaders: {
@@ -15,7 +16,7 @@ const explorer = cosmiconfig('tolgee', {
   },
 });
 
-function parseConfig(input: Schema, configDir: string): Schema {
+function parseConfig(input: Schema, configDir: string) {
   const rc = { ...input };
 
   if (rc.apiUrl !== undefined) {
@@ -58,6 +59,13 @@ function parseConfig(input: Schema, configDir: string): Schema {
       ...r,
       path: resolve(configDir, r.path).replace(/\\/g, '/'),
     }));
+  }
+
+  // convert relative paths in config to absolute
+  if (rc.push?.filesTemplate) {
+    rc.push.filesTemplate = valueToArray(rc.push.filesTemplate)?.map(
+      (template) => resolve(configDir, template).replace(/\\/g, '/')
+    );
   }
 
   // convert relative paths in config to absolute

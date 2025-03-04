@@ -12,7 +12,6 @@ import { PROJECT_1 } from './utils/api/project1.js';
 import { PROJECT_3 } from './utils/api/project3.js';
 import { PROJECT_2 } from './utils/api/project2.js';
 import { createTmpFolderWithConfig, removeTmpFolder } from './utils/tmp.js';
-import { FileMatch } from '#cli/schema.js';
 
 const FIXTURES_PATH = new URL('../__fixtures__/', import.meta.url);
 
@@ -24,23 +23,6 @@ const PROJECT_3_DEPRECATED_DIR = new URL(
   './updatedProject3DeprecatedKeys/',
   FIXTURES_PATH
 );
-
-function pushFilesConfig(base: URL, namespaces: string[] = ['']) {
-  const result: FileMatch[] = [];
-  for (const ns of namespaces) {
-    result.push({
-      path: fileURLToPath(new URL(`./${ns}/en.json`, base)),
-      language: 'en',
-      namespace: ns,
-    });
-    result.push({
-      path: fileURLToPath(new URL(`./${ns}/fr.json`, base)),
-      language: 'fr',
-      namespace: ns,
-    });
-  }
-  return result;
-}
 
 let client: TolgeeClient;
 let pak: string;
@@ -56,16 +38,13 @@ describe('project 1', () => {
   });
 
   it('pushes updated strings to Tolgee', async () => {
-    const { configFile } = await createTmpFolderWithConfig({
-      push: { files: pushFilesConfig(PROJECT_1_DIR) },
-    });
     const out = await run([
-      '--config',
-      configFile,
       '--api-key',
       pak,
       'push',
       '--verbose',
+      '--files-template',
+      fileURLToPath(new URL(`./{languageTag}.json`, PROJECT_1_DIR)),
     ]);
 
     expect(out.code).toBe(0);
@@ -95,18 +74,14 @@ describe('project 1', () => {
   });
 
   it('pushes only selected languages (args)', async () => {
-    const config = {
-      push: { files: pushFilesConfig(PROJECT_1_DIR) },
-    };
-    const { configFile } = await createTmpFolderWithConfig(config);
     const out = await run([
-      '--config',
-      configFile,
       '--api-key',
       pak,
       'push',
       '-l',
       'fr',
+      '--files-template',
+      fileURLToPath(new URL(`./{languageTag}.json`, PROJECT_1_DIR)),
     ]);
 
     expect(out.code).toBe(0);
@@ -136,7 +111,9 @@ describe('project 1', () => {
     const { configFile } = await createTmpFolderWithConfig({
       apiKey: pak,
       push: {
-        files: pushFilesConfig(PROJECT_1_DIR),
+        filesTemplate: fileURLToPath(
+          new URL(`./{languageTag}.json`, PROJECT_1_DIR)
+        ),
         languages: ['fr'],
       },
     });
@@ -179,13 +156,16 @@ describe('project 3', () => {
   });
 
   it('pushes to Tolgee with correct namespaces', async () => {
-    const { configFile } = await createTmpFolderWithConfig({
-      push: {
-        files: pushFilesConfig(PROJECT_3_DIR, ['', 'drinks', 'food']),
-        forceMode: 'OVERRIDE',
-      },
-    });
-    const out = await run(['--config', configFile, '--api-key', pak, 'push']);
+    const out = await run([
+      '--api-key',
+      pak,
+      'push',
+      '--files-template',
+      fileURLToPath(new URL(`./{languageTag}.json`, PROJECT_3_DIR)),
+      fileURLToPath(new URL(`./{namespace}/{languageTag}.json`, PROJECT_3_DIR)),
+      '--force-mode',
+      'OVERRIDE',
+    ]);
     expect(out.code).toBe(0);
 
     const keys = await client.GET('/v2/projects/{projectId}/translations', {
@@ -215,7 +195,12 @@ describe('project 3', () => {
   it('pushes only selected namespaces and languages (args)', async () => {
     const { configFile } = await createTmpFolderWithConfig({
       push: {
-        files: pushFilesConfig(PROJECT_3_DIR, ['', 'drinks', 'food']),
+        filesTemplate: [
+          fileURLToPath(new URL(`./{languageTag}.json`, PROJECT_3_DIR)),
+          fileURLToPath(
+            new URL(`./{namespace}/{languageTag}.json`, PROJECT_3_DIR)
+          ),
+        ],
         forceMode: 'OVERRIDE',
       },
     });
@@ -255,7 +240,12 @@ describe('project 3', () => {
     const { configFile } = await createTmpFolderWithConfig({
       apiKey: pak,
       push: {
-        files: pushFilesConfig(PROJECT_3_DIR, ['', 'drinks', 'food']),
+        filesTemplate: [
+          fileURLToPath(new URL(`./{languageTag}.json`, PROJECT_3_DIR)),
+          fileURLToPath(
+            new URL(`./{namespace}/{languageTag}.json`, PROJECT_3_DIR)
+          ),
+        ],
         forceMode: 'OVERRIDE',
         namespaces: ['drinks'],
       },
@@ -289,7 +279,17 @@ describe('project 3', () => {
     ]);
     const { configFile } = await createTmpFolderWithConfig({
       push: {
-        files: pushFilesConfig(PROJECT_3_DEPRECATED_DIR, ['', 'drinks']),
+        filesTemplate: [
+          fileURLToPath(
+            new URL(`./{languageTag}.json`, PROJECT_3_DEPRECATED_DIR)
+          ),
+          fileURLToPath(
+            new URL(
+              `./{namespace}/{languageTag}.json`,
+              PROJECT_3_DEPRECATED_DIR
+            )
+          ),
+        ],
       },
     });
     const out = await run([
@@ -328,7 +328,17 @@ describe('project 3', () => {
     const { configFile } = await createTmpFolderWithConfig({
       apiKey: pakWithDelete,
       push: {
-        files: pushFilesConfig(PROJECT_3_DEPRECATED_DIR, ['', 'drinks']),
+        filesTemplate: [
+          fileURLToPath(
+            new URL(`./{languageTag}.json`, PROJECT_3_DEPRECATED_DIR)
+          ),
+          fileURLToPath(
+            new URL(
+              `./{namespace}/{languageTag}.json`,
+              PROJECT_3_DEPRECATED_DIR
+            )
+          ),
+        ],
         removeOtherKeys: true,
       },
     });
@@ -366,7 +376,11 @@ describe('project 2', () => {
 
   it('does not push strings to Tolgee if there are conflicts', async () => {
     const { configFile } = await createTmpFolderWithConfig({
-      push: { files: pushFilesConfig(PROJECT_2_DIR) },
+      push: {
+        filesTemplate: fileURLToPath(
+          new URL(`./{languageTag}.json`, PROJECT_2_DIR)
+        ),
+      },
     });
     const out = await run([
       '--config',
@@ -400,7 +414,12 @@ describe('project 2', () => {
 
   it('does preserve the remote strings when using KEEP (args)', async () => {
     const { configFile } = await createTmpFolderWithConfig({
-      push: { files: pushFilesConfig(PROJECT_2_DIR) },
+      push: {
+        filesTemplate: fileURLToPath(
+          new URL(`./{languageTag}.json`, PROJECT_2_DIR)
+        ),
+        languages: ['en', 'fr'],
+      },
     });
     const out = await run([
       '--config',
@@ -441,7 +460,13 @@ describe('project 2', () => {
   it('does preserve the remote strings when using KEEP (config)', async () => {
     const { configFile } = await createTmpFolderWithConfig({
       apiKey: pak,
-      push: { files: pushFilesConfig(PROJECT_2_DIR), forceMode: 'KEEP' },
+      push: {
+        filesTemplate: fileURLToPath(
+          new URL(`./{languageTag}.json`, PROJECT_2_DIR)
+        ),
+        forceMode: 'KEEP',
+        languages: ['en', 'fr'],
+      },
     });
     const out = await run(['--config', configFile, 'push']);
 
@@ -473,7 +498,12 @@ describe('project 2', () => {
 
   it('asks for confirmation when there are conflicts', async () => {
     const { configFile } = await createTmpFolderWithConfig({
-      push: { files: pushFilesConfig(PROJECT_2_DIR) },
+      push: {
+        filesTemplate: fileURLToPath(
+          new URL(`./{languageTag}.json`, PROJECT_2_DIR)
+        ),
+        languages: ['en', 'fr'],
+      },
     });
     const out = await runWithStdin(
       ['--config', configFile, 'push', '--api-key', pak],
@@ -508,7 +538,12 @@ describe('project 2', () => {
 
   it('does override the remote strings when using OVERRIDE (args)', async () => {
     const { configFile } = await createTmpFolderWithConfig({
-      push: { files: pushFilesConfig(PROJECT_2_DIR) },
+      push: {
+        filesTemplate: fileURLToPath(
+          new URL(`./{languageTag}.json`, PROJECT_2_DIR)
+        ),
+        languages: ['en', 'fr'],
+      },
     });
     const out = await run([
       '--config',
@@ -548,7 +583,13 @@ describe('project 2', () => {
   it('does override the remote strings when using OVERRIDE (config)', async () => {
     const { configFile } = await createTmpFolderWithConfig({
       apiKey: pak,
-      push: { files: pushFilesConfig(PROJECT_2_DIR), forceMode: 'OVERRIDE' },
+      push: {
+        filesTemplate: fileURLToPath(
+          new URL(`./{languageTag}.json`, PROJECT_2_DIR)
+        ),
+        forceMode: 'OVERRIDE',
+        languages: ['en', 'fr'],
+      },
     });
     const out = await run(['--config', configFile, 'push']);
 
