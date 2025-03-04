@@ -105,7 +105,7 @@ export interface Schema {
     /**
      * Define, which files should be pushed and attach with a template.
      */
-    filesTemplate?: string;
+    filesTemplate?: string | string[];
     /**
      * Define, which files should be pushed and attach language/namespace to them. By default Tolgee pushes all files specified here, you can filter them by languages and namespaces properties.
      */

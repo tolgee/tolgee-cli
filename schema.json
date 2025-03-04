@@ -44,7 +44,15 @@
       "properties": {
         "filesTemplate": {
           "description": "Define, which files should be pushed and attach with a template.",
-          "type": "string"
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          ]
         },
         "files": {
           "description": "Define, which files should be pushed and attach language/namespace to them. By default Tolgee pushes all files specified here, you can filter them by languages and namespaces properties.",

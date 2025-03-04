@@ -20,6 +20,7 @@ import { TolgeeClient, handleLoadableError } from '../client/TolgeeClient.js';
 import { BodyOf } from '../client/internal/schema.utils.js';
 import { components } from '../client/internal/schema.generated.js';
 import { findFilesByTemplate } from '../utils/filesTemplate.js';
+import { valueToArray } from '../utils/valueToArray.js';
 
 type ImportRequest = BodyOf<
   '/v2/projects/{projectId}/single-step-import',
@@ -47,6 +48,7 @@ type PushOptions = BaseOptions & {
   namespaces?: string[];
   tagNewKeys?: string[];
   removeOtherKeys?: boolean;
+  filesTemplate?: string[];
 };
 
 async function allInPattern(pattern: string) {
@@ -150,7 +152,7 @@ const pushHandler = (config: Schema) =>
 
     let allMatchers: FileMatch[] = [];
 
-    const filesTemplate = config.push?.filesTemplate;
+    const filesTemplate = opts.filesTemplate;
 
     if (!filesTemplate && !config.push?.files?.length) {
       exitWithError(
@@ -159,9 +161,11 @@ const pushHandler = (config: Schema) =>
     }
 
     if (filesTemplate) {
-      allMatchers = allMatchers.concat(
-        ...(await findFilesByTemplate(filesTemplate))
-      );
+      for (const template of filesTemplate) {
+        allMatchers = allMatchers.concat(
+          ...(await findFilesByTemplate(template))
+        );
+      }
     }
 
     allMatchers = allMatchers.concat(...(config.push?.files || []));
@@ -242,8 +246,8 @@ export default (config: Schema) =>
     .name('push')
     .description('Pushes translations to Tolgee')
     .addOption(
-      new Option('-ft, --files-template <template>').default(
-        config.push?.filesTemplate
+      new Option('-ft, --files-template <templates...>').default(
+        valueToArray(config.push?.filesTemplate)
       )
     )
     .addOption(
