@@ -12,7 +12,12 @@ export default tseslint.config({
     'scripts/**/*.{js,ts,mjs,cjs,tsx,jsx}',
     '*.config.{js,ts}',
   ],
-  ignores: ['**/*.generated.ts', 'dist/**/*', 'dist-types/**/*'],
+  ignores: [
+    '**/*.generated.ts',
+    'dist/**/*',
+    'dist-types/**/*',
+    'src/schema.d.ts',
+  ],
   extends: [
     eslint.configs.recommended,
     ...tseslint.configs.recommended,
