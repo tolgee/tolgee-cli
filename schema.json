@@ -55,7 +55,7 @@
           ]
         },
         "files": {
-          "description": "More explicit alternative to `filesTemplate`, Define, which files should be pushed and attach language/namespace to them. By default Tolgee pushes all files specified here, you can filter them by languages and namespaces properties.",
+          "description": "More explicit alternative to `filesTemplate`. Define, which files should be pushed and attach language/namespace to them. By default Tolgee pushes all files specified here, you can filter them by languages and namespaces properties.",
           "type": "array",
           "items": { "$ref": "#/$defs/fileMatch" }
         },
