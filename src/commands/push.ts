@@ -205,7 +205,12 @@ const pushHandler = (config: Schema) =>
           format: format,
           languageTag: f.language,
           namespace: f.namespace ?? '',
-          languageTagsToImport: opts.languages,
+          // there can be multiple languages inside the file
+          // that is detected on the backend
+          // and we only say which we want to import by `languageTagsToImport`
+          // however we don't want to use this property,
+          // when it's explicitly defined what language is in the file
+          languageTagsToImport: !f.language ? opts.languages : undefined,
         };
       }),
       removeOtherKeys: opts.removeOtherKeys,
