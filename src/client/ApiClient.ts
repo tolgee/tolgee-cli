@@ -4,7 +4,7 @@ import createClient, { ParseAs } from 'openapi-fetch';
 import base32Decode from 'base32-decode';
 import { API_KEY_PAK_PREFIX, USER_AGENT } from '../constants.js';
 import { getApiKeyInformation } from './getApiKeyInformation.js';
-import { debug } from '../utils/logger.js';
+import { debug, isDebugEnabled } from '../utils/logger.js';
 import { errorFromLoadable } from './errorFromLoadable.js';
 
 async function parseResponse(response: Response, parseAs: ParseAs) {
@@ -78,8 +78,18 @@ export function createApiClient({
       debug(`[HTTP] Requesting: ${request.method} ${request.url}`);
     },
     onResponse: async ({ response, options }) => {
-      debug(`[HTTP] Response: ${response.url} [${response.status}]`);
-
+      let responseText = `[HTTP] Response: ${response.url} [${response.status}]`;
+      const apiVersion = response.headers.get('x-tolgee-version');
+      if (apiVersion) {
+        responseText += ` [${response.headers.get('x-tolgee-version')}]`;
+      }
+      if (!response.ok && isDebugEnabled()) {
+        const clonedBody = await response.clone().text();
+        if (clonedBody) {
+          responseText += ` [${clonedBody}]`;
+        }
+      }
+      debug(responseText);
       if (autoThrow && !response.ok) {
         const loadable = await parseResponse(response, options.parseAs);
         throw new Error(
