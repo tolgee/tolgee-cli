@@ -79,6 +79,10 @@ export function createApiClient({
     },
     onResponse: async ({ response, options }) => {
       let responseText = `[HTTP] Response: ${response.url} [${response.status}]`;
+      const apiVersion = response.headers.get('x-tolgee-version');
+      if (apiVersion) {
+        responseText += ` [${response.headers.get('x-tolgee-version')}]`;
+      }
       if (!response.ok && isDebugEnabled()) {
         const clonedBody = await response.clone().text();
         if (clonedBody) {
