@@ -1,5 +1,4 @@
 import { cosmiconfig, defaultLoaders } from 'cosmiconfig';
-import { Validator } from 'jsonschema';
 import { readFile } from 'fs/promises';
 import { fileURLToPath } from 'url';
 import { dirname, join, resolve } from 'path';
@@ -9,6 +8,7 @@ import { error, exitWithError } from '../utils/logger.js';
 import { existsSync } from 'fs';
 import { Schema } from '../schema.js';
 import { valueToArray } from '../utils/valueToArray.js';
+import { Ajv } from 'ajv';
 
 const explorer = cosmiconfig('tolgee', {
   loaders: {
@@ -31,7 +31,7 @@ function parseConfig(input: Schema, configDir: string) {
     rc.projectId = Number(rc.projectId); // Number("") returns 0
     if (!Number.isInteger(rc.projectId) || rc.projectId <= 0) {
       throw new Error(
-        'Invalid config: projectId should be an integer representing your project Id'
+        "Invalid config: 'projectId' should be an integer representing your project Id"
       );
     }
   }
@@ -106,16 +106,14 @@ export default async function loadTolgeeRc(
 
   const config = parseConfig(res.config, dirname(path || '.'));
 
-  const validator = new Validator();
-  const schema = await getSchema();
-  const result = validator.validate(config, schema);
+  const ajv = new Ajv({ allowUnionTypes: true });
+  const validate = ajv.compile(await getSchema());
 
-  if (result.errors.length) {
-    const { message, property } = result.errors[0];
-    const errMessage = `Tolgee config: '${property.replace(
-      'instance.',
-      ''
-    )}' ${message}`;
+  validate(config);
+  const firstErr = validate.errors?.[0];
+
+  if (firstErr) {
+    const errMessage = `Tolgee config: '${firstErr.instancePath.replaceAll('/', '.').replace(/^\./, '')}' ${firstErr.message}`;
     exitWithError(errMessage);
   }
 
