@@ -70,7 +70,7 @@ describe('$t', () => {
     expect(extracted.keys).toEqual([{ keyName: 'key1', line: 3 }]);
   });
 
-  it('extracts both this.$t and $t', async () => {
+  it('extracts both this.$t and $t but nothing else', async () => {
     const code = `
       <script>
         export default {
@@ -78,6 +78,7 @@ describe('$t', () => {
             onClick () {
               alert(this.$t('key1'))
               alert($t('key2'))
+              alert(foo.$t('key3'))
             }
           }
         }
@@ -271,6 +272,21 @@ describe('$t', () => {
         },
       ]);
       expect(extracted.keys).toEqual([]);
+    });
+  });
+
+  describe('global tolgee.t function', () => {
+    it('detects global tolgee.t function', async () => {
+      const code = `
+        <script>
+          const tolgee = Tolgee()
+          tolgee.t('key_name')
+        </script>
+      `;
+
+      const extracted = await extractVueKeys(code, 'App.vue');
+      expect(extracted.keys).toEqual([{ keyName: 'key_name', line: 4 }]);
+      expect(extracted.warnings).toEqual([]);
     });
   });
 });

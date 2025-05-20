@@ -1,24 +1,24 @@
 import { pipeMachines } from '../parser/mergerMachine.js';
-import { DEFAULT_BLOCKS, DEFAULT_MERGERERS, Parser } from '../parser/parser.js';
+import { DEFAULT_BLOCKS, DEFAULT_MERGERS, Parser } from '../parser/parser.js';
 import { IterableItem, Token } from '../parser/types.js';
 import { GeneralTokenType, generalMapper } from '../parser/generalMapper.js';
 import { vueMapper } from './vueMapper.js';
 import { vueTreeTransform } from './vueTreeTransform.js';
 
-import { globalTFunctionMerger } from './tokenMergers/globalTFunctionMerger.js';
 import { tFunctionMerger } from './tokenMergers/tFunctionMerger.js';
 import { useTranslateMerger } from './tokenMergers/useTranslateMerger.js';
 import { exportDefaultObjectMerger } from './tokenMergers/exportDefaultObjectMerger.js';
 import { scriptTagMerger } from './tokenMergers/scriptTagMerger.js';
 import { tComponentMerger } from './tokenMergers/tComponentMerger.js';
 
-import { globalTFunction } from './rules/globalTFunction.js';
+import { globalTFunction } from '../parser/rules/globalTFunction.js';
 import { tFunction } from './rules/tFunction.js';
 import { useTranslate } from './rules/useTranslate.js';
 import { tComponent } from './rules/tComponent.js';
 import { scriptTag } from './rules/scriptTag.js';
 import { exportDefaultObject } from './rules/exportDefaultObject.js';
 import { hyphenPropsMerger } from './tokenMergers/hyphenPropsMerger.js';
+import { customTCallMerger } from '../parser/tokenMergers/customTCallMerger.js';
 
 const vueMappers = [generalMapper, vueMapper];
 
@@ -27,9 +27,9 @@ export type VueMappedTokenType = NonNullable<
 >;
 
 export const vueMergers = pipeMachines([
-  ...DEFAULT_MERGERERS,
+  ...DEFAULT_MERGERS,
   hyphenPropsMerger,
-  globalTFunctionMerger,
+  customTCallMerger(['$t', 'this.$t']),
   tFunctionMerger,
   useTranslateMerger,
   tComponentMerger,

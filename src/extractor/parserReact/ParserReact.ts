@@ -1,5 +1,5 @@
 import { pipeMachines } from '../parser/mergerMachine.js';
-import { DEFAULT_BLOCKS, DEFAULT_MERGERERS, Parser } from '../parser/parser.js';
+import { DEFAULT_BLOCKS, DEFAULT_MERGERS, Parser } from '../parser/parser.js';
 import { IterableItem, Token } from '../parser/types.js';
 
 import { GeneralTokenType, generalMapper } from '../parser/generalMapper.js';
@@ -14,6 +14,7 @@ import { reactCreateElement } from './rules/createElement.js';
 import { tComponent } from './rules/tComponent.js';
 import { tFunction } from './rules/tFunction.js';
 import { useTranslate } from './rules/useTranslate.js';
+import { globalTFunction } from '../parser/rules/globalTFunction.js';
 
 const reactMappers = [generalMapper, reactMapper];
 
@@ -22,7 +23,7 @@ export type ReactMappedTokenType = NonNullable<
 >;
 
 export const reactMergers = pipeMachines([
-  ...DEFAULT_MERGERERS,
+  ...DEFAULT_MERGERS,
   createElementMerger,
   useTranslateMerger,
   tFunctionMerger,
@@ -41,7 +42,13 @@ export const ParserReact = () => {
     blocks: {
       ...DEFAULT_BLOCKS,
     },
-    rules: [reactCreateElement, tComponent, tFunction, useTranslate],
+    rules: [
+      globalTFunction,
+      reactCreateElement,
+      tComponent,
+      tFunction,
+      useTranslate,
+    ],
     merger: reactMergers,
   });
 };

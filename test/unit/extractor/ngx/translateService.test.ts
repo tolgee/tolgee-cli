@@ -157,4 +157,17 @@ describe('translate service', () => {
       expect(extracted.warnings).toEqual(expectedWarnings);
     });
   });
+
+  describe('global tolgee.t function', () => {
+    it('detects global tolgee.t function', async () => {
+      const code = `
+        const tolgee = Tolgee()
+        tolgee.t('key_name')
+      `;
+
+      const extracted = await extractNgxKeys(code, 'test.ts');
+      expect(extracted.keys).toEqual([{ keyName: 'key_name', line: 3 }]);
+      expect(extracted.warnings).toEqual([]);
+    });
+  });
 });
