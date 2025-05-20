@@ -109,9 +109,7 @@ export interface Schema {
      */
     filesTemplate?: string | string[];
     /**
-     * A template that describes the structure of the local files and their location with [file structure template format](http://localhost:3001/tolgee-cli/push-pull-strings#file-structure-template-format).
-     *
-     * Example: `./public/{namespace}/{languageTag}.json`
+     * More explicit alternative to `filesTemplate`. Define, which files should be pushed and attach language/namespace to them. By default Tolgee pushes all files specified here, you can filter them by languages and namespaces properties.
      */
     files?: FileMatch[];
     /**
