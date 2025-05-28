@@ -113,5 +113,6 @@ export type GeneralTokenType =
   | 'tag.closing'
   | 'tag.attribute.name'
   | 'expression.template.begin'
-  | 'expression.template.end';
+  | 'expression.template.end'
+  | 'trigger.global.t.function';
 export type GeneralToken = Token<GeneralTokenType>;

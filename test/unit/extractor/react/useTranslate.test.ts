@@ -536,4 +536,17 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])('useTranslate (.%s)', (ext) => {
       expect(extracted.keys).toEqual(expectedKeys);
     });
   });
+
+  describe('global tolgee.t function', () => {
+    it('detects global tolgee.t function', async () => {
+      const code = `
+        const tolgee = Tolgee()
+        tolgee.t('key_name')
+      `;
+
+      const extracted = await extractReactKeys(code, FILE_NAME);
+      expect(extracted.keys).toEqual([{ keyName: 'key_name', line: 3 }]);
+      expect(extracted.warnings).toEqual([]);
+    });
+  });
 });

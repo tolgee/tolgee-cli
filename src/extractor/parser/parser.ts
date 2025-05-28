@@ -21,8 +21,9 @@ import { ExtractOptions, ExtractedKey, Warning } from '../index.js';
 import { stringMerger } from './tokenMergers/stringMerger.js';
 import { templateStringMerger } from './tokenMergers/templateStringMerger.js';
 import { closingTagMerger } from './tokenMergers/closingTagMerger.js';
-import { typesAsMergerer } from './tokenMergers/typesAsMergerer.js';
-import { typesCastMergerer } from './tokenMergers/typesCastMerger.js';
+import { typesAsMerger } from './tokenMergers/typesAsMerger.js';
+import { typesCastMerger } from './tokenMergers/typesCastMerger.js';
+import { customTCallMerger } from './tokenMergers/customTCallMerger.js';
 
 export const DEFAULT_BLOCKS = {
   'block.begin': ['block.end'],
@@ -35,12 +36,13 @@ export const DEFAULT_BLOCKS = {
   ],
 } satisfies BlocksType<GeneralTokenType>;
 
-export const DEFAULT_MERGERERS = [
+export const DEFAULT_MERGERS = [
   stringMerger,
   templateStringMerger,
   closingTagMerger,
-  typesAsMergerer,
-  typesCastMergerer,
+  typesAsMerger,
+  typesCastMerger,
+  customTCallMerger(['tolgee.t']),
 ] as const;
 
 type ParserOptions<T extends string = GeneralTokenType> = {

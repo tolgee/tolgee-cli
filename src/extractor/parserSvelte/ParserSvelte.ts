@@ -1,5 +1,5 @@
 import { pipeMachines } from '../parser/mergerMachine.js';
-import { DEFAULT_BLOCKS, DEFAULT_MERGERERS, Parser } from '../parser/parser.js';
+import { DEFAULT_BLOCKS, DEFAULT_MERGERS, Parser } from '../parser/parser.js';
 import { IterableItem, Token } from '../parser/types.js';
 import { svelteMapper } from './svelteMapper.js';
 import { GeneralTokenType, generalMapper } from '../parser/generalMapper.js';
@@ -15,6 +15,7 @@ import { tComponent } from './rules/tComponent.js';
 import { scriptTag } from './rules/scriptTag.js';
 
 import { svelteTreeTransform } from './svelteTreeTransform.js';
+import { globalTFunction } from '../parser/rules/globalTFunction.js';
 
 const svelteMappers = [generalMapper, svelteMapper];
 
@@ -23,7 +24,7 @@ export type SvelteMappedTokenType = NonNullable<
 >;
 
 export const svelteMergers = pipeMachines([
-  ...DEFAULT_MERGERERS,
+  ...DEFAULT_MERGERS,
   tFunctionMerger,
   getTranslateMerger,
   tComponentMerger,
@@ -42,7 +43,7 @@ export const ParserSvelte = () => {
     blocks: {
       ...DEFAULT_BLOCKS,
     },
-    rules: [tFunction, getTranslate, tComponent, scriptTag],
+    rules: [globalTFunction, tFunction, getTranslate, tComponent, scriptTag],
     treeTransform: svelteTreeTransform,
     merger: svelteMergers,
   });

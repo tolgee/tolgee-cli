@@ -394,4 +394,19 @@ describe('getTranslate', () => {
       expect(extracted.keys).toEqual(expectedKeys);
     });
   });
+
+  describe('global tolgee.t function', () => {
+    it('detects global tolgee.t function', async () => {
+      const code = `
+        <script>
+          const tolgee = Tolgee()
+          tolgee.t('key_name')
+        </script>
+      `;
+
+      const extracted = await extractSvelteKeys(code, 'App.svelte');
+      expect(extracted.keys).toEqual([{ keyName: 'key_name', line: 4 }]);
+      expect(extracted.warnings).toEqual([]);
+    });
+  });
 });
