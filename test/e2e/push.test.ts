@@ -311,7 +311,7 @@ describe('project 3', () => {
 
     const stored = tolgeeDataToDict(keys.data);
 
-    // namespace not supposed to be influenced "food" is not influenced
+    // Keys in the "food" namespace should not be removed
     expect(Object.keys(stored)).toEqual([
       'table',
       'chair',
@@ -358,6 +358,7 @@ describe('project 3', () => {
 
     const stored = tolgeeDataToDict(keys.data);
 
+    // Keys in the "food" namespace should not be removed
     expect(Object.keys(stored)).toEqual([
       'table',
       'chair',
