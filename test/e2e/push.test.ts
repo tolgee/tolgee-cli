@@ -311,12 +311,16 @@ describe('project 3', () => {
 
     const stored = tolgeeDataToDict(keys.data);
 
+    // namespace not supposed to be influenced "food" is not influenced
     expect(Object.keys(stored)).toEqual([
       'table',
       'chair',
       'plate',
       'fork',
       'water',
+      'salad',
+      'tomato',
+      'onions',
     ]);
   });
 
@@ -360,6 +364,9 @@ describe('project 3', () => {
       'plate',
       'fork',
       'water',
+      'salad',
+      'tomato',
+      'onions',
     ]);
   });
 });
