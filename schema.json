@@ -88,7 +88,7 @@
           }
         },
         "removeOtherKeys": {
-          "description": "Remove keys which are not present in the import (within namespaces imported namespaces).",
+          "description": "Remove keys which are not present in the import (within imported namespaces).",
           "type": "boolean"
         }
       }
