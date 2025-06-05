@@ -384,17 +384,6 @@ describe('Project 3', () => {
     expect(Object.keys(stored).length).toEqual(11);
   }, 30e3);
 
-  async function print() {
-    const keys = await client.GET('/v2/projects/{projectId}/translations', {
-      params: {
-        path: { projectId: client.getProjectId() },
-      },
-    });
-
-    const stored = tolgeeDataToDict(keys.data);
-    console.log(stored);
-  }
-
   it('synchronizes the defined namespaces only (config)', async () => {
     const { configFile } = await createTmpFolderWithConfig({
       apiKey: pak,
