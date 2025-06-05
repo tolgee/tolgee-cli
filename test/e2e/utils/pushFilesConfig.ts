@@ -3,16 +3,8 @@ import { fileURLToPath } from 'url';
 
 export function pushFilesConfig(base: URL, namespaces: string[] = ['']) {
   const result: FileMatch[] = [];
-  const sanitizedNamespaces = namespaces.map((ns) => {
-    if (ns.includes('..') || ns.includes('/') || ns.includes('\\')) {
-      throw new Error(
-        `Invalid namespace: ${ns}. Namespaces cannot contain path separators or traversal sequences.`
-      );
-    }
-    return ns;
-  });
 
-  for (const ns of sanitizedNamespaces) {
+  for (const ns of namespaces) {
     result.push({
       path: fileURLToPath(new URL(`./${ns}/en.json`, base)),
       language: 'en',
