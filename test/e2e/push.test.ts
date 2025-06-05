@@ -311,12 +311,16 @@ describe('project 3', () => {
 
     const stored = tolgeeDataToDict(keys.data);
 
+    // Keys in the "food" namespace should not be removed
     expect(Object.keys(stored)).toEqual([
       'table',
       'chair',
       'plate',
       'fork',
       'water',
+      'salad',
+      'tomato',
+      'onions',
     ]);
   });
 
@@ -354,12 +358,16 @@ describe('project 3', () => {
 
     const stored = tolgeeDataToDict(keys.data);
 
+    // Keys in the "food" namespace should not be removed
     expect(Object.keys(stored)).toEqual([
       'table',
       'chair',
       'plate',
       'fork',
       'water',
+      'salad',
+      'tomato',
+      'onions',
     ]);
   });
 });
