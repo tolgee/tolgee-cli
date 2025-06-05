@@ -1,6 +1,6 @@
 import type { ResponseOf } from '../../client/internal/schema.utils.js';
 import type { Key } from '../../extractor/index.js';
-import { type FilteredKeys, NullNamespace } from '../../extractor/runner.js';
+import { type FilteredKeys } from '../../extractor/runner.js';
 import ansi from 'ansi-colors';
 
 type ResponseAllKeys = ResponseOf<
@@ -54,19 +54,19 @@ export function compareKeys(
 
   // Deleted keys
   for (const remoteKey of remote) {
-    const namespace = remoteKey.namespace || NullNamespace;
+    const namespace = remoteKey.namespace || '';
     const keyExists = local[namespace]?.delete(remoteKey.name);
     if (!keyExists) {
       result.removed.push({
         id: remoteKey.id,
         keyName: remoteKey.name,
-        namespace: remoteKey.namespace || undefined,
+        namespace: remoteKey.namespace || '',
       });
     }
   }
 
   // Added keys
-  const namespaces = [NullNamespace, ...Object.keys(local).sort()] as const;
+  const namespaces = [...Object.keys(local).sort()] as const;
   for (const namespace of namespaces) {
     if (namespace in local && local[namespace].size) {
       const keys = local[namespace];
@@ -74,7 +74,7 @@ export function compareKeys(
       for (const keyName of keyNames) {
         result.added.push({
           keyName: keyName,
-          namespace: namespace === NullNamespace ? undefined : namespace,
+          namespace: namespace || '',
           defaultValue: keys.get(keyName) || undefined,
         });
       }

@@ -10,10 +10,7 @@ import { extname } from 'path';
 import { callWorker } from './worker.js';
 import { exitWithError } from '../utils/logger.js';
 
-export const NullNamespace = Symbol('namespace.null');
-
 export type FilteredKeys = {
-  [NullNamespace]: Map<string, string | null>;
   [key: string]: Map<string, string | null>;
 };
 
@@ -142,7 +139,7 @@ export function filterExtractionResult(data: ExtractionResults): FilteredKeys {
   const result: FilteredKeys = Object.create(null);
   for (const { keys } of data.values()) {
     for (const key of keys) {
-      const namespace = key.namespace || NullNamespace;
+      const namespace = key.namespace || '';
       if (!(namespace in result)) {
         result[namespace] = new Map();
       }
