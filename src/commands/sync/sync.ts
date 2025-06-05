@@ -255,7 +255,7 @@ export default (config: Schema) =>
     .addOption(
       new Option(
         '--remove-unused',
-        'Delete unused keys from the Tolgee project.'
+        'Delete unused keys from the Tolgee project (within selected namespaces if specified).'
       ).default(config.sync?.removeUnused ?? false)
     )
     .option(
