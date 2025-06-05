@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url';
 import { tolgeeDataToDict } from './utils/data.js';
 import { run, runWithStdin } from './utils/run.js';
 import {
@@ -8,7 +9,6 @@ import {
 import { TolgeeClient } from '#cli/client/TolgeeClient.js';
 import { PROJECT_2 } from './utils/api/project2.js';
 import { createTmpFolderWithConfig, removeTmpFolder } from './utils/tmp.js';
-import { pushFilesConfig } from './utils/pushFilesConfig.js';
 
 const FIXTURES_PATH = new URL('../__fixtures__/', import.meta.url);
 
@@ -29,7 +29,11 @@ describe('project 2', () => {
 
   it('does not push strings to Tolgee if there are conflicts', async () => {
     const { configFile } = await createTmpFolderWithConfig({
-      push: { files: pushFilesConfig(PROJECT_2_DIR) },
+      push: {
+        filesTemplate: fileURLToPath(
+          new URL(`./{languageTag}.json`, PROJECT_2_DIR)
+        ),
+      },
     });
     const out = await run([
       '--config',
@@ -62,13 +66,13 @@ describe('project 2', () => {
   });
 
   it('does preserve the remote strings when using KEEP (args)', async () => {
-    const { configFile } = await createTmpFolderWithConfig({
-      push: { files: pushFilesConfig(PROJECT_2_DIR) },
-    });
     const out = await run([
-      '--config',
-      configFile,
       'push',
+      '--files-template',
+      fileURLToPath(new URL(`./{languageTag}.json`, PROJECT_2_DIR)),
+      '--languages',
+      'en',
+      'fr',
       '--api-key',
       pak,
       '--force-mode',
@@ -104,7 +108,13 @@ describe('project 2', () => {
   it('does preserve the remote strings when using KEEP (config)', async () => {
     const { configFile } = await createTmpFolderWithConfig({
       apiKey: pak,
-      push: { files: pushFilesConfig(PROJECT_2_DIR), forceMode: 'KEEP' },
+      push: {
+        filesTemplate: fileURLToPath(
+          new URL(`./{languageTag}.json`, PROJECT_2_DIR)
+        ),
+        forceMode: 'KEEP',
+        languages: ['en', 'fr'],
+      },
     });
     const out = await run(['--config', configFile, 'push']);
 
@@ -135,11 +145,17 @@ describe('project 2', () => {
   });
 
   it('asks for confirmation when there are conflicts', async () => {
-    const { configFile } = await createTmpFolderWithConfig({
-      push: { files: pushFilesConfig(PROJECT_2_DIR) },
-    });
     const out = await runWithStdin(
-      ['--config', configFile, 'push', '--api-key', pak],
+      [
+        'push',
+        '--api-key',
+        pak,
+        '--files-template',
+        fileURLToPath(new URL(`./{languageTag}.json`, PROJECT_2_DIR)),
+        '--languages',
+        'en',
+        'fr',
+      ],
       'OVERRIDE'
     );
 
@@ -170,13 +186,13 @@ describe('project 2', () => {
   });
 
   it('does override the remote strings when using OVERRIDE (args)', async () => {
-    const { configFile } = await createTmpFolderWithConfig({
-      push: { files: pushFilesConfig(PROJECT_2_DIR) },
-    });
     const out = await run([
-      '--config',
-      configFile,
       'push',
+      '--files-template',
+      fileURLToPath(new URL(`./{languageTag}.json`, PROJECT_2_DIR)),
+      '--languages',
+      'en',
+      'fr',
       '--api-key',
       pak,
       '--force-mode',
@@ -211,7 +227,13 @@ describe('project 2', () => {
   it('does override the remote strings when using OVERRIDE (config)', async () => {
     const { configFile } = await createTmpFolderWithConfig({
       apiKey: pak,
-      push: { files: pushFilesConfig(PROJECT_2_DIR), forceMode: 'OVERRIDE' },
+      push: {
+        filesTemplate: fileURLToPath(
+          new URL(`./{languageTag}.json`, PROJECT_2_DIR)
+        ),
+        forceMode: 'OVERRIDE',
+        languages: ['en', 'fr'],
+      },
     });
     const out = await run(['--config', configFile, 'push']);
 

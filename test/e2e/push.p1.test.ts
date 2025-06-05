@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url';
 import { tolgeeDataToDict } from './utils/data.js';
 import { run } from './utils/run.js';
 import {
@@ -28,16 +29,13 @@ describe('project 1', () => {
   });
 
   it('pushes updated strings to Tolgee', async () => {
-    const { configFile } = await createTmpFolderWithConfig({
-      push: { files: pushFilesConfig(PROJECT_1_DIR) },
-    });
     const out = await run([
-      '--config',
-      configFile,
       '--api-key',
       pak,
       'push',
       '--verbose',
+      '--files-template',
+      fileURLToPath(new URL(`./{languageTag}.json`, PROJECT_1_DIR)),
     ]);
 
     expect(out.code).toBe(0);
@@ -67,16 +65,12 @@ describe('project 1', () => {
   });
 
   it('pushes only selected languages (args)', async () => {
-    const config = {
-      push: { files: pushFilesConfig(PROJECT_1_DIR) },
-    };
-    const { configFile } = await createTmpFolderWithConfig(config);
     const out = await run([
-      '--config',
-      configFile,
       '--api-key',
       pak,
       'push',
+      '--files-template',
+      fileURLToPath(new URL(`./{languageTag}.json`, PROJECT_1_DIR)),
       '-l',
       'fr',
     ]);

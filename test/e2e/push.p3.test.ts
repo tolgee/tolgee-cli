@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url';
 import { tolgeeDataToDict } from './utils/data.js';
 import { run } from './utils/run.js';
 import {
@@ -9,7 +10,6 @@ import {
 import { TolgeeClient } from '#cli/client/TolgeeClient.js';
 import { PROJECT_3 } from './utils/api/project3.js';
 import { createTmpFolderWithConfig, removeTmpFolder } from './utils/tmp.js';
-import { pushFilesConfig } from './utils/pushFilesConfig.js';
 
 const FIXTURES_PATH = new URL('../__fixtures__/', import.meta.url);
 
@@ -35,13 +35,16 @@ describe('project 3', () => {
   });
 
   it('pushes to Tolgee with correct namespaces', async () => {
-    const { configFile } = await createTmpFolderWithConfig({
-      push: {
-        files: pushFilesConfig(PROJECT_3_DIR, ['', 'drinks', 'food']),
-        forceMode: 'OVERRIDE',
-      },
-    });
-    const out = await run(['--config', configFile, '--api-key', pak, 'push']);
+    const out = await run([
+      '--api-key',
+      pak,
+      'push',
+      '--files-template',
+      fileURLToPath(new URL(`./{languageTag}.json`, PROJECT_3_DIR)),
+      fileURLToPath(new URL(`./{namespace}/{languageTag}.json`, PROJECT_3_DIR)),
+      '--force-mode',
+      'OVERRIDE',
+    ]);
     expect(out.code).toBe(0);
 
     const keys = await client.GET('/v2/projects/{projectId}/translations', {
@@ -69,16 +72,11 @@ describe('project 3', () => {
   });
 
   it('pushes only selected namespaces and languages (args)', async () => {
-    const { configFile } = await createTmpFolderWithConfig({
-      push: {
-        files: pushFilesConfig(PROJECT_3_DIR, ['', 'drinks', 'food']),
-        forceMode: 'OVERRIDE',
-      },
-    });
     const out = await run([
-      '--config',
-      configFile,
       'push',
+      '--files-template',
+      fileURLToPath(new URL(`./{languageTag}.json`, PROJECT_3_DIR)),
+      fileURLToPath(new URL(`./{namespace}/{languageTag}.json`, PROJECT_3_DIR)),
       '--api-key',
       pak,
       '--force-mode',
@@ -111,7 +109,12 @@ describe('project 3', () => {
     const { configFile } = await createTmpFolderWithConfig({
       apiKey: pak,
       push: {
-        files: pushFilesConfig(PROJECT_3_DIR, ['', 'drinks', 'food']),
+        filesTemplate: [
+          fileURLToPath(new URL(`./{languageTag}.json`, PROJECT_3_DIR)),
+          fileURLToPath(
+            new URL(`./{namespace}/{languageTag}.json`, PROJECT_3_DIR)
+          ),
+        ],
         forceMode: 'OVERRIDE',
         namespaces: ['drinks'],
       },
@@ -143,15 +146,14 @@ describe('project 3', () => {
       ...DEFAULT_SCOPES,
       'keys.delete',
     ]);
-    const { configFile } = await createTmpFolderWithConfig({
-      push: {
-        files: pushFilesConfig(PROJECT_3_DEPRECATED_DIR, ['', 'drinks']),
-      },
-    });
+
     const out = await run([
-      '--config',
-      configFile,
       'push',
+      '--files-template',
+      fileURLToPath(new URL(`./{languageTag}.json`, PROJECT_3_DEPRECATED_DIR)),
+      fileURLToPath(
+        new URL(`./{namespace}/{languageTag}.json`, PROJECT_3_DEPRECATED_DIR)
+      ),
       '--api-key',
       pakWithDelete,
       '--remove-other-keys',
@@ -167,12 +169,16 @@ describe('project 3', () => {
 
     const stored = tolgeeDataToDict(keys.data);
 
+    // Keys in the "food" namespace should not be removed
     expect(Object.keys(stored)).toEqual([
       'table',
       'chair',
       'plate',
       'fork',
       'water',
+      'salad',
+      'tomato',
+      'onions',
     ]);
   });
 
@@ -184,7 +190,17 @@ describe('project 3', () => {
     const { configFile } = await createTmpFolderWithConfig({
       apiKey: pakWithDelete,
       push: {
-        files: pushFilesConfig(PROJECT_3_DEPRECATED_DIR, ['', 'drinks']),
+        filesTemplate: [
+          fileURLToPath(
+            new URL(`./{languageTag}.json`, PROJECT_3_DEPRECATED_DIR)
+          ),
+          fileURLToPath(
+            new URL(
+              `./{namespace}/{languageTag}.json`,
+              PROJECT_3_DEPRECATED_DIR
+            )
+          ),
+        ],
         removeOtherKeys: true,
       },
     });
@@ -200,23 +216,37 @@ describe('project 3', () => {
 
     const stored = tolgeeDataToDict(keys.data);
 
+    // Keys in the "food" namespace should not be removed
     expect(Object.keys(stored)).toEqual([
       'table',
       'chair',
       'plate',
       'fork',
       'water',
+      'salad',
+      'tomato',
+      'onions',
     ]);
   });
 
-  it('removes other keys when filtered by namespace', async () => {
+  it("doesn't remove other keys when filtered by namespace", async () => {
     const pakWithDelete = await createPak(client, [
       ...DEFAULT_SCOPES,
       'keys.delete',
     ]);
     const { configFile } = await createTmpFolderWithConfig({
       push: {
-        files: pushFilesConfig(PROJECT_3_DEPRECATED_DIR, ['', 'drinks']),
+        filesTemplate: [
+          fileURLToPath(
+            new URL(`./{languageTag}.json`, PROJECT_3_DEPRECATED_DIR)
+          ),
+          fileURLToPath(
+            new URL(
+              `./{namespace}/{languageTag}.json`,
+              PROJECT_3_DEPRECATED_DIR
+            )
+          ),
+        ],
       },
     });
     const out = await run([
@@ -240,6 +270,16 @@ describe('project 3', () => {
 
     const stored = tolgeeDataToDict(keys.data);
 
-    expect(Object.keys(stored)).toEqual(['water']);
+    expect(Object.keys(stored)).toEqual([
+      'table',
+      'chair',
+      'plate',
+      'fork',
+      'knife',
+      'water',
+      'salad',
+      'tomato',
+      'onions',
+    ]);
   });
 });
