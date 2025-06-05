@@ -173,8 +173,8 @@ describe('Project 3', () => {
 
     expect(out.code).toBe(0);
     expect(out.stdout).toContain('out of sync');
-    expect(out.stdout).toContain('4 new keys found');
-    expect(out.stdout).toContain('4 unused keys');
+    expect(out.stdout).toContain('5 new keys found');
+    expect(out.stdout).toContain('7 unused keys');
     expect(out.stdout).toContain('+ cookies (namespace: food)');
     expect(out.stdout).toContain('- onions (namespace: food)');
     expect(out.stdout).toContain('- soda (namespace: drinks)');

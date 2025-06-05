@@ -384,19 +384,30 @@ describe('Project 3', () => {
     expect(Object.keys(stored).length).toEqual(11);
   }, 30e3);
 
+  async function print() {
+    const keys = await client.GET('/v2/projects/{projectId}/translations', {
+      params: {
+        path: { projectId: client.getProjectId() },
+      },
+    });
+
+    const stored = tolgeeDataToDict(keys.data);
+    console.log(stored);
+  }
+
   it('synchronizes the defined namespaces only (config)', async () => {
     const { configFile } = await createTmpFolderWithConfig({
       apiKey: pak,
       patterns: [CODE_PROJECT_3_MIXED],
       sync: {
-        namespaces: ['food'],
+        namespaces: ['', 'food'],
       },
     });
     const out = await run(['-c', configFile, 'sync', '--yes'], undefined, 20e3);
 
     expect(out.code).toBe(0);
-    expect(out.stdout).toContain('+ 1 string');
-    expect(out.stdout).toContain('1 unused key could be deleted.');
+    expect(out.stdout).toContain('+ 2 strings');
+    expect(out.stdout).toContain('6 unused keys could be deleted.');
 
     const keys = await client.GET('/v2/projects/{projectId}/translations', {
       params: {
@@ -406,9 +417,11 @@ describe('Project 3', () => {
 
     const stored = tolgeeDataToDict(keys.data);
 
+    expect(Object.keys(stored)).toContain('spoon');
+    expect(Object.keys(stored)).toContain('salad');
     expect(Object.keys(stored)).toContain('table');
     expect(Object.keys(stored)).not.toContain('welcome');
-    expect(Object.keys(stored).length).toEqual(11);
+    expect(Object.keys(stored).length).toEqual(12);
   }, 30e3);
 
   it('deletes only keys within namespace when using namespace selector (args)', async () => {
@@ -424,8 +437,8 @@ describe('Project 3', () => {
         '--remove-unused',
         '--api-key',
         pakWithDelete,
-        '--namespaces',
-        'food',
+        '--namespaces=',
+        '--namespaces=food',
         '--patterns',
         CODE_PROJECT_3_MIXED,
       ],
@@ -434,17 +447,22 @@ describe('Project 3', () => {
     );
 
     expect(out.code).toBe(0);
-    expect(out.stdout).toContain('- 1 string');
-    expect(out.stdout).toContain('+ 1 string');
+    expect(out.stdout).toContain('+ 2 strings');
+    expect(out.stdout).toContain('- 6 strings');
 
     const keys = await client.GET('/v2/projects/{projectId}/translations', {
       params: {
         path: { projectId: client.getProjectId() },
-        query: { filterKeyName: ['onions'] },
       },
     });
 
-    expect(keys.data?.page?.totalElements).toBe(0);
+    const stored = tolgeeDataToDict(keys.data);
+
+    expect(Object.keys(stored)).toContain('spoon');
+    expect(Object.keys(stored)).toContain('salad');
+    expect(Object.keys(stored)).not.toContain('table');
+    expect(Object.keys(stored)).not.toContain('welcome');
+    expect(Object.keys(stored).length).toEqual(6);
   }, 30e3);
 
   it('deletes only keys within namespace when using namespace selector (config)', async () => {

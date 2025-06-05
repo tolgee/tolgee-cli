@@ -102,9 +102,9 @@ const syncHandler = (config: Schema) =>
     let remoteKeys = allKeysLoadable.data?._embedded?.keys ?? [];
 
     if (opts.namespaces?.length) {
-      remoteKeys = remoteKeys.filter(
-        (key) => key.namespace && opts.namespaces?.includes(key.namespace ?? '')
-      );
+      remoteKeys = remoteKeys.filter((key) => {
+        return opts.namespaces?.includes(key.namespace ?? '');
+      });
     }
 
     const diff = compareKeys(localKeys, remoteKeys);

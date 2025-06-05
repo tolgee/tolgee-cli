@@ -7,7 +7,9 @@ export default function App() {
     <Fragment>
       <section>
         <h1>
-          <T keyName="welcome">Welcome!</T>
+          <T keyName="welcome" ns="new-namespace">
+            Welcome!
+          </T>
         </h1>
         <ul>
           <li>
@@ -17,13 +19,7 @@ export default function App() {
             <T keyName="chair" ns="furniture" />
           </li>
           <li>
-            <T keyName="plate" />
-          </li>
-          <li>
-            <T keyName="fork" />
-          </li>
-          <li>
-            <T keyName="knife" />
+            <T keyName="spoon" />
           </li>
         </ul>
       </section>
