@@ -24,6 +24,7 @@ type Options = BaseOptions & {
   backup?: string | false;
   removeUnused?: boolean;
   continueOnWarning?: boolean;
+  namespaces?: string[];
   yes?: boolean;
   tagNewKeys?: string[];
 };
@@ -80,6 +81,15 @@ const syncHandler = (config: Schema) =>
     }
 
     const localKeys = filterExtractionResult(rawKeys);
+
+    if (opts.namespaces?.length) {
+      for (const namespace of Object.keys(localKeys)) {
+        if (!opts.namespaces?.includes(namespace)) {
+          localKeys[namespace].clear();
+        }
+      }
+    }
+
     const allKeysLoadable = await opts.client.GET(
       '/v2/projects/{projectId}/all-keys',
       {
@@ -89,9 +99,16 @@ const syncHandler = (config: Schema) =>
 
     handleLoadableError(allKeysLoadable);
 
-    const remoteKeys = allKeysLoadable.data?._embedded?.keys ?? [];
+    let remoteKeys = allKeysLoadable.data?._embedded?.keys ?? [];
+
+    if (opts.namespaces?.length) {
+      remoteKeys = remoteKeys.filter((key) => {
+        return opts.namespaces?.includes(key.namespace ?? '');
+      });
+    }
 
     const diff = compareKeys(localKeys, remoteKeys);
+
     if (!diff.added.length && !diff.removed.length) {
       console.log(
         ansi.green(
@@ -225,6 +242,12 @@ export default (config: Schema) =>
     )
     .addOption(
       new Option(
+        '-n, --namespaces <namespaces...>',
+        'Specifies which namespaces should be synchronized.'
+      ).default(config.sync?.namespaces)
+    )
+    .addOption(
+      new Option(
         '-Y, --yes',
         'Skip prompts and automatically say yes to them. You will not be asked for confirmation before creating/deleting keys.'
       ).default(false)
@@ -232,7 +255,7 @@ export default (config: Schema) =>
     .addOption(
       new Option(
         '--remove-unused',
-        'Delete unused keys from the Tolgee project.'
+        'Delete unused keys from the Tolgee project (within selected namespaces if specified).'
       ).default(config.sync?.removeUnused ?? false)
     )
     .option(

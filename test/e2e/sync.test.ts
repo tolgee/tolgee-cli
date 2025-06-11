@@ -31,7 +31,8 @@ const CODE_PROJECT_2_COMPLETE = `${CODE_PATH}/Test2Complete.tsx`;
 const CODE_PROJECT_2_ADDED = `${CODE_PATH}/Test2New.tsx`;
 const CODE_PROJECT_2_DELETED = `${CODE_PATH}/Test2Incomplete.tsx`;
 const CODE_PROJECT_2_WARNING = `${CODE_PATH}/Test2Warning.tsx`;
-const CODE_PROJECT_3 = `${CODE_PATH}/Test3SingleDiff.tsx`;
+const CODE_PROJECT_3_DIFF = `${CODE_PATH}/Test3SingleDiff.tsx`;
+const CODE_PROJECT_3_MIXED = `${CODE_PATH}/Test3Mixed.tsx`;
 
 setupTemporaryFolder();
 
@@ -143,7 +144,7 @@ describe('Project 2', () => {
     });
   }, 30e3);
 
-  it('deletes keys that no longer exist via --remove-unused', async () => {
+  it('deletes keys that no longer exist (args)', async () => {
     const pakWithDelete = await createPak(client, [
       ...DEFAULT_SCOPES,
       'keys.delete',
@@ -176,7 +177,7 @@ describe('Project 2', () => {
     expect(keys.data?.page?.totalElements).toBe(0);
   }, 30e3);
 
-  it('deletes keys that no longer exist via config', async () => {
+  it('deletes keys that no longer exist (config)', async () => {
     const pakWithDelete = await createPak(client, [
       ...DEFAULT_SCOPES,
       'keys.delete',
@@ -296,7 +297,7 @@ describe('Project 3', () => {
 
   it('handles namespaces properly (args)', async () => {
     const out = await run(
-      ['sync', '--yes', '--api-key', pak, '--patterns', CODE_PROJECT_3],
+      ['sync', '--yes', '--api-key', pak, '--patterns', CODE_PROJECT_3_DIFF],
       undefined,
       20e3
     );
@@ -325,7 +326,7 @@ describe('Project 3', () => {
   it('handles namespaces properly (config)', async () => {
     const { configFile } = await createTmpFolderWithConfig({
       apiKey: pak,
-      patterns: [CODE_PROJECT_3],
+      patterns: [CODE_PROJECT_3_DIFF],
     });
     const out = await run(['-c', configFile, 'sync', '--yes'], undefined, 20e3);
 
@@ -348,5 +349,139 @@ describe('Project 3', () => {
         en: 'Welcome!',
       },
     });
+  }, 30e3);
+
+  it('synchronizes the defined namespaces only (args)', async () => {
+    const out = await run(
+      [
+        'sync',
+        '--yes',
+        '--api-key',
+        pak,
+        '--patterns',
+        CODE_PROJECT_3_MIXED,
+        '--namespaces',
+        'food',
+      ],
+      undefined,
+      20e3
+    );
+
+    expect(out.code).toBe(0);
+    expect(out.stdout).toContain('+ 1 string');
+    expect(out.stdout).toContain('1 unused key could be deleted.');
+
+    const keys = await client.GET('/v2/projects/{projectId}/translations', {
+      params: {
+        path: { projectId: client.getProjectId() },
+      },
+    });
+
+    const stored = tolgeeDataToDict(keys.data);
+
+    expect(Object.keys(stored)).toContain('table');
+    expect(Object.keys(stored)).not.toContain('welcome');
+    expect(Object.keys(stored).length).toEqual(11);
+  }, 30e3);
+
+  it('synchronizes the defined namespaces only (config)', async () => {
+    const { configFile } = await createTmpFolderWithConfig({
+      apiKey: pak,
+      patterns: [CODE_PROJECT_3_MIXED],
+      sync: {
+        namespaces: ['', 'food'],
+      },
+    });
+    const out = await run(['-c', configFile, 'sync', '--yes'], undefined, 20e3);
+
+    expect(out.code).toBe(0);
+    expect(out.stdout).toContain('+ 2 strings');
+    expect(out.stdout).toContain('6 unused keys could be deleted.');
+
+    const keys = await client.GET('/v2/projects/{projectId}/translations', {
+      params: {
+        path: { projectId: client.getProjectId() },
+      },
+    });
+
+    const stored = tolgeeDataToDict(keys.data);
+
+    expect(Object.keys(stored)).toContain('spoon');
+    expect(Object.keys(stored)).toContain('salad');
+    expect(Object.keys(stored)).toContain('table');
+    expect(Object.keys(stored)).not.toContain('welcome');
+    expect(Object.keys(stored).length).toEqual(12);
+  }, 30e3);
+
+  it('deletes only keys within namespace when using namespace selector (args)', async () => {
+    const pakWithDelete = await createPak(client, [
+      ...DEFAULT_SCOPES,
+      'keys.delete',
+    ]);
+
+    const out = await run(
+      [
+        'sync',
+        '--yes',
+        '--remove-unused',
+        '--api-key',
+        pakWithDelete,
+        '--namespaces=',
+        '--namespaces=food',
+        '--patterns',
+        CODE_PROJECT_3_MIXED,
+      ],
+      undefined,
+      20e3
+    );
+
+    expect(out.code).toBe(0);
+    expect(out.stdout).toContain('+ 2 strings');
+    expect(out.stdout).toContain('- 6 strings');
+
+    const keys = await client.GET('/v2/projects/{projectId}/translations', {
+      params: {
+        path: { projectId: client.getProjectId() },
+      },
+    });
+
+    const stored = tolgeeDataToDict(keys.data);
+
+    expect(Object.keys(stored)).toContain('spoon');
+    expect(Object.keys(stored)).toContain('salad');
+    expect(Object.keys(stored)).not.toContain('table');
+    expect(Object.keys(stored)).not.toContain('welcome');
+    expect(Object.keys(stored).length).toEqual(6);
+  }, 30e3);
+
+  it('deletes only keys within namespace when using namespace selector (config)', async () => {
+    const pakWithDelete = await createPak(client, [
+      ...DEFAULT_SCOPES,
+      'keys.delete',
+    ]);
+
+    const { configFile } = await createTmpFolderWithConfig({
+      apiKey: pakWithDelete,
+      patterns: [CODE_PROJECT_3_MIXED],
+      sync: {
+        namespaces: ['food'],
+        removeUnused: true,
+      },
+    });
+
+    const out = await run(['-c', configFile, 'sync', '--yes'], undefined, 20e3);
+
+    expect(out.code).toBe(0);
+    expect(out.stdout).toContain('- 1 string');
+    expect(out.stdout).toContain('+ 1 string');
+
+    const keys = await client.GET('/v2/projects/{projectId}/translations', {
+      params: {
+        path: { projectId: client.getProjectId() },
+        query: { filterKeyName: ['onions'] },
+      },
+    });
+
+    expect(keys.data?.page?.totalElements).toBe(0);
   }, 30e3);
 });
