@@ -88,23 +88,27 @@ async function getSchema() {
 }
 
 export default async function loadTolgeeRc(
-  path?: string
+  exactPath?: string,
+  searchFrom?: string
 ): Promise<Schema | null> {
   let res: CosmiconfigResult;
-  if (path) {
+  if (exactPath) {
     try {
-      res = await explorer.load(path);
+      res = await explorer.load(exactPath);
     } catch (e: any) {
       error(e.message);
-      throw new Error(`Can't open config file on path "${path}"`);
+      throw new Error(`Can't open config file on path "${exactPath}"`);
     }
   } else {
-    res = await explorer.search();
+    res = await explorer.search(searchFrom);
   }
 
   if (!res || res.isEmpty) return null;
 
-  const config = parseConfig(res.config, dirname(path || '.'));
+  const config = parseConfig(
+    res.config,
+    exactPath ? dirname(exactPath) : searchFrom || dirname('.')
+  );
 
   const ajv = new Ajv({ allowUnionTypes: true });
   const validate = ajv.compile(await getSchema());

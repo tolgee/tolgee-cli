@@ -2,18 +2,18 @@ import { LoadableData } from './TolgeeClient.js';
 
 export const addErrorDetails = (loadable: LoadableData, showBeError = true) => {
   const items: string[] = [];
-  items.push(`status: ${loadable.response.status}`);
+  items.push(`status: ${loadable.response?.status}`);
   if (showBeError && loadable.error?.code) {
     items.push(`code: ${loadable.error.code}`);
   }
-  if (loadable.response.status === 403 && loadable.error?.params?.[0]) {
+  if (loadable.response?.status === 403 && loadable.error?.params?.[0]) {
     items.push(`missing scope: ${loadable.error.params[0]}`);
   }
   return `[${items.join(', ')}]`;
 };
 
 export const errorFromLoadable = (loadable: LoadableData) => {
-  switch (loadable.response.status) {
+  switch (loadable?.response?.status) {
     // Unauthorized
     case 400:
       return `Invalid request data ${addErrorDetails(loadable)}`;

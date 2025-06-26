@@ -5,7 +5,7 @@ import type {
   VerboseOption,
 } from './index.js';
 import { glob } from 'tinyglobby';
-import { extname } from 'path';
+import path, { extname } from 'path';
 
 import { callWorker } from './worker.js';
 import { exitWithError } from '../utils/logger.js';
@@ -95,14 +95,25 @@ type Opts = {
   strictNamespace?: boolean;
   defaultNamespace?: string;
   verbose?: VerboseOption[] | boolean;
+
+  /**
+   * option for vscode extension where we want to extract only from single file
+   */
+  filterFiles?: string[];
 };
+
+export async function getFilesFromPatterns(patterns: string[]) {
+  return await glob(patterns, { onlyFiles: true });
+}
 
 export async function extractKeysOfFiles(opts: Opts) {
   if (!opts.patterns?.length) {
     exitWithError("Missing '--patterns' or 'config.patterns' option");
   }
 
-  const files = await glob(opts.patterns, { onlyFiles: true });
+  const files = (await getFilesFromPatterns(opts.patterns)).map((p) =>
+    path.resolve(p)
+  );
 
   if (files.length === 0) {
     exitWithError('No files were matched for extraction');
@@ -120,16 +131,22 @@ export async function extractKeysOfFiles(opts: Opts) {
     verbose: parseVerbose(opts.verbose),
   };
 
+  const absoluteFilters = opts.filterFiles?.map((p) => path.resolve(p));
+
   await Promise.all(
-    files.map(async (file) => {
-      const keys = await extractKeysFromFile(
-        file,
-        parserType,
-        options,
-        opts.extractor
-      );
-      result.set(file, keys);
-    })
+    files
+      .filter(
+        (f) => absoluteFilters === undefined || absoluteFilters.includes(f)
+      )
+      .map(async (file) => {
+        const keys = await extractKeysFromFile(
+          file,
+          parserType,
+          options,
+          opts.extractor
+        );
+        result.set(file, keys);
+      })
   );
 
   return result;
