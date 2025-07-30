@@ -25,8 +25,10 @@ export type Format =
   | "APPLE_STRINGS"
   | "APPLE_XLIFF"
   | "APPLE_XCSTRINGS"
+  | "APPLE_SDK"
   | "PROPERTIES_ICU"
   | "PROPERTIES_JAVA"
+  | "ANDROID_SDK"
   | "ANDROID_XML"
   | "COMPOSE_XML"
   | "FLUTTER_ARB"
@@ -134,7 +136,7 @@ export interface Schema {
      */
     tagNewKeys?: string[];
     /**
-     * Remove keys which are not present in the import.
+     * Remove keys which are not present in the import (within imported namespaces).
      */
     removeOtherKeys?: boolean;
   };
@@ -190,7 +192,7 @@ export interface Schema {
      */
     continueOnWarning?: boolean;
     /**
-     * Delete unused keys from the Tolgee project
+     * Delete unused keys from the Tolgee project (within selected namespaces if specified).
      */
     removeUnused?: boolean;
     /**
