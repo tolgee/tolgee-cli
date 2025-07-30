@@ -8,8 +8,12 @@ type FormatResult = {
 
 export const mapExportFormat = (format: Schema['format']): FormatResult => {
   switch (format) {
+    case 'ANDROID_SDK':
+      return { format: 'ANDROID_SDK', messageFormat: 'JAVA_STRING_FORMAT' };
     case 'ANDROID_XML':
       return { format: 'ANDROID_XML', messageFormat: 'JAVA_STRING_FORMAT' };
+    case 'APPLE_SDK':
+      return { format: 'APPLE_SDK', messageFormat: 'APPLE_SPRINTF' };
     case 'APPLE_STRINGS':
       return {
         format: 'APPLE_STRINGS_STRINGSDICT',

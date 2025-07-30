@@ -34,6 +34,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Generate authentication url (third-party, SSO)
+         * @description Returns URL which can be used to authenticate user using third party SSO service
+         */
         post: operations["getAuthenticationUrl"];
         delete?: never;
         options?: never;
@@ -405,10 +409,10 @@ export interface paths {
         get: operations["allByUser"];
         put?: never;
         /**
-         * Crete API key
+         * Create API key
          * @description Creates new API key with provided scopes
          */
-        post: operations["create_13"];
+        post: operations["create_15"];
         delete?: never;
         options?: never;
         head?: never;
@@ -452,6 +456,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v2/api-keys/current-permissions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get current permission info
+         * @description Returns current PAK or PAT permissions for current user, api-key and project
+         */
+        get: operations["getCurrentPermissions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v2/api-keys/{apiKeyId}": {
         parameters: {
             query?: never;
@@ -461,10 +485,10 @@ export interface paths {
         };
         get?: never;
         /** Update API key */
-        put: operations["update_9"];
+        put: operations["update_11"];
         post?: never;
         /** Delete API key */
-        delete: operations["delete_13"];
+        delete: operations["delete_15"];
         options?: never;
         head?: never;
         patch?: never;
@@ -498,7 +522,7 @@ export interface paths {
          * Get one API key
          * @description Returns specific API key info
          */
-        get: operations["get_21"];
+        get: operations["get_24"];
         put?: never;
         post?: never;
         delete?: never;
@@ -507,7 +531,25 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/v2/auth-provider/changed": {
+    "/v2/auth-provider": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get current third party authentication provider */
+        get: operations["getCurrentAuthProvider"];
+        put?: never;
+        post?: never;
+        /** Initiate provider change to remove current third party authentication provider */
+        delete: operations["deleteCurrentAuthProvider"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/auth-provider/change": {
         parameters: {
             query?: never;
             header?: never;
@@ -517,56 +559,24 @@ export interface paths {
         /** Get info about authentication provider which can replace the current one */
         get: operations["getChangedAuthProvider"];
         put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v2/auth-provider/changed/accept": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /** Accept change of the third party authentication provider */
         post: operations["acceptChangeAuthProvider"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v2/auth-provider/changed/reject": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /** Reject change of the third party authentication provider */
-        post: operations["rejectChangeAuthProvider"];
-        delete?: never;
+        delete: operations["rejectChangeAuthProvider"];
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/v2/auth-provider/current": {
+    "/v2/ee-current-subscription-usage": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** Get current third party authentication provider */
-        get: operations["getCurrentAuthProvider"];
+        /** Get current usage for the current EE subscription */
+        get: operations["getUsage_1"];
         put?: never;
         post?: never;
         delete?: never;
@@ -697,7 +707,7 @@ export interface paths {
         put?: never;
         post?: never;
         /** Delete uploaded images */
-        delete: operations["delete_12"];
+        delete: operations["delete_14"];
         options?: never;
         head?: never;
         patch?: never;
@@ -737,6 +747,64 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v2/notification": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Gets notifications of the currently logged in user, newest is first. */
+        get: operations["getNotifications"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/notification-settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get notification settings
+         * @description Returns notification settings of the currently logged in user
+         */
+        get: operations["getNotificationsSettings"];
+        /**
+         * Save notification setting
+         * @description Saves new value for given parameters
+         */
+        put: operations["putNotificationSetting"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/notifications-mark-seen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Marks notifications of the currently logged in user with given IDs as seen. */
+        put: operations["markNotificationsAsSeen"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v2/organizations": {
         parameters: {
             query?: never;
@@ -748,7 +816,7 @@ export interface paths {
          * Get all permitted organizations
          * @description Returns all organizations, which is current user allowed to view
          */
-        get: operations["getAll_10"];
+        get: operations["getAll_12"];
         put?: never;
         /** Create organization */
         post: operations["create_12"];
@@ -766,15 +834,15 @@ export interface paths {
             cookie?: never;
         };
         /** Get one organization */
-        get: operations["get_20"];
+        get: operations["get_23"];
         /** Update organization data */
-        put: operations["update_8"];
+        put: operations["update_10"];
         post?: never;
         /**
          * Delete organization
          * @description Deletes organization and all its data including projects
          */
-        delete: operations["delete_11"];
+        delete: operations["delete_13"];
         options?: never;
         head?: never;
         patch?: never;
@@ -878,6 +946,220 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v2/organizations/{organizationId}/base-languages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get all base languages in use by projects owned by specified organization
+         * @description Returns all base languages in use by projects owned by specified organization
+         */
+        get: operations["getAllBaseLanguagesInUse"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/organizations/{organizationId}/glossaries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get all organization glossaries */
+        get: operations["getAll_14"];
+        put?: never;
+        /** Create glossary */
+        post: operations["create_13"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/organizations/{organizationId}/glossaries-with-stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get all organization glossaries with some additional statistics */
+        get: operations["getAllWithStats"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/organizations/{organizationId}/glossaries/{glossaryId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get glossary */
+        get: operations["get_20"];
+        /** Update glossary */
+        put: operations["update_8"];
+        post?: never;
+        /** Delete glossary */
+        delete: operations["delete_11"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/organizations/{organizationId}/glossaries/{glossaryId}/assigned-projects": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get all projects assigned to glossary */
+        get: operations["getAssignedProjects"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/organizations/{organizationId}/glossaries/{glossaryId}/languages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get all languages in use by the glossary */
+        get: operations["getLanguages"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/organizations/{organizationId}/glossaries/{glossaryId}/terms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get all glossary terms */
+        get: operations["getAll_15"];
+        put?: never;
+        /** Create a new glossary term */
+        post: operations["create_14"];
+        /** Batch delete multiple terms */
+        delete: operations["deleteMultiple"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/organizations/{organizationId}/glossaries/{glossaryId}/terms/{termId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get glossary term */
+        get: operations["get_21"];
+        /** Update glossary term */
+        put: operations["update_9"];
+        post?: never;
+        /** Delete glossary term */
+        delete: operations["delete_12"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/organizations/{organizationId}/glossaries/{glossaryId}/terms/{termId}/translations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Set a new glossary term translation for language */
+        post: operations["update_12"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/organizations/{organizationId}/glossaries/{glossaryId}/terms/{termId}/translations/{languageTag}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get glossary term translation for language */
+        get: operations["get_22"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/organizations/{organizationId}/glossaries/{glossaryId}/termsIds": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get all glossary terms ids */
+        get: operations["getAllIds"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/organizations/{organizationId}/glossaries/{glossaryId}/termsWithTranslations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get all glossary terms with translations */
+        get: operations["getAllWithTranslations"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v2/organizations/{organizationId}/invitations": {
         parameters: {
             query?: never;
@@ -890,6 +1172,90 @@ export interface paths {
         put?: never;
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/organizations/{organizationId}/languages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get all languages in use by projects owned by specified organization
+         * @description Returns all languages in use by projects owned by specified organization
+         */
+        get: operations["getAllLanguagesInUse"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/organizations/{organizationId}/llm-providers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getAll_13"];
+        put?: never;
+        post: operations["createProvider"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/organizations/{organizationId}/llm-providers/all-available": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getAvailableProviders"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/organizations/{organizationId}/llm-providers/server-providers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getServerProviders"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/organizations/{organizationId}/llm-providers/{providerId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["updateProvider"];
+        post?: never;
+        delete: operations["deleteProvider"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1063,7 +1429,9 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Get SSO Tenant configuration for organization */
         get: operations["findProvider"];
+        /** Set SSO Tenant configuration for organization */
         put: operations["setProvider"];
         post?: never;
         delete?: never;
@@ -1191,7 +1559,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get PAKs */
-        get: operations["getAll_9"];
+        get: operations["getAll_11"];
         put?: never;
         /** Create PAK */
         post: operations["create_11"];
@@ -1335,7 +1703,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get one project */
-        get: operations["get_4"];
+        get: operations["get_8"];
         /** Update project settings */
         put: operations["editProject"];
         post?: never;
@@ -1391,6 +1759,22 @@ export interface paths {
         get: operations["getModifiedEntitiesByRevision"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/projects/{projectId}/ai-playground-result": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["getAiPlaygroundResult"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1526,7 +1910,7 @@ export interface paths {
             cookie?: never;
         };
         /** List batch operations */
-        get: operations["list_3"];
+        get: operations["list"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1543,7 +1927,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get batch operation */
-        get: operations["get_12"];
+        get: operations["get_6"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1600,10 +1984,10 @@ export interface paths {
             cookie?: never;
         };
         /** List existing Content Delivery Configs */
-        get: operations["list_2"];
+        get: operations["list_4"];
         put?: never;
         /** Create Content Delivery Config */
-        post: operations["create_6"];
+        post: operations["create_10"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1618,16 +2002,16 @@ export interface paths {
             cookie?: never;
         };
         /** Get one Content Delivery Config */
-        get: operations["get_9"];
+        get: operations["get_17"];
         /** Update Content Delivery Config */
-        put: operations["update_4"];
+        put: operations["update_6"];
         /**
          * Publish to Content Delivery
          * @description Immediately publishes content to the configured Content Delivery
          */
         post: operations["post"];
         /** Delete Content Delivery Config */
-        delete: operations["delete_7"];
+        delete: operations["delete_9"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1641,10 +2025,10 @@ export interface paths {
             cookie?: never;
         };
         /** List Content Storages */
-        get: operations["list_1"];
+        get: operations["list_3"];
         put?: never;
         /** Create Content Storage */
-        post: operations["create_5"];
+        post: operations["create_9"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1676,12 +2060,12 @@ export interface paths {
             cookie?: never;
         };
         /** Get Content Storage */
-        get: operations["get_8"];
+        get: operations["get_16"];
         /** Update Content Storage */
-        put: operations["update_3"];
+        put: operations["update_5"];
         post?: never;
         /** Delete Content Storage */
-        delete: operations["delete_6"];
+        delete: operations["delete_8"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1748,6 +2132,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v2/projects/{projectId}/glossary-highlights": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Returns glossary term highlights for specified text */
+        post: operations["getHighlights"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v2/projects/{projectId}/import": {
         parameters: {
             query?: never;
@@ -1783,7 +2184,7 @@ export interface paths {
          * Get Import Settings
          * @description Returns import settings for the authenticated user and the project.
          */
-        get: operations["get_10"];
+        get: operations["get_4"];
         /**
          * Set Import Settings
          * @description Stores import settings for the authenticated user and the project.
@@ -1807,7 +2208,7 @@ export interface paths {
          * Get namespaces
          * @description Returns all existing and imported namespaces
          */
-        get: operations["getAllNamespaces_2"];
+        get: operations["getAllNamespaces"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2122,15 +2523,15 @@ export interface paths {
             cookie?: never;
         };
         /** Get all keys */
-        get: operations["getAll_1"];
+        get: operations["getAll_9"];
         put?: never;
         /** Create new key */
-        post: operations["create_2"];
+        post: operations["create_6"];
         /**
          * Delete one or multiple keys (post)
          * @description Delete one or multiple keys by their IDs in request body. Useful for larger requests esxceeding allowed URL length.
          */
-        delete: operations["delete_4"];
+        delete: operations["delete_6"];
         options?: never;
         head?: never;
         patch?: never;
@@ -2146,7 +2547,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Create new key */
-        post: operations["create_1"];
+        post: operations["create_5"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2266,7 +2667,7 @@ export interface paths {
         put?: never;
         post?: never;
         /** Delete one or multiple keys */
-        delete: operations["delete_2"];
+        delete: operations["delete_4"];
         options?: never;
         head?: never;
         patch?: never;
@@ -2280,7 +2681,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get one key */
-        get: operations["get_6"];
+        get: operations["get_14"];
         /** Edit key name */
         put: operations["edit"];
         post?: never;
@@ -2450,6 +2851,59 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v2/projects/{projectId}/labels": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get available project labels */
+        get: operations["getAll_3"];
+        put?: never;
+        /** Create label */
+        post: operations["createLabel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/projects/{projectId}/labels/ids": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get labels by ids */
+        get: operations["getLabelsByIds"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/projects/{projectId}/labels/{labelId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Update label */
+        put: operations["updateLabel"];
+        post?: never;
+        /** Delete label */
+        delete: operations["deleteLabel"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v2/projects/{projectId}/language-ai-prompt-customizations": {
         parameters: {
             query?: never;
@@ -2493,7 +2947,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get one language */
-        get: operations["get_16"];
+        get: operations["get_12"];
         /** Update language */
         put: operations["editLanguage"];
         post?: never;
@@ -2596,6 +3050,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v2/projects/{projectId}/machine-translation-service-settings/set-default-prompt/{promptId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Sets machine translation default prompt for all languages */
+        put: operations["setMachineTranslationSettings_1"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v2/projects/{projectId}/my-batch-jobs": {
         parameters: {
             query?: never;
@@ -2644,7 +3115,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get namespaces */
-        get: operations["getAllNamespaces"];
+        get: operations["getAllNamespaces_2"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2662,7 +3133,7 @@ export interface paths {
         };
         get?: never;
         /** Update namespace */
-        put: operations["update_1"];
+        put: operations["update_3"];
         post?: never;
         delete?: never;
         options?: never;
@@ -2688,6 +3159,87 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v2/projects/{projectId}/prompts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getAllPaged"];
+        put?: never;
+        post: operations["createPrompt"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/projects/{projectId}/prompts/default": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getDefaultPrompt"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/projects/{projectId}/prompts/get-variables": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get variables */
+        get: operations["variables"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/projects/{projectId}/prompts/run": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["run"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/projects/{projectId}/prompts/{promptId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getPrompt"];
+        put: operations["updatePrompt"];
+        post?: never;
+        delete: operations["deletePrompt"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v2/projects/{projectId}/single-step-import": {
         parameters: {
             query?: never;
@@ -2702,6 +3254,40 @@ export interface paths {
          * @description Unlike the /v2/projects/{projectId}/import endpoint, imports the data in single request by provided files and parameters. This is useful for automated importing via API or CLI.
          */
         post: operations["doImport"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/projects/{projectId}/start-batch-job/ai-playground-translate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Translates via llm and stores result in AiPlaygroundResult */
+        post: operations["aiPlaygroundTranslate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/projects/{projectId}/start-batch-job/assign-translation-label": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Assign labels to translations */
+        post: operations["assignTranslationLabel"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2856,6 +3442,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v2/projects/{projectId}/start-batch-job/unassign-translation-label": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Unassign labels from translations */
+        post: operations["unassignTranslationLabel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v2/projects/{projectId}/start-batch-job/untag-keys": {
         parameters: {
             query?: never;
@@ -2992,7 +3595,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get tags */
-        get: operations["getAll_3"];
+        get: operations["getAll_1"];
         put?: never;
         post?: never;
         delete?: never;
@@ -3107,7 +3710,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/v2/projects/{projectId}/tasks/{taskNumber}/close": {
+    "/v2/projects/{projectId}/tasks/{taskNumber}/cancel": {
         parameters: {
             query?: never;
             header?: never;
@@ -3116,6 +3719,26 @@ export interface paths {
         };
         get?: never;
         /** Close task */
+        put: operations["cancelTask"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/projects/{projectId}/tasks/{taskNumber}/close": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Close task
+         * @deprecated
+         */
         put: operations["closeTask"];
         post?: never;
         delete?: never;
@@ -3314,7 +3937,24 @@ export interface paths {
          * Create translation comment
          * @description Creates a translation comment. Empty translation is stored, when not exists.
          */
-        post: operations["create_9"];
+        post: operations["create_3"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/projects/{projectId}/translations/label": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Add label to translation by key and language id */
+        put: operations["assignLabel_2"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -3375,7 +4015,7 @@ export interface paths {
         get: operations["getAll_5"];
         put?: never;
         /** Create translation comment */
-        post: operations["create_7"];
+        post: operations["create_1"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3390,12 +4030,12 @@ export interface paths {
             cookie?: never;
         };
         /** Get one translation comment */
-        get: operations["get_14"];
+        get: operations["get_10"];
         /** Update translation comment */
-        put: operations["update_5"];
+        put: operations["update_1"];
         post?: never;
         /** Delete translation comment */
-        delete: operations["delete_8"];
+        delete: operations["delete_2"];
         options?: never;
         head?: never;
         patch?: never;
@@ -3453,6 +4093,24 @@ export interface paths {
         put?: never;
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/projects/{projectId}/translations/{translationId}/label/{labelId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Add label to translation */
+        put: operations["assignLabel"];
+        post?: never;
+        /** Remove label from translation */
+        delete: operations["unassignLabel"];
         options?: never;
         head?: never;
         patch?: never;
@@ -3617,7 +4275,7 @@ export interface paths {
             cookie?: never;
         };
         /** List webhook configurations */
-        get: operations["list"];
+        get: operations["list_2"];
         put?: never;
         /** Create new webhook configuration */
         post: operations["create"];
@@ -3635,7 +4293,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get one webhook configuration */
-        get: operations["get_5"];
+        get: operations["get_9"];
         /** Update webhook configuration */
         put: operations["update"];
         post?: never;
@@ -3747,6 +4405,22 @@ export interface paths {
         get: operations["get_1"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/public/llm/prompt": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["prompt"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4172,6 +4846,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v2/user/managed-by": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get organization which manages user
+         * @description Returns the organization that manages a given user or null
+         */
+        get: operations["getManagedBy"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v2/user/mfa/recovery": {
         parameters: {
             query?: never;
@@ -4276,13 +4970,48 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v2/user/sso": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get information about SSO configuration
+         * @description Returns information about sso configuration affecting the user.
+         */
+        get: operations["getSso"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        AcceptAuthProviderChangeRequest: {
+            id: string;
+        };
+        AiPlaygroundResultModel: {
+            contextDescription?: string;
+            /** Format: int64 */
+            keyId: number;
+            /** Format: int64 */
+            languageId: number;
+            translation?: string;
+        };
+        AiPlaygroundResultRequest: {
+            keys: number[];
+            languages: number[];
+        };
         AnnouncementDto: {
             /** @enum {string} */
-            type: "FEATURE_BATCH_OPERATIONS" | "FEATURE_MT_FORMALITY" | "FEATURE_CONTENT_DELIVERY_AND_WEBHOOKS" | "NEW_PRICING" | "FEATURE_AI_CUSTOMIZATION" | "FEATURE_VISUAL_EDITOR" | "FEATURE_CLI_2" | "FEATURE_TASKS";
+            type: "FEATURE_BATCH_OPERATIONS" | "FEATURE_MT_FORMALITY" | "FEATURE_CONTENT_DELIVERY_AND_WEBHOOKS" | "NEW_PRICING" | "FEATURE_AI_CUSTOMIZATION" | "FEATURE_VISUAL_EDITOR" | "FEATURE_CLI_2" | "FEATURE_TASKS" | "FEATURE_LLM_PROVIDERS_AND_PLAYGROUND" | "FEATURE_GLOSSARIES_AND_PLAYGROUND" | "FEATURE_LABELS";
         };
         ApiKeyModel: {
             /** @description Description */
@@ -4326,6 +5055,51 @@ export interface components {
             /** @description Username of user owner */
             username?: string;
         };
+        ApiKeyPermissionsModel: {
+            project: components["schemas"]["SimpleProjectModel"];
+            /**
+             * Format: int64
+             * @description The API key's project id or the one provided as query param
+             */
+            projectId: number;
+            /**
+             * @description Granted scopes to the user. When user has type permissions, this field contains permission scopes of the type.
+             * @example [
+             *       "KEYS_EDIT",
+             *       "TRANSLATIONS_VIEW"
+             *     ]
+             */
+            scopes: ("translations.view" | "translations.edit" | "keys.edit" | "screenshots.upload" | "screenshots.delete" | "screenshots.view" | "activity.view" | "languages.edit" | "admin" | "project.edit" | "members.view" | "members.edit" | "translation-comments.add" | "translation-comments.edit" | "translation-comments.set-state" | "translations.state-edit" | "keys.view" | "keys.delete" | "keys.create" | "batch-jobs.view" | "batch-jobs.cancel" | "translations.batch-by-tm" | "translations.batch-machine" | "content-delivery.manage" | "content-delivery.publish" | "webhooks.manage" | "tasks.view" | "tasks.edit" | "prompts.view" | "prompts.edit" | "translation-labels.manage" | "translation-labels.assign")[];
+            /**
+             * @description List of languages user can change state to. If null, changing state of all language values is permitted.
+             * @example [
+             *       200001,
+             *       200004
+             *     ]
+             */
+            stateChangeLanguageIds?: number[];
+            /**
+             * @description List of languages user can translate to. If null, all languages editing is permitted.
+             * @example [
+             *       200001,
+             *       200004
+             *     ]
+             */
+            translateLanguageIds?: number[];
+            /**
+             * @description The user's permission type. This field is null if user has assigned granular permissions or if returning API key's permissions
+             * @enum {string}
+             */
+            type?: "NONE" | "VIEW" | "TRANSLATE" | "REVIEW" | "EDIT" | "MANAGE";
+            /**
+             * @description List of languages user can view. If null, all languages view is permitted.
+             * @example [
+             *       200001,
+             *       200004
+             *     ]
+             */
+            viewLanguageIds?: number[];
+        };
         ApiKeyWithLanguagesModel: {
             description: string;
             /** Format: int64 */
@@ -4355,9 +5129,8 @@ export interface components {
         };
         AuthProviderDto: {
             /** @enum {string} */
-            accountType?: "LOCAL" | "MANAGED" | "THIRD_PARTY";
-            /** @enum {string} */
             authType?: "GOOGLE" | "GITHUB" | "OAUTH2" | "SSO" | "SSO_GLOBAL";
+            id?: string;
             ssoDomain?: string;
         };
         AutoTranslationConfigModel: {
@@ -4382,6 +5155,7 @@ export interface components {
             /** @description If true, new keys will be automatically translated via batch operation using translation memory when 100% match is found */
             usingTranslationMemory: boolean;
         };
+        /** @example Links to avatar images */
         Avatar: {
             large: string;
             thumbnail: string;
@@ -4437,7 +5211,7 @@ export interface components {
              * @description Type of the batch job
              * @enum {string}
              */
-            type: "PRE_TRANSLATE_BT_TM" | "MACHINE_TRANSLATE" | "AUTO_TRANSLATE" | "DELETE_KEYS" | "SET_TRANSLATIONS_STATE" | "CLEAR_TRANSLATIONS" | "COPY_TRANSLATIONS" | "TAG_KEYS" | "UNTAG_KEYS" | "SET_KEYS_NAMESPACE" | "AUTOMATION" | "BILLING_TRIAL_EXPIRATION_NOTICE";
+            type: "AI_PLAYGROUND_TRANSLATE" | "PRE_TRANSLATE_BT_TM" | "MACHINE_TRANSLATE" | "AUTO_TRANSLATE" | "DELETE_KEYS" | "SET_TRANSLATIONS_STATE" | "CLEAR_TRANSLATIONS" | "COPY_TRANSLATIONS" | "TAG_KEYS" | "UNTAG_KEYS" | "SET_KEYS_NAMESPACE" | "AUTOMATION" | "BILLING_TRIAL_EXPIRATION_NOTICE" | "ASSIGN_TRANSLATION_LABEL" | "UNASSIGN_TRANSLATION_LABEL";
             /**
              * Format: int64
              * @description The time when the job was last updated (status change)
@@ -4470,6 +5244,11 @@ export interface components {
             keyIds: number[];
             languageIds: number[];
         };
+        CollectionModelAiPlaygroundResultModel: {
+            _embedded?: {
+                results?: components["schemas"]["AiPlaygroundResultModel"][];
+            };
+        };
         CollectionModelAutoTranslationConfigModel: {
             _embedded?: {
                 configs?: components["schemas"]["AutoTranslationConfigModel"][];
@@ -4483,6 +5262,16 @@ export interface components {
         CollectionModelExportFormatModel: {
             _embedded?: {
                 exportFormats?: components["schemas"]["ExportFormatModel"][];
+            };
+        };
+        CollectionModelGlossaryLanguageDto: {
+            _embedded?: {
+                glossaryLanguageDtoList?: components["schemas"]["GlossaryLanguageDto"][];
+            };
+        };
+        CollectionModelGlossaryTermHighlightModel: {
+            _embedded?: {
+                glossaryHighlights?: components["schemas"]["GlossaryTermHighlightModel"][];
             };
         };
         CollectionModelImportNamespaceModel: {
@@ -4530,6 +5319,21 @@ export interface components {
                 languages?: components["schemas"]["LanguageModel"][];
             };
         };
+        CollectionModelLlmProviderModel: {
+            _embedded?: {
+                providers?: components["schemas"]["LlmProviderModel"][];
+            };
+        };
+        CollectionModelLlmProviderSimpleModel: {
+            _embedded?: {
+                providers?: components["schemas"]["LlmProviderSimpleModel"][];
+            };
+        };
+        CollectionModelLong: {
+            _embedded?: {
+                longList?: number[];
+            };
+        };
         CollectionModelOrganizationInvitationModel: {
             _embedded?: {
                 organizationInvitations?: components["schemas"]["OrganizationInvitationModel"][];
@@ -4553,6 +5357,11 @@ export interface components {
         CollectionModelSimpleOrganizationModel: {
             _embedded?: {
                 organizations?: components["schemas"]["SimpleOrganizationModel"][];
+            };
+        };
+        CollectionModelSimpleProjectModel: {
+            _embedded?: {
+                projects?: components["schemas"]["SimpleProjectModel"][];
             };
         };
         CollectionModelUsedNamespaceModel: {
@@ -4639,7 +5448,7 @@ export interface components {
              *       "TRANSLATIONS_VIEW"
              *     ]
              */
-            scopes: ("translations.view" | "translations.edit" | "keys.edit" | "screenshots.upload" | "screenshots.delete" | "screenshots.view" | "activity.view" | "languages.edit" | "admin" | "project.edit" | "members.view" | "members.edit" | "translation-comments.add" | "translation-comments.edit" | "translation-comments.set-state" | "translations.state-edit" | "keys.view" | "keys.delete" | "keys.create" | "batch-jobs.view" | "batch-jobs.cancel" | "translations.batch-by-tm" | "translations.batch-machine" | "content-delivery.manage" | "content-delivery.publish" | "webhooks.manage" | "tasks.view" | "tasks.edit")[];
+            scopes: ("translations.view" | "translations.edit" | "keys.edit" | "screenshots.upload" | "screenshots.delete" | "screenshots.view" | "activity.view" | "languages.edit" | "admin" | "project.edit" | "members.view" | "members.edit" | "translation-comments.add" | "translation-comments.edit" | "translation-comments.set-state" | "translations.state-edit" | "keys.view" | "keys.delete" | "keys.create" | "batch-jobs.view" | "batch-jobs.cancel" | "translations.batch-by-tm" | "translations.batch-machine" | "content-delivery.manage" | "content-delivery.publish" | "webhooks.manage" | "tasks.view" | "tasks.edit" | "prompts.view" | "prompts.edit" | "translation-labels.manage" | "translation-labels.assign")[];
             /**
              * @description List of languages user can change state to. If null, changing state of all language values is permitted.
              * @example [
@@ -4678,6 +5487,10 @@ export interface components {
         };
         ContentDeliveryConfigModel: {
             autoPublish: boolean;
+            /** @description If true, HTML tags are escaped in the exported file. (Supported in the XLIFF format only).
+             *
+             *     e.g. Key <b>hello</b> will be exported as &lt;b&gt;hello&lt;/b&gt; */
+            escapeHtml: boolean;
             /** @description This is a template that defines the structure of the resulting .zip file content.
              *
              *     The template is a string that can contain the following placeholders: {namespace}, {languageTag},
@@ -4714,7 +5527,7 @@ export interface components {
              * @description Format to export to
              * @enum {string}
              */
-            format: "JSON" | "JSON_TOLGEE" | "XLIFF" | "PO" | "APPLE_STRINGS_STRINGSDICT" | "APPLE_XLIFF" | "ANDROID_XML" | "COMPOSE_XML" | "FLUTTER_ARB" | "PROPERTIES" | "YAML_RUBY" | "YAML" | "JSON_I18NEXT" | "CSV" | "RESX_ICU" | "XLSX" | "APPLE_XCSTRINGS";
+            format: "JSON" | "JSON_TOLGEE" | "XLIFF" | "PO" | "APPLE_STRINGS_STRINGSDICT" | "APPLE_XLIFF" | "ANDROID_XML" | "COMPOSE_XML" | "FLUTTER_ARB" | "PROPERTIES" | "YAML_RUBY" | "YAML" | "JSON_I18NEXT" | "CSV" | "RESX_ICU" | "XLSX" | "APPLE_XCSTRINGS" | "ANDROID_SDK" | "APPLE_SDK";
             /** Format: int64 */
             id: number;
             /**
@@ -4762,6 +5575,10 @@ export interface components {
              * @description Id of custom storage to use for content delivery. If null, default server storage is used. Tolgee Cloud provides default Content Storage.
              */
             contentStorageId?: number;
+            /** @description If true, HTML tags are escaped in the exported file. (Supported in the XLIFF format only).
+             *
+             *     e.g. Key <b>hello</b> will be exported as &lt;b&gt;hello&lt;/b&gt; */
+            escapeHtml: boolean;
             /** @description This is a template that defines the structure of the resulting .zip file content.
              *
              *     The template is a string that can contain the following placeholders: {namespace}, {languageTag},
@@ -4798,7 +5615,7 @@ export interface components {
              * @description Format to export to
              * @enum {string}
              */
-            format: "JSON" | "JSON_TOLGEE" | "XLIFF" | "PO" | "APPLE_STRINGS_STRINGSDICT" | "APPLE_XLIFF" | "ANDROID_XML" | "COMPOSE_XML" | "FLUTTER_ARB" | "PROPERTIES" | "YAML_RUBY" | "YAML" | "JSON_I18NEXT" | "CSV" | "RESX_ICU" | "XLSX" | "APPLE_XCSTRINGS";
+            format: "JSON" | "JSON_TOLGEE" | "XLIFF" | "PO" | "APPLE_STRINGS_STRINGSDICT" | "APPLE_XLIFF" | "ANDROID_XML" | "COMPOSE_XML" | "FLUTTER_ARB" | "PROPERTIES" | "YAML_RUBY" | "YAML" | "JSON_I18NEXT" | "CSV" | "RESX_ICU" | "XLSX" | "APPLE_XCSTRINGS" | "ANDROID_SDK" | "APPLE_SDK";
             /**
              * @description Languages to be contained in export.
              *
@@ -4871,6 +5688,36 @@ export interface components {
             /** Format: int64 */
             projectId: number;
             scopes: string[];
+        };
+        CreateGlossaryRequest: {
+            /** @description IDs of projects to be assigned to glossary */
+            assignedProjectIds: number[];
+            /**
+             * @description Language tag according to BCP 47 definition
+             * @example cs-CZ
+             */
+            baseLanguageTag: string;
+            /**
+             * @description Glossary name
+             * @example My glossary
+             */
+            name: string;
+        };
+        CreateGlossaryTermWithTranslationRequest: {
+            /**
+             * @description A detailed explanation or definition of the glossary term
+             * @example It's trademark
+             */
+            description: string;
+            /** @description Specifies whether the term represents a shortened form of a word or phrase */
+            flagAbbreviation: boolean;
+            /** @description When true, the term matching considers uppercase and lowercase characters as distinct */
+            flagCaseSensitive: boolean;
+            /** @description When true, marks this term as prohibited or not recommended for use in translations */
+            flagForbiddenTerm: boolean;
+            /** @description When true, this term will have the same translation across all target languages */
+            flagNonTranslatable: boolean;
+            text: string;
         };
         CreateKeyDto: {
             /**
@@ -4952,9 +5799,13 @@ export interface components {
              * @example 1
              */
             languageId: number;
-            name: string;
+            name?: string;
             /** @enum {string} */
             type: "TRANSLATE" | "REVIEW";
+        };
+        CreateUpdateGlossaryTermResponse: {
+            term: components["schemas"]["SimpleGlossaryTermModel"];
+            translation?: components["schemas"]["GlossaryTermTranslationModel"];
         };
         CreditBalanceModel: {
             /** Format: int64 */
@@ -4970,12 +5821,31 @@ export interface components {
              */
             extraCreditBalance: number;
         };
+        /** @description For MT credits, the values are in full credits. Not Cents. */
+        CurrentUsageItemModel: {
+            /** Format: int64 */
+            current: number;
+            /** Format: int64 */
+            included: number;
+            /** Format: int64 */
+            limit: number;
+        };
+        CurrentUsageModel: {
+            credits: components["schemas"]["CurrentUsageItemModel"];
+            isPayAsYouGo: boolean;
+            keys: components["schemas"]["CurrentUsageItemModel"];
+            seats: components["schemas"]["CurrentUsageItemModel"];
+            strings: components["schemas"]["CurrentUsageItemModel"];
+        };
         DeleteKeysDto: {
             /** @description IDs of keys to delete */
             ids: number[];
         };
         DeleteKeysRequest: {
             keyIds: number[];
+        };
+        DeleteMultipleGlossaryTermsRequest: {
+            termIds: number[];
         };
         DocItem: {
             description?: string;
@@ -5013,7 +5883,8 @@ export interface components {
             currentPeriodEnd?: number;
             /** Format: int64 */
             currentUserCount: number;
-            enabledFeatures: ("GRANULAR_PERMISSIONS" | "PRIORITIZED_FEATURE_REQUESTS" | "PREMIUM_SUPPORT" | "DEDICATED_SLACK_CHANNEL" | "ASSISTED_UPDATES" | "DEPLOYMENT_ASSISTANCE" | "BACKUP_CONFIGURATION" | "TEAM_TRAINING" | "ACCOUNT_MANAGER" | "STANDARD_SUPPORT" | "PROJECT_LEVEL_CONTENT_STORAGES" | "WEBHOOKS" | "MULTIPLE_CONTENT_DELIVERY_CONFIGS" | "AI_PROMPT_CUSTOMIZATION" | "SLACK_INTEGRATION" | "TASKS" | "SSO" | "ORDER_TRANSLATION")[];
+            enabledFeatures: ("GRANULAR_PERMISSIONS" | "PRIORITIZED_FEATURE_REQUESTS" | "PREMIUM_SUPPORT" | "DEDICATED_SLACK_CHANNEL" | "ASSISTED_UPDATES" | "DEPLOYMENT_ASSISTANCE" | "BACKUP_CONFIGURATION" | "TEAM_TRAINING" | "ACCOUNT_MANAGER" | "STANDARD_SUPPORT" | "PROJECT_LEVEL_CONTENT_STORAGES" | "WEBHOOKS" | "MULTIPLE_CONTENT_DELIVERY_CONFIGS" | "AI_PROMPT_CUSTOMIZATION" | "SLACK_INTEGRATION" | "TASKS" | "SSO" | "ORDER_TRANSLATION" | "GLOSSARY" | "TRANSLATION_LABELS")[];
+            isPayAsYouGo: boolean;
             /** Format: date-time */
             lastValidCheck?: string;
             licenseKey: string;
@@ -5036,7 +5907,7 @@ export interface components {
         };
         ErrorResponseTyped: {
             /** @enum {string} */
-            code: "unauthenticated" | "api_access_forbidden" | "api_key_not_found" | "invalid_api_key" | "invalid_project_api_key" | "project_api_key_expired" | "bad_credentials" | "mfa_enabled" | "invalid_otp_code" | "mfa_not_enabled" | "can_not_revoke_own_permissions" | "data_corrupted" | "invitation_code_does_not_exist_or_expired" | "language_tag_exists" | "language_name_exists" | "language_not_found" | "operation_not_permitted" | "registrations_not_allowed" | "project_not_found" | "resource_not_found" | "scope_not_found" | "key_exists" | "third_party_auth_error_message" | "third_party_auth_no_email" | "third_party_auth_non_matching_email" | "third_party_auth_no_sub" | "third_party_auth_unknown_error" | "email_already_verified" | "third_party_unauthorized" | "third_party_google_workspace_mismatch" | "third_party_switch_initiated" | "username_already_exists" | "username_or_password_invalid" | "user_already_has_permissions" | "user_already_has_role" | "user_not_found" | "file_not_image" | "file_too_big" | "invalid_timestamp" | "email_not_verified" | "missing_callback_url" | "invalid_jwt_token" | "expired_jwt_token" | "general_jwt_error" | "cannot_find_suitable_address_part" | "slug_not_unique" | "user_is_not_member_of_organization" | "organization_has_no_other_owner" | "user_has_no_project_access" | "user_is_organization_owner" | "cannot_set_your_own_permissions" | "user_is_organization_member" | "property_not_mutable" | "import_language_not_from_project" | "existing_language_not_selected" | "conflict_is_not_resolved" | "language_already_selected" | "cannot_parse_file" | "could_not_resolve_property" | "cannot_add_more_then_100_languages" | "no_languages_provided" | "language_with_base_language_tag_not_found" | "language_not_from_project" | "namespace_not_from_project" | "cannot_delete_base_language" | "key_not_from_project" | "max_screenshots_exceeded" | "translation_not_from_project" | "can_edit_only_own_comment" | "request_parse_error" | "filter_by_value_state_not_valid" | "import_has_expired" | "tag_not_from_project" | "translation_text_too_long" | "invalid_recaptcha_token" | "cannot_leave_owning_project" | "cannot_leave_project_with_organization_role" | "dont_have_direct_permissions" | "tag_too_log" | "too_many_uploaded_images" | "one_or_more_images_not_found" | "screenshot_not_of_key" | "service_not_found" | "too_many_requests" | "translation_not_found" | "out_of_credits" | "key_not_found" | "organization_not_found" | "cannot_find_base_language" | "base_language_not_found" | "no_exported_result" | "cannot_set_your_own_role" | "only_translate_review_or_view_permission_accepts_view_languages" | "oauth2_token_url_not_set" | "oauth2_user_url_not_set" | "email_already_invited_or_member" | "price_not_found" | "invoice_not_from_organization" | "invoice_not_found" | "plan_not_found" | "plan_not_available_any_more" | "no_auto_translation_method" | "cannot_translate_base_language" | "pat_not_found" | "invalid_pat" | "pat_expired" | "operation_unavailable_for_account_type" | "validation_email_is_not_valid" | "current_password_required" | "cannot_create_organization" | "wrong_current_password" | "wrong_param_type" | "expired_super_jwt_token" | "cannot_delete_your_own_account" | "cannot_sort_by_this_column" | "namespace_not_found" | "namespace_exists" | "invalid_authentication_method" | "unknown_sort_property" | "only_review_permission_accepts_state_change_languages" | "only_translate_or_review_permission_accepts_translate_languages" | "cannot_set_language_permissions_for_admin_scope" | "cannot_set_view_languages_without_translations_view_scope" | "cannot_set_translate_languages_without_translations_edit_scope" | "cannot_set_state_change_languages_without_translations_state_edit_scope" | "language_not_permitted" | "scopes_has_to_be_set" | "set_exactly_one_of_scopes_or_type" | "translation_exists" | "import_keys_error" | "provide_only_one_of_screenshots_and_screenshot_uploaded_image_ids" | "multiple_projects_not_supported" | "plan_translation_limit_exceeded" | "feature_not_enabled" | "license_key_not_found" | "cannot_set_view_languages_without_for_level_based_permissions" | "cannot_set_different_translate_and_state_change_languages_for_level_based_permissions" | "cannot_disable_your_own_account" | "subscription_not_found" | "invoice_does_not_have_usage" | "customer_not_found" | "subscription_not_active" | "organization_already_subscribed" | "organization_not_subscribed" | "license_key_used_by_another_instance" | "translation_spending_limit_exceeded" | "credit_spending_limit_exceeded" | "seats_spending_limit_exceeded" | "this_instance_is_already_licensed" | "big_meta_not_from_project" | "mt_service_not_enabled" | "project_not_selected" | "organization_not_selected" | "plan_has_subscribers" | "translation_failed" | "batch_job_not_found" | "key_exists_in_namespace" | "tag_is_blank" | "execution_failed_on_management_error" | "translation_api_rate_limit" | "cannot_finalize_activity" | "formality_not_supported_by_service" | "language_not_supported_by_service" | "rate_limited" | "pat_access_not_allowed" | "pak_access_not_allowed" | "cannot_modify_disabled_translation" | "azure_config_required" | "s3_config_required" | "content_storage_config_required" | "content_storage_test_failed" | "content_storage_config_invalid" | "invalid_connection_string" | "cannot_create_azure_storage_client" | "s3_access_key_required" | "azure_connection_string_required" | "s3_secret_key_required" | "cannot_store_file_to_content_storage" | "unexpected_error_while_publishing_to_content_storage" | "webhook_responded_with_non_200_status" | "unexpected_error_while_executing_webhook" | "content_storage_is_in_use" | "cannot_set_state_for_missing_translation" | "no_project_id_provided" | "license_key_not_provided" | "subscription_already_canceled" | "user_is_subscribed_to_paid_plan" | "cannot_create_free_plan_without_fixed_type" | "cannot_modify_plan_free_status" | "key_id_not_provided" | "free_self_hosted_seat_limit_exceeded" | "advanced_params_not_supported" | "plural_forms_not_found_for_language" | "nested_plurals_not_supported" | "message_is_not_plural" | "content_outside_plural_forms" | "invalid_plural_form" | "multiple_plurals_not_supported" | "custom_values_json_too_long" | "unsupported_po_message_format" | "plural_forms_data_loss" | "current_user_does_not_own_image" | "user_cannot_view_this_organization" | "user_is_not_owner_of_organization" | "pak_created_for_different_project" | "custom_slug_is_only_applicable_for_custom_storage" | "invalid_slug_format" | "batch_job_cancellation_timeout" | "import_failed" | "cannot_add_more_then_1000_languages" | "no_data_to_import" | "multiple_namespaces_mapped_to_single_file" | "multiple_mappings_for_same_file_language_name" | "multiple_mappings_for_null_file_language_name" | "too_many_mappings_for_file" | "missing_placeholder_in_template" | "tag_not_found" | "cannot_parse_encrypted_slack_login_data" | "slack_workspace_not_found" | "cannot_fetch_user_details_from_slack" | "slack_missing_scope" | "slack_not_connected_to_your_account" | "slack_invalid_command" | "slack_not_subscribed_yet" | "slack_connection_failed" | "tolgee_account_already_connected" | "slack_not_configured" | "slack_workspace_already_connected" | "slack_connection_error" | "email_verification_code_not_valid" | "cannot_subscribe_to_free_plan" | "plan_auto_assignment_only_for_free_plans" | "plan_auto_assignment_only_for_private_plans" | "task_not_found" | "task_not_finished" | "task_not_open" | "translation_agency_not_found" | "this_feature_is_not_implemented_in_oss" | "sso_token_exchange_failed" | "sso_user_info_retrieval_failed" | "sso_id_token_expired" | "sso_user_cannot_create_organization" | "sso_cant_verify_user" | "sso_auth_missing_domain" | "sso_domain_not_found_or_disabled" | "native_authentication_disabled" | "invitation_organization_mismatch" | "user_is_managed_by_organization" | "cannot_set_sso_provider_missing_fields" | "namespaces_cannot_be_disabled_when_namespace_exists" | "namespace_cannot_be_used_when_feature_is_disabled" | "sso_domain_not_allowed" | "sso_login_forced_for_this_account" | "date_has_to_be_in_the_future" | "custom_plan_and_plan_id_cannot_be_set_together" | "specify_plan_id_or_custom_plan" | "custom_plans_has_to_be_private" | "cannot_create_free_plan_with_prices" | "subscription_not_scheduled_for_cancellation" | "cannot_cancel_trial" | "cannot_update_without_modification" | "current_subscription_is_not_trialing";
+            code: "unauthenticated" | "api_access_forbidden" | "api_key_not_found" | "invalid_api_key" | "invalid_project_api_key" | "project_api_key_expired" | "bad_credentials" | "mfa_enabled" | "invalid_otp_code" | "mfa_not_enabled" | "can_not_revoke_own_permissions" | "data_corrupted" | "invitation_code_does_not_exist_or_expired" | "language_tag_exists" | "language_name_exists" | "language_not_found" | "operation_not_permitted" | "registrations_not_allowed" | "project_not_found" | "resource_not_found" | "scope_not_found" | "key_exists" | "third_party_auth_error_message" | "third_party_auth_no_email" | "third_party_auth_non_matching_email" | "third_party_auth_no_sub" | "third_party_auth_unknown_error" | "email_already_verified" | "third_party_unauthorized" | "third_party_google_workspace_mismatch" | "third_party_switch_initiated" | "third_party_switch_conflict" | "username_already_exists" | "username_or_password_invalid" | "user_already_has_permissions" | "user_already_has_role" | "user_not_found" | "file_not_image" | "file_too_big" | "invalid_timestamp" | "email_not_verified" | "missing_callback_url" | "invalid_jwt_token" | "expired_jwt_token" | "general_jwt_error" | "cannot_find_suitable_address_part" | "slug_not_unique" | "user_is_not_member_of_organization" | "organization_has_no_other_owner" | "user_has_no_project_access" | "user_is_organization_owner" | "cannot_set_your_own_permissions" | "user_is_organization_member" | "property_not_mutable" | "import_language_not_from_project" | "existing_language_not_selected" | "conflict_is_not_resolved" | "language_already_selected" | "cannot_parse_file" | "could_not_resolve_property" | "cannot_add_more_then_100_languages" | "no_languages_provided" | "language_with_base_language_tag_not_found" | "language_not_from_project" | "namespace_not_from_project" | "cannot_delete_base_language" | "key_not_from_project" | "max_screenshots_exceeded" | "translation_not_from_project" | "can_edit_only_own_comment" | "request_parse_error" | "filter_by_value_state_not_valid" | "import_has_expired" | "tag_not_from_project" | "translation_text_too_long" | "invalid_recaptcha_token" | "cannot_leave_owning_project" | "cannot_leave_project_with_organization_role" | "dont_have_direct_permissions" | "tag_too_log" | "too_many_uploaded_images" | "one_or_more_images_not_found" | "screenshot_not_of_key" | "service_not_found" | "too_many_requests" | "translation_not_found" | "out_of_credits" | "key_not_found" | "organization_not_found" | "cannot_find_base_language" | "base_language_not_found" | "no_exported_result" | "cannot_set_your_own_role" | "only_translate_review_or_view_permission_accepts_view_languages" | "oauth2_token_url_not_set" | "oauth2_user_url_not_set" | "email_already_invited_or_member" | "price_not_found" | "invoice_not_from_organization" | "invoice_not_found" | "plan_not_found" | "plan_not_available_any_more" | "no_auto_translation_method" | "cannot_translate_base_language" | "pat_not_found" | "invalid_pat" | "pat_expired" | "operation_unavailable_for_account_type" | "validation_email_is_not_valid" | "current_password_required" | "cannot_create_organization" | "wrong_current_password" | "wrong_param_type" | "user_missing_password" | "expired_super_jwt_token" | "cannot_delete_your_own_account" | "cannot_sort_by_this_column" | "namespace_not_found" | "namespace_exists" | "invalid_authentication_method" | "unknown_sort_property" | "only_review_permission_accepts_state_change_languages" | "only_translate_or_review_permission_accepts_translate_languages" | "cannot_set_language_permissions_for_admin_scope" | "cannot_set_view_languages_without_translations_view_scope" | "cannot_set_translate_languages_without_translations_edit_scope" | "cannot_set_state_change_languages_without_translations_state_edit_scope" | "language_not_permitted" | "scopes_has_to_be_set" | "set_exactly_one_of_scopes_or_type" | "translation_exists" | "import_keys_error" | "provide_only_one_of_screenshots_and_screenshot_uploaded_image_ids" | "multiple_projects_not_supported" | "plan_translation_limit_exceeded" | "feature_not_enabled" | "license_key_not_found" | "cannot_set_view_languages_without_for_level_based_permissions" | "cannot_set_different_translate_and_state_change_languages_for_level_based_permissions" | "cannot_disable_your_own_account" | "subscription_not_found" | "invoice_does_not_have_usage" | "customer_not_found" | "subscription_not_active" | "organization_already_subscribed" | "organization_not_subscribed" | "license_key_used_by_another_instance" | "translation_spending_limit_exceeded" | "credit_spending_limit_exceeded" | "seats_spending_limit_exceeded" | "this_instance_is_already_licensed" | "big_meta_not_from_project" | "mt_service_not_enabled" | "project_not_selected" | "organization_not_selected" | "plan_has_subscribers" | "translation_failed" | "batch_job_not_found" | "key_exists_in_namespace" | "tag_is_blank" | "execution_failed_on_management_error" | "translation_api_rate_limit" | "cannot_finalize_activity" | "formality_not_supported_by_service" | "language_not_supported_by_service" | "rate_limited" | "pat_access_not_allowed" | "pak_access_not_allowed" | "cannot_modify_disabled_translation" | "azure_config_required" | "s3_config_required" | "content_storage_config_required" | "content_storage_test_failed" | "content_storage_config_invalid" | "invalid_connection_string" | "cannot_create_azure_storage_client" | "s3_access_key_required" | "azure_connection_string_required" | "s3_secret_key_required" | "cannot_store_file_to_content_storage" | "unexpected_error_while_publishing_to_content_storage" | "webhook_responded_with_non_200_status" | "unexpected_error_while_executing_webhook" | "content_storage_is_in_use" | "cannot_set_state_for_missing_translation" | "no_project_id_provided" | "license_key_not_provided" | "subscription_already_canceled" | "user_is_subscribed_to_paid_plan" | "cannot_create_free_plan_without_fixed_type" | "cannot_modify_plan_free_status" | "key_id_not_provided" | "free_self_hosted_seat_limit_exceeded" | "advanced_params_not_supported" | "plural_forms_not_found_for_language" | "nested_plurals_not_supported" | "message_is_not_plural" | "content_outside_plural_forms" | "invalid_plural_form" | "multiple_plurals_not_supported" | "custom_values_json_too_long" | "unsupported_po_message_format" | "plural_forms_data_loss" | "current_user_does_not_own_image" | "user_cannot_view_this_organization" | "user_is_not_owner_of_organization" | "user_is_not_owner_or_maintainer_of_organization" | "pak_created_for_different_project" | "custom_slug_is_only_applicable_for_custom_storage" | "invalid_slug_format" | "batch_job_cancellation_timeout" | "import_failed" | "cannot_add_more_then_1000_languages" | "no_data_to_import" | "multiple_namespaces_mapped_to_single_file" | "multiple_mappings_for_same_file_language_name" | "multiple_mappings_for_null_file_language_name" | "too_many_mappings_for_file" | "missing_placeholder_in_template" | "tag_not_found" | "cannot_parse_encrypted_slack_login_data" | "slack_workspace_not_found" | "cannot_fetch_user_details_from_slack" | "slack_missing_scope" | "slack_not_connected_to_your_account" | "slack_invalid_command" | "slack_not_subscribed_yet" | "slack_connection_failed" | "tolgee_account_already_connected" | "slack_not_configured" | "slack_workspace_already_connected" | "slack_connection_error" | "email_verification_code_not_valid" | "cannot_subscribe_to_free_plan" | "plan_auto_assignment_only_for_free_plans" | "plan_auto_assignment_only_for_private_plans" | "task_not_found" | "task_not_finished" | "task_not_open" | "translation_agency_not_found" | "this_feature_is_not_implemented_in_oss" | "sso_token_exchange_failed" | "sso_user_info_retrieval_failed" | "sso_id_token_expired" | "sso_user_cannot_create_organization" | "sso_cant_verify_user" | "sso_auth_missing_domain" | "sso_domain_not_found_or_disabled" | "authentication_method_disabled" | "native_authentication_disabled" | "invitation_organization_mismatch" | "user_is_managed_by_organization" | "cannot_set_sso_provider_missing_fields" | "namespaces_cannot_be_disabled_when_namespace_exists" | "namespace_cannot_be_used_when_feature_is_disabled" | "sso_domain_not_allowed" | "sso_login_forced_for_this_account" | "use_sso_for_authentication_instead" | "date_has_to_be_in_the_future" | "custom_plan_and_plan_id_cannot_be_set_together" | "specify_plan_id_or_custom_plan" | "custom_plans_has_to_be_private" | "cannot_create_free_plan_with_prices" | "subscription_not_scheduled_for_cancellation" | "cannot_cancel_trial" | "cannot_update_without_modification" | "current_subscription_is_not_trialing" | "sorting_and_paging_is_not_supported_when_using_cursor" | "strings_metric_are_not_supported" | "plan_key_limit_exceeded" | "keys_spending_limit_exceeded" | "plan_seat_limit_exceeded" | "instance_not_using_license_key" | "invalid_path" | "llm_provider_not_found" | "llm_provider_error" | "prompt_not_found" | "llm_provider_not_returned_json" | "llm_template_parsing_error" | "llm_rate_limited" | "llm_provider_timeout" | "no_llm_provider_configured" | "glossary_not_found" | "glossary_term_not_found" | "glossary_term_translation_not_found" | "glossary_non_translatable_term_cannot_be_translated" | "llm_content_filter" | "llm_provider_empty_response" | "label_not_found" | "label_not_from_project" | "label_already_exists" | "filter_by_value_label_not_valid";
             params?: Record<string, never>[];
         };
         ExistenceEntityDescription: {
@@ -5055,10 +5926,14 @@ export interface components {
             defaultFileStructureTemplate: string;
             extension: string;
             /** @enum {string} */
-            format: "JSON" | "JSON_TOLGEE" | "XLIFF" | "PO" | "APPLE_STRINGS_STRINGSDICT" | "APPLE_XLIFF" | "ANDROID_XML" | "COMPOSE_XML" | "FLUTTER_ARB" | "PROPERTIES" | "YAML_RUBY" | "YAML" | "JSON_I18NEXT" | "CSV" | "RESX_ICU" | "XLSX" | "APPLE_XCSTRINGS";
+            format: "JSON" | "JSON_TOLGEE" | "XLIFF" | "PO" | "APPLE_STRINGS_STRINGSDICT" | "APPLE_XLIFF" | "ANDROID_XML" | "COMPOSE_XML" | "FLUTTER_ARB" | "PROPERTIES" | "YAML_RUBY" | "YAML" | "JSON_I18NEXT" | "CSV" | "RESX_ICU" | "XLSX" | "APPLE_XCSTRINGS" | "ANDROID_SDK" | "APPLE_SDK";
             mediaType: string;
         };
         ExportParams: {
+            /** @description If true, HTML tags are escaped in the exported file. (Supported in the XLIFF format only).
+             *
+             *     e.g. Key <b>hello</b> will be exported as &lt;b&gt;hello&lt;/b&gt; */
+            escapeHtml: boolean;
             /** @description This is a template that defines the structure of the resulting .zip file content.
              *
              *     The template is a string that can contain the following placeholders: {namespace}, {languageTag},
@@ -5095,7 +5970,7 @@ export interface components {
              * @description Format to export to
              * @enum {string}
              */
-            format: "JSON" | "JSON_TOLGEE" | "XLIFF" | "PO" | "APPLE_STRINGS_STRINGSDICT" | "APPLE_XLIFF" | "ANDROID_XML" | "COMPOSE_XML" | "FLUTTER_ARB" | "PROPERTIES" | "YAML_RUBY" | "YAML" | "JSON_I18NEXT" | "CSV" | "RESX_ICU" | "XLSX" | "APPLE_XCSTRINGS";
+            format: "JSON" | "JSON_TOLGEE" | "XLIFF" | "PO" | "APPLE_STRINGS_STRINGSDICT" | "APPLE_XLIFF" | "ANDROID_XML" | "COMPOSE_XML" | "FLUTTER_ARB" | "PROPERTIES" | "YAML_RUBY" | "YAML" | "JSON_I18NEXT" | "CSV" | "RESX_ICU" | "XLSX" | "APPLE_XCSTRINGS" | "ANDROID_SDK" | "APPLE_SDK";
             /**
              * @description Languages to be contained in export.
              *
@@ -5135,10 +6010,64 @@ export interface components {
             /** @description Tags to return language translations in */
             languageTags: string[];
         };
+        GlossaryHighlightsRequest: {
+            /**
+             * @description Language tag according to BCP 47 definition
+             * @example cs-CZ
+             */
+            languageTag: string;
+            text: string;
+        };
+        GlossaryLanguageDto: {
+            /**
+             * @description Indicates if this is the base (main) language of the glossary
+             * @example true
+             */
+            base: boolean;
+            /**
+             * @description The language code (e.g., 'en' for English)
+             * @example en
+             */
+            tag: string;
+        };
+        GlossaryModel: {
+            /**
+             * @description Language tag for default translations for terms
+             * @example en
+             */
+            baseLanguageTag: string;
+            /** Format: int64 */
+            id: number;
+            name: string;
+            organizationOwner: components["schemas"]["SimpleOrganizationModel"];
+        };
+        GlossaryTermHighlightModel: {
+            position: components["schemas"]["PositionModel"];
+            value: components["schemas"]["GlossaryTermModel"];
+        };
+        GlossaryTermModel: {
+            description: string;
+            /** @description Specifies whether the term represents a shortened form of a word or phrase */
+            flagAbbreviation: boolean;
+            /** @description When true, the term matching considers uppercase and lowercase characters as distinct */
+            flagCaseSensitive: boolean;
+            /** @description When true, marks this term as prohibited or not recommended for use in translations */
+            flagForbiddenTerm: boolean;
+            /** @description When true, this term has the same translation across all target languages */
+            flagNonTranslatable: boolean;
+            glossary: components["schemas"]["GlossaryModel"];
+            /** Format: int64 */
+            id: number;
+            translations: components["schemas"]["GlossaryTermTranslationModel"][];
+        };
+        GlossaryTermTranslationModel: {
+            languageTag: string;
+            text: string;
+        };
         HierarchyItem: {
             requires: components["schemas"]["HierarchyItem"][];
             /** @enum {string} */
-            scope: "translations.view" | "translations.edit" | "keys.edit" | "screenshots.upload" | "screenshots.delete" | "screenshots.view" | "activity.view" | "languages.edit" | "admin" | "project.edit" | "members.view" | "members.edit" | "translation-comments.add" | "translation-comments.edit" | "translation-comments.set-state" | "translations.state-edit" | "keys.view" | "keys.delete" | "keys.create" | "batch-jobs.view" | "batch-jobs.cancel" | "translations.batch-by-tm" | "translations.batch-machine" | "content-delivery.manage" | "content-delivery.publish" | "webhooks.manage" | "tasks.view" | "tasks.edit";
+            scope: "translations.view" | "translations.edit" | "keys.edit" | "screenshots.upload" | "screenshots.delete" | "screenshots.view" | "activity.view" | "languages.edit" | "admin" | "project.edit" | "members.view" | "members.edit" | "translation-comments.add" | "translation-comments.edit" | "translation-comments.set-state" | "translations.state-edit" | "keys.view" | "keys.delete" | "keys.create" | "batch-jobs.view" | "batch-jobs.cancel" | "translations.batch-by-tm" | "translations.batch-machine" | "content-delivery.manage" | "content-delivery.publish" | "webhooks.manage" | "tasks.view" | "tasks.edit" | "prompts.view" | "prompts.edit" | "translation-labels.manage" | "translation-labels.assign";
         };
         IdentifyRequest: {
             anonymousUserId: string;
@@ -5321,14 +6250,20 @@ export interface components {
              */
             text: string;
         };
+        InitialDataEeSubscriptionModel: {
+            /** @enum {string} */
+            status: "ACTIVE" | "CANCELED" | "PAST_DUE" | "UNPAID" | "ERROR" | "TRIALING" | "KEY_USED_BY_ANOTHER_INSTANCE" | "UNKNOWN";
+        };
         InitialDataModel: {
             announcement?: components["schemas"]["AnnouncementDto"];
-            eeSubscription?: components["schemas"]["EeSubscriptionModel"];
+            eeSubscription?: components["schemas"]["InitialDataEeSubscriptionModel"];
             languageTag?: string;
             preferredOrganization?: components["schemas"]["PrivateOrganizationModel"];
             serverConfiguration: components["schemas"]["PublicConfigurationDTO"];
+            ssoInfo?: components["schemas"]["PublicSsoTenantModel"];
             userInfo?: components["schemas"]["PrivateUserAccountModel"];
         };
+        JsonNode: Record<string, never>;
         JwtAuthenticationResponse: {
             accessToken?: string;
             tokenType?: string;
@@ -5546,6 +6481,11 @@ export interface components {
             /** @description There is a context available for this key */
             contextPresent: boolean;
             /**
+             * Format: int64
+             * @description The time when the key was created
+             */
+            createdAt: number;
+            /**
              * @description The namespace of the key
              * @example homepage
              */
@@ -5630,8 +6570,30 @@ export interface components {
              */
             nextCursor?: string;
             page?: components["schemas"]["PageMetadata"];
+            pagedModel?: components["schemas"]["PagedModelKeyWithTranslationsModel"];
             /** @description Provided languages data */
             selectedLanguages: components["schemas"]["LanguageModel"][];
+        };
+        LabelModel: {
+            color: string;
+            description?: string;
+            /** Format: int64 */
+            id: number;
+            name: string;
+        };
+        LabelRequest: {
+            /**
+             * @description Hex color in format #RRGGBB.
+             * @example #FF5733
+             */
+            color: string;
+            description?: string;
+            name: string;
+        };
+        LabelTranslationsRequest: {
+            keyIds: number[];
+            labelIds: number[];
+            languageIds: number[];
         };
         LanguageAiPromptCustomizationModel: {
             /**
@@ -5649,7 +6611,7 @@ export interface components {
              * @deprecated
              * @description Services to be used for suggesting (deprecated: use enabledServicesInfo)
              */
-            enabledServices: ("GOOGLE" | "AWS" | "DEEPL" | "AZURE" | "BAIDU" | "TOLGEE")[];
+            enabledServices: ("GOOGLE" | "AWS" | "DEEPL" | "AZURE" | "BAIDU" | "PROMPT")[];
             /** @description Info about enabled services */
             enabledServicesInfo: components["schemas"]["MtServiceInfo"][];
             /**
@@ -5657,7 +6619,7 @@ export interface components {
              * @description Service used for automated translating (deprecated: use primaryServiceInfo)
              * @enum {string}
              */
-            primaryService?: "GOOGLE" | "AWS" | "DEEPL" | "AZURE" | "BAIDU" | "TOLGEE";
+            primaryService?: "GOOGLE" | "AWS" | "DEEPL" | "AZURE" | "BAIDU" | "PROMPT";
             primaryServiceInfo?: components["schemas"]["MtServiceInfo"];
             /**
              * Format: int64
@@ -5766,12 +6728,59 @@ export interface components {
             translatedPercentage: number;
             /** Format: int64 */
             translatedWordCount: number;
+            /** Format: date-time */
+            translationsUpdatedAt?: string;
             /** Format: int64 */
             untranslatedKeyCount: number;
             /** Format: double */
             untranslatedPercentage: number;
             /** Format: int64 */
             untranslatedWordCount: number;
+        };
+        LlmMessage: {
+            image?: string;
+            text?: string;
+            /** @enum {string} */
+            type: "TEXT" | "IMAGE";
+        };
+        LlmParams: {
+            messages: components["schemas"]["LlmMessage"][];
+            /** @enum {string} */
+            priority: "LOW" | "HIGH";
+            shouldOutputJson: boolean;
+        };
+        LlmProviderModel: {
+            apiKey?: string;
+            apiUrl?: string;
+            deployment?: string;
+            format?: string;
+            /** Format: int64 */
+            id: number;
+            model?: string;
+            name: string;
+            /** @enum {string} */
+            priority?: "LOW" | "HIGH";
+            /** @enum {string} */
+            type: "OPENAI" | "OPENAI_AZURE" | "TOLGEE" | "ANTHROPIC" | "GOOGLE_AI";
+        };
+        LlmProviderRequest: {
+            apiKey?: string;
+            apiUrl: string;
+            deployment?: string;
+            format?: string;
+            keepAlive?: string;
+            model?: string;
+            name: string;
+            /** @enum {string} */
+            priority?: "LOW" | "HIGH";
+            /** @enum {string} */
+            type: "OPENAI" | "OPENAI_AZURE" | "TOLGEE" | "ANTHROPIC" | "GOOGLE_AI";
+        };
+        LlmProviderSimpleModel: {
+            name: string;
+            source?: string;
+            /** @enum {string} */
+            type: "OPENAI" | "OPENAI_AZURE" | "TOLGEE" | "ANTHROPIC" | "GOOGLE_AI";
         };
         LoginRequest: {
             otp?: string;
@@ -5783,7 +6792,7 @@ export interface components {
              * @deprecated
              * @description List of enabled services (deprecated: use enabledServicesInfo)
              */
-            enabledServices?: ("GOOGLE" | "AWS" | "DEEPL" | "AZURE" | "BAIDU" | "TOLGEE")[];
+            enabledServices?: ("GOOGLE" | "AWS" | "DEEPL" | "AZURE" | "BAIDU" | "PROMPT")[];
             /** @description Info about enabled services */
             enabledServicesInfo?: components["schemas"]["MtServiceInfo"][];
             /**
@@ -5791,7 +6800,7 @@ export interface components {
              * @description This service will be used for automated translation
              * @enum {string}
              */
-            primaryService?: "GOOGLE" | "AWS" | "DEEPL" | "AZURE" | "BAIDU" | "TOLGEE";
+            primaryService?: "GOOGLE" | "AWS" | "DEEPL" | "AZURE" | "BAIDU" | "PROMPT";
             primaryServiceInfo?: components["schemas"]["MtServiceInfo"];
             /**
              * Format: int64
@@ -5809,6 +6818,7 @@ export interface components {
         };
         MachineTranslationRequest: {
             keyIds: number[];
+            llmPrompt?: components["schemas"]["PromptDto"];
             targetLanguageIds: number[];
         };
         ModifiedEntityModel: {
@@ -5834,12 +6844,12 @@ export interface components {
         MtServiceInfo: {
             /** @enum {string} */
             formality?: "FORMAL" | "INFORMAL" | "DEFAULT";
+            /** Format: int64 */
+            promptId?: number;
             /** @enum {string} */
-            serviceType: "GOOGLE" | "AWS" | "DEEPL" | "AZURE" | "BAIDU" | "TOLGEE";
+            serviceType: "GOOGLE" | "AWS" | "DEEPL" | "AZURE" | "BAIDU" | "PROMPT";
         };
         MtServicesDTO: {
-            /** @enum {string} */
-            defaultPrimaryService?: "GOOGLE" | "AWS" | "DEEPL" | "AZURE" | "BAIDU" | "TOLGEE";
             services: {
                 [key: string]: components["schemas"]["MtServiceDTO"];
             };
@@ -5847,7 +6857,7 @@ export interface components {
         MtSupportedService: {
             formalitySupported: boolean;
             /** @enum {string} */
-            serviceType: "GOOGLE" | "AWS" | "DEEPL" | "AZURE" | "BAIDU" | "TOLGEE";
+            serviceType: "GOOGLE" | "AWS" | "DEEPL" | "AZURE" | "BAIDU" | "PROMPT";
         };
         NamespaceModel: {
             /**
@@ -5858,6 +6868,53 @@ export interface components {
             id: number;
             /** @example homepage */
             name: string;
+        };
+        NotificationModel: {
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: int64 */
+            id: number;
+            linkedTask?: components["schemas"]["TaskModel"];
+            originatingUser?: components["schemas"]["SimpleUserAccountModel"];
+            project?: components["schemas"]["SimpleProjectModel"];
+            /** @enum {string} */
+            type: "TASK_ASSIGNED" | "TASK_FINISHED" | "TASK_CANCELED" | "MFA_ENABLED" | "MFA_DISABLED" | "PASSWORD_CHANGED";
+        };
+        NotificationSettingGroupModel: {
+            email: boolean;
+            inApp: boolean;
+        };
+        NotificationSettingModel: {
+            accountSecurity: components["schemas"]["NotificationSettingGroupModel"];
+            tasks: components["schemas"]["NotificationSettingGroupModel"];
+        };
+        NotificationSettingsRequest: {
+            /**
+             * @example IN_APP
+             * @enum {string}
+             */
+            channel: "IN_APP" | "EMAIL";
+            /**
+             * @description True if the setting should be enabled, false for disabled
+             * @example false
+             */
+            enabled: boolean;
+            /**
+             * @example TASKS
+             * @enum {string}
+             */
+            group: "ACCOUNT_SECURITY" | "TASKS";
+        };
+        NotificationsMarkSeenRequest: {
+            /**
+             * @description Notification IDs to be marked as seen
+             * @example [
+             *       1,
+             *       2,
+             *       3
+             *     ]
+             */
+            notificationIds: number[];
         };
         OAuthPublicConfigDTO: {
             clientId?: string;
@@ -5887,7 +6944,7 @@ export interface components {
             invitedUserEmail?: string;
             invitedUserName?: string;
             /** @enum {string} */
-            type: "MEMBER" | "OWNER";
+            type: "MEMBER" | "OWNER" | "MAINTAINER";
         };
         OrganizationInviteUserDto: {
             /** @description Email to send invitation to */
@@ -5895,7 +6952,34 @@ export interface components {
             /** @description Name of invited user */
             name?: string;
             /** @enum {string} */
-            roleType: "MEMBER" | "OWNER";
+            roleType: "MEMBER" | "OWNER" | "MAINTAINER";
+        };
+        OrganizationLanguageModel: {
+            /**
+             * @description Whether is base language of any project
+             * @example false
+             */
+            base: boolean;
+            /**
+             * @description Language flag emoji as UTF-8 emoji
+             * @example 🇨🇿
+             */
+            flagEmoji?: string;
+            /**
+             * @description Language name in english
+             * @example Czech
+             */
+            name: string;
+            /**
+             * @description Language name in this language
+             * @example čeština
+             */
+            originalName?: string;
+            /**
+             * @description Language tag according to BCP 47 definition
+             * @example cs-CZ
+             */
+            tag: string;
         };
         OrganizationModel: {
             avatar?: components["schemas"]["Avatar"];
@@ -5906,7 +6990,7 @@ export interface components {
              *     Can be null when user has direct access to one of the projects owned by the organization.
              * @enum {string}
              */
-            currentUserRole?: "MEMBER" | "OWNER";
+            currentUserRole?: "MEMBER" | "OWNER" | "MAINTAINER";
             /** @example This is a beautiful organization full of beautiful and clever people */
             description?: string;
             /** Format: int64 */
@@ -5987,6 +7071,18 @@ export interface components {
             };
             page?: components["schemas"]["PageMetadata"];
         };
+        PagedModelKeyWithTranslationsModel: {
+            _embedded?: {
+                keys?: components["schemas"]["KeyWithTranslationsModel"][];
+            };
+            page?: components["schemas"]["PageMetadata"];
+        };
+        PagedModelLabelModel: {
+            _embedded?: {
+                labels?: components["schemas"]["LabelModel"][];
+            };
+            page?: components["schemas"]["PageMetadata"];
+        };
         PagedModelLanguageModel: {
             _embedded?: {
                 languages?: components["schemas"]["LanguageModel"][];
@@ -6002,6 +7098,18 @@ export interface components {
         PagedModelNamespaceModel: {
             _embedded?: {
                 namespaces?: components["schemas"]["NamespaceModel"][];
+            };
+            page?: components["schemas"]["PageMetadata"];
+        };
+        PagedModelNotificationModel: {
+            _embedded?: {
+                notificationModelList?: components["schemas"]["NotificationModel"][];
+            };
+            page?: components["schemas"]["PageMetadata"];
+        };
+        PagedModelOrganizationLanguageModel: {
+            _embedded?: {
+                languages?: components["schemas"]["OrganizationLanguageModel"][];
             };
             page?: components["schemas"]["PageMetadata"];
         };
@@ -6032,6 +7140,36 @@ export interface components {
         PagedModelProjectWithStatsModel: {
             _embedded?: {
                 projects?: components["schemas"]["ProjectWithStatsModel"][];
+            };
+            page?: components["schemas"]["PageMetadata"];
+        };
+        PagedModelPromptModel: {
+            _embedded?: {
+                prompts?: components["schemas"]["PromptModel"][];
+            };
+            page?: components["schemas"]["PageMetadata"];
+        };
+        PagedModelSimpleGlossaryModel: {
+            _embedded?: {
+                glossaries?: components["schemas"]["SimpleGlossaryModel"][];
+            };
+            page?: components["schemas"]["PageMetadata"];
+        };
+        PagedModelSimpleGlossaryTermModel: {
+            _embedded?: {
+                glossaryTerms?: components["schemas"]["SimpleGlossaryTermModel"][];
+            };
+            page?: components["schemas"]["PageMetadata"];
+        };
+        PagedModelSimpleGlossaryTermWithTranslationsModel: {
+            _embedded?: {
+                glossaryTerms?: components["schemas"]["SimpleGlossaryTermWithTranslationsModel"][];
+            };
+            page?: components["schemas"]["PageMetadata"];
+        };
+        PagedModelSimpleGlossaryWithStatsModel: {
+            _embedded?: {
+                glossaries?: components["schemas"]["SimpleGlossaryWithStatsModel"][];
             };
             page?: components["schemas"]["PageMetadata"];
         };
@@ -6101,6 +7239,18 @@ export interface components {
             };
             page?: components["schemas"]["PageMetadata"];
         };
+        PagedModelWithNextCursorNotificationModel: {
+            _embedded?: {
+                notificationModelList?: components["schemas"]["NotificationModel"][];
+            };
+            /**
+             * @description Cursor to get next data
+             * @example eyJrZXlJZCI6eyJkaXJlY3Rpb24iOiJBU0MiLCJ2YWx1ZSI6IjEwMDAwMDAxMjAifX0=
+             */
+            nextCursor?: string;
+            page?: components["schemas"]["PageMetadata"];
+            pagedModel?: components["schemas"]["PagedModelNotificationModel"];
+        };
         PatModel: {
             /** Format: int64 */
             createdAt: number;
@@ -6128,10 +7278,6 @@ export interface components {
             updatedAt: number;
             user: components["schemas"]["SimpleUserAccountModel"];
         };
-        /**
-         * @description Current user's direct permission
-         * @example MANAGE
-         */
         PermissionModel: {
             /**
              * @deprecated
@@ -6151,7 +7297,7 @@ export interface components {
              *       "TRANSLATIONS_VIEW"
              *     ]
              */
-            scopes: ("translations.view" | "translations.edit" | "keys.edit" | "screenshots.upload" | "screenshots.delete" | "screenshots.view" | "activity.view" | "languages.edit" | "admin" | "project.edit" | "members.view" | "members.edit" | "translation-comments.add" | "translation-comments.edit" | "translation-comments.set-state" | "translations.state-edit" | "keys.view" | "keys.delete" | "keys.create" | "batch-jobs.view" | "batch-jobs.cancel" | "translations.batch-by-tm" | "translations.batch-machine" | "content-delivery.manage" | "content-delivery.publish" | "webhooks.manage" | "tasks.view" | "tasks.edit")[];
+            scopes: ("translations.view" | "translations.edit" | "keys.edit" | "screenshots.upload" | "screenshots.delete" | "screenshots.view" | "activity.view" | "languages.edit" | "admin" | "project.edit" | "members.view" | "members.edit" | "translation-comments.add" | "translation-comments.edit" | "translation-comments.set-state" | "translations.state-edit" | "keys.view" | "keys.delete" | "keys.create" | "batch-jobs.view" | "batch-jobs.cancel" | "translations.batch-by-tm" | "translations.batch-machine" | "content-delivery.manage" | "content-delivery.publish" | "webhooks.manage" | "tasks.view" | "tasks.edit" | "prompts.view" | "prompts.edit" | "translation-labels.manage" | "translation-labels.assign")[];
             /**
              * @description List of languages user can change state to. If null, changing state of all language values is permitted.
              * @example [
@@ -6202,7 +7348,7 @@ export interface components {
              *       "TRANSLATIONS_VIEW"
              *     ]
              */
-            scopes: ("translations.view" | "translations.edit" | "keys.edit" | "screenshots.upload" | "screenshots.delete" | "screenshots.view" | "activity.view" | "languages.edit" | "admin" | "project.edit" | "members.view" | "members.edit" | "translation-comments.add" | "translation-comments.edit" | "translation-comments.set-state" | "translations.state-edit" | "keys.view" | "keys.delete" | "keys.create" | "batch-jobs.view" | "batch-jobs.cancel" | "translations.batch-by-tm" | "translations.batch-machine" | "content-delivery.manage" | "content-delivery.publish" | "webhooks.manage" | "tasks.view" | "tasks.edit")[];
+            scopes: ("translations.view" | "translations.edit" | "keys.edit" | "screenshots.upload" | "screenshots.delete" | "screenshots.view" | "activity.view" | "languages.edit" | "admin" | "project.edit" | "members.view" | "members.edit" | "translation-comments.add" | "translation-comments.edit" | "translation-comments.set-state" | "translations.state-edit" | "keys.view" | "keys.delete" | "keys.create" | "batch-jobs.view" | "batch-jobs.cancel" | "translations.batch-by-tm" | "translations.batch-machine" | "content-delivery.manage" | "content-delivery.publish" | "webhooks.manage" | "tasks.view" | "tasks.edit" | "prompts.view" | "prompts.edit" | "translation-labels.manage" | "translation-labels.assign")[];
             /**
              * @description List of languages user can change state to. If null, changing state of all language values is permitted.
              * @example [
@@ -6235,16 +7381,17 @@ export interface components {
         };
         PlanIncludedUsageModel: {
             /** Format: int64 */
+            keys: number;
+            /** Format: int64 */
             mtCredits: number;
             /** Format: int64 */
             seats: number;
-            /** Format: int64 */
-            translationSlots: number;
             /** Format: int64 */
             translations: number;
         };
         PlanPricesModel: {
             perSeat: number;
+            perThousandKeys: number;
             perThousandMtCredits?: number;
             perThousandTranslations?: number;
             subscriptionMonthly: number;
@@ -6254,6 +7401,12 @@ export interface components {
             domain?: string;
             scriptUrl: string;
             url: string;
+        };
+        PositionModel: {
+            /** Format: int32 */
+            end: number;
+            /** Format: int32 */
+            start: number;
         };
         PreTranslationByTmRequest: {
             keyIds: number[];
@@ -6273,11 +7426,11 @@ export interface components {
              *     Can be null when user has direct access to one of the projects owned by the organization.
              * @enum {string}
              */
-            currentUserRole?: "MEMBER" | "OWNER";
+            currentUserRole?: "MEMBER" | "OWNER" | "MAINTAINER";
             /** @example This is a beautiful organization full of beautiful and clever people */
             description?: string;
             /** @example Features organization has enabled */
-            enabledFeatures: ("GRANULAR_PERMISSIONS" | "PRIORITIZED_FEATURE_REQUESTS" | "PREMIUM_SUPPORT" | "DEDICATED_SLACK_CHANNEL" | "ASSISTED_UPDATES" | "DEPLOYMENT_ASSISTANCE" | "BACKUP_CONFIGURATION" | "TEAM_TRAINING" | "ACCOUNT_MANAGER" | "STANDARD_SUPPORT" | "PROJECT_LEVEL_CONTENT_STORAGES" | "WEBHOOKS" | "MULTIPLE_CONTENT_DELIVERY_CONFIGS" | "AI_PROMPT_CUSTOMIZATION" | "SLACK_INTEGRATION" | "TASKS" | "SSO" | "ORDER_TRANSLATION")[];
+            enabledFeatures: ("GRANULAR_PERMISSIONS" | "PRIORITIZED_FEATURE_REQUESTS" | "PREMIUM_SUPPORT" | "DEDICATED_SLACK_CHANNEL" | "ASSISTED_UPDATES" | "DEPLOYMENT_ASSISTANCE" | "BACKUP_CONFIGURATION" | "TEAM_TRAINING" | "ACCOUNT_MANAGER" | "STANDARD_SUPPORT" | "PROJECT_LEVEL_CONTENT_STORAGES" | "WEBHOOKS" | "MULTIPLE_CONTENT_DELIVERY_CONFIGS" | "AI_PROMPT_CUSTOMIZATION" | "SLACK_INTEGRATION" | "TASKS" | "SSO" | "ORDER_TRANSLATION" | "GLOSSARY" | "TRANSLATION_LABELS")[];
             /** Format: int64 */
             id: number;
             /** @example Beautiful organization */
@@ -6292,6 +7445,7 @@ export interface components {
             accountType: "LOCAL" | "MANAGED" | "THIRD_PARTY";
             avatar?: components["schemas"]["Avatar"];
             deletable: boolean;
+            domain?: string;
             emailAwaitingVerification?: string;
             /** @enum {string} */
             globalServerRole: "USER" | "ADMIN";
@@ -6300,6 +7454,8 @@ export interface components {
             mfaEnabled: boolean;
             name?: string;
             needsSuperJwtToken: boolean;
+            /** @enum {string} */
+            thirdPartyAuthType?: "GOOGLE" | "GITHUB" | "OAUTH2" | "SSO" | "SSO_GLOBAL";
             username: string;
         };
         ProjectActivityAuthorModel: {
@@ -6327,7 +7483,7 @@ export interface components {
             /** Format: int64 */
             timestamp: number;
             /** @enum {string} */
-            type: "UNKNOWN" | "SET_TRANSLATION_STATE" | "SET_TRANSLATIONS" | "DISMISS_AUTO_TRANSLATED_STATE" | "SET_OUTDATED_FLAG" | "TRANSLATION_COMMENT_ADD" | "TRANSLATION_COMMENT_DELETE" | "TRANSLATION_COMMENT_EDIT" | "TRANSLATION_COMMENT_SET_STATE" | "SCREENSHOT_DELETE" | "SCREENSHOT_ADD" | "KEY_TAGS_EDIT" | "KEY_NAME_EDIT" | "KEY_DELETE" | "CREATE_KEY" | "COMPLEX_EDIT" | "IMPORT" | "CREATE_LANGUAGE" | "EDIT_LANGUAGE" | "DELETE_LANGUAGE" | "HARD_DELETE_LANGUAGE" | "CREATE_PROJECT" | "EDIT_PROJECT" | "NAMESPACE_EDIT" | "BATCH_PRE_TRANSLATE_BY_TM" | "BATCH_MACHINE_TRANSLATE" | "AUTO_TRANSLATE" | "BATCH_CLEAR_TRANSLATIONS" | "BATCH_COPY_TRANSLATIONS" | "BATCH_SET_TRANSLATION_STATE" | "BATCH_TAG_KEYS" | "BATCH_UNTAG_KEYS" | "BATCH_SET_KEYS_NAMESPACE" | "AUTOMATION" | "CONTENT_DELIVERY_CONFIG_CREATE" | "CONTENT_DELIVERY_CONFIG_UPDATE" | "CONTENT_DELIVERY_CONFIG_DELETE" | "CONTENT_STORAGE_CREATE" | "CONTENT_STORAGE_UPDATE" | "CONTENT_STORAGE_DELETE" | "WEBHOOK_CONFIG_CREATE" | "WEBHOOK_CONFIG_UPDATE" | "WEBHOOK_CONFIG_DELETE" | "COMPLEX_TAG_OPERATION" | "TASKS_CREATE" | "TASK_CREATE" | "TASK_UPDATE" | "TASK_KEYS_UPDATE" | "TASK_FINISH" | "TASK_CLOSE" | "TASK_REOPEN" | "TASK_KEY_UPDATE" | "ORDER_TRANSLATION";
+            type: "UNKNOWN" | "SET_TRANSLATION_STATE" | "SET_TRANSLATIONS" | "DISMISS_AUTO_TRANSLATED_STATE" | "SET_OUTDATED_FLAG" | "TRANSLATION_COMMENT_ADD" | "TRANSLATION_COMMENT_DELETE" | "TRANSLATION_COMMENT_EDIT" | "TRANSLATION_COMMENT_SET_STATE" | "SCREENSHOT_DELETE" | "SCREENSHOT_ADD" | "KEY_TAGS_EDIT" | "KEY_NAME_EDIT" | "KEY_DELETE" | "CREATE_KEY" | "COMPLEX_EDIT" | "IMPORT" | "CREATE_LANGUAGE" | "EDIT_LANGUAGE" | "DELETE_LANGUAGE" | "HARD_DELETE_LANGUAGE" | "CREATE_PROJECT" | "EDIT_PROJECT" | "NAMESPACE_EDIT" | "BATCH_PRE_TRANSLATE_BY_TM" | "BATCH_MACHINE_TRANSLATE" | "AUTO_TRANSLATE" | "BATCH_CLEAR_TRANSLATIONS" | "BATCH_COPY_TRANSLATIONS" | "BATCH_SET_TRANSLATION_STATE" | "BATCH_TAG_KEYS" | "BATCH_UNTAG_KEYS" | "BATCH_SET_KEYS_NAMESPACE" | "BATCH_ASSIGN_TRANSLATION_LABEL" | "BATCH_UNASSIGN_TRANSLATION_LABEL" | "AUTOMATION" | "CONTENT_DELIVERY_CONFIG_CREATE" | "CONTENT_DELIVERY_CONFIG_UPDATE" | "CONTENT_DELIVERY_CONFIG_DELETE" | "CONTENT_STORAGE_CREATE" | "CONTENT_STORAGE_UPDATE" | "CONTENT_STORAGE_DELETE" | "WEBHOOK_CONFIG_CREATE" | "WEBHOOK_CONFIG_UPDATE" | "WEBHOOK_CONFIG_DELETE" | "COMPLEX_TAG_OPERATION" | "TASKS_CREATE" | "TASK_CREATE" | "TASK_UPDATE" | "TASK_KEYS_UPDATE" | "TASK_FINISH" | "TASK_CLOSE" | "TASK_REOPEN" | "TASK_KEY_UPDATE" | "ORDER_TRANSLATION" | "GLOSSARY_CREATE" | "GLOSSARY_UPDATE" | "GLOSSARY_DELETE" | "GLOSSARY_TERM_CREATE" | "GLOSSARY_TERM_UPDATE" | "GLOSSARY_TERM_DELETE" | "GLOSSARY_TERM_TRANSLATION_UPDATE" | "TRANSLATION_LABELS_EDIT" | "TRANSLATION_LABEL_ASSIGN" | "TRANSLATION_LABEL_CREATE" | "TRANSLATION_LABEL_UPDATE" | "TRANSLATION_LABEL_DELETE";
         };
         ProjectAiPromptCustomizationModel: {
             /**
@@ -6405,7 +7561,7 @@ export interface components {
             name: string;
             organizationOwner?: components["schemas"]["SimpleOrganizationModel"];
             /** @enum {string} */
-            organizationRole?: "MEMBER" | "OWNER";
+            organizationRole?: "MEMBER" | "OWNER" | "MAINTAINER";
             slug?: string;
             useNamespaces: boolean;
         };
@@ -6461,10 +7617,68 @@ export interface components {
             name: string;
             organizationOwner?: components["schemas"]["SimpleOrganizationModel"];
             /** @enum {string} */
-            organizationRole?: "MEMBER" | "OWNER";
+            organizationRole?: "MEMBER" | "OWNER" | "MAINTAINER";
             slug?: string;
             stats: components["schemas"]["ProjectStatistics"];
         };
+        PromptDto: {
+            basicPromptOptions?: ("KEY_NAME" | "KEY_DESCRIPTION" | "KEY_CONTEXT" | "PROJECT_DESCRIPTION" | "LANGUAGE_NOTES" | "TM_SUGGESTIONS" | "SCREENSHOT" | "GLOSSARY")[];
+            name: string;
+            providerName: string;
+            template?: string;
+        };
+        PromptModel: {
+            basicPromptOptions?: ("KEY_NAME" | "KEY_DESCRIPTION" | "KEY_CONTEXT" | "PROJECT_DESCRIPTION" | "LANGUAGE_NOTES" | "TM_SUGGESTIONS" | "SCREENSHOT" | "GLOSSARY")[];
+            /** Format: int64 */
+            id: number;
+            name: string;
+            /** Format: int64 */
+            projectId: number;
+            providerName: string;
+            template?: string;
+        };
+        PromptResponseDto: {
+            parsedJson?: components["schemas"]["JsonNode"];
+            /** Format: int32 */
+            price?: number;
+            prompt: string;
+            result: string;
+            usage?: components["schemas"]["PromptResponseUsageDto"];
+        };
+        PromptResponseUsageDto: {
+            /** Format: int64 */
+            cachedTokens?: number;
+            /** Format: int64 */
+            inputTokens?: number;
+            /** Format: int64 */
+            outputTokens?: number;
+        };
+        PromptResult: {
+            parsedJson?: components["schemas"]["JsonNode"];
+            /** Format: int32 */
+            price: number;
+            response: string;
+            usage?: components["schemas"]["PromptResponseUsageDto"];
+        };
+        PromptRunDto: {
+            basicPromptOptions?: ("KEY_NAME" | "KEY_DESCRIPTION" | "KEY_CONTEXT" | "PROJECT_DESCRIPTION" | "LANGUAGE_NOTES" | "TM_SUGGESTIONS" | "SCREENSHOT" | "GLOSSARY")[];
+            /** Format: int64 */
+            keyId: number;
+            provider: string;
+            /** Format: int64 */
+            targetLanguageId: number;
+            template?: string;
+        };
+        PromptVariableDto: {
+            description?: string;
+            name: string;
+            /** @description List of nested properties for this variable, allowing hierarchical structuring. */
+            props?: components["schemas"]["PromptVariableDto"][] | null;
+            /** @enum {string} */
+            type: "FRAGMENT" | "OBJECT" | "STRING";
+            value?: string;
+        };
+        /** @description Modified fields */
         PropertyModification: {
             new?: Record<string, never>;
             old?: Record<string, never>;
@@ -6472,11 +7686,26 @@ export interface components {
         PublicBillingConfigurationDTO: {
             enabled: boolean;
         };
+        PublicCloudPlanModel: {
+            enabledFeatures: ("GRANULAR_PERMISSIONS" | "PRIORITIZED_FEATURE_REQUESTS" | "PREMIUM_SUPPORT" | "DEDICATED_SLACK_CHANNEL" | "ASSISTED_UPDATES" | "DEPLOYMENT_ASSISTANCE" | "BACKUP_CONFIGURATION" | "TEAM_TRAINING" | "ACCOUNT_MANAGER" | "STANDARD_SUPPORT" | "PROJECT_LEVEL_CONTENT_STORAGES" | "WEBHOOKS" | "MULTIPLE_CONTENT_DELIVERY_CONFIGS" | "AI_PROMPT_CUSTOMIZATION" | "SLACK_INTEGRATION" | "TASKS" | "SSO" | "ORDER_TRANSLATION" | "GLOSSARY" | "TRANSLATION_LABELS")[];
+            free: boolean;
+            /** Format: int64 */
+            id: number;
+            includedUsage: components["schemas"]["PlanIncludedUsageModel"];
+            /** @enum {string} */
+            metricType: "KEYS_SEATS" | "STRINGS";
+            name: string;
+            nonCommercial: boolean;
+            public: boolean;
+            /** @enum {string} */
+            type: "PAY_AS_YOU_GO" | "FIXED";
+        };
         /** @example Current active subscription info */
         PublicCloudSubscriptionModel: {
             cancelAtPeriodEnd: boolean;
             /** @enum {string} */
             currentBillingPeriod?: "MONTHLY" | "YEARLY";
+            plan: components["schemas"]["PublicCloudPlanModel"];
             /** @enum {string} */
             status: "ACTIVE" | "CANCELED" | "PAST_DUE" | "UNPAID" | "ERROR" | "TRIALING" | "KEY_USED_BY_ANOTHER_INSTANCE" | "UNKNOWN";
             /** Format: int64 */
@@ -6494,6 +7723,7 @@ export interface components {
             contentDeliveryConfigured: boolean;
             ga4Tag?: string;
             internalControllerEnabled: boolean;
+            llm: components["schemas"]["PublicLlmConfigurationDTO"];
             machineTranslationServices: components["schemas"]["MtServicesDTO"];
             /** Format: int64 */
             maxTranslationTextLength: number;
@@ -6509,6 +7739,8 @@ export interface components {
             screenshotsUrl: string;
             showVersion: boolean;
             slack: components["schemas"]["SlackDTO"];
+            /** Format: int32 */
+            translationsViewLanguagesLimit: number;
             userCanCreateOrganizations: boolean;
             userSourceField: boolean;
             version: string;
@@ -6520,6 +7752,14 @@ export interface components {
             id: number;
             organizationName?: string;
             projectName?: string;
+        };
+        PublicLlmConfigurationDTO: {
+            enabled: boolean;
+        };
+        PublicSsoTenantModel: {
+            domain: string;
+            force: boolean;
+            global: boolean;
         };
         PublicUsageModel: {
             /**
@@ -6544,14 +7784,19 @@ export interface components {
             creditBalanceRefilledAt: number;
             /**
              * Format: int64
+             * @description How many keys are currently stored by organization
+             */
+            currentKeys: number;
+            /**
+             * Format: int64
              * @description Currently used credits over credits included in plan and extra credits
              */
             currentPayAsYouGoMtCredits: number;
             /**
              * Format: int64
-             * @description How many translations slots are currently used by organization
+             * @description How seats are currently used by organization
              */
-            currentTranslationSlots: number;
+            currentSeats: number;
             /**
              * Format: int64
              * @description How many non-empty translations are currently stored by organization
@@ -6567,32 +7812,50 @@ export interface components {
             extraCreditBalance: number;
             /**
              * Format: int64
+             * @description How many keys are included in current subscription plan. How many keys can organization use without additional costs.
+             */
+            includedKeys: number;
+            /**
+             * Format: int64
              * @description How many credits are included in your current plan
              */
             includedMtCredits: number;
             /**
              * Format: int64
-             * @description How many translation slots are included in current subscription plan. How many translation slots can organization use without additional costs
+             * @description How many seats are included in current subscription plan. How many seats can organization use without additional costs.
              */
-            includedTranslationSlots: number;
+            includedSeats: number;
             /**
              * Format: int64
              * @description How many translations are included in current subscription plan. How many translations can organization use without additional costs
              */
             includedTranslations: number;
+            /** @description Whether the current plan is pay-as-you-go of fixed. For pay-as-you-go plans, the spending limit is the top limit. */
+            isPayAsYouGo: boolean;
+            /**
+             * Format: int64
+             * @description How many keys can be stored until reaching the limit. (For pay us you go, the top limit is the spending limit)
+             */
+            keysLimit: number;
             /** Format: int64 */
             organizationId: number;
             /**
              * Format: int64
-             * @description How many translations can be stored within your organization
+             * @description How many seats can be stored until reaching the limit. (For pay us you go, the top limit is the spending limit)
              */
-            translationSlotsLimit: number;
+            seatsLimit: number;
             /**
              * Format: int64
              * @description How many translations can be stored until reaching the limit. (For pay us you go, the top limit is the spending limit)
              */
             translationsLimit: number;
+            /**
+             * Format: int64
+             * @description Currently used credits including credits used over the limit
+             */
+            usedMtCredits: number;
         };
+        /** @example Quick start data for current user */
         QuickStartModel: {
             completedSteps: string[];
             finished: boolean;
@@ -6666,12 +7929,15 @@ export interface components {
             contentStorageType?: "S3" | "AZURE";
             enabled?: boolean;
             endpoint: string;
+            /** @description Specifies an optional subfolder structure within s3 bucket to which content will be stored */
+            path: string;
             secretKey?: string;
             signingRegion: string;
         };
         S3ContentStorageConfigModel: {
             bucketName: string;
             endpoint: string;
+            path: string;
             signingRegion: string;
         };
         ScreenshotInfoDto: {
@@ -6710,12 +7976,13 @@ export interface components {
             ids: number[];
         };
         SelfHostedEePlanModel: {
-            enabledFeatures: ("GRANULAR_PERMISSIONS" | "PRIORITIZED_FEATURE_REQUESTS" | "PREMIUM_SUPPORT" | "DEDICATED_SLACK_CHANNEL" | "ASSISTED_UPDATES" | "DEPLOYMENT_ASSISTANCE" | "BACKUP_CONFIGURATION" | "TEAM_TRAINING" | "ACCOUNT_MANAGER" | "STANDARD_SUPPORT" | "PROJECT_LEVEL_CONTENT_STORAGES" | "WEBHOOKS" | "MULTIPLE_CONTENT_DELIVERY_CONFIGS" | "AI_PROMPT_CUSTOMIZATION" | "SLACK_INTEGRATION" | "TASKS" | "SSO" | "ORDER_TRANSLATION")[];
+            enabledFeatures: ("GRANULAR_PERMISSIONS" | "PRIORITIZED_FEATURE_REQUESTS" | "PREMIUM_SUPPORT" | "DEDICATED_SLACK_CHANNEL" | "ASSISTED_UPDATES" | "DEPLOYMENT_ASSISTANCE" | "BACKUP_CONFIGURATION" | "TEAM_TRAINING" | "ACCOUNT_MANAGER" | "STANDARD_SUPPORT" | "PROJECT_LEVEL_CONTENT_STORAGES" | "WEBHOOKS" | "MULTIPLE_CONTENT_DELIVERY_CONFIGS" | "AI_PROMPT_CUSTOMIZATION" | "SLACK_INTEGRATION" | "TASKS" | "SSO" | "ORDER_TRANSLATION" | "GLOSSARY" | "TRANSLATION_LABELS")[];
             free: boolean;
             hasYearlyPrice: boolean;
             /** Format: int64 */
             id: number;
             includedUsage: components["schemas"]["PlanIncludedUsageModel"];
+            isPayAsYouGo: boolean;
             name: string;
             nonCommercial: boolean;
             prices: components["schemas"]["PlanPricesModel"];
@@ -6749,7 +8016,7 @@ export interface components {
         };
         SetOrganizationRoleDto: {
             /** @enum {string} */
-            roleType: "MEMBER" | "OWNER";
+            roleType: "MEMBER" | "OWNER" | "MAINTAINER";
         };
         SetProjectPromptCustomizationRequest: {
             /**
@@ -6836,6 +8103,68 @@ export interface components {
             /** @description Where did the user find us? */
             userSource?: string;
         };
+        SimpleGlossaryModel: {
+            /**
+             * @description Language tag for default translations for terms
+             * @example en
+             */
+            baseLanguageTag: string;
+            /** Format: int64 */
+            id: number;
+            name: string;
+        };
+        SimpleGlossaryTermModel: {
+            description: string;
+            /** @description Specifies whether the term represents a shortened form of a word or phrase */
+            flagAbbreviation: boolean;
+            /** @description When true, the term matching considers uppercase and lowercase characters as distinct */
+            flagCaseSensitive: boolean;
+            /** @description When true, marks this term as prohibited or not recommended for use in translations */
+            flagForbiddenTerm: boolean;
+            /** @description When true, this term has the same translation across all target languages */
+            flagNonTranslatable: boolean;
+            /** Format: int64 */
+            id: number;
+        };
+        SimpleGlossaryTermWithTranslationsModel: {
+            /**
+             * @description A detailed explanation or definition of the glossary term
+             * @example It's trademark
+             */
+            description: string;
+            /** @description Specifies whether the term represents a shortened form of a word or phrase */
+            flagAbbreviation: boolean;
+            /** @description When true, the term matching considers uppercase and lowercase characters as distinct */
+            flagCaseSensitive: boolean;
+            /** @description When true, marks this term as prohibited or not recommended for use in translations */
+            flagForbiddenTerm: boolean;
+            /** @description When true, this term has the same translation across all target languages */
+            flagNonTranslatable: boolean;
+            /** Format: int64 */
+            id: number;
+            translations: components["schemas"]["GlossaryTermTranslationModel"][];
+        };
+        SimpleGlossaryWithStatsModel: {
+            /**
+             * Format: int64
+             * @description Total number of projects currently using this glossary
+             * @example 69
+             */
+            assignedProjectsCount: number;
+            /**
+             * @description The primary language code used for terms (e.g., 'en' for English)
+             * @example en
+             */
+            baseLanguageTag: string;
+            /**
+             * @description The name of one project using this glossary (can be shown as a preview)
+             * @example My Project
+             */
+            firstAssignedProjectName?: string;
+            /** Format: int64 */
+            id: number;
+            name: string;
+        };
         SimpleOrganizationModel: {
             avatar?: components["schemas"]["Avatar"];
             basePermissions: components["schemas"]["PermissionModel"];
@@ -6858,6 +8187,7 @@ export interface components {
             name: string;
             slug?: string;
         };
+        /** @description User who created the comment */
         SimpleUserAccountModel: {
             avatar?: components["schemas"]["Avatar"];
             deleted: boolean;
@@ -6894,7 +8224,7 @@ export interface components {
             languageMappings?: components["schemas"]["LanguageMapping"][];
             /** @description If true, key descriptions will be overridden by the import */
             overrideKeyDescriptions: boolean;
-            /** @description If yes, keys from project that were not included in import will be deleted. */
+            /** @description If yes, keys from project that were not included in import will be deleted (only within namespaces which are included in the import). */
             removeOtherKeys?: boolean;
             /**
              * @description When importing files in structured formats (e.g., JSON, YAML), this field defines the delimiter which will be used in names of imported keys.
@@ -6952,7 +8282,7 @@ export interface components {
         };
         StorageTestResult: {
             /** @enum {string} */
-            message?: "unauthenticated" | "api_access_forbidden" | "api_key_not_found" | "invalid_api_key" | "invalid_project_api_key" | "project_api_key_expired" | "bad_credentials" | "mfa_enabled" | "invalid_otp_code" | "mfa_not_enabled" | "can_not_revoke_own_permissions" | "data_corrupted" | "invitation_code_does_not_exist_or_expired" | "language_tag_exists" | "language_name_exists" | "language_not_found" | "operation_not_permitted" | "registrations_not_allowed" | "project_not_found" | "resource_not_found" | "scope_not_found" | "key_exists" | "third_party_auth_error_message" | "third_party_auth_no_email" | "third_party_auth_non_matching_email" | "third_party_auth_no_sub" | "third_party_auth_unknown_error" | "email_already_verified" | "third_party_unauthorized" | "third_party_google_workspace_mismatch" | "third_party_switch_initiated" | "username_already_exists" | "username_or_password_invalid" | "user_already_has_permissions" | "user_already_has_role" | "user_not_found" | "file_not_image" | "file_too_big" | "invalid_timestamp" | "email_not_verified" | "missing_callback_url" | "invalid_jwt_token" | "expired_jwt_token" | "general_jwt_error" | "cannot_find_suitable_address_part" | "slug_not_unique" | "user_is_not_member_of_organization" | "organization_has_no_other_owner" | "user_has_no_project_access" | "user_is_organization_owner" | "cannot_set_your_own_permissions" | "user_is_organization_member" | "property_not_mutable" | "import_language_not_from_project" | "existing_language_not_selected" | "conflict_is_not_resolved" | "language_already_selected" | "cannot_parse_file" | "could_not_resolve_property" | "cannot_add_more_then_100_languages" | "no_languages_provided" | "language_with_base_language_tag_not_found" | "language_not_from_project" | "namespace_not_from_project" | "cannot_delete_base_language" | "key_not_from_project" | "max_screenshots_exceeded" | "translation_not_from_project" | "can_edit_only_own_comment" | "request_parse_error" | "filter_by_value_state_not_valid" | "import_has_expired" | "tag_not_from_project" | "translation_text_too_long" | "invalid_recaptcha_token" | "cannot_leave_owning_project" | "cannot_leave_project_with_organization_role" | "dont_have_direct_permissions" | "tag_too_log" | "too_many_uploaded_images" | "one_or_more_images_not_found" | "screenshot_not_of_key" | "service_not_found" | "too_many_requests" | "translation_not_found" | "out_of_credits" | "key_not_found" | "organization_not_found" | "cannot_find_base_language" | "base_language_not_found" | "no_exported_result" | "cannot_set_your_own_role" | "only_translate_review_or_view_permission_accepts_view_languages" | "oauth2_token_url_not_set" | "oauth2_user_url_not_set" | "email_already_invited_or_member" | "price_not_found" | "invoice_not_from_organization" | "invoice_not_found" | "plan_not_found" | "plan_not_available_any_more" | "no_auto_translation_method" | "cannot_translate_base_language" | "pat_not_found" | "invalid_pat" | "pat_expired" | "operation_unavailable_for_account_type" | "validation_email_is_not_valid" | "current_password_required" | "cannot_create_organization" | "wrong_current_password" | "wrong_param_type" | "expired_super_jwt_token" | "cannot_delete_your_own_account" | "cannot_sort_by_this_column" | "namespace_not_found" | "namespace_exists" | "invalid_authentication_method" | "unknown_sort_property" | "only_review_permission_accepts_state_change_languages" | "only_translate_or_review_permission_accepts_translate_languages" | "cannot_set_language_permissions_for_admin_scope" | "cannot_set_view_languages_without_translations_view_scope" | "cannot_set_translate_languages_without_translations_edit_scope" | "cannot_set_state_change_languages_without_translations_state_edit_scope" | "language_not_permitted" | "scopes_has_to_be_set" | "set_exactly_one_of_scopes_or_type" | "translation_exists" | "import_keys_error" | "provide_only_one_of_screenshots_and_screenshot_uploaded_image_ids" | "multiple_projects_not_supported" | "plan_translation_limit_exceeded" | "feature_not_enabled" | "license_key_not_found" | "cannot_set_view_languages_without_for_level_based_permissions" | "cannot_set_different_translate_and_state_change_languages_for_level_based_permissions" | "cannot_disable_your_own_account" | "subscription_not_found" | "invoice_does_not_have_usage" | "customer_not_found" | "subscription_not_active" | "organization_already_subscribed" | "organization_not_subscribed" | "license_key_used_by_another_instance" | "translation_spending_limit_exceeded" | "credit_spending_limit_exceeded" | "seats_spending_limit_exceeded" | "this_instance_is_already_licensed" | "big_meta_not_from_project" | "mt_service_not_enabled" | "project_not_selected" | "organization_not_selected" | "plan_has_subscribers" | "translation_failed" | "batch_job_not_found" | "key_exists_in_namespace" | "tag_is_blank" | "execution_failed_on_management_error" | "translation_api_rate_limit" | "cannot_finalize_activity" | "formality_not_supported_by_service" | "language_not_supported_by_service" | "rate_limited" | "pat_access_not_allowed" | "pak_access_not_allowed" | "cannot_modify_disabled_translation" | "azure_config_required" | "s3_config_required" | "content_storage_config_required" | "content_storage_test_failed" | "content_storage_config_invalid" | "invalid_connection_string" | "cannot_create_azure_storage_client" | "s3_access_key_required" | "azure_connection_string_required" | "s3_secret_key_required" | "cannot_store_file_to_content_storage" | "unexpected_error_while_publishing_to_content_storage" | "webhook_responded_with_non_200_status" | "unexpected_error_while_executing_webhook" | "content_storage_is_in_use" | "cannot_set_state_for_missing_translation" | "no_project_id_provided" | "license_key_not_provided" | "subscription_already_canceled" | "user_is_subscribed_to_paid_plan" | "cannot_create_free_plan_without_fixed_type" | "cannot_modify_plan_free_status" | "key_id_not_provided" | "free_self_hosted_seat_limit_exceeded" | "advanced_params_not_supported" | "plural_forms_not_found_for_language" | "nested_plurals_not_supported" | "message_is_not_plural" | "content_outside_plural_forms" | "invalid_plural_form" | "multiple_plurals_not_supported" | "custom_values_json_too_long" | "unsupported_po_message_format" | "plural_forms_data_loss" | "current_user_does_not_own_image" | "user_cannot_view_this_organization" | "user_is_not_owner_of_organization" | "pak_created_for_different_project" | "custom_slug_is_only_applicable_for_custom_storage" | "invalid_slug_format" | "batch_job_cancellation_timeout" | "import_failed" | "cannot_add_more_then_1000_languages" | "no_data_to_import" | "multiple_namespaces_mapped_to_single_file" | "multiple_mappings_for_same_file_language_name" | "multiple_mappings_for_null_file_language_name" | "too_many_mappings_for_file" | "missing_placeholder_in_template" | "tag_not_found" | "cannot_parse_encrypted_slack_login_data" | "slack_workspace_not_found" | "cannot_fetch_user_details_from_slack" | "slack_missing_scope" | "slack_not_connected_to_your_account" | "slack_invalid_command" | "slack_not_subscribed_yet" | "slack_connection_failed" | "tolgee_account_already_connected" | "slack_not_configured" | "slack_workspace_already_connected" | "slack_connection_error" | "email_verification_code_not_valid" | "cannot_subscribe_to_free_plan" | "plan_auto_assignment_only_for_free_plans" | "plan_auto_assignment_only_for_private_plans" | "task_not_found" | "task_not_finished" | "task_not_open" | "translation_agency_not_found" | "this_feature_is_not_implemented_in_oss" | "sso_token_exchange_failed" | "sso_user_info_retrieval_failed" | "sso_id_token_expired" | "sso_user_cannot_create_organization" | "sso_cant_verify_user" | "sso_auth_missing_domain" | "sso_domain_not_found_or_disabled" | "native_authentication_disabled" | "invitation_organization_mismatch" | "user_is_managed_by_organization" | "cannot_set_sso_provider_missing_fields" | "namespaces_cannot_be_disabled_when_namespace_exists" | "namespace_cannot_be_used_when_feature_is_disabled" | "sso_domain_not_allowed" | "sso_login_forced_for_this_account" | "date_has_to_be_in_the_future" | "custom_plan_and_plan_id_cannot_be_set_together" | "specify_plan_id_or_custom_plan" | "custom_plans_has_to_be_private" | "cannot_create_free_plan_with_prices" | "subscription_not_scheduled_for_cancellation" | "cannot_cancel_trial" | "cannot_update_without_modification" | "current_subscription_is_not_trialing";
+            message?: "unauthenticated" | "api_access_forbidden" | "api_key_not_found" | "invalid_api_key" | "invalid_project_api_key" | "project_api_key_expired" | "bad_credentials" | "mfa_enabled" | "invalid_otp_code" | "mfa_not_enabled" | "can_not_revoke_own_permissions" | "data_corrupted" | "invitation_code_does_not_exist_or_expired" | "language_tag_exists" | "language_name_exists" | "language_not_found" | "operation_not_permitted" | "registrations_not_allowed" | "project_not_found" | "resource_not_found" | "scope_not_found" | "key_exists" | "third_party_auth_error_message" | "third_party_auth_no_email" | "third_party_auth_non_matching_email" | "third_party_auth_no_sub" | "third_party_auth_unknown_error" | "email_already_verified" | "third_party_unauthorized" | "third_party_google_workspace_mismatch" | "third_party_switch_initiated" | "third_party_switch_conflict" | "username_already_exists" | "username_or_password_invalid" | "user_already_has_permissions" | "user_already_has_role" | "user_not_found" | "file_not_image" | "file_too_big" | "invalid_timestamp" | "email_not_verified" | "missing_callback_url" | "invalid_jwt_token" | "expired_jwt_token" | "general_jwt_error" | "cannot_find_suitable_address_part" | "slug_not_unique" | "user_is_not_member_of_organization" | "organization_has_no_other_owner" | "user_has_no_project_access" | "user_is_organization_owner" | "cannot_set_your_own_permissions" | "user_is_organization_member" | "property_not_mutable" | "import_language_not_from_project" | "existing_language_not_selected" | "conflict_is_not_resolved" | "language_already_selected" | "cannot_parse_file" | "could_not_resolve_property" | "cannot_add_more_then_100_languages" | "no_languages_provided" | "language_with_base_language_tag_not_found" | "language_not_from_project" | "namespace_not_from_project" | "cannot_delete_base_language" | "key_not_from_project" | "max_screenshots_exceeded" | "translation_not_from_project" | "can_edit_only_own_comment" | "request_parse_error" | "filter_by_value_state_not_valid" | "import_has_expired" | "tag_not_from_project" | "translation_text_too_long" | "invalid_recaptcha_token" | "cannot_leave_owning_project" | "cannot_leave_project_with_organization_role" | "dont_have_direct_permissions" | "tag_too_log" | "too_many_uploaded_images" | "one_or_more_images_not_found" | "screenshot_not_of_key" | "service_not_found" | "too_many_requests" | "translation_not_found" | "out_of_credits" | "key_not_found" | "organization_not_found" | "cannot_find_base_language" | "base_language_not_found" | "no_exported_result" | "cannot_set_your_own_role" | "only_translate_review_or_view_permission_accepts_view_languages" | "oauth2_token_url_not_set" | "oauth2_user_url_not_set" | "email_already_invited_or_member" | "price_not_found" | "invoice_not_from_organization" | "invoice_not_found" | "plan_not_found" | "plan_not_available_any_more" | "no_auto_translation_method" | "cannot_translate_base_language" | "pat_not_found" | "invalid_pat" | "pat_expired" | "operation_unavailable_for_account_type" | "validation_email_is_not_valid" | "current_password_required" | "cannot_create_organization" | "wrong_current_password" | "wrong_param_type" | "user_missing_password" | "expired_super_jwt_token" | "cannot_delete_your_own_account" | "cannot_sort_by_this_column" | "namespace_not_found" | "namespace_exists" | "invalid_authentication_method" | "unknown_sort_property" | "only_review_permission_accepts_state_change_languages" | "only_translate_or_review_permission_accepts_translate_languages" | "cannot_set_language_permissions_for_admin_scope" | "cannot_set_view_languages_without_translations_view_scope" | "cannot_set_translate_languages_without_translations_edit_scope" | "cannot_set_state_change_languages_without_translations_state_edit_scope" | "language_not_permitted" | "scopes_has_to_be_set" | "set_exactly_one_of_scopes_or_type" | "translation_exists" | "import_keys_error" | "provide_only_one_of_screenshots_and_screenshot_uploaded_image_ids" | "multiple_projects_not_supported" | "plan_translation_limit_exceeded" | "feature_not_enabled" | "license_key_not_found" | "cannot_set_view_languages_without_for_level_based_permissions" | "cannot_set_different_translate_and_state_change_languages_for_level_based_permissions" | "cannot_disable_your_own_account" | "subscription_not_found" | "invoice_does_not_have_usage" | "customer_not_found" | "subscription_not_active" | "organization_already_subscribed" | "organization_not_subscribed" | "license_key_used_by_another_instance" | "translation_spending_limit_exceeded" | "credit_spending_limit_exceeded" | "seats_spending_limit_exceeded" | "this_instance_is_already_licensed" | "big_meta_not_from_project" | "mt_service_not_enabled" | "project_not_selected" | "organization_not_selected" | "plan_has_subscribers" | "translation_failed" | "batch_job_not_found" | "key_exists_in_namespace" | "tag_is_blank" | "execution_failed_on_management_error" | "translation_api_rate_limit" | "cannot_finalize_activity" | "formality_not_supported_by_service" | "language_not_supported_by_service" | "rate_limited" | "pat_access_not_allowed" | "pak_access_not_allowed" | "cannot_modify_disabled_translation" | "azure_config_required" | "s3_config_required" | "content_storage_config_required" | "content_storage_test_failed" | "content_storage_config_invalid" | "invalid_connection_string" | "cannot_create_azure_storage_client" | "s3_access_key_required" | "azure_connection_string_required" | "s3_secret_key_required" | "cannot_store_file_to_content_storage" | "unexpected_error_while_publishing_to_content_storage" | "webhook_responded_with_non_200_status" | "unexpected_error_while_executing_webhook" | "content_storage_is_in_use" | "cannot_set_state_for_missing_translation" | "no_project_id_provided" | "license_key_not_provided" | "subscription_already_canceled" | "user_is_subscribed_to_paid_plan" | "cannot_create_free_plan_without_fixed_type" | "cannot_modify_plan_free_status" | "key_id_not_provided" | "free_self_hosted_seat_limit_exceeded" | "advanced_params_not_supported" | "plural_forms_not_found_for_language" | "nested_plurals_not_supported" | "message_is_not_plural" | "content_outside_plural_forms" | "invalid_plural_form" | "multiple_plurals_not_supported" | "custom_values_json_too_long" | "unsupported_po_message_format" | "plural_forms_data_loss" | "current_user_does_not_own_image" | "user_cannot_view_this_organization" | "user_is_not_owner_of_organization" | "user_is_not_owner_or_maintainer_of_organization" | "pak_created_for_different_project" | "custom_slug_is_only_applicable_for_custom_storage" | "invalid_slug_format" | "batch_job_cancellation_timeout" | "import_failed" | "cannot_add_more_then_1000_languages" | "no_data_to_import" | "multiple_namespaces_mapped_to_single_file" | "multiple_mappings_for_same_file_language_name" | "multiple_mappings_for_null_file_language_name" | "too_many_mappings_for_file" | "missing_placeholder_in_template" | "tag_not_found" | "cannot_parse_encrypted_slack_login_data" | "slack_workspace_not_found" | "cannot_fetch_user_details_from_slack" | "slack_missing_scope" | "slack_not_connected_to_your_account" | "slack_invalid_command" | "slack_not_subscribed_yet" | "slack_connection_failed" | "tolgee_account_already_connected" | "slack_not_configured" | "slack_workspace_already_connected" | "slack_connection_error" | "email_verification_code_not_valid" | "cannot_subscribe_to_free_plan" | "plan_auto_assignment_only_for_free_plans" | "plan_auto_assignment_only_for_private_plans" | "task_not_found" | "task_not_finished" | "task_not_open" | "translation_agency_not_found" | "this_feature_is_not_implemented_in_oss" | "sso_token_exchange_failed" | "sso_user_info_retrieval_failed" | "sso_id_token_expired" | "sso_user_cannot_create_organization" | "sso_cant_verify_user" | "sso_auth_missing_domain" | "sso_domain_not_found_or_disabled" | "authentication_method_disabled" | "native_authentication_disabled" | "invitation_organization_mismatch" | "user_is_managed_by_organization" | "cannot_set_sso_provider_missing_fields" | "namespaces_cannot_be_disabled_when_namespace_exists" | "namespace_cannot_be_used_when_feature_is_disabled" | "sso_domain_not_allowed" | "sso_login_forced_for_this_account" | "use_sso_for_authentication_instead" | "date_has_to_be_in_the_future" | "custom_plan_and_plan_id_cannot_be_set_together" | "specify_plan_id_or_custom_plan" | "custom_plans_has_to_be_private" | "cannot_create_free_plan_with_prices" | "subscription_not_scheduled_for_cancellation" | "cannot_cancel_trial" | "cannot_update_without_modification" | "current_subscription_is_not_trialing" | "sorting_and_paging_is_not_supported_when_using_cursor" | "strings_metric_are_not_supported" | "plan_key_limit_exceeded" | "keys_spending_limit_exceeded" | "plan_seat_limit_exceeded" | "instance_not_using_license_key" | "invalid_path" | "llm_provider_not_found" | "llm_provider_error" | "prompt_not_found" | "llm_provider_not_returned_json" | "llm_template_parsing_error" | "llm_rate_limited" | "llm_provider_timeout" | "no_llm_provider_configured" | "glossary_not_found" | "glossary_term_not_found" | "glossary_term_translation_not_found" | "glossary_non_translatable_term_cannot_be_translated" | "llm_content_filter" | "llm_provider_empty_response" | "label_not_found" | "label_not_from_project" | "label_already_exists" | "filter_by_value_label_not_valid";
             params?: Record<string, never>[];
             success: boolean;
         };
@@ -6969,7 +8299,7 @@ export interface components {
             keyId?: number;
             plural?: boolean;
             /** @description List of services to use. If null, then all enabled services are used. */
-            services?: ("GOOGLE" | "AWS" | "DEEPL" | "AZURE" | "BAIDU" | "TOLGEE")[];
+            services?: ("GOOGLE" | "AWS" | "DEEPL" | "AZURE" | "BAIDU" | "PROMPT")[];
             /** Format: int64 */
             targetLanguageId: number;
         };
@@ -7028,7 +8358,6 @@ export interface components {
             keyIds: number[];
             tags: string[];
         };
-        /** @description Tags of key */
         TagModel: {
             /** Format: int64 */
             id: number;
@@ -7055,11 +8384,11 @@ export interface components {
             /** Format: int64 */
             dueDate?: number;
             language: components["schemas"]["LanguageModel"];
-            name: string;
+            name?: string;
             /** Format: int64 */
             number: number;
             /** @enum {string} */
-            state: "NEW" | "IN_PROGRESS" | "DONE" | "CLOSED";
+            state: "NEW" | "IN_PROGRESS" | "FINISHED" | "CANCELED";
             /** Format: int64 */
             totalItems: number;
             /** @enum {string} */
@@ -7092,12 +8421,12 @@ export interface components {
             /** Format: int64 */
             dueDate?: number;
             language: components["schemas"]["LanguageModel"];
-            name: string;
+            name?: string;
             /** Format: int64 */
             number: number;
             project: components["schemas"]["SimpleProjectModel"];
             /** @enum {string} */
-            state: "NEW" | "IN_PROGRESS" | "DONE" | "CLOSED";
+            state: "NEW" | "IN_PROGRESS" | "FINISHED" | "CANCELED";
             /** Format: int64 */
             totalItems: number;
             /** @enum {string} */
@@ -7181,6 +8510,14 @@ export interface components {
             contextDescription?: string;
             output: string;
         };
+        TranslationLabelRequest: {
+            /** Format: int64 */
+            keyId: number;
+            /** Format: int64 */
+            labelId: number;
+            /** Format: int64 */
+            languageId: number;
+        };
         TranslationMemoryItemModel: {
             baseText: string;
             keyName: string;
@@ -7188,15 +8525,6 @@ export interface components {
             similarity: number;
             targetText: string;
         };
-        /**
-         * @description Translations object containing values updated in this request
-         * @example {
-         *       "en": {
-         *         "id": 100000003,
-         *         "text": "This is super translation!"
-         *       }
-         *     }
-         */
         TranslationModel: {
             /** @description Was translated using Translation Memory or Machine translation service? */
             auto: boolean;
@@ -7209,7 +8537,7 @@ export interface components {
              * @description Which machine translation service was used to auto translate this
              * @enum {string}
              */
-            mtProvider?: "GOOGLE" | "AWS" | "DEEPL" | "AZURE" | "BAIDU" | "TOLGEE";
+            mtProvider?: "GOOGLE" | "AWS" | "DEEPL" | "AZURE" | "BAIDU" | "PROMPT";
             /** @description Whether base language translation was changed after this translation was updated */
             outdated: boolean;
             /**
@@ -7248,11 +8576,13 @@ export interface components {
              * @description Id of translation record
              */
             id: number;
+            /** @description Labels assigned to this translation */
+            labels?: components["schemas"]["LabelModel"][];
             /**
              * @description Which machine translation service was used to auto translate this
              * @enum {string}
              */
-            mtProvider?: "GOOGLE" | "AWS" | "DEEPL" | "AZURE" | "BAIDU" | "TOLGEE";
+            mtProvider?: "GOOGLE" | "AWS" | "DEEPL" | "AZURE" | "BAIDU" | "PROMPT";
             /** @description Whether base language translation was changed after this translation was updated */
             outdated: boolean;
             /**
@@ -7275,6 +8605,44 @@ export interface components {
         UntagKeysRequest: {
             keyIds: number[];
             tags: string[];
+        };
+        UpdateGlossaryRequest: {
+            /** @description Projects assigned to glossary; when null, assigned projects will be kept unchanged. */
+            assignedProjectIds?: number[];
+            /**
+             * @description Language tag according to BCP 47 definition
+             * @example cs-CZ
+             */
+            baseLanguageTag: string;
+            /**
+             * @description Glossary name
+             * @example My glossary
+             */
+            name: string;
+        };
+        UpdateGlossaryTermTranslationRequest: {
+            /**
+             * @description Language tag according to BCP 47 definition
+             * @example cs-CZ
+             */
+            languageTag: string;
+            /**
+             * @description Translation text
+             * @example Translated text to language of languageTag
+             */
+            text: string;
+        };
+        UpdateGlossaryTermWithTranslationRequest: {
+            description?: string;
+            /** @description Specifies whether the term represents a shortened form of a word or phrase */
+            flagAbbreviation?: boolean;
+            /** @description When true, the term matching considers uppercase and lowercase characters as distinct */
+            flagCaseSensitive?: boolean;
+            /** @description When true, marks this term as prohibited or not recommended for use in translations */
+            flagForbiddenTerm?: boolean;
+            /** @description When true, this term will have the same translation across all target languages */
+            flagNonTranslatable?: boolean;
+            text?: string;
         };
         UpdateNamespaceDto: {
             name: string;
@@ -7307,7 +8675,7 @@ export interface components {
              * @example 1661172869000
              */
             dueDate?: number;
-            name: string;
+            name?: string;
         };
         UploadedImageModel: {
             /** Format: date-time */
@@ -7323,6 +8691,7 @@ export interface components {
             /** @description Relevant for invoices only. When there are applied stripe credits, we need to reduce the total price by this amount. */
             appliedStripeCredits?: number;
             credits?: components["schemas"]["SumUsageItemModel"];
+            keys: components["schemas"]["AverageProportionalUsageItemModel"];
             seats: components["schemas"]["AverageProportionalUsageItemModel"];
             subscriptionPrice?: number;
             total: number;
@@ -7350,7 +8719,7 @@ export interface components {
             name?: string;
             organizationBasePermission: components["schemas"]["PermissionModel"];
             /** @enum {string} */
-            organizationRole?: "MEMBER" | "OWNER";
+            organizationRole?: "MEMBER" | "OWNER" | "MAINTAINER";
             username: string;
         };
         UserAccountModel: {
@@ -7371,7 +8740,7 @@ export interface components {
             id: number;
             name: string;
             /** @enum {string} */
-            organizationRole?: "MEMBER" | "OWNER";
+            organizationRole?: "MEMBER" | "OWNER" | "MAINTAINER";
             projectsWithDirectPermission: components["schemas"]["SimpleProjectModel"][];
             username: string;
         };
@@ -7405,6 +8774,9 @@ export interface components {
         V2EditApiKeyDto: {
             description?: string;
             scopes: string[];
+        };
+        VariablesResponseDto: {
+            data: components["schemas"]["PromptVariableDto"][];
         };
         WebhookConfigModel: {
             /**
@@ -8730,7 +10102,7 @@ export interface operations {
             };
         };
     };
-    create_13: {
+    create_15: {
         parameters: {
             query?: never;
             header?: never;
@@ -8902,7 +10274,66 @@ export interface operations {
             };
         };
     };
-    update_9: {
+    getCurrentPermissions: {
+        parameters: {
+            query?: {
+                /** @description Required when using with PAT */
+                projectId?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiKeyPermissionsModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
+    update_11: {
         parameters: {
             query?: never;
             header?: never;
@@ -8964,7 +10395,7 @@ export interface operations {
             };
         };
     };
-    delete_13: {
+    delete_15: {
         parameters: {
             query?: never;
             header?: never;
@@ -9082,7 +10513,7 @@ export interface operations {
             };
         };
     };
-    get_21: {
+    get_24: {
         parameters: {
             query?: never;
             header?: never;
@@ -9101,6 +10532,116 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["ApiKeyModel"];
                 };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
+    getCurrentAuthProvider: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuthProviderDto"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
+    deleteCurrentAuthProvider: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Bad Request */
             400: {
@@ -9203,7 +10744,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AcceptAuthProviderChangeRequest"];
+            };
+        };
         responses: {
             /** @description OK */
             200: {
@@ -9306,7 +10851,7 @@ export interface operations {
             };
         };
     };
-    getCurrentAuthProvider: {
+    getUsage_1: {
         parameters: {
             query?: never;
             header?: never;
@@ -9321,7 +10866,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AuthProviderDto"];
+                    "application/json": components["schemas"]["CurrentUsageModel"];
                 };
             };
             /** @description Bad Request */
@@ -9712,7 +11257,7 @@ export interface operations {
             };
         };
     };
-    delete_12: {
+    delete_14: {
         parameters: {
             query?: never;
             header?: never;
@@ -9880,7 +11425,251 @@ export interface operations {
             };
         };
     };
-    getAll_10: {
+    getNotifications: {
+        parameters: {
+            query?: {
+                /** @description Zero-based page index (0..N) */
+                page?: number;
+                /** @description The size of the page to be returned */
+                size?: number;
+                /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+                sort?: string[];
+                /** @description Filter by the `seen` parameter.
+                 *
+                 *     no value = request everything
+                 *
+                 *     true = only seen
+                 *
+                 *     false = only unseen */
+                filterSeen?: boolean;
+                cursor?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PagedModelWithNextCursorNotificationModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
+    getNotificationsSettings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NotificationSettingModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
+    putNotificationSetting: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["NotificationSettingsRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
+    markNotificationsAsSeen: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["NotificationsMarkSeenRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
+    getAll_12: {
         parameters: {
             query?: {
                 /** @description Zero-based page index (0..N) */
@@ -10005,7 +11794,7 @@ export interface operations {
             };
         };
     };
-    get_20: {
+    get_23: {
         parameters: {
             query?: never;
             header?: never;
@@ -10063,7 +11852,7 @@ export interface operations {
             };
         };
     };
-    update_8: {
+    update_10: {
         parameters: {
             query?: never;
             header?: never;
@@ -10125,7 +11914,7 @@ export interface operations {
             };
         };
     };
-    delete_11: {
+    delete_13: {
         parameters: {
             query?: never;
             header?: never;
@@ -10554,6 +12343,1193 @@ export interface operations {
             };
         };
     };
+    getAllBaseLanguagesInUse: {
+        parameters: {
+            query?: {
+                /** @description Zero-based page index (0..N) */
+                page?: number;
+                /** @description The size of the page to be returned */
+                size?: number;
+                /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+                sort?: string[];
+                search?: string;
+                projectIds?: number[];
+            };
+            header?: never;
+            path: {
+                organizationId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PagedModelOrganizationLanguageModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
+    getAll_14: {
+        parameters: {
+            query?: {
+                /** @description Zero-based page index (0..N) */
+                page?: number;
+                /** @description The size of the page to be returned */
+                size?: number;
+                /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+                sort?: string[];
+                search?: string;
+            };
+            header?: never;
+            path: {
+                organizationId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PagedModelSimpleGlossaryModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
+    create_13: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                organizationId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateGlossaryRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GlossaryModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
+    getAllWithStats: {
+        parameters: {
+            query?: {
+                /** @description Zero-based page index (0..N) */
+                page?: number;
+                /** @description The size of the page to be returned */
+                size?: number;
+                /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+                sort?: string[];
+                search?: string;
+            };
+            header?: never;
+            path: {
+                organizationId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PagedModelSimpleGlossaryWithStatsModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
+    get_20: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                organizationId: number;
+                glossaryId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GlossaryModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
+    update_8: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                organizationId: number;
+                glossaryId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateGlossaryRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GlossaryModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
+    delete_11: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                organizationId: number;
+                glossaryId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
+    getAssignedProjects: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                organizationId: number;
+                glossaryId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CollectionModelSimpleProjectModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
+    getLanguages: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                organizationId: number;
+                glossaryId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CollectionModelGlossaryLanguageDto"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
+    getAll_15: {
+        parameters: {
+            query?: {
+                /** @description Zero-based page index (0..N) */
+                page?: number;
+                /** @description The size of the page to be returned */
+                size?: number;
+                /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+                sort?: string[];
+                search?: string;
+                languageTags?: string[];
+            };
+            header?: never;
+            path: {
+                organizationId: number;
+                glossaryId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PagedModelSimpleGlossaryTermModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
+    create_14: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                organizationId: number;
+                glossaryId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateGlossaryTermWithTranslationRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreateUpdateGlossaryTermResponse"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
+    deleteMultiple: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                organizationId: number;
+                glossaryId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DeleteMultipleGlossaryTermsRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
+    get_21: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                organizationId: number;
+                glossaryId: number;
+                termId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GlossaryTermModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
+    update_9: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                organizationId: number;
+                glossaryId: number;
+                termId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateGlossaryTermWithTranslationRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreateUpdateGlossaryTermResponse"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
+    delete_12: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                organizationId: number;
+                glossaryId: number;
+                termId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
+    update_12: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                organizationId: number;
+                glossaryId: number;
+                termId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateGlossaryTermTranslationRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GlossaryTermTranslationModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
+    get_22: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                organizationId: number;
+                glossaryId: number;
+                termId: number;
+                languageTag: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GlossaryTermTranslationModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
+    getAllIds: {
+        parameters: {
+            query?: {
+                search?: string;
+                languageTags?: string[];
+            };
+            header?: never;
+            path: {
+                organizationId: number;
+                glossaryId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CollectionModelLong"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
+    getAllWithTranslations: {
+        parameters: {
+            query?: {
+                /** @description Zero-based page index (0..N) */
+                page?: number;
+                /** @description The size of the page to be returned */
+                size?: number;
+                /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+                sort?: string[];
+                search?: string;
+                languageTags?: string[];
+            };
+            header?: never;
+            path: {
+                organizationId: number;
+                glossaryId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PagedModelSimpleGlossaryTermWithTranslationsModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
     getInvitations: {
         parameters: {
             query?: never;
@@ -10573,6 +13549,429 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["CollectionModelOrganizationInvitationModel"];
                 };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
+    getAllLanguagesInUse: {
+        parameters: {
+            query?: {
+                /** @description Zero-based page index (0..N) */
+                page?: number;
+                /** @description The size of the page to be returned */
+                size?: number;
+                /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+                sort?: string[];
+                search?: string;
+                projectIds?: number[];
+            };
+            header?: never;
+            path: {
+                organizationId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PagedModelOrganizationLanguageModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
+    getAll_13: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                organizationId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CollectionModelLlmProviderModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
+    createProvider: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                organizationId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LlmProviderRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LlmProviderModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
+    getAvailableProviders: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                organizationId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CollectionModelLlmProviderSimpleModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
+    getServerProviders: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                organizationId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CollectionModelLlmProviderSimpleModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
+    updateProvider: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                organizationId: number;
+                providerId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LlmProviderRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LlmProviderModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
+    deleteProvider: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                organizationId: number;
+                providerId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Bad Request */
             400: {
@@ -11577,7 +14976,7 @@ export interface operations {
             };
         };
     };
-    getAll_9: {
+    getAll_11: {
         parameters: {
             query?: {
                 /** @description Zero-based page index (0..N) */
@@ -12242,7 +15641,7 @@ export interface operations {
             };
         };
     };
-    get_4: {
+    get_8: {
         parameters: {
             query?: never;
             header?: never;
@@ -12570,6 +15969,68 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PagedModelModifiedEntityModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
+    getAiPlaygroundResult: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AiPlaygroundResultRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CollectionModelAiPlaygroundResultModel"];
                 };
             };
             /** @description Bad Request */
@@ -13149,7 +16610,7 @@ export interface operations {
             };
         };
     };
-    list_3: {
+    list: {
         parameters: {
             query?: {
                 /** @description Zero-based page index (0..N) */
@@ -13214,7 +16675,7 @@ export interface operations {
             };
         };
     };
-    get_12: {
+    get_6: {
         parameters: {
             query?: never;
             header?: never;
@@ -13390,7 +16851,7 @@ export interface operations {
             };
         };
     };
-    list_2: {
+    list_4: {
         parameters: {
             query?: {
                 /** @description Zero-based page index (0..N) */
@@ -13455,7 +16916,7 @@ export interface operations {
             };
         };
     };
-    create_6: {
+    create_10: {
         parameters: {
             query?: never;
             header?: never;
@@ -13517,7 +16978,7 @@ export interface operations {
             };
         };
     };
-    get_9: {
+    get_17: {
         parameters: {
             query?: never;
             header?: never;
@@ -13576,7 +17037,7 @@ export interface operations {
             };
         };
     };
-    update_4: {
+    update_6: {
         parameters: {
             query?: never;
             header?: never;
@@ -13696,7 +17157,7 @@ export interface operations {
             };
         };
     };
-    delete_7: {
+    delete_9: {
         parameters: {
             query?: never;
             header?: never;
@@ -13753,7 +17214,7 @@ export interface operations {
             };
         };
     };
-    list_1: {
+    list_3: {
         parameters: {
             query?: {
                 /** @description Zero-based page index (0..N) */
@@ -13818,7 +17279,7 @@ export interface operations {
             };
         };
     };
-    create_5: {
+    create_9: {
         parameters: {
             query?: never;
             header?: never;
@@ -13942,7 +17403,7 @@ export interface operations {
             };
         };
     };
-    get_8: {
+    get_16: {
         parameters: {
             query?: never;
             header?: never;
@@ -14001,7 +17462,7 @@ export interface operations {
             };
         };
     };
-    update_3: {
+    update_5: {
         parameters: {
             query?: never;
             header?: never;
@@ -14064,7 +17525,7 @@ export interface operations {
             };
         };
     };
-    delete_6: {
+    delete_8: {
         parameters: {
             query?: never;
             header?: never;
@@ -14253,7 +17714,7 @@ export interface operations {
                  */
                 languages?: string[];
                 /** @description Format to export to */
-                format?: "JSON" | "JSON_TOLGEE" | "XLIFF" | "PO" | "APPLE_STRINGS_STRINGSDICT" | "APPLE_XLIFF" | "ANDROID_XML" | "COMPOSE_XML" | "FLUTTER_ARB" | "PROPERTIES" | "YAML_RUBY" | "YAML" | "JSON_I18NEXT" | "CSV" | "RESX_ICU" | "XLSX" | "APPLE_XCSTRINGS";
+                format?: "JSON" | "JSON_TOLGEE" | "XLIFF" | "PO" | "APPLE_STRINGS_STRINGSDICT" | "APPLE_XLIFF" | "ANDROID_XML" | "COMPOSE_XML" | "FLUTTER_ARB" | "PROPERTIES" | "YAML_RUBY" | "YAML" | "JSON_I18NEXT" | "CSV" | "RESX_ICU" | "XLSX" | "APPLE_XCSTRINGS" | "ANDROID_SDK" | "APPLE_SDK";
                 /** @description Delimiter to structure file content.
                  *
                  *     e.g. For key "home.header.title" would result in {"home": {"header": "title": {"Hello"}}} structure.
@@ -14308,6 +17769,10 @@ export interface operations {
                  *
                  *     e.g. Key hello[0] will be exported as {"hello": ["..."]} */
                 supportArrays?: boolean;
+                /** @description If true, HTML tags are escaped in the exported file. (Supported in the XLIFF format only).
+                 *
+                 *     e.g. Key <b>hello</b> will be exported as &lt;b&gt;hello&lt;/b&gt; */
+                escapeHtml?: boolean;
             };
             header?: never;
             path: {
@@ -14388,6 +17853,68 @@ export interface operations {
                 };
                 content: {
                     "application/*": unknown;
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
+    getHighlights: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GlossaryHighlightsRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CollectionModelGlossaryTermHighlightModel"];
                 };
             };
             /** @description Bad Request */
@@ -14554,7 +18081,7 @@ export interface operations {
             };
         };
     };
-    get_10: {
+    get_4: {
         parameters: {
             query?: never;
             header?: never;
@@ -14674,7 +18201,7 @@ export interface operations {
             };
         };
     };
-    getAllNamespaces_2: {
+    getAllNamespaces: {
         parameters: {
             query?: never;
             header?: never;
@@ -15697,7 +19224,7 @@ export interface operations {
             };
         };
     };
-    getAll_1: {
+    getAll_9: {
         parameters: {
             query?: {
                 /** @description Zero-based page index (0..N) */
@@ -15762,7 +19289,7 @@ export interface operations {
             };
         };
     };
-    create_2: {
+    create_6: {
         parameters: {
             query?: never;
             header?: never;
@@ -15824,7 +19351,7 @@ export interface operations {
             };
         };
     };
-    delete_4: {
+    delete_6: {
         parameters: {
             query?: never;
             header?: never;
@@ -15884,7 +19411,7 @@ export interface operations {
             };
         };
     };
-    create_1: {
+    create_5: {
         parameters: {
             query?: never;
             header?: never;
@@ -16236,17 +19763,29 @@ export interface operations {
                  * @example en-US
                  */
                 filterTranslatedInLang?: string;
+                /**
+                 * @description Selects only keys, where translation was auto translated for specified languages.
+                 * @example en-US
+                 */
+                filterAutoTranslatedInLang?: string[];
                 /** @description Selects only keys with screenshots */
                 filterHasScreenshot?: boolean;
                 /** @description Selects only keys without screenshots */
                 filterHasNoScreenshot?: boolean;
-                /** @description Filter namespaces.
+                /** @description Selects only keys with provided namespaces.
                  *
                  *     To filter default namespace, set to empty string.
                  *        */
                 filterNamespace?: string[];
+                /** @description Selects only keys without provided namespaces.
+                 *
+                 *     To filter default namespace, set to empty string.
+                 *        */
+                filterNoNamespace?: string[];
                 /** @description Selects only keys with provided tag */
                 filterTag?: string[];
+                /** @description Selects only keys without provided tag */
+                filterNoTag?: string[];
                 /**
                  * @description Selects only keys, where translation in provided langs is in outdated state
                  * @example en-US
@@ -16270,6 +19809,15 @@ export interface operations {
                 filterTaskKeysNotDone?: boolean;
                 /** @description Filter task keys which are `done` */
                 filterTaskKeysDone?: boolean;
+                /** @description Filter keys with unresolved comments in lang */
+                filterHasUnresolvedCommentsInLang?: string[];
+                /** @description Filter keys with any comments in lang */
+                filterHasCommentsInLang?: string[];
+                /**
+                 * @description Filter key translations with labels
+                 * @example labelId1,labelId2
+                 */
+                filterLabel?: string[];
             };
             header?: never;
             path: {
@@ -16326,7 +19874,7 @@ export interface operations {
             };
         };
     };
-    delete_2: {
+    delete_4: {
         parameters: {
             query?: never;
             header?: never;
@@ -16383,7 +19931,7 @@ export interface operations {
             };
         };
     };
-    get_6: {
+    get_14: {
         parameters: {
             query?: never;
             header?: never;
@@ -17117,6 +20665,314 @@ export interface operations {
             };
         };
     };
+    getAll_3: {
+        parameters: {
+            query?: {
+                search?: string;
+                /** @description Zero-based page index (0..N) */
+                page?: number;
+                /** @description The size of the page to be returned */
+                size?: number;
+                /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+                sort?: string[];
+            };
+            header?: never;
+            path: {
+                projectId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PagedModelLabelModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
+    createLabel: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LabelRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LabelModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
+    getLabelsByIds: {
+        parameters: {
+            query: {
+                id: number[];
+            };
+            header?: never;
+            path: {
+                projectId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LabelModel"][];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
+    updateLabel: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                labelId: number;
+                projectId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LabelRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LabelModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
+    deleteLabel: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                labelId: number;
+                projectId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
     getLanguagePromptCustomizations: {
         parameters: {
             query?: never;
@@ -17188,6 +21044,8 @@ export interface operations {
                 filterId?: number[];
                 /** @description Filter languages without id */
                 filterNotId?: number[];
+                /** @description Filter languages by name or tag */
+                search?: string;
             };
             header?: never;
             path: {
@@ -17306,7 +21164,7 @@ export interface operations {
             };
         };
     };
-    get_16: {
+    get_12: {
         parameters: {
             query?: never;
             header?: never;
@@ -17840,6 +21698,63 @@ export interface operations {
             };
         };
     };
+    setMachineTranslationSettings_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                promptId: number;
+                projectId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
     myList: {
         parameters: {
             query?: {
@@ -17964,7 +21879,7 @@ export interface operations {
             };
         };
     };
-    getAllNamespaces: {
+    getAllNamespaces_2: {
         parameters: {
             query?: {
                 /** @description Zero-based page index (0..N) */
@@ -17973,6 +21888,7 @@ export interface operations {
                 size?: number;
                 /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
                 sort?: string[];
+                search?: string;
             };
             header?: never;
             path: {
@@ -18029,7 +21945,7 @@ export interface operations {
             };
         };
     };
-    update_1: {
+    update_3: {
         parameters: {
             query?: never;
             header?: never;
@@ -18212,6 +22128,494 @@ export interface operations {
             };
         };
     };
+    getAllPaged: {
+        parameters: {
+            query?: {
+                /** @description Zero-based page index (0..N) */
+                page?: number;
+                /** @description The size of the page to be returned */
+                size?: number;
+                /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+                sort?: string[];
+                search?: string;
+            };
+            header?: never;
+            path: {
+                projectId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PagedModelPromptModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
+    createPrompt: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PromptDto"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PromptModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
+    getDefaultPrompt: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PromptDto"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
+    variables: {
+        parameters: {
+            query?: {
+                keyId?: number;
+                targetLanguageId?: number;
+            };
+            header?: never;
+            path: {
+                projectId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VariablesResponseDto"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
+    run: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PromptRunDto"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PromptResponseDto"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
+    getPrompt: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                promptId: number;
+                projectId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PromptModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
+    updatePrompt: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                promptId: number;
+                projectId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PromptDto"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PromptModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
+    deletePrompt: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                promptId: number;
+                projectId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
     doImport: {
         parameters: {
             query?: never;
@@ -18236,6 +22640,130 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
+    aiPlaygroundTranslate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MachineTranslationRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BatchJobModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
+    assignTranslationLabel: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LabelTranslationsRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BatchJobModel"];
+                };
             };
             /** @description Bad Request */
             400: {
@@ -18771,6 +23299,68 @@ export interface operations {
             };
         };
     };
+    unassignTranslationLabel: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LabelTranslationsRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BatchJobModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
     untagKeys: {
         parameters: {
             query?: never;
@@ -19204,7 +23794,7 @@ export interface operations {
             };
         };
     };
-    getAll_3: {
+    getAll_1: {
         parameters: {
             query?: {
                 search?: string;
@@ -19274,9 +23864,9 @@ export interface operations {
         parameters: {
             query?: {
                 /** @description Filter tasks by state */
-                filterState?: ("NEW" | "IN_PROGRESS" | "DONE" | "CLOSED")[];
+                filterState?: ("NEW" | "IN_PROGRESS" | "FINISHED" | "CANCELED")[];
                 /** @description Filter tasks without state */
-                filterNotState?: ("NEW" | "IN_PROGRESS" | "DONE" | "CLOSED")[];
+                filterNotState?: ("NEW" | "IN_PROGRESS" | "FINISHED" | "CANCELED")[];
                 /** @description Filter tasks by assignee */
                 filterAssignee?: number[];
                 /** @description Filter tasks by type */
@@ -19295,8 +23885,6 @@ export interface operations {
                 filterKey?: number[];
                 /** @description Filter tasks by agency */
                 filterAgency?: number[];
-                /** @description Exclude "done" tasks which are older than specified timestamp */
-                filterDoneMinClosedAt?: number;
                 /** @description Exclude tasks which were closed before specified timestamp */
                 filterNotClosedBefore?: number;
                 /** @description Zero-based page index (0..N) */
@@ -19772,6 +24360,65 @@ export interface operations {
                 };
                 content: {
                     "application/json": number[];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
+    cancelTask: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                taskNumber: number;
+                projectId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TaskModel"];
                 };
             };
             /** @description Bad Request */
@@ -20447,17 +25094,29 @@ export interface operations {
                  * @example en-US
                  */
                 filterTranslatedInLang?: string;
+                /**
+                 * @description Selects only keys, where translation was auto translated for specified languages.
+                 * @example en-US
+                 */
+                filterAutoTranslatedInLang?: string[];
                 /** @description Selects only keys with screenshots */
                 filterHasScreenshot?: boolean;
                 /** @description Selects only keys without screenshots */
                 filterHasNoScreenshot?: boolean;
-                /** @description Filter namespaces.
+                /** @description Selects only keys with provided namespaces.
                  *
                  *     To filter default namespace, set to empty string.
                  *        */
                 filterNamespace?: string[];
+                /** @description Selects only keys without provided namespaces.
+                 *
+                 *     To filter default namespace, set to empty string.
+                 *        */
+                filterNoNamespace?: string[];
                 /** @description Selects only keys with provided tag */
                 filterTag?: string[];
+                /** @description Selects only keys without provided tag */
+                filterNoTag?: string[];
                 /**
                  * @description Selects only keys, where translation in provided langs is in outdated state
                  * @example en-US
@@ -20481,6 +25140,15 @@ export interface operations {
                 filterTaskKeysNotDone?: boolean;
                 /** @description Filter task keys which are `done` */
                 filterTaskKeysDone?: boolean;
+                /** @description Filter keys with unresolved comments in lang */
+                filterHasUnresolvedCommentsInLang?: string[];
+                /** @description Filter keys with any comments in lang */
+                filterHasCommentsInLang?: string[];
+                /**
+                 * @description Filter key translations with labels
+                 * @example labelId1,labelId2
+                 */
+                filterLabel?: string[];
                 /** @description Zero-based page index (0..N) */
                 page?: number;
                 /** @description The size of the page to be returned */
@@ -20667,7 +25335,7 @@ export interface operations {
             };
         };
     };
-    create_9: {
+    create_3: {
         parameters: {
             query?: never;
             header?: never;
@@ -20689,6 +25357,68 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["TranslationWithCommentModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
+    assignLabel_2: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TranslationLabelRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LabelModel"];
                 };
             };
             /** @description Bad Request */
@@ -20766,17 +25496,29 @@ export interface operations {
                  * @example en-US
                  */
                 filterTranslatedInLang?: string;
+                /**
+                 * @description Selects only keys, where translation was auto translated for specified languages.
+                 * @example en-US
+                 */
+                filterAutoTranslatedInLang?: string[];
                 /** @description Selects only keys with screenshots */
                 filterHasScreenshot?: boolean;
                 /** @description Selects only keys without screenshots */
                 filterHasNoScreenshot?: boolean;
-                /** @description Filter namespaces.
+                /** @description Selects only keys with provided namespaces.
                  *
                  *     To filter default namespace, set to empty string.
                  *        */
                 filterNamespace?: string[];
+                /** @description Selects only keys without provided namespaces.
+                 *
+                 *     To filter default namespace, set to empty string.
+                 *        */
+                filterNoNamespace?: string[];
                 /** @description Selects only keys with provided tag */
                 filterTag?: string[];
+                /** @description Selects only keys without provided tag */
+                filterNoTag?: string[];
                 /**
                  * @description Selects only keys, where translation in provided langs is in outdated state
                  * @example en-US
@@ -20800,6 +25542,15 @@ export interface operations {
                 filterTaskKeysNotDone?: boolean;
                 /** @description Filter task keys which are `done` */
                 filterTaskKeysDone?: boolean;
+                /** @description Filter keys with unresolved comments in lang */
+                filterHasUnresolvedCommentsInLang?: string[];
+                /** @description Filter keys with any comments in lang */
+                filterHasCommentsInLang?: string[];
+                /**
+                 * @description Filter key translations with labels
+                 * @example labelId1,labelId2
+                 */
+                filterLabel?: string[];
             };
             header?: never;
             path: {
@@ -21009,7 +25760,7 @@ export interface operations {
             };
         };
     };
-    create_7: {
+    create_1: {
         parameters: {
             query?: never;
             header?: never;
@@ -21072,7 +25823,7 @@ export interface operations {
             };
         };
     };
-    get_14: {
+    get_10: {
         parameters: {
             query?: never;
             header?: never;
@@ -21132,7 +25883,7 @@ export interface operations {
             };
         };
     };
-    update_5: {
+    update_1: {
         parameters: {
             query?: never;
             header?: never;
@@ -21196,7 +25947,7 @@ export interface operations {
             };
         };
     };
-    delete_8: {
+    delete_2: {
         parameters: {
             query?: never;
             header?: never;
@@ -21401,6 +26152,124 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["PagedModelTranslationHistoryModel"];
                 };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
+    assignLabel: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                translationId: number;
+                labelId: number;
+                projectId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LabelModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
+    unassignLabel: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                translationId: number;
+                labelId: number;
+                projectId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Bad Request */
             400: {
@@ -21937,7 +26806,7 @@ export interface operations {
             };
         };
     };
-    list: {
+    list_2: {
         parameters: {
             query?: {
                 /** @description Zero-based page index (0..N) */
@@ -22064,7 +26933,7 @@ export interface operations {
             };
         };
     };
-    get_5: {
+    get_9: {
         parameters: {
             query?: never;
             header?: never;
@@ -22586,6 +27455,66 @@ export interface operations {
             };
         };
     };
+    prompt: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LlmParams"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PromptResult"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
     getInfo_4: {
         parameters: {
             query?: never;
@@ -22718,7 +27647,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        [key: string]: ("translations.view" | "translations.edit" | "keys.edit" | "screenshots.upload" | "screenshots.delete" | "screenshots.view" | "activity.view" | "languages.edit" | "admin" | "project.edit" | "members.view" | "members.edit" | "translation-comments.add" | "translation-comments.edit" | "translation-comments.set-state" | "translations.state-edit" | "keys.view" | "keys.delete" | "keys.create" | "batch-jobs.view" | "batch-jobs.cancel" | "translations.batch-by-tm" | "translations.batch-machine" | "content-delivery.manage" | "content-delivery.publish" | "webhooks.manage" | "tasks.view" | "tasks.edit")[];
+                        [key: string]: ("translations.view" | "translations.edit" | "keys.edit" | "screenshots.upload" | "screenshots.delete" | "screenshots.view" | "activity.view" | "languages.edit" | "admin" | "project.edit" | "members.view" | "members.edit" | "translation-comments.add" | "translation-comments.edit" | "translation-comments.set-state" | "translations.state-edit" | "keys.view" | "keys.delete" | "keys.create" | "batch-jobs.view" | "batch-jobs.cancel" | "translations.batch-by-tm" | "translations.batch-machine" | "content-delivery.manage" | "content-delivery.publish" | "webhooks.manage" | "tasks.view" | "tasks.edit" | "prompts.view" | "prompts.edit" | "translation-labels.manage" | "translation-labels.assign")[];
                     };
                 };
             };
@@ -23878,9 +28807,9 @@ export interface operations {
         parameters: {
             query?: {
                 /** @description Filter tasks by state */
-                filterState?: ("NEW" | "IN_PROGRESS" | "DONE" | "CLOSED")[];
+                filterState?: ("NEW" | "IN_PROGRESS" | "FINISHED" | "CANCELED")[];
                 /** @description Filter tasks without state */
-                filterNotState?: ("NEW" | "IN_PROGRESS" | "DONE" | "CLOSED")[];
+                filterNotState?: ("NEW" | "IN_PROGRESS" | "FINISHED" | "CANCELED")[];
                 /** @description Filter tasks by assignee */
                 filterAssignee?: number[];
                 /** @description Filter tasks by type */
@@ -23899,8 +28828,6 @@ export interface operations {
                 filterKey?: number[];
                 /** @description Filter tasks by agency */
                 filterAgency?: number[];
-                /** @description Exclude "done" tasks which are older than specified timestamp */
-                filterDoneMinClosedAt?: number;
                 /** @description Exclude tasks which were closed before specified timestamp */
                 filterNotClosedBefore?: number;
                 /** @description Zero-based page index (0..N) */
@@ -24104,6 +29031,69 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["JwtAuthenticationResponse"];
                 };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
+    getManagedBy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PrivateOrganizationModel"];
+                };
+            };
+            /** @description No SSO configuration available for this user */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Bad Request */
             400: {
@@ -24454,6 +29444,69 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["CollectionModelSimpleOrganizationModel"];
                 };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"];
+                };
+            };
+        };
+    };
+    getSso: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicSsoTenantModel"];
+                };
+            };
+            /** @description No SSO configuration available for this user */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Bad Request */
             400: {
