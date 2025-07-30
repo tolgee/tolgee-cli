@@ -21,9 +21,13 @@ export const mapImportFormat = (
     case 'JSON_TOLGEE':
       return 'JSON_ICU';
     case 'ANDROID_SDK':
-      throw new InvalidArgumentError('Importing files in ANDROID_SDK format is not supported.');
+      throw new InvalidArgumentError(
+        'Importing files in ANDROID_SDK format is not supported.'
+      );
     case 'APPLE_SDK':
-      throw new InvalidArgumentError('Importing files in APPLE_SDK format is not supported.');
+      throw new InvalidArgumentError(
+        'Importing files in APPLE_SDK format is not supported.'
+      );
     default:
       return format ?? 'JSON_ICU';
   }
