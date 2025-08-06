@@ -35,6 +35,7 @@ async function backup(client: TolgeeClient, dest: string) {
     supportArrays: false,
     filterState: ['UNTRANSLATED', 'TRANSLATED', 'REVIEWED'],
     structureDelimiter: '',
+    escapeHtml: false,
   });
 
   handleLoadableError(loadable);

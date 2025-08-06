@@ -48,7 +48,7 @@ type Options = {
 
 export async function createProjectWithClient(
   name: string,
-  data: components['schemas']['ImportKeysResolvableDto'],
+  data: components['schemas']['SingleStepImportResolvableRequest'],
   options?: Options
 ) {
   const userToken = await userLogin();
@@ -60,28 +60,28 @@ export async function createProjectWithClient(
       name: name,
       organizationId: organizations.data!._embedded!.organizations![0].id,
       languages: options?.languages ?? languagesTestData,
-      icuPlaceholders: true,
+      icuPlaceholders: options?.icuEnabled ?? true,
     },
   });
 
   client = createClient(userToken, { projectId: project.data!.id });
 
-  if (options?.icuEnabled) {
-    client.PUT('/v2/projects/{projectId}', {
-      params: {
-        path: {
-          projectId: client.getProjectId(),
-        },
+  await client.PUT('/v2/projects/{projectId}', {
+    params: {
+      path: {
+        projectId: client.getProjectId(),
       },
-      body: {
-        name,
-        icuPlaceholders: true,
-        useNamespaces: true,
-      },
-    });
-  }
+    },
+    body: {
+      name,
+      icuPlaceholders: options?.icuEnabled ?? true,
+      useNamespaces: true,
+      suggestionsMode: 'DISABLED',
+      translationProtection: 'NONE',
+    },
+  });
 
-  await client.POST('/v2/projects/{projectId}/keys/import-resolvable', {
+  await client.POST('/v2/projects/{projectId}/single-step-import-resolvable', {
     params: { path: { projectId: client.getProjectId() } },
     body: data,
   });

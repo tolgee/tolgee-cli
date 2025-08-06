@@ -1,6 +1,8 @@
 import { LoadableData } from './TolgeeClient.js';
+import ansi from 'ansi-colors';
 
 export const addErrorDetails = (loadable: LoadableData, showBeError = true) => {
+  let additionalInfo = '';
   const items: string[] = [];
   items.push(`status: ${loadable.response.status}`);
   if (showBeError && loadable.error?.code) {
@@ -9,7 +11,24 @@ export const addErrorDetails = (loadable: LoadableData, showBeError = true) => {
   if (loadable.response.status === 403 && loadable.error?.params?.[0]) {
     items.push(`missing scope: ${loadable.error.params[0]}`);
   }
-  return `[${items.join(', ')}]`;
+
+  if (
+    loadable.error?.code === 'import_failed' &&
+    typeof loadable.error.params?.[0] === 'object'
+  ) {
+    additionalInfo += '\n';
+    additionalInfo += 'Some keys cannot be updated:\n';
+    loadable.error.params?.forEach((key) => {
+      const namespace = key.namespace
+        ? ` ${ansi.italic(`(namespace: ${key.namespace})`)}`
+        : '';
+
+      additionalInfo += ansi.red(`${`${key.name}`}${namespace}\n`);
+    });
+    additionalInfo += '\n\n';
+  }
+
+  return `[${items.join(', ')}]${additionalInfo ? '\n' + additionalInfo : ''}`;
 };
 
 export const errorFromLoadable = (loadable: LoadableData) => {

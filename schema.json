@@ -90,6 +90,9 @@
         "removeOtherKeys": {
           "description": "Remove keys which are not present in the import (within imported namespaces).",
           "type": "boolean"
+        },
+        "overrideMode": {
+          "$ref": "#/$defs/overrideMode"
         }
       }
     },
@@ -250,6 +253,11 @@
       "description": "Specifies how to solve potential conflicts in the pushed data.\n\nOptions:\n\n  `OVERRIDE` - update everything according to local files\n  `KEEP` - create only non-existent strings, don't touch existing ones\n  `NO_FORCE` - throw an error, if there are any conflict",
       "type": "string",
       "enum": ["OVERRIDE", "KEEP", "NO_FORCE"]
+    },
+    "overrideMode": {
+      "description": "Specifies what is considered non-overridable translation: \n - RECOMMENDED - protected reviewed translations are considered as non-overridable\n - ALL - translations that user has permissions for",
+      "type": "string",
+      "enum": ["ALL", "RECOMMENDED"]
     },
     "path": {
       "description": "File glob specifying which files to include.",

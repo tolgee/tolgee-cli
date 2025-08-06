@@ -26,15 +26,23 @@ export type ComparatorResult = {
  * @param key The key to print.
  * @param deletion True if the key is about to be deleted.
  */
-export function printKey(key: PartialKey, deletion: boolean) {
+export function printKey(
+  key: PartialKey,
+  deletion?: boolean,
+  color?: ansi.StyleFunction
+) {
+  const colorFunc = color ?? (deletion == false ? ansi.red : ansi.green);
+
   const namespace = key.namespace
     ? ` ${ansi.italic(`(namespace: ${key.namespace})`)}`
     : '';
 
-  if (deletion) {
-    console.log(`${ansi.red(`- ${key.keyName}`)}${namespace}`);
+  if (deletion === undefined) {
+    console.log(`${colorFunc(`${key.keyName}`)}${namespace}`);
+  } else if (deletion) {
+    console.log(`${colorFunc(`- ${key.keyName}`)}${namespace}`);
   } else {
-    console.log(`${ansi.green(`+ ${key.keyName}`)}${namespace}`);
+    console.log(`${colorFunc(`+ ${key.keyName}`)}${namespace}`);
   }
 }
 

@@ -5,10 +5,9 @@ export function tolgeeDataToDict(data: any) {
       {
         __ns: k.keyNamespace,
         ...Object.fromEntries(
-          Object.entries(k.translations).map(([locale, data]: any) => [
-            locale,
-            data.text,
-          ])
+          Object.entries(k.translations)
+            .filter(([_, data]: any) => Boolean(data.text))
+            .map(([locale, data]: any) => [locale, data.text])
         ),
       },
     ])
