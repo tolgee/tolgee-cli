@@ -1,5 +1,4 @@
 import { fileURLToPath } from 'node:url';
-import { tolgeeDataToDict } from './utils/data.js';
 import { run } from './utils/run.js';
 import {
   createPak,
@@ -8,126 +7,83 @@ import {
 } from './utils/api/common.js';
 import { TolgeeClient } from '#cli/client/TolgeeClient.js';
 import { PROJECT_1 } from './utils/api/project1.js';
-import { createTmpFolderWithConfig, removeTmpFolder } from './utils/tmp.js';
-import { pushFilesConfig } from './utils/pushFilesConfig.js';
 
 const FIXTURES_PATH = new URL('../__fixtures__/', import.meta.url);
 
-const PROJECT_1_DIR = new URL('./updatedProject1/', FIXTURES_PATH);
+const PROJECT_1_DIR = new URL('./tolgeeImportData/test1/', FIXTURES_PATH);
 
 let client: TolgeeClient;
 let pak: string;
 
 describe('project 1', () => {
   beforeEach(async () => {
-    client = await createProjectWithClient('Project 1', PROJECT_1);
+    client = await createProjectWithClient('Project 1', PROJECT_1, {
+      translationProtection: 'PROTECT_REVIEWED',
+    });
     pak = await createPak(client);
   });
   afterEach(async () => {
     await deleteProject(client);
-    await removeTmpFolder();
   });
 
-  it('pushes updated strings to Tolgee', async () => {
+  it("doesn't update reviewed translation when is protected", async () => {
+    const keys = await client.GET('/v2/projects/{projectId}/translations', {
+      params: {
+        path: { projectId: client.getProjectId() },
+        query: { filterKeyName: ['controller'] },
+      },
+    });
+
+    const key = keys.data?._embedded?.keys?.[0];
+
+    await client.PUT('/v2/projects/{projectId}/translations', {
+      params: { path: { projectId: client.getProjectId() } },
+      body: {
+        key: 'controller',
+        translations: {
+          en: 'Controller (old)',
+        },
+      },
+    });
+
+    await client.PUT(
+      '/v2/projects/{projectId}/translations/{translationId}/set-state/{state}',
+      {
+        params: {
+          path: {
+            projectId: client.getProjectId(),
+            translationId: key!.translations!['en']!.id!,
+            state: 'REVIEWED',
+          },
+        },
+      }
+    );
+
     const out = await run([
       '--api-key',
       pak,
       'push',
+      '--force-mode',
+      'OVERRIDE',
       '--verbose',
       '--files-template',
       fileURLToPath(new URL(`./{languageTag}.json`, PROJECT_1_DIR)),
     ]);
 
+    expect(out.stdout.toString()).toContain('Some keys cannot be updated:');
+    expect(out.stdout.toString()).toContain('controller');
     expect(out.code).toBe(0);
 
-    const keys = await client.GET('/v2/projects/{projectId}/translations', {
+    const response = await client.GET('/v2/projects/{projectId}/translations', {
       params: {
         path: { projectId: client.getProjectId() },
-        query: { search: 'wire' },
+        query: { filterKeyName: ['controller'] },
       },
     });
 
-    expect(keys.data?.page?.totalElements).toBe(2);
+    const translation =
+      response.data?._embedded?.keys?.[0]?.translations?.['en'].text;
 
-    const stored = tolgeeDataToDict(keys.data);
-    expect(stored).toEqual({
-      wired: {
-        __ns: null,
-        en: 'Wired',
-        fr: 'Filaire',
-      },
-      wireless: {
-        __ns: null,
-        en: 'Wireless',
-        fr: 'Sans-fil',
-      },
-    });
-  });
-
-  it('pushes only selected languages (args)', async () => {
-    const out = await run([
-      '--api-key',
-      pak,
-      'push',
-      '--files-template',
-      fileURLToPath(new URL(`./{languageTag}.json`, PROJECT_1_DIR)),
-      '-l',
-      'fr',
-    ]);
-
-    expect(out.code).toBe(0);
-
-    const keys = await client.GET('/v2/projects/{projectId}/translations', {
-      params: {
-        path: { projectId: client.getProjectId() },
-        query: { search: 'wire' },
-      },
-    });
-    expect(keys.data?.page?.totalElements).toBe(2);
-
-    const stored = tolgeeDataToDict(keys.data);
-    expect(stored).toEqual({
-      wired: {
-        __ns: null,
-        fr: 'Filaire',
-      },
-      wireless: {
-        __ns: null,
-        fr: 'Sans-fil',
-      },
-    });
-  });
-
-  it('pushes only selected languages (config)', async () => {
-    const { configFile } = await createTmpFolderWithConfig({
-      apiKey: pak,
-      push: {
-        files: pushFilesConfig(PROJECT_1_DIR),
-        languages: ['fr'],
-      },
-    });
-    const out = await run(['--config', configFile, 'push']);
-
-    expect(out.code).toBe(0);
-
-    const keys = await client.GET('/v2/projects/{projectId}/translations', {
-      params: {
-        path: { projectId: client.getProjectId() },
-        query: { search: 'wire' },
-      },
-    });
-    expect(keys.data?.page?.totalElements).toBe(2);
-
-    const stored = tolgeeDataToDict(keys.data);
-    expect(stored).toEqual({
-      wired: {
-        __ns: null,
-        fr: 'Filaire',
-      },
-      wireless: {
-        __ns: null,
-        fr: 'Sans-fil',
-      },
-    });
+    expect(translation).toEqual('Controller (old)');
   });
 });

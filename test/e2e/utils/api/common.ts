@@ -43,8 +43,7 @@ export async function deleteProject(client: TolgeeClient | undefined) {
 
 type Options = {
   languages?: components['schemas']['LanguageRequest'][];
-  icuEnabled?: boolean;
-};
+} & Partial<components['schemas']['EditProjectRequest']>;
 
 export async function createProjectWithClient(
   name: string,
@@ -60,7 +59,7 @@ export async function createProjectWithClient(
       name: name,
       organizationId: organizations.data!._embedded!.organizations![0].id,
       languages: options?.languages ?? languagesTestData,
-      icuPlaceholders: options?.icuEnabled ?? true,
+      icuPlaceholders: options?.icuPlaceholders ?? true,
     },
   });
 
@@ -74,10 +73,10 @@ export async function createProjectWithClient(
     },
     body: {
       name,
-      icuPlaceholders: options?.icuEnabled ?? true,
-      useNamespaces: true,
-      suggestionsMode: 'DISABLED',
-      translationProtection: 'NONE',
+      icuPlaceholders: options?.icuPlaceholders ?? true,
+      useNamespaces: options?.useNamespaces ?? true,
+      suggestionsMode: options?.suggestionsMode ?? 'DISABLED',
+      translationProtection: options?.translationProtection ?? 'NONE',
     },
   });
 

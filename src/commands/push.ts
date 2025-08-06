@@ -19,6 +19,7 @@ import {
   Schema,
   FileMatch,
   OverrideMode,
+  ErrorOnFailedKey,
 } from '../schema.js';
 import { askString } from '../utils/ask.js';
 import { mapImportFormat } from '../utils/mapImportFormat.js';
@@ -57,6 +58,7 @@ type PushOptions = BaseOptions & {
   removeOtherKeys?: boolean;
   filesTemplate?: string[];
   overrideMode?: OverrideMode;
+  errorOnFailedKey?: ErrorOnFailedKey;
 };
 
 async function allInPattern(pattern: string) {
@@ -200,6 +202,21 @@ const pushHandler = (config: Schema) =>
       return;
     }
 
+    let errorOnFailedKey: boolean | undefined;
+    switch (opts.errorOnFailedKey) {
+      case 'auto':
+        errorOnFailedKey = undefined;
+        break;
+      case 'yes':
+        errorOnFailedKey = true;
+        break;
+      case 'no':
+        errorOnFailedKey = false;
+        break;
+    }
+
+    console.log(errorOnFailedKey, opts.errorOnFailedKey);
+
     const params: ImportProps['params'] = {
       createNewKeys: true,
       forceMode: opts.forceMode,
@@ -223,7 +240,10 @@ const pushHandler = (config: Schema) =>
         };
       }),
       removeOtherKeys: opts.removeOtherKeys,
+      errorOnFailedKey,
     };
+
+    console.log({ errorOnFailedKey });
 
     let attempt = await loading(
       'Importing...',
@@ -316,9 +336,17 @@ export default (config: Schema) =>
     .addOption(
       new Option(
         '--override-mode <mode>',
-        'Specifies what is considered non-overridable translation'
+        'Specifies what is considered non-overridable translation.'
       )
         .choices(['RECOMMENDED', 'ALL'])
         .default(config.push?.overrideMode)
+    )
+    .addOption(
+      new Option(
+        '--error-on-failed-key <choice>',
+        'Fail the whole import if there are failed keys for override.'
+      )
+        .choices(['yes', 'no', 'auto'])
+        .default(config.push?.errorOnFailedKey ?? 'auto')
     )
     .action(pushHandler(config));

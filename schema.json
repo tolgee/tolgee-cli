@@ -91,6 +91,9 @@
           "description": "Remove keys which are not present in the import (within imported namespaces).",
           "type": "boolean"
         },
+        "errorOnFailedKey": {
+          "$ref": "#/$defs/errorOnFailedKey"
+        },
         "overrideMode": {
           "$ref": "#/$defs/overrideMode"
         }
@@ -258,6 +261,11 @@
       "description": "Specifies what is considered non-overridable translation: \n - RECOMMENDED - protected reviewed translations are considered as non-overridable\n - ALL - translations that user has permissions for",
       "type": "string",
       "enum": ["ALL", "RECOMMENDED"]
+    },
+    "errorOnFailedKey": {
+      "description": "Fail the whole import if there are failed keys for override.",
+      "type": "string",
+      "enum": ["yes", "no", "auto"]
     },
     "path": {
       "description": "File glob specifying which files to include.",
