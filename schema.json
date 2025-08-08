@@ -91,8 +91,8 @@
           "description": "Remove keys which are not present in the import (within imported namespaces).",
           "type": "boolean"
         },
-        "errorOnFailedKey": {
-          "$ref": "#/$defs/errorOnFailedKey"
+        "errorOnUnresolvedConflict": {
+          "$ref": "#/$defs/errorOnUnresolvedConflict"
         },
         "overrideMode": {
           "$ref": "#/$defs/overrideMode"
@@ -262,8 +262,8 @@
       "type": "string",
       "enum": ["ALL", "RECOMMENDED"]
     },
-    "errorOnFailedKey": {
-      "description": "Fail the whole import if there are failed keys for override.",
+    "errorOnUnresolvedConflict": {
+      "description": "Fail the whole import if there are unresolved conflicts in import.",
       "type": "string",
       "enum": ["yes", "no", "auto"]
     },

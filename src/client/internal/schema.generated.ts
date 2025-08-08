@@ -6335,7 +6335,7 @@ export interface components {
             name: string;
         };
         ImportResult: {
-            failedKeys?: components["schemas"]["SimpleKeyResult"][];
+            unresolvedConflicts?: components["schemas"]["SimpleImportConflictResult"][];
         };
         ImportSettingsModel: {
             /** @description If true, placeholders from other formats will be converted to ICU when possible */
@@ -8331,11 +8331,11 @@ export interface components {
             id: number;
             name: string;
         };
-        SimpleKeyResult: {
-            /** Format: int64 */
-            id: number;
-            name: string;
-            namespace?: string;
+        SimpleImportConflictResult: {
+            isOverridable: boolean;
+            keyName: string;
+            keyNamespace?: string;
+            language: string;
         };
         SimpleOrganizationModel: {
             avatar?: components["schemas"]["Avatar"];
@@ -8373,9 +8373,9 @@ export interface components {
             convertPlaceholdersToIcu: boolean;
             /** @description If false, only updates keys, skipping the creation of new keys */
             createNewKeys: boolean;
-            /** @description If `false`, import will apply all `non-failed` overrides and reports `failedKeys`
-             *     .If `true`, import will fail completely on failed override and won't apply any changes. Failed keys are reported in the `params` of the error response */
-            errorOnFailedKey?: boolean;
+            /** @description If `false`, import will apply all `non-failed` overrides and reports `unresolvedConflict`
+             *     .If `true`, import will fail completely on unresolved conflict and won't apply any changes. Unresolved conflicts are reported in the `params` of the error response */
+            errorOnUnresolvedConflict?: boolean;
             /** @description Definition of mapping for each file to import. */
             fileMappings: components["schemas"]["ImportFileMapping"][];
             /**
@@ -8432,9 +8432,9 @@ export interface components {
             };
         };
         SingleStepImportResolvableRequest: {
-            /** @description If `false`, import will apply all `non-failed` overrides and reports `failedKeys`
-             *     .If `true`, import will fail completely on failed override and won't apply any changes. Failed keys are reported in the `params` of the error response */
-            errorOnFailedKey?: boolean;
+            /** @description If `false`, import will apply all `non-failed` overrides and reports `unresolvedConflict`
+             *     .If `true`, import will fail completely on unresolved conflict and won't apply any changes. Unresolved conflicts are reported in the `params` of the error response */
+            errorOnUnresolvedConflict?: boolean;
             /** @description List of keys to import */
             keys: components["schemas"]["SingleStepImportResolvableItemRequest"][];
             /**

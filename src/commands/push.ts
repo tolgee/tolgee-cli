@@ -19,7 +19,7 @@ import {
   Schema,
   FileMatch,
   OverrideMode,
-  ErrorOnFailedKey,
+  ErrorOnUnresolvedConflict,
 } from '../schema.js';
 import { askString } from '../utils/ask.js';
 import { mapImportFormat } from '../utils/mapImportFormat.js';
@@ -28,7 +28,7 @@ import { BodyOf } from '../client/internal/schema.utils.js';
 import { components } from '../client/internal/schema.generated.js';
 import { findFilesByTemplate } from '../utils/filesTemplate.js';
 import { valueToArray } from '../utils/valueToArray.js';
-import { printFailedKeys } from '../utils/printFailedKeys.js';
+import { printUnresolvedConflicts } from '../utils/printFailedKeys.js';
 
 type ImportRequest = BodyOf<
   '/v2/projects/{projectId}/single-step-import',
@@ -58,7 +58,7 @@ type PushOptions = BaseOptions & {
   removeOtherKeys?: boolean;
   filesTemplate?: string[];
   overrideMode?: OverrideMode;
-  errorOnFailedKey?: ErrorOnFailedKey;
+  errorOnUnresolvedConflict?: ErrorOnUnresolvedConflict;
 };
 
 async function allInPattern(pattern: string) {
@@ -202,20 +202,20 @@ const pushHandler = (config: Schema) =>
       return;
     }
 
-    let errorOnFailedKey: boolean | undefined;
-    switch (opts.errorOnFailedKey) {
+    let errorOnUnresolvedConflict: boolean | undefined;
+    switch (opts.errorOnUnresolvedConflict) {
       case 'auto':
-        errorOnFailedKey = undefined;
+        errorOnUnresolvedConflict = undefined;
         break;
       case 'yes':
-        errorOnFailedKey = true;
+        errorOnUnresolvedConflict = true;
         break;
       case 'no':
-        errorOnFailedKey = false;
+        errorOnUnresolvedConflict = false;
         break;
     }
 
-    console.log(errorOnFailedKey, opts.errorOnFailedKey);
+    console.log(errorOnUnresolvedConflict, opts.errorOnUnresolvedConflict);
 
     const params: ImportProps['params'] = {
       createNewKeys: true,
@@ -240,10 +240,10 @@ const pushHandler = (config: Schema) =>
         };
       }),
       removeOtherKeys: opts.removeOtherKeys,
-      errorOnFailedKey,
+      errorOnUnresolvedConflict: errorOnUnresolvedConflict,
     };
 
-    console.log({ errorOnFailedKey });
+    console.log({ errorOnFailedKey: errorOnUnresolvedConflict });
 
     let attempt = await loading(
       'Importing...',
@@ -271,8 +271,8 @@ const pushHandler = (config: Schema) =>
       handleLoadableError(attempt);
     }
 
-    if (attempt.data?.failedKeys?.length) {
-      printFailedKeys(attempt.data.failedKeys);
+    if (attempt.data?.unresolvedConflicts?.length) {
+      printUnresolvedConflicts(attempt.data.unresolvedConflicts);
     }
 
     success('Done!');
@@ -343,10 +343,10 @@ export default (config: Schema) =>
     )
     .addOption(
       new Option(
-        '--error-on-failed-key <choice>',
-        'Fail the whole import if there are failed keys for override.'
+        '--error-on-unresolved-conflict <choice>',
+        'Fail the whole import if there are unresolved conflicts.'
       )
         .choices(['yes', 'no', 'auto'])
-        .default(config.push?.errorOnFailedKey ?? 'auto')
+        .default(config.push?.errorOnUnresolvedConflict ?? 'auto')
     )
     .action(pushHandler(config));

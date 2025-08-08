@@ -29,7 +29,8 @@ export type ComparatorResult = {
 export function printKey(
   key: PartialKey,
   deletion?: boolean,
-  color?: ansi.StyleFunction
+  color?: ansi.StyleFunction,
+  note?: string
 ) {
   const colorFunc = color ?? (deletion == false ? ansi.red : ansi.green);
 
@@ -37,12 +38,14 @@ export function printKey(
     ? ` ${ansi.italic(`(namespace: ${key.namespace})`)}`
     : '';
 
+  const renderedNote = note ? ` ${note}` : '';
+
   if (deletion === undefined) {
-    console.log(`${colorFunc(`${key.keyName}`)}${namespace}`);
+    console.log(`${colorFunc(`${key.keyName}`)}${namespace}${renderedNote}`);
   } else if (deletion) {
-    console.log(`${colorFunc(`- ${key.keyName}`)}${namespace}`);
+    console.log(`${colorFunc(`- ${key.keyName}`)}${namespace}${renderedNote}`);
   } else {
-    console.log(`${colorFunc(`+ ${key.keyName}`)}${namespace}`);
+    console.log(`${colorFunc(`+ ${key.keyName}`)}${namespace}${renderedNote}`);
   }
 }
 

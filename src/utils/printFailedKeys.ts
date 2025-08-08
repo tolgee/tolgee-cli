@@ -3,13 +3,22 @@ import ansi from 'ansi-colors';
 import { warn } from './logger.js';
 import { printKey } from '../commands/sync/syncUtils.js';
 
-type SimpleKeyResult = components['schemas']['SimpleKeyResult'];
+type SimpleImportConflictResult =
+  components['schemas']['SimpleImportConflictResult'];
 
-export function printFailedKeys(keys: SimpleKeyResult[], color = ansi.yellow) {
+export function printUnresolvedConflicts(
+  keys: SimpleImportConflictResult[],
+  color = ansi.yellow
+) {
   console.log('');
   warn('Some keys cannot be updated:');
-  keys.forEach((key) => {
-    printKey({ keyName: key.name, namespace: key.namespace }, undefined, color);
+  keys.forEach((c) => {
+    printKey(
+      { keyName: c.keyName, namespace: c.keyNamespace },
+      undefined,
+      color,
+      c.isOverridable ? '(overridable)' : ''
+    );
   });
   console.log('');
 }

@@ -62,9 +62,9 @@ export type Path = string;
  */
 export type ForceMode = "OVERRIDE" | "KEEP" | "NO_FORCE";
 /**
- * Fail the whole import if there are failed keys for override.
+ * Fail the whole import if there are unresolved conflicts in import.
  */
-export type ErrorOnFailedKey = "yes" | "no" | "auto";
+export type ErrorOnUnresolvedConflict = "yes" | "no" | "auto";
 /**
  * Specifies what is considered non-overridable translation:
  *  - RECOMMENDED - protected reviewed translations are considered as non-overridable
@@ -147,7 +147,7 @@ export interface Schema {
      * Remove keys which are not present in the import (within imported namespaces).
      */
     removeOtherKeys?: boolean;
-    errorOnFailedKey?: ErrorOnFailedKey;
+    errorOnUnresolvedConflict?: ErrorOnUnresolvedConflict;
     overrideMode?: OverrideMode;
   };
   pull?: {
