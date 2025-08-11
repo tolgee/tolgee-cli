@@ -1,5 +1,5 @@
+import { getUnresolvedConflictsMessage } from '../utils/printFailedKeys.js';
 import { LoadableData } from './TolgeeClient.js';
-import ansi from 'ansi-colors';
 
 export const addErrorDetails = (loadable: LoadableData, showBeError = true) => {
   let additionalInfo = '';
@@ -13,19 +13,13 @@ export const addErrorDetails = (loadable: LoadableData, showBeError = true) => {
   }
 
   if (
-    loadable.error?.code === 'import_failed' &&
+    loadable.error?.code === 'conflict_is_not_resolved' &&
     typeof loadable.error.params?.[0] === 'object'
   ) {
-    additionalInfo += '\n';
-    additionalInfo += 'Some keys cannot be updated:\n';
-    loadable.error.params?.forEach((key) => {
-      const namespace = key.namespace
-        ? ` ${ansi.italic(`(namespace: ${key.namespace})`)}`
-        : '';
-
-      additionalInfo += ansi.red(`${`${key.name}`}${namespace}\n`);
-    });
-    additionalInfo += '\n\n';
+    additionalInfo += getUnresolvedConflictsMessage(
+      loadable.error.params as any,
+      true
+    );
   }
 
   return `[${items.join(', ')}]${additionalInfo ? '\n' + additionalInfo : ''}`;

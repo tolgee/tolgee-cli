@@ -215,8 +215,6 @@ const pushHandler = (config: Schema) =>
         break;
     }
 
-    console.log(errorOnUnresolvedConflict, opts.errorOnUnresolvedConflict);
-
     const params: ImportProps['params'] = {
       createNewKeys: true,
       forceMode: opts.forceMode,
@@ -242,8 +240,6 @@ const pushHandler = (config: Schema) =>
       removeOtherKeys: opts.removeOtherKeys,
       errorOnUnresolvedConflict: errorOnUnresolvedConflict,
     };
-
-    console.log({ errorOnFailedKey: errorOnUnresolvedConflict });
 
     let attempt = await loading(
       'Importing...',
@@ -272,7 +268,7 @@ const pushHandler = (config: Schema) =>
     }
 
     if (attempt.data?.unresolvedConflicts?.length) {
-      printUnresolvedConflicts(attempt.data.unresolvedConflicts);
+      printUnresolvedConflicts(attempt.data.unresolvedConflicts, false);
     }
 
     success('Done!');

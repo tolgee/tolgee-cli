@@ -21,12 +21,109 @@ describe('project 1', () => {
       translationProtection: 'PROTECT_REVIEWED',
     });
     pak = await createPak(client);
+    await prepareData();
   });
   afterEach(async () => {
     await deleteProject(client);
   });
 
   it("doesn't update reviewed translation when is protected", async () => {
+    const out = await run([
+      '--api-key',
+      pak,
+      'push',
+      '--force-mode',
+      'OVERRIDE',
+      '--verbose',
+      '--files-template',
+      fileURLToPath(new URL(`./{languageTag}.json`, PROJECT_1_DIR)),
+    ]);
+
+    expect(out.stdout.toString()).toContain(
+      'Some translations cannot be updated:'
+    );
+    expect(out.stdout.toString()).toContain('controller');
+    expect(out.code).toBe(0);
+
+    const response = await client.GET('/v2/projects/{projectId}/translations', {
+      params: {
+        path: { projectId: client.getProjectId() },
+        query: { filterKeyName: ['controller'] },
+      },
+    });
+
+    const translation =
+      response.data?._embedded?.keys?.[0]?.translations?.['en'].text;
+
+    expect(translation).toEqual('Controller (old)');
+  });
+
+  it("doesn't update reviewed translation and fails when is protected", async () => {
+    const out = await run([
+      '--api-key',
+      pak,
+      'push',
+      '--force-mode',
+      'OVERRIDE',
+      '--error-on-unresolved-conflict',
+      'yes',
+      '--files-template',
+      fileURLToPath(new URL(`./{languageTag}.json`, PROJECT_1_DIR)),
+    ]);
+
+    expect(out.stdout.toString()).toContain(
+      'Some translations cannot be updated:'
+    );
+    expect(out.stdout.toString()).toContain('controller');
+    expect(out.code).toBe(1);
+
+    const response = await client.GET('/v2/projects/{projectId}/translations', {
+      params: {
+        path: { projectId: client.getProjectId() },
+        query: { filterKeyName: ['controller'] },
+      },
+    });
+
+    const translation =
+      response.data?._embedded?.keys?.[0]?.translations?.['en'].text;
+
+    expect(translation).toEqual('Controller (old)');
+  });
+
+  it("update reviewed when override mode is 'ALL'", async () => {
+    const out = await run([
+      '--api-key',
+      pak,
+      'push',
+      '--force-mode',
+      'OVERRIDE',
+      '--override-mode',
+      'ALL',
+      '--verbose',
+      '--files-template',
+      fileURLToPath(new URL(`./{languageTag}.json`, PROJECT_1_DIR)),
+    ]);
+
+    expect(out.stdout.toString()).not.toContain(
+      'Some translations cannot be updated:'
+    );
+    expect(out.stdout.toString()).not.toContain('controller');
+    expect(out.code).toBe(0);
+
+    const response = await client.GET('/v2/projects/{projectId}/translations', {
+      params: {
+        path: { projectId: client.getProjectId() },
+        query: { filterKeyName: ['controller'] },
+      },
+    });
+
+    const translation =
+      response.data?._embedded?.keys?.[0]?.translations?.['en'].text;
+
+    expect(translation).toEqual('Controller');
+  });
+
+  async function prepareData() {
     const keys = await client.GET('/v2/projects/{projectId}/translations', {
       params: {
         path: { projectId: client.getProjectId() },
@@ -58,32 +155,5 @@ describe('project 1', () => {
         },
       }
     );
-
-    const out = await run([
-      '--api-key',
-      pak,
-      'push',
-      '--force-mode',
-      'OVERRIDE',
-      '--verbose',
-      '--files-template',
-      fileURLToPath(new URL(`./{languageTag}.json`, PROJECT_1_DIR)),
-    ]);
-
-    expect(out.stdout.toString()).toContain('Some keys cannot be updated:');
-    expect(out.stdout.toString()).toContain('controller');
-    expect(out.code).toBe(0);
-
-    const response = await client.GET('/v2/projects/{projectId}/translations', {
-      params: {
-        path: { projectId: client.getProjectId() },
-        query: { filterKeyName: ['controller'] },
-      },
-    });
-
-    const translation =
-      response.data?._embedded?.keys?.[0]?.translations?.['en'].text;
-
-    expect(translation).toEqual('Controller (old)');
-  });
+  }
 });
