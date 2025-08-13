@@ -62,7 +62,10 @@ export type Path = string;
  */
 export type ForceMode = "OVERRIDE" | "KEEP" | "NO_FORCE";
 /**
- * Fail the whole import if there are unresolved conflicts in import.
+ * Fail the whole import if there are unresolved conflicts in import:
+ *  - yes - fail if any unresolved conflict is present
+ *  no - don't fail and just print unresolved conflicts
+ *  auto - fails when when forceMode=KEEP, otherwise doesn't fail
  */
 export type ErrorOnUnresolvedConflict = "yes" | "no" | "auto";
 /**

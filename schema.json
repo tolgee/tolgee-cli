@@ -263,7 +263,7 @@
       "enum": ["ALL", "RECOMMENDED"]
     },
     "errorOnUnresolvedConflict": {
-      "description": "Fail the whole import if there are unresolved conflicts in import.",
+      "description": "Fail the whole import if there are unresolved conflicts in import: \n - yes - fail if any unresolved conflict is present\n no - don't fail and just print unresolved conflicts\n auto - fails when when forceMode=KEEP, otherwise doesn't fail",
       "type": "string",
       "enum": ["yes", "no", "auto"]
     },
