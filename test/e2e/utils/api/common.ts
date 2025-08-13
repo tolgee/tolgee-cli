@@ -53,13 +53,14 @@ export async function createProjectWithClient(
   const userToken = await userLogin();
   let client = createClient(userToken!);
   const organizations = await client.GET('/v2/organizations');
+  const { languages, ...editOptions } = options ?? {};
 
   const project = await client.POST('/v2/projects', {
     body: {
       name: name,
       organizationId: organizations.data!._embedded!.organizations![0].id,
-      languages: options?.languages ?? languagesTestData,
-      icuPlaceholders: options?.icuPlaceholders ?? true,
+      languages: languages ?? languagesTestData,
+      icuPlaceholders: editOptions?.icuPlaceholders ?? true,
     },
   });
 
@@ -76,7 +77,7 @@ export async function createProjectWithClient(
       useNamespaces: true,
       suggestionsMode: 'DISABLED',
       translationProtection: 'NONE',
-      ...options,
+      ...editOptions,
       name,
     },
   });
