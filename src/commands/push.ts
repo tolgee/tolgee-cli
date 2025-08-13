@@ -13,7 +13,14 @@ import {
   warn,
   exitWithError,
 } from '../utils/logger.js';
-import { ForceMode, Format, Schema, FileMatch } from '../schema.js';
+import {
+  ForceMode,
+  Format,
+  Schema,
+  FileMatch,
+  OverrideMode,
+  ErrorOnUnresolvedConflict,
+} from '../schema.js';
 import { askString } from '../utils/ask.js';
 import { mapImportFormat } from '../utils/mapImportFormat.js';
 import { TolgeeClient, handleLoadableError } from '../client/TolgeeClient.js';
@@ -21,6 +28,7 @@ import { BodyOf } from '../client/internal/schema.utils.js';
 import { components } from '../client/internal/schema.generated.js';
 import { findFilesByTemplate } from '../utils/filesTemplate.js';
 import { valueToArray } from '../utils/valueToArray.js';
+import { printUnresolvedConflicts } from '../utils/printFailedKeys.js';
 
 type ImportRequest = BodyOf<
   '/v2/projects/{projectId}/single-step-import',
@@ -49,6 +57,8 @@ type PushOptions = BaseOptions & {
   tagNewKeys?: string[];
   removeOtherKeys?: boolean;
   filesTemplate?: string[];
+  overrideMode?: OverrideMode;
+  errorOnUnresolvedConflict?: ErrorOnUnresolvedConflict;
 };
 
 async function allInPattern(pattern: string) {
@@ -192,12 +202,26 @@ const pushHandler = (config: Schema) =>
       return;
     }
 
+    let errorOnUnresolvedConflict: boolean | undefined;
+    switch (opts.errorOnUnresolvedConflict) {
+      case 'auto':
+        errorOnUnresolvedConflict = undefined;
+        break;
+      case 'yes':
+        errorOnUnresolvedConflict = true;
+        break;
+      case 'no':
+        errorOnUnresolvedConflict = false;
+        break;
+    }
+
     const params: ImportProps['params'] = {
       createNewKeys: true,
       forceMode: opts.forceMode,
       overrideKeyDescriptions: opts.overrideKeyDescriptions,
       convertPlaceholdersToIcu: opts.convertPlaceholdersToIcu,
       tagNewKeys: opts.tagNewKeys ?? [],
+      overrideMode: opts.overrideMode ?? 'RECOMMENDED',
       fileMappings: files.map((f) => {
         const format = mapImportFormat(opts.format, extname(f.name));
         return {
@@ -214,9 +238,10 @@ const pushHandler = (config: Schema) =>
         };
       }),
       removeOtherKeys: opts.removeOtherKeys,
+      errorOnUnresolvedConflict: errorOnUnresolvedConflict,
     };
 
-    const attempt1 = await loading(
+    let attempt = await loading(
       'Importing...',
       importData(opts.client, {
         files,
@@ -224,23 +249,28 @@ const pushHandler = (config: Schema) =>
       })
     );
 
-    if (attempt1.error) {
-      if (attempt1.error.code === 'existing_language_not_selected') {
+    if (attempt.error) {
+      if (attempt.error.code === 'existing_language_not_selected') {
         handleMappingError(params.fileMappings);
       }
-      if (attempt1.error.code !== 'conflict_is_not_resolved') {
-        handleLoadableError(attempt1);
+      if (attempt.error.code !== 'conflict_is_not_resolved') {
+        handleLoadableError(attempt);
       }
       const forceMode = await promptConflicts(opts);
-      const attempt2 = await loading(
+      attempt = await loading(
         'Overriding...',
         importData(opts.client, {
           files,
           params: { ...params, forceMode },
         })
       );
-      handleLoadableError(attempt2);
+      handleLoadableError(attempt);
     }
+
+    if (attempt.data?.unresolvedConflicts?.length) {
+      printUnresolvedConflicts(attempt.data.unresolvedConflicts, false);
+    }
+
     success('Done!');
   };
 
@@ -298,5 +328,21 @@ export default (config: Schema) =>
         '--remove-other-keys',
         'Remove keys which are not present in the import (within imported namespaces).'
       ).default(config.push?.removeOtherKeys)
+    )
+    .addOption(
+      new Option(
+        '--override-mode <mode>',
+        'Specifies what is considered non-overridable translation.'
+      )
+        .choices(['RECOMMENDED', 'ALL'])
+        .default(config.push?.overrideMode)
+    )
+    .addOption(
+      new Option(
+        '--error-on-unresolved-conflict <choice>',
+        'Fail the whole import if there are unresolved conflicts.'
+      )
+        .choices(['yes', 'no', 'auto'])
+        .default(config.push?.errorOnUnresolvedConflict ?? 'auto')
     )
     .action(pushHandler(config));

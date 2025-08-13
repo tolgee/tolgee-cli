@@ -1,7 +1,8 @@
 export const getStackTrace = () => {
-  const obj = {} as any;
-  Error.captureStackTrace(obj, getStackTrace);
-  const stack = obj.stack as string;
-  const parts = stack.split('\n');
-  return parts.slice(2).join('\n');
+  if (typeof Error.captureStackTrace === 'function') {
+    const obj = {} as { stack?: string };
+    Error.captureStackTrace(obj, getStackTrace);
+    return obj.stack ?? '';
+  }
+  return new Error().stack ?? '';
 };

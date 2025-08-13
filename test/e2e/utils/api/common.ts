@@ -43,45 +43,46 @@ export async function deleteProject(client: TolgeeClient | undefined) {
 
 type Options = {
   languages?: components['schemas']['LanguageRequest'][];
-  icuEnabled?: boolean;
-};
+} & Partial<Omit<components['schemas']['EditProjectRequest'], 'name'>>;
 
 export async function createProjectWithClient(
   name: string,
-  data: components['schemas']['ImportKeysResolvableDto'],
+  data: components['schemas']['SingleStepImportResolvableRequest'],
   options?: Options
 ) {
   const userToken = await userLogin();
   let client = createClient(userToken!);
   const organizations = await client.GET('/v2/organizations');
+  const { languages, ...editOptions } = options ?? {};
 
   const project = await client.POST('/v2/projects', {
     body: {
       name: name,
       organizationId: organizations.data!._embedded!.organizations![0].id,
-      languages: options?.languages ?? languagesTestData,
-      icuPlaceholders: true,
+      languages: languages ?? languagesTestData,
+      icuPlaceholders: editOptions?.icuPlaceholders ?? true,
     },
   });
 
   client = createClient(userToken, { projectId: project.data!.id });
 
-  if (options?.icuEnabled) {
-    client.PUT('/v2/projects/{projectId}', {
-      params: {
-        path: {
-          projectId: client.getProjectId(),
-        },
+  await client.PUT('/v2/projects/{projectId}', {
+    params: {
+      path: {
+        projectId: client.getProjectId(),
       },
-      body: {
-        name,
-        icuPlaceholders: true,
-        useNamespaces: true,
-      },
-    });
-  }
+    },
+    body: {
+      icuPlaceholders: true,
+      useNamespaces: true,
+      suggestionsMode: 'DISABLED',
+      translationProtection: 'NONE',
+      ...editOptions,
+      name,
+    },
+  });
 
-  await client.POST('/v2/projects/{projectId}/keys/import-resolvable', {
+  await client.POST('/v2/projects/{projectId}/single-step-import-resolvable', {
     params: { path: { projectId: client.getProjectId() } },
     body: data,
   });

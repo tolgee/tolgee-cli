@@ -61,6 +61,19 @@ export type Path = string;
  *   `NO_FORCE` - throw an error, if there are any conflict
  */
 export type ForceMode = "OVERRIDE" | "KEEP" | "NO_FORCE";
+/**
+ * Fail the whole import if there are unresolved conflicts in import:
+ *  - yes - fail if any unresolved conflict is present
+ *  no - don't fail and just print unresolved conflicts
+ *  auto - fails when when forceMode=KEEP, otherwise doesn't fail
+ */
+export type ErrorOnUnresolvedConflict = "yes" | "no" | "auto";
+/**
+ * Specifies what is considered non-overridable translation:
+ *  - RECOMMENDED - protected reviewed translations are considered as non-overridable
+ *  - ALL - translations that user has permissions for
+ */
+export type OverrideMode = "ALL" | "RECOMMENDED";
 
 export interface Schema {
   /**
@@ -134,9 +147,11 @@ export interface Schema {
      */
     tagNewKeys?: string[];
     /**
-     * Remove keys which are not present in the import.
+     * Remove keys which are not present in the import (within imported namespaces).
      */
     removeOtherKeys?: boolean;
+    errorOnUnresolvedConflict?: ErrorOnUnresolvedConflict;
+    overrideMode?: OverrideMode;
   };
   pull?: {
     /**
@@ -190,7 +205,7 @@ export interface Schema {
      */
     continueOnWarning?: boolean;
     /**
-     * Delete unused keys from the Tolgee project
+     * Delete unused keys from the Tolgee project (within selected namespaces if specified).
      */
     removeUnused?: boolean;
     /**

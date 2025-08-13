@@ -40,6 +40,7 @@ async function fetchZipBlob(opts: PullOptions): Promise<Blob> {
     filterTagIn: opts.tags,
     filterTagNotIn: opts.excludeTags,
     fileStructureTemplate: opts.fileStructureTemplate,
+    escapeHtml: false,
   });
 
   handleLoadableError(loadable);
