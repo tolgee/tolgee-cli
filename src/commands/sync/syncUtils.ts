@@ -32,7 +32,7 @@ export function printKey(
   color?: ansi.StyleFunction,
   note?: string
 ) {
-  const colorFunc = color ?? (deletion == false ? ansi.red : ansi.green);
+  const colorFunc = color ?? (deletion ? ansi.red : ansi.green);
 
   const namespace = key.namespace
     ? ` ${ansi.italic(`(namespace: ${key.namespace})`)}`

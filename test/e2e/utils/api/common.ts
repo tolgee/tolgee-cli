@@ -43,7 +43,7 @@ export async function deleteProject(client: TolgeeClient | undefined) {
 
 type Options = {
   languages?: components['schemas']['LanguageRequest'][];
-} & Partial<components['schemas']['EditProjectRequest']>;
+} & Partial<Omit<components['schemas']['EditProjectRequest'], 'name'>>;
 
 export async function createProjectWithClient(
   name: string,
@@ -72,11 +72,12 @@ export async function createProjectWithClient(
       },
     },
     body: {
+      icuPlaceholders: true,
+      useNamespaces: true,
+      suggestionsMode: 'DISABLED',
+      translationProtection: 'NONE',
+      ...options,
       name,
-      icuPlaceholders: options?.icuPlaceholders ?? true,
-      useNamespaces: options?.useNamespaces ?? true,
-      suggestionsMode: options?.suggestionsMode ?? 'DISABLED',
-      translationProtection: options?.translationProtection ?? 'NONE',
     },
   });
 
