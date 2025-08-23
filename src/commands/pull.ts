@@ -5,11 +5,22 @@ import { Command, Option } from 'commander';
 
 import { unzipBuffer } from '../utils/zip.js';
 import { prepareDir } from '../utils/prepareDir.js';
-import { exitWithError, loading, success } from '../utils/logger.js';
+import {
+  exitWithError,
+  loading,
+  success,
+  info,
+  debug,
+} from '../utils/logger.js';
 import { Schema } from '../schema.js';
 import { checkPathNotAFile } from '../utils/checkPathNotAFile.js';
 import { mapExportFormat } from '../utils/mapExportFormat.js';
 import { handleLoadableError } from '../client/TolgeeClient.js';
+import { startWatching } from '../utils/watchHandler.js';
+import {
+  getLastModified,
+  extractLastModifiedFromResponse,
+} from '../utils/lastModifiedStorage.js';
 
 type PullOptions = BaseOptions & {
   format: Schema['format'];
@@ -23,9 +34,57 @@ type PullOptions = BaseOptions & {
   excludeTags?: string[];
   fileStructureTemplate?: string;
   path?: string;
+  watch?: boolean;
 };
 
-async function fetchZipBlob(opts: PullOptions): Promise<Blob> {
+const pullHandler = () =>
+  async function (this: Command) {
+    const opts: PullOptions = this.optsWithGlobals();
+
+    if (!opts.path) {
+      exitWithError(
+        'Missing option --path <path> or `pull.path` in tolgee config'
+      );
+    }
+
+    await checkPathNotAFile(opts.path);
+
+    if (!opts.watch) {
+      await doPull(opts);
+      success('Done!');
+      return;
+    }
+
+    // Start watching for changes
+    await startWatching({
+      apiUrl: opts.apiUrl,
+      apiKey: opts.apiKey,
+      projectId: opts.projectId,
+      doPull: async () => {
+        await doPull(opts);
+      },
+    });
+  };
+
+const doPull = async (opts: PullOptions) => {
+  const result = await loading(
+    'Fetching strings from Tolgee...',
+    fetchZipBlob(opts, getLastModified(opts.projectId))
+  );
+  if (result.notModified) {
+    debug('No changes detected. Skipping pull.');
+    return;
+  }
+  await prepareDir(opts.path!, opts.emptyDir);
+  await loading('Extracting strings...', unzipBuffer(result.data, opts.path!));
+  // Store last modified timestamp after successful pull
+  if (result.lastModified) {
+    const { setLastModified } = await import('../utils/lastModifiedStorage.js');
+    setLastModified(opts.projectId, result.lastModified);
+  }
+};
+
+async function fetchZipBlob(opts: PullOptions, ifModifiedSince?: string) {
   const exportFormat = mapExportFormat(opts.format);
   const { format, messageFormat } = exportFormat;
 
@@ -41,32 +100,23 @@ async function fetchZipBlob(opts: PullOptions): Promise<Blob> {
     filterTagNotIn: opts.excludeTags,
     fileStructureTemplate: opts.fileStructureTemplate,
     escapeHtml: false,
+    ifModifiedSince,
   });
 
   handleLoadableError(loadable);
-  return loadable.data;
-}
+  const lastModified = loadable.response
+    ? extractLastModifiedFromResponse(loadable.response)
+    : undefined;
 
-const pullHandler = () =>
-  async function (this: Command) {
-    const opts: PullOptions = this.optsWithGlobals();
-
-    if (!opts.path) {
-      exitWithError(
-        'Missing option --path <path> or `pull.path` in tolgee config'
-      );
-    }
-
-    await checkPathNotAFile(opts.path);
-
-    const zipBlob = await loading(
-      'Fetching strings from Tolgee...',
-      fetchZipBlob(opts)
-    );
-    await prepareDir(opts.path, opts.emptyDir);
-    await loading('Extracting strings...', unzipBuffer(zipBlob, opts.path));
-    success('Done!');
+  return {
+    data: loadable.data,
+    lastModified,
+    // 412 is not modified for POST request
+    // https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/412
+    // 304 is not modified for GET request
+    notModified: [412, 304].includes(loadable.response?.status ?? 0),
   };
+}
 
 export default (config: Schema) =>
   new Command()
@@ -136,5 +186,11 @@ export default (config: Schema) =>
         '--file-structure-template <template>',
         'Defines exported file structure: https://tolgee.io/tolgee-cli/push-pull-strings#file-structure-template-format'
       ).default(config.pull?.fileStructureTemplate)
+    )
+    .addOption(
+      new Option(
+        '--watch',
+        'Watch for changes and re-pull automatically'
+      ).default(false)
     )
     .action(pullHandler());

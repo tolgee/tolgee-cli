@@ -107,22 +107,25 @@ export async function savePak(
 }
 
 export async function getApiKey(
-  instance: URL,
+  apiUrl: string,
   projectId: number
 ): Promise<string | null> {
   const store = await loadStore();
-  if (!store[instance.hostname]) {
+
+  const apiUrlObj = new URL(apiUrl);
+
+  if (!store[apiUrlObj.hostname]) {
     return null;
   }
 
-  const scopedStore = store[instance.hostname];
+  const scopedStore = store[apiUrlObj.hostname];
   if (scopedStore.user) {
     if (
       scopedStore.user.expires !== 0 &&
       Date.now() > scopedStore.user.expires
     ) {
-      warn(`Your personal access token for ${instance.hostname} expired.`);
-      await storePat(store, instance, undefined);
+      warn(`Your personal access token for ${apiUrlObj.hostname} expired.`);
+      await storePat(store, apiUrlObj, undefined);
       return null;
     }
 
@@ -137,9 +140,9 @@ export async function getApiKey(
   if (pak) {
     if (pak.expires !== 0 && Date.now() > pak.expires) {
       warn(
-        `Your project API key for project #${projectId} on ${instance.hostname} expired.`
+        `Your project API key for project #${projectId} on ${apiUrlObj.hostname} expired.`
       );
-      await removePak(store, instance, projectId);
+      await removePak(store, apiUrlObj, projectId);
       return null;
     }
 
