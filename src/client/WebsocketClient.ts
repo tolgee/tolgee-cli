@@ -33,6 +33,7 @@ export const WebsocketClient = (options: WebsocketClientOptions) => {
   let _client: CompatClient | undefined;
   let _deactivated = false;
   let connected = false;
+  let connecting = false;
   let subscriptions: Subscription<any>[] = [];
 
   const resubscribe = () => {
@@ -73,29 +74,29 @@ export const WebsocketClient = (options: WebsocketClientOptions) => {
   }
 
   function connectIfNotAlready() {
-    if (_deactivated) {
+    if (_deactivated || connected || connecting) {
       return;
     }
+
+    connecting = true;
 
     const client = getClient();
 
     const onConnected = function () {
       connected = true;
+      connecting = false;
       resubscribe();
       options.onConnected?.();
     };
 
     const onDisconnect = function () {
       connected = false;
-      subscriptions.forEach((s) => {
-        s.unsubscribe = undefined;
-        s.id = undefined;
-        removeSubscription(s);
-      });
+      connecting = false;
       options.onConnectionClose?.();
     };
 
     const onError = (error: any) => {
+      connecting = false;
       options.onError?.(error);
     };
 

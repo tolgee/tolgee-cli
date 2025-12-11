@@ -80,8 +80,8 @@ export async function startWatching(
     serverUrl: new URL(apiUrl).origin,
     authentication: { apiKey: apiKey },
     onConnected: () => {
-      // If the connection is lost, we need to reconnect when connected again.
-      subscribe();
+      // // If the connection is lost, we need to reconnect when connected again.
+      // subscribe();
     },
     onError: (error) => {
       handleAuthErrors(error, shutdown);
@@ -99,7 +99,6 @@ export async function startWatching(
 
   function subscribe() {
     unsubscribe = wsClient.subscribe(channel, () => {
-      unsubscribe?.();
       debug('Data change detected by websocket. Pulling now... ');
       schedulePull();
       startPolling();
