@@ -1,9 +1,3 @@
-export interface LastModifiedData {
-  projectId: number;
-  lastModified: string;
-  timestamp: number;
-}
-
 // In-memory storage for last modified data
 // In the future we can use filesystem to store it
 const lastModifiedStorage = new Map<

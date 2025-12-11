@@ -12,7 +12,7 @@ type WebsocketClientOptions = {
     apiKey?: string;
   };
   onConnected?: () => void;
-  onError?: () => void;
+  onError?: (error: any) => void;
   onConnectionClose?: () => void;
 };
 
@@ -52,12 +52,11 @@ export const WebsocketClient = (options: WebsocketClientOptions) => {
       debug(`Subscribing to ${subscription.channel}`);
       const stompSubscription = _client!.subscribe(
         subscription.channel,
-        function(message: any) {
+        function (message: any) {
           const parsed = JSON.parse(message.body) as Message;
           subscription.callback(parsed as any);
-        },
+        }
       );
-      console.log('Subscribed to: ', subscription.channel, ' with id: ', stompSubscription.id);
       subscription.unsubscribe = stompSubscription.unsubscribe;
       subscription.id = stompSubscription.id;
     }
@@ -80,13 +79,13 @@ export const WebsocketClient = (options: WebsocketClientOptions) => {
 
     const client = getClient();
 
-    const onConnected = function() {
+    const onConnected = function () {
       connected = true;
       resubscribe();
       options.onConnected?.();
     };
 
-    const onDisconnect = function() {
+    const onDisconnect = function () {
       connected = false;
       subscriptions.forEach((s) => {
         s.unsubscribe = undefined;
@@ -96,15 +95,15 @@ export const WebsocketClient = (options: WebsocketClientOptions) => {
       options.onConnectionClose?.();
     };
 
-    const onError = () => {
-      options.onError?.();
+    const onError = (error: any) => {
+      options.onError?.(error);
     };
 
     client.connect(
       getAuthentication(options),
       onConnected,
       onError,
-      onDisconnect,
+      onDisconnect
     );
   }
 
@@ -124,11 +123,10 @@ export const WebsocketClient = (options: WebsocketClientOptions) => {
    */
   function subscribe<T extends ChannelProject | ChannelUser>(
     channel: T,
-    callback: (data: Data<T>) => void,
+    callback: (data: Data<T>) => void
   ): () => void {
     if (_deactivated) {
-      return () => {
-      };
+      return () => {};
     }
 
     connectIfNotAlready();
@@ -195,11 +193,11 @@ export type BatchJobProgress = WebsocketEvent<{
 
 export type EntityModification<T> = T extends keyof schemas
   ? {
-    id: number;
-    modifications: Partial<schemas[T]['mutableFields']>;
-    relations: schemas[T]['relations'];
-    changeType: 'MOD' | 'DEL' | 'ADD';
-  }
+      id: number;
+      modifications: Partial<schemas[T]['mutableFields']>;
+      relations: schemas[T]['relations'];
+      changeType: 'MOD' | 'DEL' | 'ADD';
+    }
   : never;
 
 export type WebsocketEvent<Data> = {

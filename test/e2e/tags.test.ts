@@ -1,6 +1,7 @@
 import { TolgeeClient } from '#cli/client/TolgeeClient.js';
 import { join } from 'path';
 import {
+  API_URL,
   createPak,
   createProjectWithClient,
   deleteProject,
@@ -21,7 +22,7 @@ const TAGS_PROJECT_CONFIG = fileURLToPathSlash(
 );
 
 const PROJECT_CONFIG_BASE = {
-  apiUrl: 'http://localhost:22222',
+  apiUrl: API_URL,
   patterns: [join(TAGS_PROJECT_DIR, './react.tsx')],
   push: {
     files: [

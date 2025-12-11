@@ -1,10 +1,6 @@
 import { WebsocketClient } from '../client/WebsocketClient.js';
 import { debug, error, info, success } from './logger.js';
-import {
-  getLastModified,
-  setLastModified,
-  extractLastModifiedFromResponse,
-} from './lastModifiedStorage.js';
+import { setLastModified } from './lastModifiedStorage.js';
 import { clearInterval } from 'node:timers';
 
 // Polling interval as backup when WebSocket is not available (in seconds)
@@ -60,7 +56,10 @@ export async function startWatching(
     } else {
       // Otherwise, schedule the update with debounce
       if (debounceTimer) clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(() => executePull(lastModified), SCHEDULE_PULL_DEBOUNCE_MS);
+      debounceTimer = setTimeout(
+        () => executePull(lastModified),
+        SCHEDULE_PULL_DEBOUNCE_MS
+      );
     }
   };
 
@@ -69,6 +68,7 @@ export async function startWatching(
     clearInterval(pollingTimer);
     const poll = async () => {
       if (pulling) return;
+      debug('Polling for changes...');
       await schedulePull();
     };
 
@@ -80,12 +80,11 @@ export async function startWatching(
     serverUrl: new URL(apiUrl).origin,
     authentication: { apiKey: apiKey },
     onConnected: () => {
-      // Pull on every connection/reconnection to ensure we're up to date
-      schedulePull();
-      // Start polling as backup
-      startPolling();
+      // If the connection is lost, we need to reconnect when connected again.
+      subscribe();
     },
-    onError: () => {
+    onError: (error) => {
+      handleAuthErrors(error, shutdown);
       // Non-fatal: just inform
       info('Websocket error encountered. Reconnecting...');
     },
@@ -95,13 +94,21 @@ export async function startWatching(
   });
 
   const channel = `/projects/${projectId}/translation-data-modified` as const;
-  const unsubscribe = wsClient.subscribe(channel, () => {
-    schedulePull();
-  });
+
+  let unsubscribe: () => void | undefined;
+
+  function subscribe() {
+    unsubscribe = wsClient.subscribe(channel, () => {
+      unsubscribe?.();
+      debug('Data change detected by websocket. Pulling now... ');
+      schedulePull();
+      startPolling();
+    });
+  }
 
   const shutdown = () => {
     try {
-      unsubscribe();
+      unsubscribe?.();
     } catch {}
     try {
       wsClient.deactivate();
@@ -119,6 +126,20 @@ export async function startWatching(
   process.on('SIGINT', shutdown);
   process.on('SIGTERM', shutdown);
 
+  subscribe();
+  schedulePull();
+
   // Keep process alive
   await new Promise<void>(() => {});
+}
+
+function handleAuthErrors(err: any, shutdown: () => void) {
+  if (err?.headers?.message == 'Unauthenticated') {
+    error("You're not authenticated. Invalid API key?");
+    shutdown();
+  }
+  if (err?.headers?.message == 'Unauthorized') {
+    err("You're not authorized. Insufficient permissions?");
+    shutdown();
+  }
 }

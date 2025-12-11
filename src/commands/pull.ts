@@ -75,9 +75,10 @@ const doPull = async (opts: PullOptions) => {
     debug('No changes detected. Skipping pull.');
     return;
   }
+  info(`Updating local data. Last modified: ${result.lastModified}`);
   await prepareDir(opts.path!, opts.emptyDir);
   await loading('Extracting strings...', unzipBuffer(result.data, opts.path!));
-  // Store last modified timestamp after successful pull
+  // Store last modified timestamp after a successful pull
   if (result.lastModified) {
     const { setLastModified } = await import('../utils/lastModifiedStorage.js');
     setLastModified(opts.projectId, result.lastModified);

@@ -38,7 +38,7 @@ export function spawn(
       CLI_INDEX,
       DEBUG_ENABLED && '--verbose',
       '--api-url',
-      'http://localhost:22222',
+      process.env.TOLGEE_TEST_BACKEND_URL || 'http://localhost:22222',
       ...args,
     ].filter(Boolean) as string[],
     {
