@@ -47,6 +47,31 @@ TOLGEE_TEST_BACKEND_URL=http://localhost:8080 npm run test:e2e
 
 When this environment variable is set, the Docker backend will not be started, and tests will use the specified URL instead.
 
+## Building Docker Images
+
+The project includes Docker support for containerized deployment. The Docker setup consists of:
+
+- `Dockerfile`: Multi-stage build configuration using Node.js 22 Alpine
+- `scripts/build-docker.sh`: Comprehensive build script with multi-platform support
+
+### Prerequisites
+
+- Docker installed and running
+- For multi-platform builds: Docker Buildx
+- For pushing images: Docker Hub credentials
+
+### Building Docker Images
+
+The `scripts/build-docker.sh` script provides several build options:
+
+**Basic build (current platform only):**
+
+```bash
+./scripts/build-docker.sh
+```
+
+More information about possible build options is documented in the `build-docker.sh`.
+
 ## Code & internals overview
 
 ### Command parsing
