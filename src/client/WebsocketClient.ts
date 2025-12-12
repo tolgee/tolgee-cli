@@ -11,7 +11,7 @@ type WebsocketClientOptions = {
     jwtToken?: string;
     apiKey?: string;
   };
-  onConnected?: () => void;
+  onConnected?: (message: any) => void;
   onError?: (error: any) => void;
   onConnectionClose?: () => void;
 };
@@ -82,11 +82,11 @@ export const WebsocketClient = (options: WebsocketClientOptions) => {
 
     const client = getClient();
 
-    const onConnected = function () {
+    const onConnected = function (message: any) {
       connected = true;
       connecting = false;
       resubscribe();
-      options.onConnected?.();
+      options.onConnected?.(message);
     };
 
     const onDisconnect = function () {

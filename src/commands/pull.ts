@@ -16,7 +16,7 @@ import { Schema } from '../schema.js';
 import { checkPathNotAFile } from '../utils/checkPathNotAFile.js';
 import { mapExportFormat } from '../utils/mapExportFormat.js';
 import { handleLoadableError } from '../client/TolgeeClient.js';
-import { startWatching } from '../utils/watchHandler.js';
+import { startWatching } from '../utils/pullWatch/watchHandler.js';
 import {
   getLastModified,
   extractLastModifiedFromResponse,
@@ -60,6 +60,7 @@ const pullHandler = () =>
       apiUrl: opts.apiUrl,
       apiKey: opts.apiKey,
       projectId: opts.projectId,
+      client: opts.client,
       doPull: async () => {
         await doPull(opts);
       },

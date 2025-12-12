@@ -1,7 +1,9 @@
-import { WebsocketClient } from '../client/WebsocketClient.js';
-import { debug, error, info, success } from './logger.js';
-import { setLastModified } from './lastModifiedStorage.js';
+import { WebsocketClient } from '../../client/WebsocketClient.js';
+import { debug, error, info, success } from '../logger.js';
+import { setLastModified } from '../lastModifiedStorage.js';
 import { clearInterval } from 'node:timers';
+import { createTolgeeClient } from '../../client/TolgeeClient.js';
+import { AuthErrorHandler } from './AuthErrorHandler.js';
 
 // Polling interval as backup when WebSocket is not available (in seconds)
 const POLLING_INTERVAL_SECONDS = 60;
@@ -12,13 +14,14 @@ export type WatchHandlerOptions = {
   apiUrl: URL;
   apiKey: string;
   projectId: number;
+  client: ReturnType<typeof createTolgeeClient>;
   doPull: () => Promise<void>;
 };
 
 export async function startWatching(
   options: WatchHandlerOptions
 ): Promise<void> {
-  const { apiUrl, apiKey, projectId, doPull } = options;
+  const { apiUrl, apiKey, projectId, doPull, client } = options;
 
   // Watch mode using WebsocketClient on translation-data-modified
   info('Watching for translation changes... Press Ctrl+C to stop.');
@@ -79,12 +82,13 @@ export async function startWatching(
   const wsClient = WebsocketClient({
     serverUrl: new URL(apiUrl).origin,
     authentication: { apiKey: apiKey },
-    onConnected: () => {
-      // // If the connection is lost, we need to reconnect when connected again.
-      // subscribe();
-    },
     onError: (error) => {
-      handleAuthErrors(error, shutdown);
+      console.error('Error: handling auth error');
+      AuthErrorHandler(client)
+        .handleAuthErrors(error, shutdown)
+        .catch((err: any) => {
+          debug('Error in handleAuthErrors: ' + err);
+        });
       // Non-fatal: just inform
       info('Websocket error encountered. Reconnecting...');
     },
@@ -130,15 +134,4 @@ export async function startWatching(
 
   // Keep process alive
   await new Promise<void>(() => {});
-}
-
-function handleAuthErrors(err: any, shutdown: () => void) {
-  if (err?.headers?.message == 'Unauthenticated') {
-    error("You're not authenticated. Invalid API key?");
-    shutdown();
-  }
-  if (err?.headers?.message == 'Unauthorized') {
-    err("You're not authorized. Insufficient permissions?");
-    shutdown();
-  }
 }

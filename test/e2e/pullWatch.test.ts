@@ -67,10 +67,15 @@ export async function isFilesystemDataUpdated(newValue: string) {
 
   if (!existsSync(TMP_FOLDER)) return false;
 
-  const enJsonPath = path.join(TMP_FOLDER, 'en.json');
-  const content = await fs.readFile(enJsonPath, 'utf-8');
-  const data = JSON.parse(content);
-  return data['controller'] === newValue;
+  try {
+    const enJsonPath = path.join(TMP_FOLDER, 'en.json');
+    const content = await fs.readFile(enJsonPath, 'utf-8');
+    const data = JSON.parse(content);
+    return data['controller'] === newValue;
+  } catch (e) {
+    console.debug(e);
+    return false;
+  }
 }
 
 export async function changeLocalizationData(newEnText: string) {
