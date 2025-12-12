@@ -103,3 +103,15 @@ export async function run(
   const cliProcess = spawn(args, false, env);
   return runProcess(cliProcess, timeout);
 }
+
+export function runWithKill(
+  args: string[],
+  env?: Record<string, string>,
+  timeout = 10e3
+) {
+  const cliProcess = spawn(args, false, env);
+  return {
+    promise: runProcess(cliProcess, timeout),
+    kill: (signal: NodeJS.Signals) => cliProcess.kill(signal),
+  };
+}

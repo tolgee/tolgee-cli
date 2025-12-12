@@ -172,7 +172,7 @@ function getAuthentication(options: WebsocketClientOptions) {
     return { 'x-api-key': options.authentication.apiKey };
   }
 
-  return null;
+  return {};
 }
 
 export type EventTypeProject =

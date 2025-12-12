@@ -27,12 +27,21 @@ export async function startWatching(
   info('Watching for translation changes... Press Ctrl+C to stop.');
 
   let pulling = false;
+
+  /**
+   * Pending handles the situation when changes are detected while the pull is
+   * already in progress.
+   */
+  let pending = false;
   let debounceTimer: NodeJS.Timeout | undefined;
   let pollingTimer: NodeJS.Timeout | undefined;
   let lastExecutionTime = 0;
 
   const executePull = async (lastModified?: string) => {
-    if (pulling) return;
+    if (pulling) {
+      pending = true;
+      return;
+    }
     pulling = true;
     lastExecutionTime = Date.now();
     try {
@@ -45,6 +54,11 @@ export async function startWatching(
       error('Error during pull: ' + e.message);
       debug(e);
     } finally {
+      // If there was a pending pull (data changed when pulling), execute it now
+      if (pending) {
+        pending = false;
+        void executePull();
+      }
       pulling = false;
     }
   };
@@ -68,7 +82,9 @@ export async function startWatching(
 
   // Polling mechanism as backup
   const startPolling = () => {
-    clearInterval(pollingTimer);
+    if (pollingTimer) {
+      clearInterval(pollingTimer);
+    }
     const poll = async () => {
       if (pulling) return;
       debug('Polling for changes...');
@@ -83,7 +99,6 @@ export async function startWatching(
     serverUrl: new URL(apiUrl).origin,
     authentication: { apiKey: apiKey },
     onError: (error) => {
-      console.error('Error: handling auth error');
       AuthErrorHandler(client)
         .handleAuthErrors(error, shutdown)
         .catch((err: any) => {
@@ -99,7 +114,7 @@ export async function startWatching(
 
   const channel = `/projects/${projectId}/translation-data-modified` as const;
 
-  let unsubscribe: () => void | undefined;
+  let unsubscribe: (() => void) | undefined;
 
   function subscribe() {
     unsubscribe = wsClient.subscribe(channel, () => {
