@@ -26,7 +26,7 @@ describe('Pull watch', () => {
   });
 
   it('pulls strings from Tolgee with watch', async () => {
-    changeLocalizationData('A key');
+    await changeLocalizationData('A key');
 
     const process = run(
       ['pull', '--api-key', pak, '--path', TMP_FOLDER, '--watch', '--verbose'],

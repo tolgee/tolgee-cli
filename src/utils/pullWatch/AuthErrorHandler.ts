@@ -17,8 +17,6 @@ export function AuthErrorHandler(
 
   async function printUnauthenticatedError() {
     const { isSupported, serverVersion } = await isAppSupportedVersion(client);
-
-    console.log({ isSupported, serverVersion });
     if (isSupported) {
       error("You're not authenticated. Invalid API key?");
       return;
