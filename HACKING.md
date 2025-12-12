@@ -32,6 +32,31 @@ E2E test instance:
 - `tolgee:start`: Start the E2E testing instance. Will be available on port 22222.
 - `tolgee:stop`: Stop the E2E testing instance.
 
+## Building Docker Images
+
+The project includes Docker support for containerized deployment. The Docker setup consists of:
+
+- `Dockerfile`: Multi-stage build configuration using Node.js 22 Alpine
+- `scripts/build-docker.sh`: Comprehensive build script with multi-platform support
+
+### Prerequisites
+
+- Docker installed and running
+- For multi-platform builds: Docker Buildx
+- For pushing images: Docker Hub credentials
+
+### Building Docker Images
+
+The `scripts/build-docker.sh` script provides several build options:
+
+**Basic build (current platform only):**
+
+```bash
+./scripts/build-docker.sh
+```
+
+More information about possible build options is documented in the `build-docker.sh`.
+
 ### Using an alternative backend for testing
 
 By default, E2E tests will start a Docker container with Tolgee backend on port 22222. If you want to use an alternative backend (e.g., a development server running elsewhere), you can set the `TOLGEE_TEST_BACKEND_URL` environment variable:
