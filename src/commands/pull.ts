@@ -1,4 +1,3 @@
-import { Blob } from 'buffer';
 import type { BaseOptions } from '../options.js';
 
 import { Command, Option } from 'commander';
@@ -6,11 +5,11 @@ import { Command, Option } from 'commander';
 import { unzipBuffer } from '../utils/zip.js';
 import { prepareDir } from '../utils/prepareDir.js';
 import {
+  debug,
   exitWithError,
+  info,
   loading,
   success,
-  info,
-  debug,
 } from '../utils/logger.js';
 import { Schema } from '../schema.js';
 import { checkPathNotAFile } from '../utils/checkPathNotAFile.js';
@@ -18,8 +17,8 @@ import { mapExportFormat } from '../utils/mapExportFormat.js';
 import { handleLoadableError } from '../client/TolgeeClient.js';
 import { startWatching } from '../utils/pullWatch/watchHandler.js';
 import {
-  getLastModified,
   extractLastModifiedFromResponse,
+  getLastModified,
 } from '../utils/lastModifiedStorage.js';
 
 type PullOptions = BaseOptions & {

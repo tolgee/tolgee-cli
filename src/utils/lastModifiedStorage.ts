@@ -1,9 +1,6 @@
 // In-memory storage for last modified data
 // In the future we can use filesystem to store it
-const lastModifiedStorage = new Map<
-  number,
-  { lastModified: string; timestamp: number }
->();
+const lastModifiedStorage = new Map<number, { lastModified: string }>();
 
 export function getLastModified(projectId: number): string | undefined {
   const data = lastModifiedStorage.get(projectId);
@@ -18,7 +15,6 @@ export function getLastModified(projectId: number): string | undefined {
 export function setLastModified(projectId: number, lastModified: string): void {
   lastModifiedStorage.set(projectId, {
     lastModified,
-    timestamp: Date.now(),
   });
 }
 

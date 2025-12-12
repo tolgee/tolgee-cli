@@ -1,7 +1,7 @@
 import { CompatClient, Stomp } from '@stomp/stompjs'; // @ts-ignore
 import SockJS from 'sockjs-client';
 import { components } from './internal/schema.generated.js';
-import { debug } from '../utils/logger.js';
+import { debug, error } from '../utils/logger.js';
 
 type BatchJobModelStatus = components['schemas']['BatchJobModel']['status'];
 
@@ -49,13 +49,17 @@ export const WebsocketClient = (options: WebsocketClientOptions) => {
   };
 
   const subscribeToStompChannel = (subscription: Subscription<any>) => {
-    if (connected) {
+    if (connected && _client) {
       debug(`Subscribing to ${subscription.channel}`);
-      const stompSubscription = _client!.subscribe(
+      const stompSubscription = _client.subscribe(
         subscription.channel,
         function (message: any) {
-          const parsed = JSON.parse(message.body) as Message;
-          subscription.callback(parsed as any);
+          try {
+            const parsed = JSON.parse(message.body) as Message;
+            subscription.callback(parsed as any);
+          } catch (e: any) {
+            error(`Error parsing message: ${e.message}`);
+          }
         }
       );
       subscription.unsubscribe = stompSubscription.unsubscribe;

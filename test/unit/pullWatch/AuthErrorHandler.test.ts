@@ -69,7 +69,9 @@ describe('AuthErrorHandler', () => {
       // Verify server version was checked
       expect(mockClient.GET).toHaveBeenCalledWith('/api/public/configuration');
       expect(mockIsVersionAtLeast).toHaveBeenCalledWith('3.143.0', '3.143.0');
-      expect(mockError).toHaveBeenCalledWith("You're not authenticated. Invalid API key?");
+      expect(mockError).toHaveBeenCalledWith(
+        "You're not authenticated. Invalid API key?"
+      );
       expect(mockShutdown).toHaveBeenCalled();
     });
 
@@ -98,7 +100,10 @@ describe('AuthErrorHandler', () => {
 
       // Verify server version was checked
       expect(mockClient.GET).toHaveBeenCalledWith('/api/public/configuration');
-      expect(mockIsVersionAtLeast).toHaveBeenCalledWith('3.143.0', unsupportedVersion);
+      expect(mockIsVersionAtLeast).toHaveBeenCalledWith(
+        '3.143.0',
+        unsupportedVersion
+      );
       expect(mockError).toHaveBeenCalledWith(
         `Server version ${unsupportedVersion} does not support CLI watch mode. Please update your Tolgee server to version 3.143.0 or higher.`
       );
@@ -162,7 +167,9 @@ describe('AuthErrorHandler', () => {
 
       // Verify no server version check was made for unauthorized errors
       expect(mockClient.GET).not.toHaveBeenCalled();
-      expect(mockError).toHaveBeenCalledWith("You're not authorized. Insufficient permissions?");
+      expect(mockError).toHaveBeenCalledWith(
+        "You're not authorized. Insufficient permissions?"
+      );
       expect(mockShutdown).toHaveBeenCalled();
     });
 
@@ -214,10 +221,15 @@ describe('AuthErrorHandler', () => {
 
         await authErrorHandler.handleAuthErrors(error, mockShutdown);
 
-        expect(mockIsVersionAtLeast).toHaveBeenCalledWith('3.143.0', testCase.version);
+        expect(mockIsVersionAtLeast).toHaveBeenCalledWith(
+          '3.143.0',
+          testCase.version
+        );
 
         if (testCase.expected) {
-          expect(mockError).toHaveBeenCalledWith("You're not authenticated. Invalid API key?");
+          expect(mockError).toHaveBeenCalledWith(
+            "You're not authenticated. Invalid API key?"
+          );
         } else {
           expect(mockError).toHaveBeenCalledWith(
             `Server version ${testCase.version} does not support CLI watch mode. Please update your Tolgee server to version 3.143.0 or higher.`

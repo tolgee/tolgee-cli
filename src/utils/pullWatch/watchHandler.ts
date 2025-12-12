@@ -112,10 +112,14 @@ export async function startWatching(
   const shutdown = () => {
     try {
       unsubscribe?.();
-    } catch {}
+    } catch {
+      // Ignore errors during shutdown cleanup
+    }
     try {
       wsClient.deactivate();
-    } catch {}
+    } catch {
+      // Ignore errors during shutdown cleanup
+    }
     if (pollingTimer) {
       clearInterval(pollingTimer);
     }
