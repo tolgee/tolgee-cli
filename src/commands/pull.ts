@@ -4,13 +4,7 @@ import { Command, Option } from 'commander';
 
 import { unzipBuffer } from '../utils/zip.js';
 import { prepareDir } from '../utils/prepareDir.js';
-import {
-  debug,
-  exitWithError,
-  info,
-  loading,
-  success,
-} from '../utils/logger.js';
+import { exitWithError, info, loading, success } from '../utils/logger.js';
 import { Schema } from '../schema.js';
 import { checkPathNotAFile } from '../utils/checkPathNotAFile.js';
 import { mapExportFormat } from '../utils/mapExportFormat.js';
@@ -69,12 +63,10 @@ const doPull = async (opts: PullOptions) => {
     fetchZipBlob(opts, getETag(opts.projectId))
   );
   if (result.notModified) {
-    debug('No changes detected. Skipping pull.');
+    info('Exported data not changed.');
     return;
   }
-  info(
-    `Updating local data. ETag: ${result.etag} (${new Date().toLocaleString()})`
-  );
+  info(`ETag: ${result.etag} (${new Date().toLocaleString()})`);
   await prepareDir(opts.path!, opts.emptyDir);
   await loading('Extracting strings...', unzipBuffer(result.data, opts.path!));
   // Store ETag after a successful pull
