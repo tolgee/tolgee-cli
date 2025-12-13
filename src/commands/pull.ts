@@ -16,10 +16,7 @@ import { checkPathNotAFile } from '../utils/checkPathNotAFile.js';
 import { mapExportFormat } from '../utils/mapExportFormat.js';
 import { handleLoadableError } from '../client/TolgeeClient.js';
 import { startWatching } from '../utils/pullWatch/watchHandler.js';
-import {
-  extractLastModifiedFromResponse,
-  getLastModified,
-} from '../utils/lastModifiedStorage.js';
+import { extractETagFromResponse, getETag } from '../utils/eTagStorage.js';
 
 type PullOptions = BaseOptions & {
   format: Schema['format'];
@@ -69,23 +66,25 @@ const pullHandler = () =>
 const doPull = async (opts: PullOptions) => {
   const result = await loading(
     'Fetching strings from Tolgee...',
-    fetchZipBlob(opts, getLastModified(opts.projectId))
+    fetchZipBlob(opts, getETag(opts.projectId))
   );
   if (result.notModified) {
     debug('No changes detected. Skipping pull.');
     return;
   }
-  info(`Updating local data. Last modified: ${result.lastModified}`);
+  info(
+    `Updating local data. ETag: ${result.etag} (${new Date().toLocaleString()})`
+  );
   await prepareDir(opts.path!, opts.emptyDir);
   await loading('Extracting strings...', unzipBuffer(result.data, opts.path!));
-  // Store last modified timestamp after a successful pull
-  if (result.lastModified) {
-    const { setLastModified } = await import('../utils/lastModifiedStorage.js');
-    setLastModified(opts.projectId, result.lastModified);
+  // Store ETag after a successful pull
+  if (result.etag) {
+    const { setETag } = await import('../utils/eTagStorage.js');
+    setETag(opts.projectId, result.etag);
   }
 };
 
-async function fetchZipBlob(opts: PullOptions, ifModifiedSince?: string) {
+async function fetchZipBlob(opts: PullOptions, ifNoneMatch?: string) {
   const exportFormat = mapExportFormat(opts.format);
   const { format, messageFormat } = exportFormat;
 
@@ -101,17 +100,17 @@ async function fetchZipBlob(opts: PullOptions, ifModifiedSince?: string) {
     filterTagNotIn: opts.excludeTags,
     fileStructureTemplate: opts.fileStructureTemplate,
     escapeHtml: false,
-    ifModifiedSince,
+    ifNoneMatch,
   });
 
   handleLoadableError(loadable);
-  const lastModified = loadable.response
-    ? extractLastModifiedFromResponse(loadable.response)
+  const etag = loadable.response
+    ? extractETagFromResponse(loadable.response)
     : undefined;
 
   return {
     data: loadable.data,
-    lastModified,
+    etag,
     // 412 is not modified for POST request
     // https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/412
     // 304 is not modified for GET request

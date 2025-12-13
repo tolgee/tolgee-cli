@@ -1,6 +1,6 @@
 import { WebsocketClient } from '../../client/WebsocketClient.js';
 import { debug, error, info, success } from '../logger.js';
-import { setLastModified } from '../lastModifiedStorage.js';
+import { setETag } from '../eTagStorage.js';
 import { clearInterval } from 'node:timers';
 import { createTolgeeClient } from '../../client/TolgeeClient.js';
 import { AuthErrorHandler } from './AuthErrorHandler.js';
@@ -37,7 +37,7 @@ export async function startWatching(
   let pollingTimer: NodeJS.Timeout | undefined;
   let lastExecutionTime = 0;
 
-  const executePull = async (lastModified?: string) => {
+  const executePull = async (etag?: string) => {
     if (pulling) {
       pending = true;
       return;
@@ -46,9 +46,9 @@ export async function startWatching(
     lastExecutionTime = Date.now();
     try {
       await doPull();
-      // Store last modified timestamp after successful pull
-      if (lastModified) {
-        setLastModified(projectId, lastModified);
+      // Store ETag after successful pull
+      if (etag) {
+        setETag(projectId, etag);
       }
     } catch (e: any) {
       error('Error during pull: ' + e.message);
@@ -63,18 +63,18 @@ export async function startWatching(
     }
   };
 
-  const schedulePull = async (lastModified?: string) => {
+  const schedulePull = async (etag?: string) => {
     const now = Date.now();
     const timeSinceLastExecution = now - lastExecutionTime;
 
     // If last execution was more than 500ms ago, execute immediately
     if (timeSinceLastExecution >= SCHEDULE_PULL_DEBOUNCE_MS) {
-      await executePull(lastModified);
+      await executePull(etag);
     } else {
       // Otherwise, schedule the update with debounce
       if (debounceTimer) clearTimeout(debounceTimer);
       debounceTimer = setTimeout(
-        () => executePull(lastModified),
+        () => executePull(etag),
         SCHEDULE_PULL_DEBOUNCE_MS
       );
     }

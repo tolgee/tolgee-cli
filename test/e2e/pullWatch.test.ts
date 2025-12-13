@@ -9,7 +9,6 @@ import {
 import { TolgeeClient } from '#cli/client/TolgeeClient.js';
 import { PROJECT_1 } from './utils/api/project1.js';
 import { PullWatchUtil } from './utils/pullWatchUtil.js';
-import { sleep } from './utils/sleep.js';
 
 let client: TolgeeClient;
 let pak: string;
@@ -28,24 +27,26 @@ describe('Pull watch', () => {
     await deleteProject(client);
   });
 
-  it('pulls strings from Tolgee with watch', async () => {
+  it('pulls strings from Tolgee with watch', { timeout: 300000 }, async () => {
     await util.changeLocalizationData('A key');
 
     const { kill } = runWithKill(
-      ['pull', '--api-key', pak, '--path', TMP_FOLDER, '--watch', '--verbose'],
+      ['pull', '--api-key', pak, '--path', TMP_FOLDER, '--watch'],
       undefined,
       300000
     );
 
-    // Tests that it pulls at the beginning...
-    await util.waitFilesystemDataUpdated('A key');
-
-    // We need to sleep a bit to make sure the Last-Modified header is updated.
-    // The Last-Modified has second precision, so we need to wait at least 1 second.
-    await sleep(1000);
-    // Tests that it pulls after change...
-    await util.changeLocalizationData('Another key');
-    await util.waitFilesystemDataUpdated('Another key');
+    for (let i = 1; i <= 10; i++) {
+      await testFetchAfterUpdate(i);
+    }
     kill('SIGTERM');
   });
+
+  async function testFetchAfterUpdate(nr: number) {
+    // Tests that it pulls after change...
+    let newEnText = `Another key ${nr}`;
+    await util.changeLocalizationData(newEnText);
+    await util.waitFilesystemDataUpdated(newEnText);
+    console.log(`Tested pull after ${nr} change(s)...`);
+  }
 });

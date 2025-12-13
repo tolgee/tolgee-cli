@@ -6,7 +6,7 @@ export type ExportRequest = Omit<
   BodyOf<'/v2/projects/{projectId}/export', 'post'>,
   'zip'
 > & {
-  ifModifiedSince?: string;
+  ifNoneMatch?: string;
 };
 
 type SingleExportRequest = Omit<ExportRequest, 'languages'> & {
@@ -20,11 +20,11 @@ type ExportClientProps = {
 export const createExportClient = ({ apiClient }: ExportClientProps) => {
   return {
     async export(req: ExportRequest) {
-      const { ifModifiedSince, ...exportReq } = req;
+      const { ifNoneMatch, ...exportReq } = req;
       const body = { ...exportReq, zip: true };
       const headers: Record<string, string> = {};
-      if (ifModifiedSince) {
-        headers['If-Modified-Since'] = ifModifiedSince;
+      if (ifNoneMatch) {
+        headers['If-None-Match'] = ifNoneMatch;
       }
       const loadable = await apiClient.POST('/v2/projects/{projectId}/export', {
         params: { path: { projectId: apiClient.getProjectId() } },
