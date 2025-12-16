@@ -30,7 +30,7 @@ describe('Pull watch', () => {
   it('pulls strings from Tolgee with watch', { timeout: 300000 }, async () => {
     await util.changeLocalizationData('A key');
 
-    const { kill } = runWithKill(
+    const { kill, promise } = runWithKill(
       ['pull', '--api-key', pak, '--path', TMP_FOLDER, '--watch'],
       undefined,
       300000
@@ -40,11 +40,12 @@ describe('Pull watch', () => {
       await testFetchAfterUpdate(i);
     }
     kill('SIGTERM');
+    await promise;
   });
 
   async function testFetchAfterUpdate(nr: number) {
     // Tests that it pulls after change...
-    let newEnText = `Another key ${nr}`;
+    const newEnText = `Another key ${nr}`;
     await util.changeLocalizationData(newEnText);
     await util.waitFilesystemDataUpdated(newEnText);
     console.log(`Tested pull after ${nr} change(s)...`);

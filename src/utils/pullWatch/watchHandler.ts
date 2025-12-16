@@ -33,6 +33,7 @@ export async function startWatching(
    * already in progress.
    */
   let pending = false;
+  let pendingEtag: string | undefined;
   let debounceTimer: NodeJS.Timeout | undefined;
   let pollingTimer: NodeJS.Timeout | undefined;
   let lastExecutionTime = 0;
@@ -40,6 +41,7 @@ export async function startWatching(
   const executePull = async (etag?: string) => {
     if (pulling) {
       pending = true;
+      pendingEtag = etag;
       return;
     }
     pulling = true;
@@ -54,12 +56,14 @@ export async function startWatching(
       error('Error during pull: ' + e.message);
       debug(e);
     } finally {
+      pulling = false;
       // If there was a pending pull (data changed when pulling), execute it now
       if (pending) {
         pending = false;
-        void executePull();
+        const capturedEtag = pendingEtag;
+        pendingEtag = undefined;
+        void executePull(capturedEtag);
       }
-      pulling = false;
     }
   };
 

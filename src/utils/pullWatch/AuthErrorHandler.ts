@@ -8,11 +8,14 @@ export function AuthErrorHandler(
   async function handleAuthErrors(err: any, shutdown: () => void) {
     if (err?.headers?.message == 'Unauthenticated') {
       await printUnauthenticatedError();
+      shutdown();
+      return;
     }
-    if (err?.headers?.message == 'Unauthorized') {
+    if (err?.headers?.message == 'Forbidden') {
       error("You're not authorized. Insufficient permissions?");
+      shutdown();
+      return;
     }
-    shutdown();
   }
 
   async function printUnauthenticatedError() {
