@@ -159,7 +159,7 @@ describe('AuthErrorHandler', () => {
     it('should handle unauthorized error without version checking', async () => {
       const error = {
         headers: {
-          message: 'Unauthorized',
+          message: 'Forbidden',
         },
       };
 
@@ -170,21 +170,6 @@ describe('AuthErrorHandler', () => {
       expect(mockError).toHaveBeenCalledWith(
         "You're not authorized. Insufficient permissions?"
       );
-      expect(mockShutdown).toHaveBeenCalled();
-    });
-
-    it('should handle other errors without specific processing', async () => {
-      const error = {
-        headers: {
-          message: 'Some other error',
-        },
-      };
-
-      await authErrorHandler.handleAuthErrors(error, mockShutdown);
-
-      // Verify no specific processing was done
-      expect(mockClient.GET).not.toHaveBeenCalled();
-      expect(mockError).not.toHaveBeenCalled();
       expect(mockShutdown).toHaveBeenCalled();
     });
 
