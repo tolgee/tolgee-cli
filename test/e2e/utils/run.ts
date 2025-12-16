@@ -1,9 +1,9 @@
 import type { ChildProcessWithoutNullStreams } from 'child_process';
+import { spawn as spawnProcess } from 'child_process';
 
 import { fileURLToPath } from 'url';
 import { join } from 'path';
 import { tmpdir } from 'os';
-import { spawn as spawnProcess } from 'child_process';
 
 const TTY_PRELOAD = fileURLToPath(
   new URL('../__internal__/tty.cjs', import.meta.url)
@@ -100,8 +100,7 @@ export async function run(
   env?: Record<string, string>,
   timeout = 10e3
 ) {
-  const cliProcess = spawn(args, false, env);
-  return runProcess(cliProcess, timeout);
+  return runWithKill(args, env, timeout).promise;
 }
 
 export function runWithKill(

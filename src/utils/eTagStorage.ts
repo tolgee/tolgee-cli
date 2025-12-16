@@ -17,9 +17,3 @@ export function setETag(projectId: number, etag: string): void {
     etag,
   });
 }
-
-export function extractETagFromResponse(
-  response: Response
-): string | undefined {
-  return response.headers.get('ETag') || undefined;
-}
