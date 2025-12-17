@@ -71,10 +71,26 @@ jobs:
       - name: Build CLI
         run: npm run build
 
+#      - name: Pull Latest Tolgee Docker Image
+#        run: docker pull tolgee/tolgee:latest
       - name: Start Tolgee Container
         run: npm run tolgee:start
+        env:
+          RUNNER_DEBUG: 1
       - name: Run Tests
         run: npm run test:e2e
+      - name: Capture Docker Logs
+        run: |
+          mkdir -p docker-logs
+          docker logs tolgee_cli_e2e > docker-logs/tolgee-container.log 2>&1 || echo "Failed to capture Docker logs"
+        if: always()
+      - name: Upload Docker Logs
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: docker-logs-node-${{ matrix.node }}
+          path: docker-logs/
+          retention-days: 7
       - name: Stop Tolgee Container
         run: npm run tolgee:stop
         if: always()
