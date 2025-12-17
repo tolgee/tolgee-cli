@@ -1,11 +1,14 @@
 import { setupTemporaryFolder, TMP_FOLDER } from './utils/tmp.js';
 import { run, runWithKill } from './utils/run.js';
 import './utils/toMatchContentsOf.js';
-import { createPak, createProjectWithClient, deleteProject, } from './utils/api/common.js';
+import {
+  createPak,
+  createProjectWithClient,
+  deleteProject,
+} from './utils/api/common.js';
 import { TolgeeClient } from '#cli/client/TolgeeClient.js';
 import { PROJECT_1 } from './utils/api/project1.js';
 import { PullWatchUtil } from './utils/pullWatchUtil.js';
-import { sleep } from './utils/sleep.js';
 
 let client: TolgeeClient;
 let pak: string;
@@ -43,8 +46,6 @@ describe('Pull watch', () => {
         printOnExit: false,
       }
     );
-
-    await sleep(1000);
 
     for (let i = 1; i <= 10; i++) {
       await testFetchAfterUpdate(i);

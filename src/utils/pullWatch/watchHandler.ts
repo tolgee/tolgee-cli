@@ -102,6 +102,12 @@ export async function startWatching(
   const wsClient = WebsocketClient({
     serverUrl: new URL(apiUrl).origin,
     authentication: { apiKey: apiKey },
+    onConnected: () => {
+      debug(
+        'WebSocket connected and subscriptions active. Performing initial pull...'
+      );
+      schedulePull();
+    },
     onError: (error) => {
       AuthErrorHandler(client)
         .handleAuthErrors(error, shutdown)
@@ -153,7 +159,6 @@ export async function startWatching(
   process.on('SIGTERM', shutdown);
 
   subscribe();
-  schedulePull();
 
   // Keep process alive
   await new Promise<void>(() => {});
