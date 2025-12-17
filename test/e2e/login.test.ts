@@ -1,6 +1,6 @@
 import { tmpdir } from 'os';
 import { join } from 'path';
-import { rm, readFile } from 'fs/promises';
+import { readFile, rm } from 'fs/promises';
 import { run } from './utils/run.js';
 import { TolgeeClient } from '#cli/client/TolgeeClient.js';
 import { PROJECT_1 } from './utils/api/project1.js';
@@ -33,6 +33,8 @@ describe('Project 1', () => {
   });
   afterAll(async () => {
     await deleteProject(client);
+    // cleanup after logout, otherwise it pollutes to next tests
+    await run(['logout']);
   });
 
   it('logs the user in with a PAT', async () => {

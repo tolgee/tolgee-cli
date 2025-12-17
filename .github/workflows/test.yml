@@ -70,9 +70,6 @@ jobs:
         run: npm ci
       - name: Build CLI
         run: npm run build
-
-#      - name: Pull Latest Tolgee Docker Image
-#        run: docker pull tolgee/tolgee:latest
       - name: Start Tolgee Container
         run: npm run tolgee:start
         env:
