@@ -57,7 +57,9 @@ describe('Pull watch', () => {
   async function testFetchAfterUpdate(nr: number) {
     // Tests that it pulls after change...
     const newEnText = `Another key ${nr}`;
+    console.log(`Changing localization data to ${newEnText}...`);
     await util.changeLocalizationData(newEnText);
+    console.log(`Waiting for filesystem data to be updated...`);
     await util.waitFilesystemDataUpdated(newEnText);
     console.log(`Tested pull after ${nr} change(s)...`);
   }
