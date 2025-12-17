@@ -2,9 +2,9 @@ import { fileURLToPath } from 'node:url';
 import { tolgeeDataToDict } from './utils/data.js';
 import { run } from './utils/run.js';
 import {
-  DEFAULT_SCOPES,
   createPak,
   createProjectWithClient,
+  DEFAULT_SCOPES,
   deleteProject,
 } from './utils/api/common.js';
 import { TolgeeClient } from '#cli/client/TolgeeClient.js';
@@ -25,7 +25,7 @@ let pak: string;
 describe('project 3', () => {
   beforeEach(async () => {
     client = await createProjectWithClient('Project 3', PROJECT_3, {
-      icuEnabled: true,
+      icuPlaceholders: true,
     });
     pak = await createPak(client);
   });
