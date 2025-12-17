@@ -6,10 +6,9 @@ import {
   removeApiKeys,
   saveApiKey,
 } from '../config/credentials.js';
-import { debug, exitWithError, success } from '../utils/logger.js';
+import { exitWithError, success } from '../utils/logger.js';
 import { createTolgeeClient } from '../client/TolgeeClient.js';
 import { printApiKeyLists } from '../utils/apiKeyList.js';
-import { getStackTrace } from '../utils/getStackTrace.js';
 
 type Options = {
   apiUrl: URL;
@@ -26,9 +25,6 @@ async function loginHandler(this: Command, key?: string) {
   } else if (!key) {
     exitWithError('Missing argument [API Key]');
   }
-  debug(
-    `Logging in with API key ${key?.slice(0, 5)}...${key?.slice(-4)}.\n${getStackTrace()}`
-  );
 
   const keyInfo = await createTolgeeClient({
     baseUrl: opts.apiUrl.toString(),

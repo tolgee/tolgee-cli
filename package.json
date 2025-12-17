@@ -56,6 +56,7 @@
     "@types/eslint__js": "^8.42.3",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^22.10.1",
+    "@types/sockjs-client": "^1.5.4",
     "@types/yauzl": "^2.10.3",
     "cross-env": "^7.0.3",
     "eslint": "^9.16.0",

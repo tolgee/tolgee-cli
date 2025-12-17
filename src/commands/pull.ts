@@ -128,7 +128,6 @@ const doPull = async (opts: PullOptions) => {
     info('Exported data not changed.');
     return;
   }
-  info(`ETag: ${result.etag} (${new Date().toLocaleString()})`);
   await prepareDir(opts.path!, opts.emptyDir);
   await loading('Extracting strings...', unzipBuffer(result.data, opts.path!));
   // Store ETag after a successful pull

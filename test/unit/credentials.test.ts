@@ -1,8 +1,8 @@
 import { tmpdir } from 'os';
 
 import { join } from 'path';
-import { rm, readFile } from 'fs/promises';
-import { saveApiKey, getApiKey } from '#cli/config/credentials.js';
+import { readFile, rm } from 'fs/promises';
+import { getApiKey, saveApiKey } from '#cli/config/credentials.js';
 
 const AUTH_FILE = join(tmpdir(), 'authentication.json');
 const TG_1 = new URL('https://app.tolgee.io');
@@ -112,11 +112,11 @@ describe('credentials', () => {
     });
 
     it('loads the correct token based on instance and project', async () => {
-      const key1 = await getApiKey(TG_1, 1);
-      const key2 = await getApiKey(TG_1, 2);
-      const key3 = await getApiKey(TG_1, 3);
-      const key4 = await getApiKey(TG_1, -1);
-      const key5 = await getApiKey(TG_2, -1);
+      const key1 = await getApiKey(TG_1.toString(), 1);
+      const key2 = await getApiKey(TG_1.toString(), 2);
+      const key3 = await getApiKey(TG_1.toString(), 3);
+      const key4 = await getApiKey(TG_1.toString(), -1);
+      const key5 = await getApiKey(TG_2.toString(), -1);
 
       expect(key1).toBe(PAK_1.key);
       expect(key2).toBe(PAK_2.key);
@@ -126,7 +126,7 @@ describe('credentials', () => {
     });
 
     it('prioritizes personal access tokens over project api keys', async () => {
-      const key = await getApiKey(TG_2, 1);
+      const key = await getApiKey(TG_2.toString(), 1);
       expect(key).toBe(PAT_1.key);
     });
 
@@ -134,7 +134,7 @@ describe('credentials', () => {
       const saved1 = await readFile(AUTH_FILE, 'utf8');
       expect(saved1).toContain(PAT_4.key);
 
-      const key = await getApiKey(TG_3, -1);
+      const key = await getApiKey(TG_3.toString(), -1);
       expect(key).toBeNull();
 
       // Check it pruned it from store

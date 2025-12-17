@@ -1,4 +1,4 @@
-import { CompatClient, Stomp } from '@stomp/stompjs'; // @ts-ignore
+import { CompatClient, Stomp } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { components } from './internal/schema.generated.js';
 import { debug, error } from '../utils/logger.js';
@@ -30,18 +30,18 @@ type Subscription<T extends string> = {
 };
 
 export const WebsocketClient = (options: WebsocketClientOptions) => {
-  let _client: CompatClient | undefined;
-  let _deactivated = false;
+  let client: CompatClient | undefined;
+  let deactivated = false;
   let connected = false;
   let connecting = false;
   let subscriptions: Subscription<any>[] = [];
 
   const resubscribe = () => {
-    if (_deactivated) {
+    if (deactivated) {
       return;
     }
 
-    if (_client) {
+    if (client) {
       subscriptions.forEach((subscription) => {
         subscribeToStompChannel(subscription);
       });
@@ -49,9 +49,9 @@ export const WebsocketClient = (options: WebsocketClientOptions) => {
   };
 
   const subscribeToStompChannel = (subscription: Subscription<any>) => {
-    if (connected && _client) {
+    if (connected && client) {
       debug(`Subscribing to ${subscription.channel}`);
-      const stompSubscription = _client.subscribe(
+      const stompSubscription = client.subscribe(
         subscription.channel,
         function (message: any) {
           try {
@@ -68,8 +68,8 @@ export const WebsocketClient = (options: WebsocketClientOptions) => {
   };
 
   function initClient() {
-    _client = Stomp.over(() => new SockJS(`${options.serverUrl}/websocket`));
-    _client.configure({
+    client = Stomp.over(() => new SockJS(`${options.serverUrl}/websocket`));
+    client.configure({
       reconnectDelay: 3000,
       debug: (msg: string) => {
         debug(msg);
@@ -78,7 +78,7 @@ export const WebsocketClient = (options: WebsocketClientOptions) => {
   }
 
   function connectIfNotAlready() {
-    if (_deactivated || connected || connecting) {
+    if (deactivated || connected || connecting) {
       return;
     }
 
@@ -113,11 +113,11 @@ export const WebsocketClient = (options: WebsocketClientOptions) => {
   }
 
   const getClient = () => {
-    if (_client !== undefined) {
-      return _client;
+    if (client !== undefined) {
+      return client;
     }
     initClient();
-    return _client!;
+    return client!;
   };
 
   /**
@@ -130,7 +130,7 @@ export const WebsocketClient = (options: WebsocketClientOptions) => {
     channel: T,
     callback: (data: Data<T>) => void
   ): () => void {
-    if (_deactivated) {
+    if (deactivated) {
       return () => {};
     }
 
@@ -146,13 +146,13 @@ export const WebsocketClient = (options: WebsocketClientOptions) => {
   }
 
   function disconnect() {
-    if (_client) {
-      _client.disconnect();
+    if (client) {
+      client.disconnect();
     }
   }
 
   function deactivate() {
-    _deactivated = true;
+    deactivated = true;
     disconnect();
   }
 

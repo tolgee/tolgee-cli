@@ -24,6 +24,25 @@ jobs:
       - name: Run eslint
         run: npm run eslint
 
+  test-types:
+    name: Type Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: cache-node-modules-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run type check
+        run: npm run test:types
+
   test-unit:
     strategy:
       matrix:
