@@ -53,7 +53,8 @@ export function spawn(
 
 function runProcess(
   cliProcess: ChildProcessWithoutNullStreams,
-  timeoutTime: number
+  timeoutTime: number,
+  options: RunOptionsType = {}
 ) {
   return new Promise<RunResult>((resolve, reject) => {
     let stdout = '';
@@ -61,10 +62,16 @@ function runProcess(
     let killed = false;
 
     cliProcess.stdout.setEncoding('utf8');
-    cliProcess.stdout.on('data', (d) => (stdout += d));
+    cliProcess.stdout.on('data', (d) => {
+      options.onStdout?.(Buffer.from(d));
+      return (stdout += d);
+    });
 
     cliProcess.stderr.setEncoding('utf8');
-    cliProcess.stderr.on('data', (d) => (stderr += d));
+    cliProcess.stderr.on('data', (d) => {
+      options.onStderr?.(Buffer.from(d));
+      return (stderr += d);
+    });
 
     const timeout = setTimeout(() => {
       killed = true;
@@ -73,9 +80,10 @@ function runProcess(
     }, timeoutTime);
 
     cliProcess.on('exit', (code) => {
-      console.log('::group::stdout\n%s\n::endgroup::', stdout);
-      console.log('::group::stderr\n%s\n::endgroup::', stderr);
-
+      if (options.printOnExit !== false) {
+        console.log('::group::stdout\n%s\n::endgroup::', stdout);
+        console.log('::group::stderr\n%s\n::endgroup::', stderr);
+      }
       if (killed) return;
       clearTimeout(timeout);
       resolve({ code: code ?? -1, stdout, stderr });
@@ -106,11 +114,18 @@ export async function run(
 export function runWithKill(
   args: string[],
   env?: Record<string, string>,
-  timeout = 10e3
+  timeout = 10e3,
+  options: RunOptionsType = {}
 ) {
   const cliProcess = spawn(args, false, env);
   return {
-    promise: runProcess(cliProcess, timeout),
+    promise: runProcess(cliProcess, timeout, options),
     kill: (signal: NodeJS.Signals) => cliProcess.kill(signal),
   };
 }
+
+type RunOptionsType = {
+  onStdout?: (chunk: Buffer) => void;
+  onStderr?: (chunk: Buffer) => void;
+  printOnExit?: boolean;
+};

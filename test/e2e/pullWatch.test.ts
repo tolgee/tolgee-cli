@@ -1,5 +1,5 @@
 import { setupTemporaryFolder, TMP_FOLDER } from './utils/tmp.js';
-import { runWithKill } from './utils/run.js';
+import { run, runWithKill } from './utils/run.js';
 import './utils/toMatchContentsOf.js';
 import {
   createPak,
@@ -30,10 +30,21 @@ describe('Pull watch', () => {
   it('pulls strings from Tolgee with watch', { timeout: 300000 }, async () => {
     await util.changeLocalizationData('A key');
 
+    await run(['login', '-l']);
+
     const { kill, promise } = runWithKill(
-      ['pull', '--api-key', pak, '--path', TMP_FOLDER, '--watch'],
+      ['pull', '--api-key', pak, '--path', TMP_FOLDER, '--watch', '--verbose'],
       undefined,
-      300000
+      300000,
+      {
+        onStdout: (data) => {
+          console.log(data.toString());
+        },
+        onStderr: (data) => {
+          console.error(data.toString());
+        },
+        printOnExit: false,
+      }
     );
 
     for (let i = 1; i <= 10; i++) {
