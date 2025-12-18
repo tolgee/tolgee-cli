@@ -15,7 +15,6 @@ RUN npm ci && npm cache clean --force
 COPY src/ ./src/
 COPY scripts/ ./scripts/
 COPY tsconfig*.json ./
-COPY eslint.config.js ./
 
 # Copy additional files needed for build
 COPY textmate/ ./textmate/
