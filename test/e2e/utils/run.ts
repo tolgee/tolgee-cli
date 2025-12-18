@@ -1,9 +1,9 @@
 import type { ChildProcessWithoutNullStreams } from 'child_process';
+import { spawn as spawnProcess } from 'child_process';
 
 import { fileURLToPath } from 'url';
 import { join } from 'path';
 import { tmpdir } from 'os';
-import { spawn as spawnProcess } from 'child_process';
 
 const TTY_PRELOAD = fileURLToPath(
   new URL('../__internal__/tty.cjs', import.meta.url)
@@ -38,7 +38,7 @@ export function spawn(
       CLI_INDEX,
       DEBUG_ENABLED && '--verbose',
       '--api-url',
-      'http://localhost:22222',
+      process.env.TOLGEE_TEST_BACKEND_URL || 'http://localhost:22222',
       ...args,
     ].filter(Boolean) as string[],
     {
@@ -53,7 +53,8 @@ export function spawn(
 
 function runProcess(
   cliProcess: ChildProcessWithoutNullStreams,
-  timeoutTime: number
+  timeoutTime: number,
+  options: RunOptionsType = {}
 ) {
   return new Promise<RunResult>((resolve, reject) => {
     let stdout = '';
@@ -61,10 +62,16 @@ function runProcess(
     let killed = false;
 
     cliProcess.stdout.setEncoding('utf8');
-    cliProcess.stdout.on('data', (d) => (stdout += d));
+    cliProcess.stdout.on('data', (d) => {
+      options.onStdout?.(Buffer.from(d));
+      return (stdout += d);
+    });
 
     cliProcess.stderr.setEncoding('utf8');
-    cliProcess.stderr.on('data', (d) => (stderr += d));
+    cliProcess.stderr.on('data', (d) => {
+      options.onStderr?.(Buffer.from(d));
+      return (stderr += d);
+    });
 
     const timeout = setTimeout(() => {
       killed = true;
@@ -73,9 +80,10 @@ function runProcess(
     }, timeoutTime);
 
     cliProcess.on('exit', (code) => {
-      console.log('::group::stdout\n%s\n::endgroup::', stdout);
-      console.log('::group::stderr\n%s\n::endgroup::', stderr);
-
+      if (options.printOnExit !== false) {
+        console.log('::group::stdout\n%s\n::endgroup::', stdout);
+        console.log('::group::stderr\n%s\n::endgroup::', stderr);
+      }
       if (killed) return;
       clearTimeout(timeout);
       resolve({ code: code ?? -1, stdout, stderr });
@@ -100,6 +108,24 @@ export async function run(
   env?: Record<string, string>,
   timeout = 10e3
 ) {
-  const cliProcess = spawn(args, false, env);
-  return runProcess(cliProcess, timeout);
+  return runWithKill(args, env, timeout).promise;
 }
+
+export function runWithKill(
+  args: string[],
+  env?: Record<string, string>,
+  timeout = 10e3,
+  options: RunOptionsType = {}
+) {
+  const cliProcess = spawn(args, false, env);
+  return {
+    promise: runProcess(cliProcess, timeout, options),
+    kill: (signal: NodeJS.Signals) => cliProcess.kill(signal),
+  };
+}
+
+type RunOptionsType = {
+  onStdout?: (chunk: Buffer) => void;
+  onStderr?: (chunk: Buffer) => void;
+  printOnExit?: boolean;
+};

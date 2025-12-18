@@ -1,72 +1,16 @@
-import { Blob } from 'buffer';
 import type { BaseOptions } from '../options.js';
 
 import { Command, Option } from 'commander';
 
 import { unzipBuffer } from '../utils/zip.js';
 import { prepareDir } from '../utils/prepareDir.js';
-import { exitWithError, loading, success } from '../utils/logger.js';
+import { exitWithError, info, loading, success } from '../utils/logger.js';
 import { Schema } from '../schema.js';
 import { checkPathNotAFile } from '../utils/checkPathNotAFile.js';
 import { mapExportFormat } from '../utils/mapExportFormat.js';
 import { handleLoadableError } from '../client/TolgeeClient.js';
-
-type PullOptions = BaseOptions & {
-  format: Schema['format'];
-  languages?: string[];
-  states?: Array<'UNTRANSLATED' | 'TRANSLATED' | 'REVIEWED'>;
-  delimiter?: string;
-  emptyDir?: boolean;
-  namespaces?: string[];
-  tags?: string[];
-  supportArrays: boolean;
-  excludeTags?: string[];
-  fileStructureTemplate?: string;
-  path?: string;
-};
-
-async function fetchZipBlob(opts: PullOptions): Promise<Blob> {
-  const exportFormat = mapExportFormat(opts.format);
-  const { format, messageFormat } = exportFormat;
-
-  const loadable = await opts.client.export.export({
-    format,
-    messageFormat,
-    supportArrays: opts.supportArrays,
-    languages: opts.languages,
-    filterState: opts.states,
-    structureDelimiter: opts.delimiter ?? '',
-    filterNamespace: opts.namespaces,
-    filterTagIn: opts.tags,
-    filterTagNotIn: opts.excludeTags,
-    fileStructureTemplate: opts.fileStructureTemplate,
-    escapeHtml: false,
-  });
-
-  handleLoadableError(loadable);
-  return loadable.data;
-}
-
-const pullHandler = () =>
-  async function (this: Command) {
-    const opts: PullOptions = this.optsWithGlobals();
-
-    if (!opts.path) {
-      exitWithError(
-        'Missing option --path <path> or `pull.path` in tolgee config'
-      );
-    }
-
-    await checkPathNotAFile(opts.path);
-
-    const zipBlob = await loading(
-      'Fetching strings from Tolgee...',
-      fetchZipBlob(opts)
-    );
-    await prepareDir(opts.path, opts.emptyDir);
-    await loading('Extracting strings...', unzipBuffer(zipBlob, opts.path));
-    success('Done!');
-  };
+import { startWatching } from '../utils/pullWatch/watchHandler.js';
+import { getETag } from '../utils/eTagStorage.js';
 
 export default (config: Schema) =>
   new Command()
@@ -137,4 +81,111 @@ export default (config: Schema) =>
         'Defines exported file structure: https://tolgee.io/tolgee-cli/push-pull-strings#file-structure-template-format'
       ).default(config.pull?.fileStructureTemplate)
     )
+    .addOption(
+      new Option(
+        '--watch',
+        'Watch for changes and re-pull automatically'
+      ).default(false)
+    )
     .action(pullHandler());
+
+const pullHandler = () =>
+  async function (this: Command) {
+    const opts: PullOptions = this.optsWithGlobals();
+
+    if (!opts.path) {
+      exitWithError(
+        'Missing option --path <path> or `pull.path` in tolgee config'
+      );
+    }
+
+    await checkPathNotAFile(opts.path);
+
+    if (!opts.watch) {
+      await doPull(opts);
+      success('Done!');
+      return;
+    }
+
+    // Start watching for changes
+    await startWatching({
+      apiUrl: opts.apiUrl,
+      apiKey: opts.apiKey,
+      projectId: opts.projectId,
+      client: opts.client,
+      doPull: async () => {
+        await doPull(opts);
+      },
+    });
+  };
+
+const doPull = async (opts: PullOptions) => {
+  const result = await loading(
+    'Fetching strings from Tolgee...',
+    fetchZipBlob(opts, getETag(opts.projectId))
+  );
+  if (result.notModified) {
+    info('Exported data not changed.');
+    return;
+  }
+  await prepareDir(opts.path!, opts.emptyDir);
+  await loading('Extracting strings...', unzipBuffer(result.data, opts.path!));
+  // Store ETag after a successful pull
+  if (result.etag) {
+    const { setETag } = await import('../utils/eTagStorage.js');
+    setETag(opts.projectId, result.etag);
+  }
+};
+
+async function fetchZipBlob(opts: PullOptions, ifNoneMatch?: string) {
+  const exportFormat = mapExportFormat(opts.format);
+  const { format, messageFormat } = exportFormat;
+
+  const loadable = await opts.client.export.export({
+    format,
+    messageFormat,
+    supportArrays: opts.supportArrays,
+    languages: opts.languages,
+    filterState: opts.states,
+    structureDelimiter: opts.delimiter ?? '',
+    filterNamespace: opts.namespaces,
+    filterTagIn: opts.tags,
+    filterTagNotIn: opts.excludeTags,
+    fileStructureTemplate: opts.fileStructureTemplate,
+    escapeHtml: false,
+    ifNoneMatch,
+  });
+
+  handleLoadableError(loadable);
+  const etag = loadable.response
+    ? extractETagFromResponse(loadable.response)
+    : undefined;
+
+  return {
+    data: loadable.data,
+    etag,
+    // 412 is not modified for POST request
+    // https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/412
+    // 304 is not modified for GET request
+    notModified: [412, 304].includes(loadable.response?.status ?? 0),
+  };
+}
+
+function extractETagFromResponse(response: Response): string | undefined {
+  return response.headers.get('ETag') || undefined;
+}
+
+type PullOptions = BaseOptions & {
+  format: Schema['format'];
+  languages?: string[];
+  states?: Array<'UNTRANSLATED' | 'TRANSLATED' | 'REVIEWED'>;
+  delimiter?: string;
+  emptyDir?: boolean;
+  namespaces?: string[];
+  tags?: string[];
+  supportArrays: boolean;
+  excludeTags?: string[];
+  fileStructureTemplate?: string;
+  path?: string;
+  watch?: boolean;
+};

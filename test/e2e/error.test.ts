@@ -28,6 +28,8 @@ describe('Testing error message', () => {
   });
   afterAll(async () => {
     await deleteProject(client);
+    // cleanup after logout, otherwise it pollutes to next tests
+    await run(['logout']);
   });
 
   it('error server response body is printed', async () => {

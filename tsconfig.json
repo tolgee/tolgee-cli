@@ -3,6 +3,6 @@
   "compilerOptions": {
     "rootDir": "."
   },
-  "include": ["./src/**/*", "./test/**/*", "./scripts/**/*"],
-  "exclude": ["./test/__fixtures__"]
+  "include": ["./src/**/*", "./test/**/*"],
+  "exclude": ["./test/__fixtures__", ]
 }

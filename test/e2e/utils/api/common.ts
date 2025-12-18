@@ -3,7 +3,8 @@ import { TolgeeClient, createTolgeeClient } from '#cli/client/TolgeeClient.js';
 import { components } from '#cli/client/internal/schema.generated.js';
 import { languagesTestData } from './languagesTestData.js';
 
-const API_URL = 'http://localhost:22222';
+export const API_URL =
+  process.env.TOLGEE_TEST_BACKEND_URL || 'http://localhost:22222';
 
 export async function userLogin() {
   const loadable = await createTolgeeClient({

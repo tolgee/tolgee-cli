@@ -1,4 +1,3 @@
-import { exitWithError } from './../utils/logger.js';
 import { ApiClientProps, createApiClient } from './ApiClient.js';
 import { createExportClient } from './ExportClient.js';
 import { createImportClient } from './ImportClient.js';
@@ -22,8 +21,14 @@ export function createTolgeeClient(props: Props) {
 
 export const handleLoadableError = (loadable: LoadableData) => {
   if (loadable.error) {
-    exitWithError(errorFromLoadable(loadable));
+    throw new LoadableError(loadable);
   }
 };
+
+export class LoadableError extends Error {
+  constructor(public loadable: LoadableData) {
+    super(errorFromLoadable(loadable));
+  }
+}
 
 export type TolgeeClient = ReturnType<typeof createTolgeeClient>;

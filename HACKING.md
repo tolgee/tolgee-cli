@@ -32,6 +32,21 @@ E2E test instance:
 - `tolgee:start`: Start the E2E testing instance. Will be available on port 22222.
 - `tolgee:stop`: Stop the E2E testing instance.
 
+### Using an alternative backend for testing
+
+By default, E2E tests will start a Docker container with Tolgee backend on port 22222. If you want to use an alternative backend (e.g., a development server running elsewhere), you can set the `TOLGEE_TEST_BACKEND_URL` environment variable:
+
+```bash
+# Use an alternative backend instead of Docker
+export TOLGEE_TEST_BACKEND_URL=http://localhost:8080
+npm run test:e2e
+
+# Or run with the environment variable inline
+TOLGEE_TEST_BACKEND_URL=http://localhost:8080 npm run test:e2e
+```
+
+When this environment variable is set, the Docker backend will not be started, and tests will use the specified URL instead.
+
 ## Code & internals overview
 
 ### Command parsing
