@@ -33,6 +33,7 @@ export type BaseOptions = {
   apiUrl: URL;
   apiKey: string;
   projectId: number;
+  branch?: string;
   client: ReturnType<typeof createTolgeeClient>;
   extractor: string | undefined;
   patterns: string[] | undefined;
@@ -54,6 +55,11 @@ export const API_URL_OPT = new Option(
   '-au, --api-url <url>',
   'The url of Tolgee API.'
 ).argParser(parseUrlArgument);
+
+export const PROJECT_BRANCH = new Option(
+  '-b, --branch <name>',
+  'Project branch. Use when branching enabled for the project.'
+).env('TOLGEE_BRANCH');
 
 export const EXTRACTOR = new Option(
   '-e, --extractor <extractor>',

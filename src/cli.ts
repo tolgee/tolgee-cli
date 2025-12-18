@@ -19,6 +19,7 @@ import {
   STRICT_NAMESPACE,
   PARSER,
   PROJECT_ID_OPT,
+  PROJECT_BRANCH,
   STRICT_NAMESPACE_NEGATION,
   VERBOSE,
 } from './options.js';
@@ -180,6 +181,7 @@ async function run() {
     program.addOption(API_URL_OPT.default(config.apiUrl ?? DEFAULT_API_URL));
     program.addOption(API_KEY_OPT.default(config.apiKey));
     program.addOption(PROJECT_ID_OPT.default(config.projectId ?? -1));
+    program.addOption(PROJECT_BRANCH.default(config.branch));
     program.addOption(FORMAT_OPT.default(config.format ?? 'JSON_TOLGEE'));
     program.addOption(EXTRACTOR.default(config.extractor));
     program.addOption(FILE_PATTERNS.default(config.patterns));
