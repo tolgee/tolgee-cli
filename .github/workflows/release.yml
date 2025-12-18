@@ -6,7 +6,7 @@ on:
     types:
       - completed
   push:
-    branches: [ next, prerelease ]
+    branches: [ next, prerelease, jancizmar/release-docker-image ]
 
 # This part sets up the Trusted Publishers for npm via GitHub Actions,
 # that's why we don't need to set up the token manually
@@ -38,19 +38,6 @@ jobs:
       - name: Build the CLI
         run: npm run build
 
-      - name: Extract version from package.json
-        id: package-version
-        run: echo "VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
-
-      - name: Build and push Docker image
-        run: ./scripts/build-docker.sh latest linux/amd64,linux/arm64 push
-        env:
-          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-          VERSION: ${{ steps.package-version.outputs.VERSION }}
-          GITHUB_SHA: ${{ github.sha }}
-          BUILD_DATE: ${{ github.event.head_commit.timestamp }}
-
       - name: Run npm release
         run: npm run release
         env:
@@ -59,3 +46,16 @@ jobs:
           GIT_AUTHOR_EMAIL: machine@tolgee.io
           GIT_COMMITTER_NAME: Tolgee Machine
           GIT_COMMITTER_EMAIL: machine@tolgee.io
+
+      - name: Extract version from package.json
+        id: package-version
+        run: echo "VERSION=$(node -p 'require("./package.json").version')" >> "$GITHUB_OUTPUT"
+
+      - name: Build and push Docker image
+        run: ./scripts/build-docker.sh latest linux/amd64,linux/arm64 push
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+          VERSION: ${{ steps.package-version.outputs.VERSION }}
+          GITHUB_SHA: ${{ github.event.workflow_run.head_sha }}
+          BUILD_DATE: ${{ github.event.workflow_run.head_commit.timestamp }}

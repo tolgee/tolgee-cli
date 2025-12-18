@@ -21,7 +21,7 @@
 # 1. Build for your current platform only (e.g., linux/arm64 on Apple Silicon)
 # 2. Push the multi-platform image to a registry and pull it
 
-set -e
+set -euo pipefail
 
 # Default values
 TAG=${1:-"dev"}
@@ -47,7 +47,7 @@ fi
 
 # Docker login if push is requested
 if [ "$PUSH" = "push" ]; then
-    if [ -z "$DOCKERHUB_USERNAME" ] || [ -z "$DOCKERHUB_TOKEN" ]; then
+    if [ -z "${DOCKERHUB_USERNAME:-}" ] || [ -z "${DOCKERHUB_TOKEN:-}" ]; then
         echo -e "${RED}Error: DOCKERHUB_USERNAME and DOCKERHUB_TOKEN environment variables are required for push.${NC}"
         exit 1
     fi
@@ -62,37 +62,45 @@ if [ ! -d "dist" ]; then
 fi
 
 # Prepare tags
-TAGS="-t ${IMAGE_NAME}:${TAG}"
-if [ -n "$VERSION" ] && [ "$TAG" = "latest" ]; then
-    TAGS="$TAGS -t ${IMAGE_NAME}:${VERSION}"
+TAGS=( -t "${IMAGE_NAME}:${TAG}" )
+if [ -n "${VERSION:-}" ] && [ "$TAG" = "latest" ]; then
+    TAGS+=( -t "${IMAGE_NAME}:${VERSION}" )
 fi
 
 # Prepare labels
-LABELS=""
+LABELS=()
 if [ "$PUSH" = "push" ]; then
-    LABELS="--label org.opencontainers.image.title=Tolgee CLI"
-    LABELS="$LABELS --label org.opencontainers.image.description=A tool to interact with the Tolgee Platform through CLI"
-    LABELS="$LABELS --label org.opencontainers.image.url=https://github.com/tolgee/tolgee-cli"
-    LABELS="$LABELS --label org.opencontainers.image.source=https://github.com/tolgee/tolgee-cli"
-    LABELS="$LABELS --label org.opencontainers.image.licenses=MIT"
-    if [ -n "$VERSION" ]; then
-        LABELS="$LABELS --label org.opencontainers.image.version=${VERSION}"
+    LABELS+=( --label "org.opencontainers.image.title=Tolgee CLI" )
+    LABELS+=( --label "org.opencontainers.image.description=A tool to interact with the Tolgee Platform through CLI" )
+    LABELS+=( --label "org.opencontainers.image.url=https://github.com/tolgee/tolgee-cli" )
+    LABELS+=( --label "org.opencontainers.image.source=https://github.com/tolgee/tolgee-cli" )
+    LABELS+=( --label "org.opencontainers.image.licenses=MIT" )
+    if [ -n "${VERSION:-}" ]; then
+        LABELS+=( --label "org.opencontainers.image.version=${VERSION}" )
     fi
-    if [ -n "$GITHUB_SHA" ]; then
-        LABELS="$LABELS --label org.opencontainers.image.revision=${GITHUB_SHA}"
+    if [ -n "${GITHUB_SHA:-}" ]; then
+        LABELS+=( --label "org.opencontainers.image.revision=${GITHUB_SHA}" )
     fi
-    if [ -n "$BUILD_DATE" ]; then
-        LABELS="$LABELS --label org.opencontainers.image.created=${BUILD_DATE}"
+    if [ -n "${BUILD_DATE:-}" ]; then
+        LABELS+=( --label "org.opencontainers.image.created=${BUILD_DATE}" )
     fi
 fi
 
 # Build command
-BUILD_CMD="docker build $TAGS $LABELS"
+BUILD_CMD=( docker build )
+BUILD_CMD+=( "${TAGS[@]}" )
+if [ ${#LABELS[@]} -gt 0 ]; then
+    BUILD_CMD+=( "${LABELS[@]}" )
+fi
 
 if [ -n "$PLATFORM" ]; then
     echo "Platform(s): ${PLATFORM}"
     # For multi-platform builds, we need buildx
-    BUILD_CMD="docker buildx build --platform ${PLATFORM} $TAGS $LABELS"
+    BUILD_CMD=( docker buildx build --platform "${PLATFORM}" )
+    BUILD_CMD+=( "${TAGS[@]}" )
+    if [ ${#LABELS[@]} -gt 0 ]; then
+        BUILD_CMD+=( "${LABELS[@]}" )
+    fi
 
     # Check if buildx is available
     if ! docker buildx version > /dev/null 2>&1; then
@@ -113,11 +121,11 @@ if [ -n "$PLATFORM" ]; then
     PLATFORM_COUNT=$(echo "$PLATFORM" | tr ',' '\n' | wc -l)
     if [ "$PLATFORM_COUNT" -eq 1 ] && [ "$PUSH" != "push" ]; then
         # Single platform - we can load it to local Docker daemon
-        BUILD_CMD="${BUILD_CMD} --load"
+        BUILD_CMD+=( --load )
         echo -e "${GREEN}Single platform build - image will be available locally after build.${NC}"
     elif [ "$PUSH" = "push" ]; then
         # Push mode - add push flag
-        BUILD_CMD="${BUILD_CMD} --push"
+        BUILD_CMD+=( --push )
         echo -e "${GREEN}Build and push mode enabled.${NC}"
     else
         # Multi-platform build - cannot load to local Docker daemon
@@ -129,16 +137,16 @@ elif [ "$PUSH" = "push" ]; then
     echo -e "${GREEN}Build and push mode enabled for single architecture.${NC}"
 fi
 
-BUILD_CMD="${BUILD_CMD} ."
+BUILD_CMD+=( . )
 
-echo -e "${GREEN}Running: ${BUILD_CMD}${NC}"
-eval $BUILD_CMD
+echo -e "${GREEN}Running:${NC} ${BUILD_CMD[*]}"
+"${BUILD_CMD[@]}"
 
 if [ "$PUSH" = "push" ] && [ -z "$PLATFORM" ]; then
     # For regular builds, we need to push separately
     echo -e "${GREEN}Pushing images to registry...${NC}"
     docker push ${IMAGE_NAME}:${TAG}
-    if [ -n "$VERSION" ] && [ "$TAG" = "latest" ]; then
+    if [ -n "${VERSION:-}" ] && [ "$TAG" = "latest" ]; then
         docker push ${IMAGE_NAME}:${VERSION}
     fi
 fi

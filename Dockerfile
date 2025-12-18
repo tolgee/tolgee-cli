@@ -1,6 +1,6 @@
 # Multi-stage Docker build for Tolgee CLI
 # Stage 1: Build stage with dev dependencies
-FROM node:18-alpine AS builder
+FROM node:24-alpine AS builder
 
 # Set working directory
 WORKDIR /app
@@ -26,7 +26,7 @@ COPY schema.json ./
 RUN npm run build
 
 # Stage 2: Production stage with only runtime dependencies
-FROM node:18-alpine AS production
+FROM node:24-alpine AS production
 
 # Set working directory
 WORKDIR /app

@@ -5,7 +5,7 @@ to get some work done.
 
 ## Toolchain
 
-To work on this project, you will just need Node 16+ (and Docker to run tests). We use `npm` to manage dependencies,
+To work on this project, you will just need Node 22+ (and Docker to run tests). We use `npm` to manage dependencies,
 and [prettier](https://github.com/prettier/prettier) to lint our code.
 
 ## Scripts
