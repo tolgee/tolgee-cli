@@ -71,7 +71,7 @@ jobs:
         run: ./scripts/build-docker.sh latest linux/amd64,linux/arm64 push
         env:
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-          DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_PASSWORD }}
           VERSION: ${{ steps.version-after.outputs.VERSION }}
           GITHUB_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
           BUILD_DATE: ${{ github.event.workflow_run.run_started_at || github.event.workflow_run.head_commit.timestamp }}
