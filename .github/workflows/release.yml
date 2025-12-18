@@ -10,7 +10,9 @@ on:
 # that's why we don't need to set up the token manually
 permissions:
   id-token: write
-  contents: read
+  contents: write
+  issues: write
+  pull-requests: write
 
 jobs:
   release:
