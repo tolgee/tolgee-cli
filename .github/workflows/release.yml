@@ -5,6 +5,8 @@ on:
     branches: [ main ]
     types:
       - completed
+  push:
+    branches: [ next, prerelease ]
 
 # This part sets up the Trusted Publishers for npm via GitHub Actions,
 # that's why we don't need to set up the token manually
@@ -16,15 +18,14 @@ permissions:
 
 jobs:
   release:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'push' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
-
-      - run: install -g npm@^11.5.1
+          node-version: '24'
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Cache dependencies
         uses: actions/cache@v4
