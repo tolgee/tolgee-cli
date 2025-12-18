@@ -1,25 +1,51 @@
-# Use Node.js 18 Alpine for smaller image size
-FROM node:22-alpine
+# Multi-stage Docker build for Tolgee CLI
+# Stage 1: Build stage with dev dependencies
+FROM node:18-alpine AS builder
 
 # Set working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json first for better Docker layer caching
+# Copy package files first for better Docker layer caching
 COPY package*.json ./
 
-# Install all dependencies (including dev dependencies needed by the built code)
+# Install ALL dependencies (including dev dependencies needed for building)
 RUN npm ci && npm cache clean --force
 
-# Copy built application files (as specified in package.json "files" section)
-COPY dist/ ./dist/
+# Copy source files
+COPY src/ ./src/
+COPY scripts/ ./scripts/
+COPY tsconfig*.json ./
+COPY eslint.config.js ./
+
+# Copy additional files needed for build
 COPY textmate/ ./textmate/
 COPY extractor.d.ts ./
 COPY schema.json ./
+
+# Build the CLI
+RUN npm run build
+
+# Stage 2: Production stage with only runtime dependencies
+FROM node:18-alpine AS production
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files first for better Docker layer caching
+COPY package*.json ./
+
+# Install ONLY production dependencies
+RUN npm ci --only=production && npm cache clean --force
+
+# Copy built application files from builder stage
+COPY --from=builder /app/dist/ ./dist/
+COPY --from=builder /app/textmate/ ./textmate/
+COPY --from=builder /app/extractor.d.ts ./
+COPY --from=builder /app/schema.json ./
+
+# Copy documentation files
 COPY README.md ./
 COPY LICENSE ./
-
-# Copy node_modules for runtime dependencies
-COPY node_modules/ ./node_modules/
 
 # Make the CLI binary executable
 RUN chmod +x ./dist/cli.js
