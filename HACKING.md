@@ -14,7 +14,7 @@ These are the runnable scripts with `npm run`:
 
 General:
 
-- `run-dev`: Run the CLI (with [`tsx`](https://github.com/privatenumber/tsx)). Use `--` to pass arguments to the CLI rather than NPM: \
+- `run-dev`: Run the CLI (with [`tsx`](https://github.com/privatenumber/tsx)). Use `--` to pass arguments to the CLI rather than to NPM: \
   `npm run run-dev -- extract print --extractor react src/**/*.tsx`
 - `build`: Build the CLI.
 - `eslint`: Run ESLint.
