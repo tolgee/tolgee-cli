@@ -23,6 +23,22 @@ pnpm add --global @tolgee/cli
 
 See our [documentation](https://tolgee.io/tolgee-cli/installation) for more information.
 
+### Docker Installation
+Alternatively, you can use the Docker image:
+
+```sh
+# Pull the latest image
+docker pull tolgee/cli:latest
+
+# Run directly
+docker run --rm tolgee/cli:latest --help
+
+# Create an alias for easier usage
+alias tolgee="docker run --rm -v \$(pwd):/workspace -w /workspace tolgee/cli:latest"
+```
+
+The Docker images are available on [Docker Hub](https://hub.docker.com/r/tolgee/cli) and support multiple platforms (linux/amd64, linux/arm64).
+
 ## Usage
 Once installed, you'll have access to the `tolgee` command. Run `tolgee help` to see all the supported commands, their
 options and arguments.

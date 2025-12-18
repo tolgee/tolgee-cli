@@ -37,6 +37,11 @@ jobs:
 
       - name: Build the CLI
         run: npm run build
+
+      - name: Store version before release
+        id: version-before
+        run: echo "VERSION=$(node -p 'require("./package.json").version')" >> "$GITHUB_OUTPUT"
+
       - name: Run npm release
         run: npm run release
         env:
@@ -45,3 +50,28 @@ jobs:
           GIT_AUTHOR_EMAIL: machine@tolgee.io
           GIT_COMMITTER_NAME: Tolgee Machine
           GIT_COMMITTER_EMAIL: machine@tolgee.io
+
+      - name: Extract version after release
+        id: version-after
+        run: echo "VERSION=$(node -p 'require("./package.json").version')" >> "$GITHUB_OUTPUT"
+
+      - name: Check if version was released
+        id: version-check
+        run: |
+          if [ "${{ steps.version-before.outputs.VERSION }}" != "${{ steps.version-after.outputs.VERSION }}" ]; then
+            echo "RELEASED=true" >> "$GITHUB_OUTPUT"
+            echo "New version released: ${{ steps.version-before.outputs.VERSION }} -> ${{ steps.version-after.outputs.VERSION }}"
+          else
+            echo "RELEASED=false" >> "$GITHUB_OUTPUT"
+            echo "No new version released (version remains ${{ steps.version-before.outputs.VERSION }})"
+          fi
+
+      - name: Build and push Docker image
+        if: steps.version-check.outputs.RELEASED == 'true'
+        run: ./scripts/build-docker.sh latest linux/amd64,linux/arm64 push
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_PASSWORD }}
+          VERSION: ${{ steps.version-after.outputs.VERSION }}
+          GITHUB_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+          BUILD_DATE: ${{ github.event.workflow_run.run_started_at || github.event.workflow_run.head_commit.timestamp }}
