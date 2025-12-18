@@ -75,3 +75,4 @@ jobs:
           VERSION: ${{ steps.version-after.outputs.VERSION }}
           GITHUB_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
           BUILD_DATE: ${{ github.event.workflow_run.run_started_at || github.event.workflow_run.head_commit.timestamp }}
+
