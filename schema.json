@@ -5,6 +5,11 @@
       "description": "Project ID. Only required when using a Personal Access Token.",
       "type": ["number", "string"]
     },
+    "branch": {
+      "description": "Project branch. Use when branching enabled for the project.",
+      "type": "string",
+      "minLength": 1
+    },
     "apiUrl": {
       "description": "The url of Tolgee API.",
       "type": "string"

@@ -1,12 +1,15 @@
-import { cosmiconfig, defaultLoaders } from 'cosmiconfig';
-import { readFile } from 'fs/promises';
-import { fileURLToPath } from 'url';
-import { dirname, join, resolve } from 'path';
+import {
+  cosmiconfig,
+  defaultLoaders,
+  type CosmiconfigResult,
+} from 'cosmiconfig';
+import { existsSync } from 'node:fs';
+import { readFile } from 'node:fs/promises';
+import { fileURLToPath } from 'node:url';
+import { dirname, join, resolve } from 'node:path';
 
-import { CosmiconfigResult } from 'cosmiconfig/dist/types.js';
 import { error, exitWithError } from '../utils/logger.js';
-import { existsSync } from 'fs';
-import { Schema } from '../schema.js';
+import type { Schema } from '../schema.js';
 import { valueToArray } from '../utils/valueToArray.js';
 import { Ajv } from 'ajv';
 
@@ -34,6 +37,15 @@ function parseConfig(input: Schema, configDir: string) {
         "Invalid config: 'projectId' should be an integer representing your project Id"
       );
     }
+  }
+
+  if (rc.branch !== undefined) {
+    if (typeof rc.branch !== 'string' || !rc.branch.trim().length) {
+      throw new Error(
+        "Invalid config: 'branch' should be a non-empty string representing your project branch"
+      );
+    }
+    rc.branch = rc.branch.trim();
   }
 
   // convert relative paths in config to absolute

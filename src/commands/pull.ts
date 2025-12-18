@@ -10,6 +10,7 @@ import { Schema } from '../schema.js';
 import { checkPathNotAFile } from '../utils/checkPathNotAFile.js';
 import { mapExportFormat } from '../utils/mapExportFormat.js';
 import { handleLoadableError } from '../client/TolgeeClient.js';
+import { appendBranch } from '../utils/branch.js';
 
 type PullOptions = BaseOptions & {
   format: Schema['format'];
@@ -41,6 +42,7 @@ async function fetchZipBlob(opts: PullOptions): Promise<Blob> {
     filterTagNotIn: opts.excludeTags,
     fileStructureTemplate: opts.fileStructureTemplate,
     escapeHtml: false,
+    filterBranch: opts.branch,
   });
 
   handleLoadableError(loadable);
@@ -60,11 +62,14 @@ const pullHandler = () =>
     await checkPathNotAFile(opts.path);
 
     const zipBlob = await loading(
-      'Fetching strings from Tolgee...',
+      `Fetching strings from Tolgee${appendBranch(opts.branch)}...`,
       fetchZipBlob(opts)
     );
     await prepareDir(opts.path, opts.emptyDir);
-    await loading('Extracting strings...', unzipBuffer(zipBlob, opts.path));
+    await loading(
+      `Extracting strings${appendBranch(opts.branch)}...`,
+      unzipBuffer(zipBlob, opts.path)
+    );
     success('Done!');
   };
 

@@ -81,6 +81,10 @@ export interface Schema {
    */
   projectId?: number | string;
   /**
+   * Project branch. Use when branching enabled for the project.
+   */
+  branch?: string;
+  /**
    * The url of Tolgee API.
    */
   apiUrl?: string;
