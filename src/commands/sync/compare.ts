@@ -11,6 +11,7 @@ import { loading } from '../../utils/logger.js';
 import { Schema } from '../../schema.js';
 import { BaseOptions } from '../../options.js';
 import { handleLoadableError } from '../../client/TolgeeClient.js';
+import { appendBranch } from '../../utils/branch.js';
 
 type Options = BaseOptions;
 
@@ -25,9 +26,16 @@ const asyncHandler = (config: Schema) =>
     dumpWarnings(rawKeys);
 
     const localKeys = filterExtractionResult(rawKeys);
-    const loadable = await opts.client.GET(
-      '/v2/projects/{projectId}/all-keys',
-      { params: { path: { projectId: opts.client.getProjectId() } } }
+    const loadable = await loading(
+      `Fetching Tolgee keys${appendBranch(opts.branch)}...`,
+      opts.client.GET('/v2/projects/{projectId}/all-keys', {
+        params: {
+          path: {
+            projectId: opts.client.getProjectId(),
+            query: { branch: opts.branch },
+          },
+        },
+      })
     );
 
     handleLoadableError(loadable);
