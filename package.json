@@ -1,6 +1,6 @@
 {
   "name": "@tolgee/cli",
-  "version": "0.1.0",
+  "version": "2.15.1-rc.1",
   "type": "module",
   "description": "A tool to interact with the Tolgee Platform through CLI",
   "repository": {
