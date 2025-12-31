@@ -3,6 +3,8 @@ import { run } from './utils/run.js';
 import { TolgeeClient } from '#cli/client/TolgeeClient.js';
 import { PROJECT_2 } from './utils/api/project2.js';
 import {
+  createBranch,
+  createKey,
   createPak,
   createProjectWithClient,
   deleteProject,
@@ -34,7 +36,7 @@ const CODE_UNORDERED = fileURLToPathSlash(
 let client: TolgeeClient;
 let pak: string;
 
-describe('Project 1', () => {
+describe('Project 2', () => {
   beforeEach(async () => {
     client = await createProjectWithClient('Project 2', PROJECT_2);
     pak = await createPak(client);
@@ -106,12 +108,12 @@ describe('Project 1', () => {
     expect(out.code).toBe(0);
 
     // Test all added keys
-    expect(out.stdout).toContain('section-content');
-    expect(out.stdout).toContain('section-title');
-    expect(out.stdout).toContain('copyright-notice');
-    expect(out.stdout).toContain('privacy-policy');
-    expect(out.stdout).toContain('terms-of-service');
-    expect(out.stdout).toContain('welcome');
+    expect(out.stdout).toContain('+ section-content');
+    expect(out.stdout).toContain('+ section-title');
+    expect(out.stdout).toContain('+ copyright-notice');
+    expect(out.stdout).toContain('+ privacy-policy');
+    expect(out.stdout).toContain('+ terms-of-service');
+    expect(out.stdout).toContain('+ welcome');
 
     expect(out.stdout.indexOf('section-content')).toBeLessThan(
       out.stdout.indexOf('section-title')
@@ -130,12 +132,12 @@ describe('Project 1', () => {
     );
 
     // Test all removed keys
-    expect(out.stdout).toContain('bird-name');
-    expect(out.stdout).toContain('bird-sound');
-    expect(out.stdout).toContain('cat-name');
-    expect(out.stdout).toContain('cat-sound');
-    expect(out.stdout).toContain('dog-name');
-    expect(out.stdout).toContain('dog-sound');
+    expect(out.stdout).toContain('- bird-name');
+    expect(out.stdout).toContain('- bird-sound');
+    expect(out.stdout).toContain('- cat-name');
+    expect(out.stdout).toContain('- cat-sound');
+    expect(out.stdout).toContain('- dog-name');
+    expect(out.stdout).toContain('- dog-sound');
 
     expect(out.stdout.indexOf('bird-name')).toBeLessThan(
       out.stdout.indexOf('bird-sound')
@@ -152,6 +154,78 @@ describe('Project 1', () => {
     expect(out.stdout.indexOf('dog-name')).toBeLessThan(
       out.stdout.indexOf('dog-sound')
     );
+  }, 30e3);
+});
+
+describe('Branching', () => {
+  beforeEach(async () => {
+    client = await createProjectWithClient('Project 2', PROJECT_2);
+    pak = await createPak(client);
+
+    await createBranch(client, 'feature-branch');
+
+    await createKey(client, 'mouse-name', {
+      branch: 'feature-branch',
+      translations: { en: 'Mouse' },
+    });
+    await createKey(client, 'mouse-sound', {
+      branch: 'feature-branch',
+      translations: { en: 'Squeek' },
+    });
+  });
+
+  afterEach(async () => {
+    await deleteProject(client);
+  });
+
+  it('contains added keys in new branch', async () => {
+    const out = await run(
+      [
+        'compare',
+        '--api-key',
+        pak,
+        '--patterns',
+        CODE_PROJECT_2_ADDED,
+        '--branch',
+        'feature-branch',
+      ],
+      undefined,
+      20e3
+    );
+
+    expect(out.code).toBe(0);
+    expect(out.stdout).toContain('is in sync');
+  });
+
+  it('does not contain the added keys in main branch', async () => {
+    const out = await run(
+      ['compare', '--api-key', pak, '--patterns', CODE_PROJECT_2_ADDED],
+      undefined,
+      20e3
+    );
+
+    expect(out.code).toBe(0);
+    expect(out.stdout).toContain('out of sync');
+    expect(out.stdout).toContain('2 new keys found');
+  }, 30e3);
+
+  it('fails when branch does not exist', async () => {
+    const out = await run(
+      [
+        'compare',
+        '--api-key',
+        pak,
+        '--patterns',
+        CODE_PROJECT_2_COMPLETE,
+        '--branch',
+        'missing-branch',
+      ],
+      undefined,
+      20e3
+    );
+
+    expect(out.code).not.toBe(0);
+    expect(out.stderr + out.stdout).toContain('branch_not_found');
   }, 30e3);
 });
 
