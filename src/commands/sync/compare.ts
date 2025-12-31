@@ -30,10 +30,8 @@ const asyncHandler = (config: Schema) =>
       `Fetching Tolgee keys${appendBranch(opts.branch)}...`,
       opts.client.GET('/v2/projects/{projectId}/all-keys', {
         params: {
-          path: {
-            projectId: opts.client.getProjectId(),
-            query: { branch: opts.branch },
-          },
+          path: { projectId: opts.client.getProjectId() },
+          query: { branch: opts.branch },
         },
       })
     );
