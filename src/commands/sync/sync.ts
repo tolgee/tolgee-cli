@@ -19,6 +19,7 @@ import {
   TolgeeClient,
   handleLoadableError,
 } from '../../client/TolgeeClient.js';
+import { appendBranch } from '../../utils/branch.js';
 
 type Options = BaseOptions & {
   backup?: string | false;
@@ -29,13 +30,14 @@ type Options = BaseOptions & {
   tagNewKeys?: string[];
 };
 
-async function backup(client: TolgeeClient, dest: string) {
+async function backup(client: TolgeeClient, dest: string, branch?: string) {
   const loadable = await client.export.export({
     format: 'JSON',
     supportArrays: false,
     filterState: ['UNTRANSLATED', 'TRANSLATED', 'REVIEWED'],
     structureDelimiter: '',
     escapeHtml: false,
+    filterBranch: branch,
   });
 
   handleLoadableError(loadable);
@@ -91,11 +93,14 @@ const syncHandler = (config: Schema) =>
       }
     }
 
-    const allKeysLoadable = await opts.client.GET(
-      '/v2/projects/{projectId}/all-keys',
-      {
-        params: { path: { projectId: opts.client.getProjectId() } },
-      }
+    const allKeysLoadable = await loading(
+      `Fetching Tolgee keys${appendBranch(opts.branch)}...`,
+      opts.client.GET('/v2/projects/{projectId}/all-keys', {
+        params: {
+          path: { projectId: opts.client.getProjectId() },
+          query: { branch: opts.branch },
+        },
+      })
     );
 
     handleLoadableError(allKeysLoadable);
@@ -138,8 +143,8 @@ const syncHandler = (config: Schema) =>
     if (opts.backup) {
       await prepareDir(opts.backup, opts.yes);
       await loading(
-        'Backing up Tolgee project',
-        backup(opts.client, opts.backup)
+        `Backing up Tolgee project${appendBranch(opts.branch)}`,
+        backup(opts.client, opts.backup, opts.branch)
       );
     }
 
@@ -159,9 +164,12 @@ const syncHandler = (config: Schema) =>
       }));
 
       const loadable = await loading(
-        'Creating missing keys...',
+        `Creating missing keys${appendBranch(opts.branch)}...`,
         opts.client.POST('/v2/projects/{projectId}/keys/import', {
-          params: { path: { projectId: opts.client.getProjectId() } },
+          params: {
+            path: { projectId: opts.client.getProjectId() },
+            query: { branch: opts.branch },
+          },
           body: { keys },
         })
       );
@@ -178,7 +186,7 @@ const syncHandler = (config: Schema) =>
 
         const ids = await diff.removed.map((k) => k.id);
         const loadable = await loading(
-          'Deleting unused keys...',
+          `Deleting unused keys${appendBranch(opts.branch)}...`,
           opts.client.DELETE('/v2/projects/{projectId}/keys', {
             params: { path: { projectId: opts.client.getProjectId() } },
             body: { ids },

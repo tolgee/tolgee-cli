@@ -21587,7 +21587,9 @@ export interface operations {
     };
     importKeys_2: {
         parameters: {
-            query?: never;
+            query?: {
+                branch?: string;
+            };
             header?: never;
             path: {
                 projectId: number;
@@ -26295,7 +26297,9 @@ export interface operations {
     };
     executeComplexTagOperation: {
         parameters: {
-            query?: never;
+            query?: {
+                branch?: string;
+            };
             header?: never;
             path: {
                 projectId: number;
