@@ -37,6 +37,7 @@ import ExtractCommand from './commands/extract.js';
 import CompareCommand from './commands/sync/compare.js';
 import SyncCommand from './commands/sync/sync.js';
 import TagCommand from './commands/tag.js';
+import BranchCommand from './commands/branch.js';
 
 import { getSingleOption } from './utils/getSingleOption.js';
 import { Schema } from './schema.js';
@@ -210,6 +211,9 @@ async function run() {
     );
     program.addCommand(
       TagCommand(config).configureHelp({ showGlobalOptions: true })
+    );
+    program.addCommand(
+      BranchCommand(config).configureHelp({ showGlobalOptions: true })
     );
 
     await program.parseAsync();
