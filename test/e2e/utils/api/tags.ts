@@ -39,11 +39,11 @@ export const ORIGINAL_TAGS = {
   screen: ['deprecated-v11'],
 } as const;
 
-export async function getTagsMap(client: TolgeeClient) {
+export async function getTagsMap(client: TolgeeClient, branch?: string) {
   const keys = await client.GET('/v2/projects/{projectId}/translations', {
     params: {
       path: { projectId: client.getProjectId() },
-      query: { languages: ['en', 'cs'] },
+      query: { languages: ['en', 'cs'], ...(!!branch && { branch }) },
     },
   });
 

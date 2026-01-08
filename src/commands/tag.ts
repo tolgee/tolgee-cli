@@ -5,6 +5,7 @@ import { handleLoadableError } from '../client/TolgeeClient.js';
 import { exitWithError, loading, success } from '../utils/logger.js';
 import { extractKeysOfFiles } from '../extractor/runner.js';
 import { components } from '../client/internal/schema.generated.js';
+import { appendBranch } from '../utils/branch.js';
 
 type KeyId = components['schemas']['KeyId'];
 
@@ -44,9 +45,12 @@ const tagHandler = (config: Schema) =>
     }
 
     const loadable = await loading(
-      'Tagging...',
+      `Tagging${appendBranch(opts.branch)}...`,
       opts.client.PUT('/v2/projects/{projectId}/tag-complex', {
-        params: { path: { projectId: opts.client.getProjectId() } },
+        params: {
+          path: { projectId: opts.client.getProjectId() },
+          query: { branch: opts.branch },
+        },
         body: {
           filterTag: opts.filterTag,
           filterTagNot: opts.filterNoTag,

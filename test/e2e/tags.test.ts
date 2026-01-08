@@ -2,6 +2,7 @@ import { TolgeeClient } from '#cli/client/TolgeeClient.js';
 import { join } from 'path';
 import {
   API_URL,
+  createBranch,
   createPak,
   createProjectWithClient,
   deleteProject,
@@ -50,7 +51,7 @@ afterEach(async () => {
 it('updates production tags from extracted (args)', async () => {
   const { configFile } = await createTmpFolderWithConfig(PROJECT_CONFIG_BASE);
   const out = await run([
-    '-c',
+    '--config',
     configFile,
     '--api-key',
     pak,
@@ -80,7 +81,7 @@ it('updates production tags from extracted (config)', async () => {
       untag: ['production-*'],
     },
   });
-  const out = await run(['-c', configFile, 'tag']);
+  const out = await run(['--config', configFile, 'tag']);
 
   expect(out.code).toBe(0);
 
@@ -93,7 +94,7 @@ it('updates production tags from extracted (config)', async () => {
 it('marks as deprecated (args)', async () => {
   const { configFile } = await createTmpFolderWithConfig(PROJECT_CONFIG_BASE);
   const out = await run([
-    '-c',
+    '--config',
     configFile,
     '--api-key',
     pak,
@@ -126,7 +127,7 @@ it('marks as deprecated (config)', async () => {
       untag: ['production-*'],
     },
   });
-  const out = await run(['-c', configFile, 'tag']);
+  const out = await run(['--config', configFile, 'tag']);
 
   expect(out.code).toBe(0);
 
@@ -139,7 +140,7 @@ it('marks as deprecated (config)', async () => {
 it('marks newly created keys as drafts (args)', async () => {
   const { configFile } = await createTmpFolderWithConfig(PROJECT_CONFIG_BASE);
   const out = await run([
-    '-c',
+    '--config',
     configFile,
     '--api-key',
     pak,
@@ -163,7 +164,7 @@ it('marks newly created keys as drafts (config)', async () => {
       tagNewKeys: ['draft-another-branch'],
     },
   });
-  const out = await run(['-c', configFile, 'push']);
+  const out = await run(['--config', configFile, 'push']);
   expect(out.code).toBe(0);
   expect(await getTagsMap(client)).toEqual({
     ...ORIGINAL_TAGS,
@@ -174,7 +175,7 @@ it('marks newly created keys as drafts (config)', async () => {
 it('marks other keys (args)', async () => {
   const { configFile } = await createTmpFolderWithConfig(PROJECT_CONFIG_BASE);
   const out = await run([
-    '-c',
+    '--config',
     configFile,
     '--api-key',
     pak,
@@ -205,7 +206,7 @@ it('marks other keys (config)', async () => {
       tagOther: ['other'],
     },
   });
-  const out = await run(['-c', configFile, 'tag']);
+  const out = await run(['--config', configFile, 'tag']);
 
   expect(out.code).toBe(0);
 
@@ -218,7 +219,7 @@ it('marks other keys (config)', async () => {
 
 it('marks no key', async () => {
   const out = await run([
-    '-c',
+    '--config',
     TAGS_PROJECT_CONFIG,
     '--api-key',
     pak,
@@ -238,7 +239,7 @@ it('marks no key', async () => {
 
 it('marks no key but through other without filter', async () => {
   const out = await run([
-    '-c',
+    '--config',
     TAGS_PROJECT_CONFIG,
     '--api-key',
     pak,
@@ -251,5 +252,57 @@ it('marks no key but through other without filter', async () => {
 
   expect(await getTagsMap(client)).toEqual({
     ...ORIGINAL_TAGS,
+  });
+});
+
+describe('Branching', () => {
+  beforeEach(async () => {
+    await createBranch(client, 'feature-branch');
+  });
+
+  it('tags extracted keys in the selected branch', async () => {
+    const out = await run([
+      '--config',
+      TAGS_PROJECT_CONFIG,
+      '--api-key',
+      pak,
+      'tag',
+      '--branch',
+      'feature-branch',
+      '--filter-extracted',
+      '--tag',
+      'branch-tag',
+    ]);
+
+    expect(out.code).toBe(0);
+
+    expect(
+      Object.values(await getTagsMap(client, 'feature-branch')).filter((tags) =>
+        tags.includes('branch-tag')
+      ).length
+    ).toBe(1);
+    expect(
+      Object.values(await getTagsMap(client)).filter((tags) =>
+        tags.includes('branch-tag')
+      ).length
+    ).toBe(0);
+  });
+
+  it('fails when branch does not exist', async () => {
+    const out = await run([
+      '--config',
+      TAGS_PROJECT_CONFIG,
+      '--api-key',
+      pak,
+      'tag',
+      '--branch',
+      'missing-branch',
+      '--filter-extracted',
+      '--tag',
+      'branch-tag',
+    ]);
+
+    expect(out.code).not.toBe(0);
+    expect(out.stderr + out.stdout).toContain('branch_not_found');
   });
 });
