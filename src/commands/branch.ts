@@ -3,6 +3,7 @@ import { Schema } from '../schema.js';
 import { BaseOptions } from '../options.js';
 import { components } from '../client/internal/schema.generated.js';
 import { handleLoadableError } from '../client/TolgeeClient.js';
+import { fetchBranches, listBranches } from '../utils/branch.js';
 import { error, exitWithError, loading, success } from '../utils/logger.js';
 
 type BranchOptions = BaseOptions & {
@@ -10,30 +11,6 @@ type BranchOptions = BaseOptions & {
   delete?: string;
   origin?: string;
 };
-
-async function fetchBranches(cmd: BranchOptions) {
-  const loadable = await cmd.client.GET('/v2/projects/{projectId}/branches', {
-    params: { path: { projectId: cmd.client.getProjectId() } },
-  });
-  handleLoadableError(loadable);
-  return loadable.data?._embedded?.branches ?? [];
-}
-
-function listBranches(branches: components['schemas']['BranchModel'][]) {
-  if (!branches.length) {
-    success('No branches found.');
-    return;
-  }
-  console.log('Branches:');
-  branches.forEach((b) => {
-    const markers: string[] = [];
-    if (b.isDefault) markers.push('default');
-    if (b.isProtected) markers.push('protected');
-    if (b.active === false) markers.push('inactive');
-    const suffix = markers.length ? ` (${markers.join(', ')})` : '';
-    console.log(`- ${b.name}${suffix}`);
-  });
-}
 
 function resolveTargetNames(opts: BranchOptions, createArg?: string) {
   const createName = opts.create ?? createArg;
