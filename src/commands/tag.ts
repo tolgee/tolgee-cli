@@ -49,7 +49,7 @@ const tagHandler = (config: Schema) =>
       opts.client.PUT('/v2/projects/{projectId}/tag-complex', {
         params: {
           path: { projectId: opts.client.getProjectId() },
-          query: { branch: opts.branch },
+          ...(!!opts.branch && { query: { branch: opts.branch } }),
         },
         body: {
           filterTag: opts.filterTag,

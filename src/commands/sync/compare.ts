@@ -31,7 +31,7 @@ const asyncHandler = (config: Schema) =>
       opts.client.GET('/v2/projects/{projectId}/all-keys', {
         params: {
           path: { projectId: opts.client.getProjectId() },
-          query: { branch: opts.branch },
+          ...(!!opts.branch && { query: { branch: opts.branch } }),
         },
       })
     );

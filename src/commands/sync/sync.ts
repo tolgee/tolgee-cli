@@ -98,7 +98,7 @@ const syncHandler = (config: Schema) =>
       opts.client.GET('/v2/projects/{projectId}/all-keys', {
         params: {
           path: { projectId: opts.client.getProjectId() },
-          query: { branch: opts.branch },
+          ...(!!opts.branch && { query: { branch: opts.branch } }),
         },
       })
     );
@@ -168,7 +168,7 @@ const syncHandler = (config: Schema) =>
         opts.client.POST('/v2/projects/{projectId}/keys/import', {
           params: {
             path: { projectId: opts.client.getProjectId() },
-            query: { branch: opts.branch },
+            ...(!!opts.branch && { query: { branch: opts.branch } }),
           },
           body: { keys },
         })
