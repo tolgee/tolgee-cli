@@ -16,10 +16,13 @@ export async function fetchBranches(cmd: BaseOptions) {
 }
 
 export function listBranches(branches: components['schemas']['BranchModel'][]) {
+  branches = branches.filter((b) => !b.merge || !b.merge.mergedAt);
+
   if (!branches.length) {
     success('No branches found.');
     return;
   }
+
   console.log('Branches:');
   branches.forEach((b) => {
     const markers: string[] = [];
