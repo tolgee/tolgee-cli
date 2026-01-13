@@ -9,7 +9,10 @@ export function appendBranch(branch?: string) {
 
 export async function fetchBranches(cmd: BaseOptions) {
   const loadable = await cmd.client.GET('/v2/projects/{projectId}/branches', {
-    params: { path: { projectId: cmd.client.getProjectId() } },
+    params: {
+      path: { projectId: cmd.client.getProjectId() },
+      query: { size: 10000, activeOnly: true },
+    },
   });
   handleLoadableError(loadable);
   return loadable.data?._embedded?.branches ?? [];

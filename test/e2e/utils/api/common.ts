@@ -97,6 +97,17 @@ type CreateBranchOptions = {
   originBranchId?: number;
 };
 
+export async function fetchBranches(client: TolgeeClient) {
+  const branches = await client.GET('/v2/projects/{projectId}/branches', {
+    params: {
+      path: { projectId: client.getProjectId() },
+      query: { size: 10000, activeOnly: true },
+    },
+  });
+
+  return branches.data?._embedded?.branches ?? [];
+}
+
 export async function createBranch(
   client: TolgeeClient,
   name: string,
@@ -104,13 +115,7 @@ export async function createBranch(
 ) {
   let originBranchId = options?.originBranchId;
   if (!originBranchId) {
-    const branches = await client.GET('/v2/projects/{projectId}/branches', {
-      params: {
-        path: { projectId: client.getProjectId() },
-      },
-    });
-
-    const origin = branches.data?._embedded?.branches?.find((b) => b.isDefault);
+    const origin = (await fetchBranches(client)).find((b) => b.isDefault);
     originBranchId = origin?.id;
   }
 

@@ -1,5 +1,6 @@
 import { run } from './utils/run.js';
 import { TolgeeClient } from '#cli/client/TolgeeClient.js';
+import { fetchBranches } from './utils/api/common.js';
 import { PROJECT_1 } from './utils/api/project1.js';
 import {
   DEFAULT_SCOPES,
@@ -12,16 +13,8 @@ import {
 let client: TolgeeClient;
 let pak: string;
 
-async function fetchBranches() {
-  const branches = await client.GET('/v2/projects/{projectId}/branches', {
-    params: { path: { projectId: client.getProjectId() } },
-  });
-
-  return branches.data?._embedded?.branches ?? [];
-}
-
 async function findBranch(name: string) {
-  const branches = await fetchBranches();
+  const branches = await fetchBranches(client);
   return branches.find((branch) => branch.name === name);
 }
 
@@ -38,7 +31,7 @@ describe('branch command', () => {
   it('lists branches', async () => {
     await createBranch(client, 'feature-branch');
 
-    const branches = await fetchBranches();
+    const branches = await fetchBranches(client);
     const defaultBranch = branches.find((branch) => branch.isDefault);
 
     const out = await run(['branch', '--api-key', pak]);
