@@ -78,6 +78,7 @@ export async function createProjectWithClient(
     body: {
       icuPlaceholders: true,
       useNamespaces: true,
+      useBranching: false,
       suggestionsMode: 'DISABLED',
       translationProtection: 'NONE',
       ...editOptions,
@@ -93,9 +94,9 @@ export async function createProjectWithClient(
   return client;
 }
 
-type CreateBranchOptions = {
-  originBranchId?: number;
-};
+type CreateBranchOptions = Partial<
+  Omit<components['schemas']['CreateBranchModel'], 'name'>
+>;
 
 export async function fetchBranches(client: TolgeeClient) {
   const branches = await client.GET('/v2/projects/{projectId}/branches', {
@@ -167,6 +168,16 @@ export async function createPak(client: TolgeeClient, scopes = DEFAULT_SCOPES) {
   });
 
   return apiKey.data!.key;
+}
+
+export async function enableFeature(feature: string, enabled = true) {
+  const url = `${API_URL}/internal/features/toggle?feature=${feature}&enabled=${enabled}`;
+  const res = await fetch(url, {
+    method: 'PUT',
+  });
+  if (!res.ok) {
+    throw new Error(`Failed to toggle feature ${feature}: ${res.status}`);
+  }
 }
 
 export async function createPat(client: TolgeeClient) {

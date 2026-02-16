@@ -16,6 +16,7 @@ import {
   createPak,
   createProjectWithClient,
   deleteProject,
+  enableFeature,
 } from './utils/api/common.js';
 import { TolgeeClient } from '#cli/client/TolgeeClient.js';
 import { PROJECT_1 } from './utils/api/project1.js';
@@ -435,8 +436,11 @@ describe('Project 3', () => {
 describe('Branching', () => {
   setupTemporaryFolder();
   beforeEach(async () => {
-    client = await createProjectWithClient('Branching project', PROJECT_1);
+    client = await createProjectWithClient('Branching project', PROJECT_1, {
+      useBranching: true,
+    });
     pak = await createPak(client);
+    await enableFeature('BRANCHING');
 
     await createBranch(client, 'feature-branch');
     await createKey(client, 'branch-only', {

@@ -1,6 +1,6 @@
 import { run } from './utils/run.js';
 import { TolgeeClient } from '#cli/client/TolgeeClient.js';
-import { fetchBranches } from './utils/api/common.js';
+import { enableFeature, fetchBranches } from './utils/api/common.js';
 import { PROJECT_1 } from './utils/api/project1.js';
 import {
   DEFAULT_SCOPES,
@@ -20,8 +20,15 @@ async function findBranch(name: string) {
 
 describe('branch command', () => {
   beforeEach(async () => {
-    client = await createProjectWithClient('Branch project', PROJECT_1);
-    pak = await createPak(client, [...DEFAULT_SCOPES, 'project.edit']);
+    await enableFeature('BRANCHING');
+    client = await createProjectWithClient('Branch project', PROJECT_1, {
+      useBranching: true,
+    });
+    pak = await createPak(client, [
+      ...DEFAULT_SCOPES,
+      'project.edit',
+      'branch.management',
+    ]);
   });
 
   afterEach(async () => {

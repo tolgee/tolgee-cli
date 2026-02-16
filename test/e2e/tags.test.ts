@@ -6,6 +6,7 @@ import {
   createPak,
   createProjectWithClient,
   deleteProject,
+  enableFeature,
 } from './utils/api/common.js';
 import { PROJECT_1 } from './utils/api/project1.js';
 import { ORIGINAL_TAGS, createTestTags, getTagsMap } from './utils/api/tags.js';
@@ -39,7 +40,9 @@ let client: TolgeeClient;
 let pak: string;
 
 beforeEach(async () => {
-  client = await createProjectWithClient('Project with tags', PROJECT_1);
+  client = await createProjectWithClient('Project with tags', PROJECT_1, {
+    useBranching: true,
+  });
   pak = await createPak(client);
   await createTestTags(client);
 });
@@ -257,6 +260,7 @@ it('marks no key but through other without filter', async () => {
 
 describe('Branching', () => {
   beforeEach(async () => {
+    await enableFeature('BRANCHING');
     await createBranch(client, 'feature-branch');
   });
 

@@ -7,6 +7,7 @@ import {
   createPak,
   createProjectWithClient,
   deleteProject,
+  enableFeature,
 } from './utils/api/common.js';
 import { PROJECT_1 } from './utils/api/project1.js';
 
@@ -15,7 +16,10 @@ let pak: string;
 
 describe('merge command', () => {
   beforeEach(async () => {
-    client = await createProjectWithClient('Project 1', PROJECT_1);
+    await enableFeature('BRANCHING');
+    client = await createProjectWithClient('Project 1', PROJECT_1, {
+      useBranching: true,
+    });
     pak = await createPak(client, [...DEFAULT_SCOPES, 'project.edit']);
   });
 

@@ -17,6 +17,7 @@ import {
   createPak,
   createProjectWithClient,
   deleteProject,
+  enableFeature,
 } from './utils/api/common.js';
 import { PROJECT_2 } from './utils/api/project2.js';
 import { PROJECT_3 } from './utils/api/project3.js';
@@ -289,7 +290,10 @@ describe('Project 2', () => {
 
 describe('Branching', () => {
   beforeEach(async () => {
-    client = await createProjectWithClient('Project 2', PROJECT_2);
+    await enableFeature('BRANCHING');
+    client = await createProjectWithClient('Project 2', PROJECT_2, {
+      useBranching: true,
+    });
     pak = await createPak(client);
 
     await createBranch(client, 'feature-branch');
