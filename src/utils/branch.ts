@@ -1,10 +1,12 @@
 import { BaseOptions } from '../options.js';
 import { components } from '../client/internal/schema.generated.js';
 import { handleLoadableError } from '../client/TolgeeClient.js';
-import { success } from './logger.js';
+import { info, success } from './logger.js';
 
-export function appendBranch(branch?: string) {
-  return branch ? ` (branch "${branch}")` : ' (none or default branch)';
+export function printBranchInfo(branch?: string) {
+  if (branch) {
+    info(`Using branch "${branch}"`);
+  }
 }
 
 export async function fetchBranches(cmd: BaseOptions) {

@@ -29,7 +29,7 @@ import { components } from '../client/internal/schema.generated.js';
 import { findFilesByTemplate } from '../utils/filesTemplate.js';
 import { valueToArray } from '../utils/valueToArray.js';
 import { printUnresolvedConflicts } from '../utils/printFailedKeys.js';
-import { appendBranch } from '../utils/branch.js';
+import { printBranchInfo } from '../utils/branch.js';
 
 type ImportRequest = BodyOf<
   '/v2/projects/{projectId}/single-step-import',
@@ -193,6 +193,8 @@ const pushHandler = (config: Schema) =>
       return true;
     });
 
+    printBranchInfo(opts.branch);
+
     const files = await loading(
       'Reading files...',
       readRecords(filteredMatchers)
@@ -244,7 +246,7 @@ const pushHandler = (config: Schema) =>
     };
 
     let attempt = await loading(
-      `Importing${appendBranch(opts.branch)}...`,
+      'Importing...',
       importData(opts.client, {
         files,
         params,
@@ -260,7 +262,7 @@ const pushHandler = (config: Schema) =>
       }
       const forceMode = await promptConflicts(opts);
       attempt = await loading(
-        `Overriding${appendBranch(opts.branch)}...`,
+        'Overriding...',
         importData(opts.client, {
           files,
           params: { ...params, forceMode },

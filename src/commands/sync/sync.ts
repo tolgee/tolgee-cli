@@ -19,7 +19,7 @@ import {
   TolgeeClient,
   handleLoadableError,
 } from '../../client/TolgeeClient.js';
-import { appendBranch } from '../../utils/branch.js';
+import { printBranchInfo } from '../../utils/branch.js';
 
 type Options = BaseOptions & {
   backup?: string | false;
@@ -73,6 +73,8 @@ const syncHandler = (config: Schema) =>
   async function (this: Command) {
     const opts: Options = this.optsWithGlobals();
 
+    printBranchInfo(opts.branch);
+
     const rawKeys = await loading(
       'Analyzing code...',
       extractKeysOfFiles(opts)
@@ -94,7 +96,7 @@ const syncHandler = (config: Schema) =>
     }
 
     const allKeysLoadable = await loading(
-      `Fetching Tolgee keys${appendBranch(opts.branch)}...`,
+      'Fetching Tolgee keys...',
       opts.client.GET('/v2/projects/{projectId}/all-keys', {
         params: {
           path: { projectId: opts.client.getProjectId() },
@@ -143,7 +145,7 @@ const syncHandler = (config: Schema) =>
     if (opts.backup) {
       await prepareDir(opts.backup, opts.yes);
       await loading(
-        `Backing up Tolgee project${appendBranch(opts.branch)}`,
+        'Backing up Tolgee project...',
         backup(opts.client, opts.backup, opts.branch)
       );
     }
@@ -164,7 +166,7 @@ const syncHandler = (config: Schema) =>
       }));
 
       const loadable = await loading(
-        `Creating missing keys${appendBranch(opts.branch)}...`,
+        'Creating missing keys...',
         opts.client.POST('/v2/projects/{projectId}/keys/import', {
           params: {
             path: { projectId: opts.client.getProjectId() },
@@ -186,7 +188,7 @@ const syncHandler = (config: Schema) =>
 
         const ids = await diff.removed.map((k) => k.id);
         const loadable = await loading(
-          `Deleting unused keys${appendBranch(opts.branch)}...`,
+          'Deleting unused keys...',
           opts.client.DELETE('/v2/projects/{projectId}/keys', {
             params: { path: { projectId: opts.client.getProjectId() } },
             body: { ids },

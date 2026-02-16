@@ -11,13 +11,15 @@ import { loading } from '../../utils/logger.js';
 import { Schema } from '../../schema.js';
 import { BaseOptions } from '../../options.js';
 import { handleLoadableError } from '../../client/TolgeeClient.js';
-import { appendBranch } from '../../utils/branch.js';
+import { printBranchInfo } from '../../utils/branch.js';
 
 type Options = BaseOptions;
 
 const asyncHandler = (config: Schema) =>
   async function (this: Command) {
     const opts: Options = this.optsWithGlobals();
+
+    printBranchInfo(opts.branch);
 
     const rawKeys = await loading(
       'Analyzing code...',
@@ -27,7 +29,7 @@ const asyncHandler = (config: Schema) =>
 
     const localKeys = filterExtractionResult(rawKeys);
     const loadable = await loading(
-      `Fetching Tolgee keys${appendBranch(opts.branch)}...`,
+      'Fetching Tolgee keys...',
       opts.client.GET('/v2/projects/{projectId}/all-keys', {
         params: {
           path: { projectId: opts.client.getProjectId() },

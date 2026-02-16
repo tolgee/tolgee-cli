@@ -9,7 +9,7 @@ import { Schema } from '../schema.js';
 import { checkPathNotAFile } from '../utils/checkPathNotAFile.js';
 import { mapExportFormat } from '../utils/mapExportFormat.js';
 import { handleLoadableError } from '../client/TolgeeClient.js';
-import { appendBranch } from '../utils/branch.js';
+import { printBranchInfo } from '../utils/branch.js';
 import { startWatching } from '../utils/pullWatch/watchHandler.js';
 import { getETag } from '../utils/eTagStorage.js';
 
@@ -102,6 +102,8 @@ const pullHandler = () =>
 
     await checkPathNotAFile(opts.path);
 
+    printBranchInfo(opts.branch);
+
     if (!opts.watch) {
       await doPull(opts);
       success('Done!');
@@ -122,7 +124,7 @@ const pullHandler = () =>
 
 const doPull = async (opts: PullOptions) => {
   const result = await loading(
-    `Fetching strings from Tolgee${appendBranch(opts.branch)}...`,
+    'Fetching strings from Tolgee...',
     fetchZipBlob(opts, getETag(opts.projectId))
   );
   if (result.notModified) {
@@ -130,10 +132,7 @@ const doPull = async (opts: PullOptions) => {
     return;
   }
   await prepareDir(opts.path!, opts.emptyDir);
-  await loading(
-    `Extracting strings${appendBranch(opts.branch)}...`,
-    unzipBuffer(result.data, opts.path!)
-  );
+  await loading('Extracting strings...', unzipBuffer(result.data, opts.path!));
   // Store ETag after a successful pull
   if (result.etag) {
     const { setETag } = await import('../utils/eTagStorage.js');
