@@ -116,7 +116,7 @@ const branchHandler = (config: Schema) =>
 export default (config: Schema) =>
   new Command('branch')
     .description('Create or delete project branches')
-    .argument('[branch]', 'branch name to create')
+    .argument('[branch]', 'Branch name to create')
     .addOption(
       new Option('--create <branch>', 'create a new branch').conflicts('delete')
     )

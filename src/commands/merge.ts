@@ -15,13 +15,17 @@ import {
 type MergeOptions = BaseOptions;
 type MergeChange = components['schemas']['BranchMergeChangeModel'];
 
-function resolveBranchName(opts: MergeOptions, branchArg?: string) {
-  if (branchArg && opts.branch) {
+function resolveBranchName(
+  opts: MergeOptions,
+  branchArg?: string,
+  branchExplicit?: boolean
+) {
+  if (branchArg && branchExplicit) {
     exitWithError(
       "error: use either the '[branch]' arg or the option '--branch <branch>'"
     );
   }
-  const branchName = branchArg ?? opts.branch;
+  const branchName = branchArg ?? (branchExplicit ? opts.branch : undefined);
   if (!branchName) {
     exitWithError('Specify a branch to merge.');
   }
@@ -61,7 +65,9 @@ const mergeHandler = (config: Schema) =>
   async function (this: Command) {
     const opts: MergeOptions = this.optsWithGlobals();
     const branchArg = this.processedArgs[0];
-    const branchName = resolveBranchName(opts, branchArg);
+    const branchExplicit =
+      this.parent?.getOptionValueSource('branch') === 'cli';
+    const branchName = resolveBranchName(opts, branchArg, branchExplicit);
 
     const branches = await loading(
       'Fetching project branches...',
@@ -170,6 +176,6 @@ const mergeHandler = (config: Schema) =>
 
 export default (config: Schema) =>
   new Command('merge')
-    .description('Merge a branch into its parent branch')
-    .argument('[branch]', 'branch name to merge')
+    .description('Merge a branch into its origin branch')
+    .argument('[branch]', 'Branch name to merge')
     .action(mergeHandler(config));
