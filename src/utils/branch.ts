@@ -13,7 +13,7 @@ export async function fetchBranches(cmd: BaseOptions) {
   const loadable = await cmd.client.GET('/v2/projects/{projectId}/branches', {
     params: {
       path: { projectId: cmd.client.getProjectId() },
-      query: { size: 10000, activeOnly: true },
+      query: { size: 10000 },
     },
   });
   handleLoadableError(loadable);
@@ -21,8 +21,6 @@ export async function fetchBranches(cmd: BaseOptions) {
 }
 
 export function listBranches(branches: components['schemas']['BranchModel'][]) {
-  branches = branches.filter((b) => !b.merge || !b.merge.mergedAt);
-
   if (!branches.length) {
     success('No branches found.');
     return;
