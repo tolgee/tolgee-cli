@@ -53,7 +53,9 @@ export async function createProjectWithClient(
 ) {
   const userToken = await userLogin();
   let client = createClient(userToken!);
-  const organizations = await client.GET('/v2/organizations');
+  const organizations = await client.GET('/v2/organizations', {
+    params: { query: { filterCurrentUserOwner: true } },
+  });
   const { languages, ...editOptions } = options ?? {};
 
   const project = await client.POST('/v2/projects', {
@@ -76,6 +78,7 @@ export async function createProjectWithClient(
     body: {
       icuPlaceholders: true,
       useNamespaces: true,
+      useBranching: false,
       suggestionsMode: 'DISABLED',
       translationProtection: 'NONE',
       ...editOptions,
@@ -89,6 +92,62 @@ export async function createProjectWithClient(
   });
 
   return client;
+}
+
+type CreateBranchOptions = Partial<
+  Omit<components['schemas']['CreateBranchModel'], 'name'>
+>;
+
+export async function fetchBranches(client: TolgeeClient) {
+  const branches = await client.GET('/v2/projects/{projectId}/branches', {
+    params: {
+      path: { projectId: client.getProjectId() },
+      query: { size: 10000, activeOnly: true },
+    },
+  });
+
+  return branches.data?._embedded?.branches ?? [];
+}
+
+export async function createBranch(
+  client: TolgeeClient,
+  name: string,
+  options?: CreateBranchOptions
+) {
+  let originBranchId = options?.originBranchId;
+  if (!originBranchId) {
+    const origin = (await fetchBranches(client)).find((b) => b.isDefault);
+    originBranchId = origin?.id;
+  }
+
+  if (!originBranchId) {
+    throw new Error('Default branch not found');
+  }
+
+  await client.POST('/v2/projects/{projectId}/branches', {
+    params: { path: { projectId: client.getProjectId() } },
+    body: { name, originBranchId },
+  });
+}
+
+type CreateKeyOptions = Partial<
+  Omit<components['schemas']['CreateKeyDto'], 'name'>
+>;
+
+export async function createKey(
+  client: TolgeeClient,
+  name: string,
+  options: CreateKeyOptions = {}
+) {
+  const { isPlural = false, ...rest } = options;
+  return await client.POST('/v2/projects/{projectId}/keys', {
+    params: { path: { projectId: client.getProjectId() } },
+    body: {
+      name,
+      isPlural,
+      ...rest,
+    },
+  });
 }
 
 export const DEFAULT_SCOPES = [
@@ -109,6 +168,16 @@ export async function createPak(client: TolgeeClient, scopes = DEFAULT_SCOPES) {
   });
 
   return apiKey.data!.key;
+}
+
+export async function enableFeature(feature: string, enabled = true) {
+  const url = `${API_URL}/internal/features/toggle?feature=${feature}&enabled=${enabled}`;
+  const res = await fetch(url, {
+    method: 'PUT',
+  });
+  if (!res.ok) {
+    throw new Error(`Failed to toggle feature ${feature}: ${res.status}`);
+  }
 }
 
 export async function createPat(client: TolgeeClient) {

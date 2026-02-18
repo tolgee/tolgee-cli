@@ -5,6 +5,7 @@ import { handleLoadableError } from '../client/TolgeeClient.js';
 import { exitWithError, loading, success } from '../utils/logger.js';
 import { extractKeysOfFiles } from '../extractor/runner.js';
 import { components } from '../client/internal/schema.generated.js';
+import { printBranchInfo } from '../utils/branch.js';
 
 type KeyId = components['schemas']['KeyId'];
 
@@ -22,6 +23,8 @@ type TagOptions = BaseOptions & {
 const tagHandler = (config: Schema) =>
   async function (this: Command) {
     const opts: TagOptions = this.optsWithGlobals();
+
+    printBranchInfo(opts.branch);
 
     let extractedKeys: KeyId[] | undefined;
     if (opts.filterExtracted || opts.filterNotExtracted) {
@@ -46,7 +49,10 @@ const tagHandler = (config: Schema) =>
     const loadable = await loading(
       'Tagging...',
       opts.client.PUT('/v2/projects/{projectId}/tag-complex', {
-        params: { path: { projectId: opts.client.getProjectId() } },
+        params: {
+          path: { projectId: opts.client.getProjectId() },
+          ...(!!opts.branch && { query: { branch: opts.branch } }),
+        },
         body: {
           filterTag: opts.filterTag,
           filterTagNot: opts.filterNoTag,

@@ -12,9 +12,12 @@ import './utils/toMatchContentsOf';
 import { TolgeeClient } from '#cli/client/TolgeeClient.js';
 import {
   DEFAULT_SCOPES,
+  createBranch,
+  createKey,
   createPak,
   createProjectWithClient,
   deleteProject,
+  enableFeature,
 } from './utils/api/common.js';
 import { PROJECT_2 } from './utils/api/project2.js';
 import { PROJECT_3 } from './utils/api/project3.js';
@@ -282,6 +285,113 @@ describe('Project 2', () => {
 
     expect(out.code).toBe(0);
     expect(out.stderr).toContain('Warnings were emitted');
+  }, 30e3);
+});
+
+describe('Branching', () => {
+  beforeEach(async () => {
+    await enableFeature('BRANCHING');
+    client = await createProjectWithClient('Project 2', PROJECT_2, {
+      useBranching: true,
+    });
+    pak = await createPak(client);
+
+    await createBranch(client, 'feature-branch');
+  });
+
+  afterEach(async () => {
+    await deleteProject(client);
+    await removeTmpFolder();
+  });
+
+  it('is in sync when comparing against branch keys', async () => {
+    const out = await run(
+      [
+        'sync',
+        '--yes',
+        '--api-key',
+        pak,
+        '--patterns',
+        CODE_PROJECT_2_COMPLETE,
+        '--branch',
+        'feature-branch',
+      ],
+      undefined,
+      20e3
+    );
+
+    expect(out.code).toBe(0);
+    expect(out.stdout).toContain('is in sync');
+  }, 30e3);
+
+  it('sync branch keys', async () => {
+    await createKey(client, 'penguin-name', {
+      branch: 'feature-branch',
+      translations: { en: 'Tux' },
+    });
+    await createKey(client, 'penguin-sound', {
+      branch: 'feature-branch',
+      translations: { en: 'Bray' },
+    });
+
+    const out = await run(
+      [
+        'sync',
+        '--yes',
+        '--api-key',
+        pak,
+        '--patterns',
+        CODE_PROJECT_2_ADDED,
+        '--branch',
+        'feature-branch',
+      ],
+      undefined,
+      20e3
+    );
+
+    expect(out.code).toBe(0);
+    expect(out.stdout).toContain('+ 2 strings');
+    expect(out.stdout).toContain('2 unused keys');
+  }, 30e3);
+
+  it('creates keys in the default branch when branch is not specified', async () => {
+    const out = await run(
+      ['sync', '--yes', '--api-key', pak, '--patterns', CODE_PROJECT_2_ADDED],
+      undefined,
+      20e3
+    );
+
+    expect(out.code).toBe(0);
+    expect(out.stdout).toContain('+ 2 strings');
+
+    const keys = await client.GET('/v2/projects/{projectId}/translations', {
+      params: {
+        path: { projectId: client.getProjectId() },
+        query: { filterKeyName: ['mouse-name', 'mouse-sound'] },
+      },
+    });
+
+    expect(keys.data?.page?.totalElements).toBe(2);
+  }, 30e3);
+
+  it('fails when branch does not exist', async () => {
+    const out = await run(
+      [
+        'sync',
+        '--yes',
+        '--api-key',
+        pak,
+        '--patterns',
+        CODE_PROJECT_2_ADDED,
+        '--branch',
+        'missing-branch',
+      ],
+      undefined,
+      20e3
+    );
+
+    expect(out.code).not.toBe(0);
+    expect(out.stderr + out.stdout).toContain('branch_not_found');
   }, 30e3);
 });
 

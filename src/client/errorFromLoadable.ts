@@ -43,6 +43,10 @@ export const errorFromLoadable = (loadable: LoadableData) => {
         loadable
       )}`;
 
+    // Not found (e.g. branch in project)
+    case 404:
+      return `Requested data not found. Please check your inputs ${addErrorDetails(loadable)}`;
+
     // Rate limited
     case 429:
       return `You've been rate limited. Please try again later ${addErrorDetails(

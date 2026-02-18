@@ -11,9 +11,12 @@ import { run } from './utils/run.js';
 import './utils/toMatchContentsOf.js';
 import { dirname, join } from 'path';
 import {
+  createBranch,
+  createKey,
   createPak,
   createProjectWithClient,
   deleteProject,
+  enableFeature,
 } from './utils/api/common.js';
 import { TolgeeClient } from '#cli/client/TolgeeClient.js';
 import { PROJECT_1 } from './utils/api/project1.js';
@@ -427,6 +430,71 @@ describe('Project 3', () => {
     const content = (await import(join(TMP_FOLDER, 'drinks', 'lang-en.json')))
       .default;
     expect(content).toEqual({ water: 'Water' });
+  });
+});
+
+describe('Branching', () => {
+  setupTemporaryFolder();
+  beforeEach(async () => {
+    client = await createProjectWithClient('Branching project', PROJECT_1, {
+      useBranching: true,
+    });
+    pak = await createPak(client);
+    await enableFeature('BRANCHING');
+
+    await createBranch(client, 'feature-branch');
+    await createKey(client, 'branch-only', {
+      branch: 'feature-branch',
+      translations: { en: 'Branch only', fr: 'Branche seulement' },
+    });
+  });
+
+  afterEach(async () => {
+    await deleteProject(client);
+  });
+
+  it('pulls branch-only keys when branch is specified', async () => {
+    const out = await run([
+      'pull',
+      '--api-key',
+      pak,
+      '--path',
+      TMP_FOLDER,
+      '--branch',
+      'feature-branch',
+    ]);
+
+    expect(out.code).toBe(0);
+    expect(readJsonFile(join(TMP_FOLDER, 'en.json'))['branch-only']).toBe(
+      'Branch only'
+    );
+    expect(readJsonFile(join(TMP_FOLDER, 'fr.json'))['branch-only']).toBe(
+      'Branche seulement'
+    );
+  });
+
+  it('does not include branch-only keys in default branch', async () => {
+    const out = await run(['pull', '--api-key', pak, '--path', TMP_FOLDER]);
+
+    expect(out.code).toBe(0);
+    expect(readJsonFile(join(TMP_FOLDER, 'en.json'))['branch-only']).toBe(
+      undefined
+    );
+  });
+
+  it('fails when branch does not exist', async () => {
+    const out = await run([
+      'pull',
+      '--api-key',
+      pak,
+      '--path',
+      TMP_FOLDER,
+      '--branch',
+      'missing-branch',
+    ]);
+
+    expect(out.code).not.toBe(0);
+    expect(out.stderr + out.stdout).toContain('branch_not_found');
   });
 });
 

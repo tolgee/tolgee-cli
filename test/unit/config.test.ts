@@ -93,4 +93,14 @@ describe('.tolgeerc', () => {
 
     expect(cfg.projectId).toBe(1337);
   });
+
+  it('loads config with branch', async () => {
+    const path = fileURLToPath(
+      new URL('./validTolgeeRc/withBranch.json', FIXTURES_PATH)
+    );
+
+    const cfg = await loadTolgeeRc(path);
+
+    expect(cfg?.branch).toBe('config-branch');
+  });
 });

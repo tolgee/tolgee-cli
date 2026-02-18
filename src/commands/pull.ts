@@ -9,6 +9,7 @@ import { Schema } from '../schema.js';
 import { checkPathNotAFile } from '../utils/checkPathNotAFile.js';
 import { mapExportFormat } from '../utils/mapExportFormat.js';
 import { handleLoadableError } from '../client/TolgeeClient.js';
+import { printBranchInfo } from '../utils/branch.js';
 import { startWatching } from '../utils/pullWatch/watchHandler.js';
 import { getETag } from '../utils/eTagStorage.js';
 
@@ -101,6 +102,8 @@ const pullHandler = () =>
 
     await checkPathNotAFile(opts.path);
 
+    printBranchInfo(opts.branch);
+
     if (!opts.watch) {
       await doPull(opts);
       success('Done!');
@@ -154,6 +157,7 @@ async function fetchZipBlob(opts: PullOptions, ifNoneMatch?: string) {
     fileStructureTemplate: opts.fileStructureTemplate,
     escapeHtml: false,
     ifNoneMatch,
+    filterBranch: opts.branch,
   });
 
   handleLoadableError(loadable);

@@ -19,6 +19,7 @@ import {
   STRICT_NAMESPACE,
   PARSER,
   PROJECT_ID_OPT,
+  PROJECT_BRANCH,
   STRICT_NAMESPACE_NEGATION,
   VERBOSE,
 } from './options.js';
@@ -36,6 +37,8 @@ import ExtractCommand from './commands/extract.js';
 import CompareCommand from './commands/sync/compare.js';
 import SyncCommand from './commands/sync/sync.js';
 import TagCommand from './commands/tag.js';
+import BranchCommand from './commands/branch.js';
+import MergeCommand from './commands/merge.js';
 
 import { getSingleOption } from './utils/getSingleOption.js';
 import { Schema } from './schema.js';
@@ -180,6 +183,7 @@ async function run() {
     program.addOption(API_URL_OPT.default(config.apiUrl ?? DEFAULT_API_URL));
     program.addOption(API_KEY_OPT.default(config.apiKey));
     program.addOption(PROJECT_ID_OPT.default(config.projectId ?? -1));
+    program.addOption(PROJECT_BRANCH.default(config.branch));
     program.addOption(FORMAT_OPT.default(config.format ?? 'JSON_TOLGEE'));
     program.addOption(EXTRACTOR.default(config.extractor));
     program.addOption(FILE_PATTERNS.default(config.patterns));
@@ -208,6 +212,12 @@ async function run() {
     );
     program.addCommand(
       TagCommand(config).configureHelp({ showGlobalOptions: true })
+    );
+    program.addCommand(
+      BranchCommand(config).configureHelp({ showGlobalOptions: true })
+    );
+    program.addCommand(
+      MergeCommand(config).configureHelp({ showGlobalOptions: true })
     );
 
     await program.parseAsync();

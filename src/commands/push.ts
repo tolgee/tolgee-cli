@@ -29,6 +29,7 @@ import { components } from '../client/internal/schema.generated.js';
 import { findFilesByTemplate } from '../utils/filesTemplate.js';
 import { valueToArray } from '../utils/valueToArray.js';
 import { printUnresolvedConflicts } from '../utils/printFailedKeys.js';
+import { printBranchInfo } from '../utils/branch.js';
 
 type ImportRequest = BodyOf<
   '/v2/projects/{projectId}/single-step-import',
@@ -192,6 +193,8 @@ const pushHandler = (config: Schema) =>
       return true;
     });
 
+    printBranchInfo(opts.branch);
+
     const files = await loading(
       'Reading files...',
       readRecords(filteredMatchers)
@@ -221,6 +224,7 @@ const pushHandler = (config: Schema) =>
       overrideKeyDescriptions: opts.overrideKeyDescriptions,
       convertPlaceholdersToIcu: opts.convertPlaceholdersToIcu,
       tagNewKeys: opts.tagNewKeys ?? [],
+      branch: opts.branch,
       overrideMode: opts.overrideMode ?? 'RECOMMENDED',
       fileMappings: files.map((f) => {
         const format = mapImportFormat(opts.format, extname(f.name));
