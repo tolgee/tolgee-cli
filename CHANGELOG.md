@@ -1,3 +1,10 @@
+# [2.16.0](https://github.com/tolgee/tolgee-cli/compare/v2.15.1...v2.16.0) (2026-02-18)
+
+
+### Features
+
+* add branching ([#195](https://github.com/tolgee/tolgee-cli/issues/195)) ([9345fce](https://github.com/tolgee/tolgee-cli/commit/9345fcee5349d25c96b377d8d18e1aecf39774bf))
+
 ## [2.15.1](https://github.com/tolgee/tolgee-cli/compare/v2.15.0...v2.15.1) (2025-12-19)
 
 
