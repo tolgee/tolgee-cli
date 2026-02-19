@@ -1,3 +1,10 @@
+## [2.16.1](https://github.com/tolgee/tolgee-cli/compare/v2.16.0...v2.16.1) (2026-02-19)
+
+
+### Bug Fixes
+
+* branch listing shows all active branches ([#198](https://github.com/tolgee/tolgee-cli/issues/198)) ([4bbf8b3](https://github.com/tolgee/tolgee-cli/commit/4bbf8b331401236f3c0fa1fa08fa2f7d7073858f))
+
 # [2.16.0](https://github.com/tolgee/tolgee-cli/compare/v2.15.1...v2.16.0) (2026-02-18)
 
 
