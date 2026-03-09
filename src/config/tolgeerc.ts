@@ -60,9 +60,12 @@ function parseConfig(input: Schema, configDir: string) {
 
   // convert relative paths in config to absolute
   if (rc.patterns !== undefined) {
-    rc.patterns = rc.patterns.map((pattern: string) =>
-      resolve(configDir, pattern).replace(/\\/g, '/')
-    );
+    rc.patterns = rc.patterns.map((pattern: string) => {
+      const isNegated = pattern.startsWith('!');
+      const raw = isNegated ? pattern.slice(1) : pattern;
+      const resolved = resolve(configDir, raw).replace(/\\/g, '/');
+      return isNegated ? `!${resolved}` : resolved;
+    });
   }
 
   // convert relative paths in config to absolute
