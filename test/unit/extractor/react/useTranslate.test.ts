@@ -549,4 +549,57 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])('useTranslate (.%s)', (ext) => {
       expect(extracted.warnings).toEqual([]);
     });
   });
+
+  describe('top-level const namespace identifiers', () => {
+    it('resolves a plain const string to its literal value', async () => {
+      const code = `
+        import '@tolgee/react'
+        const NS = 'my-namespace'
+        function Test () {
+          const { t } = useTranslate(NS)
+          t('key1')
+        }
+      `;
+
+      const extracted = await extractReactKeys(code, FILE_NAME);
+      expect(extracted.warnings).toEqual([]);
+      expect(extracted.keys).toEqual([
+        { keyName: 'key1', namespace: 'my-namespace', line: 6 },
+      ]);
+    });
+
+    it('resolves an exported `as const` declaration', async () => {
+      const code = `
+        import '@tolgee/react'
+        export const NS = 'billing' as const
+        function Test () {
+          const { t } = useTranslate(NS)
+          t('key1')
+        }
+      `;
+
+      const extracted = await extractReactKeys(code, FILE_NAME);
+      expect(extracted.warnings).toEqual([]);
+      expect(extracted.keys).toEqual([
+        { keyName: 'key1', namespace: 'billing', line: 6 },
+      ]);
+    });
+
+    it('still emits a warning for identifiers without a const declaration', async () => {
+      const code = `
+        import '@tolgee/react'
+        function Test () {
+          const { t } = useTranslate(unknownNs)
+          t('key1')
+        }
+      `;
+
+      const extracted = await extractReactKeys(code, FILE_NAME);
+      expect(extracted.warnings).toEqual([
+        { warning: 'W_DYNAMIC_NAMESPACE', line: 4 },
+        { warning: 'W_UNRESOLVABLE_NAMESPACE', line: 5 },
+      ]);
+      expect(extracted.keys).toEqual([]);
+    });
+  });
 });

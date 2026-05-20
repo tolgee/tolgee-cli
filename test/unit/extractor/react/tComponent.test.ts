@@ -363,4 +363,38 @@ describe.each(['jsx', 'tsx'])('<T> (.%s)', (ext) => {
       expect(extracted.keys).toEqual(expectedKeys);
     });
   });
+
+  describe('top-level const namespace identifiers', () => {
+    it('resolves a const used as the `ns` prop of <T>', async () => {
+      const code = `
+        import { T } from '@tolgee/react'
+        const NS = 'auth'
+        function Test () {
+          return <T keyName="key1" ns={NS} />
+        }
+      `;
+
+      const extracted = await extractReactKeys(code, FILE_NAME);
+      expect(extracted.warnings).toEqual([]);
+      expect(extracted.keys).toEqual([
+        { keyName: 'key1', namespace: 'auth', line: 5 },
+      ]);
+    });
+
+    it('resolves an `as const` declaration used as `ns` prop', async () => {
+      const code = `
+        import { T } from '@tolgee/react'
+        export const NS = 'billing' as const
+        function Test () {
+          return <T keyName="key1" ns={NS} />
+        }
+      `;
+
+      const extracted = await extractReactKeys(code, FILE_NAME);
+      expect(extracted.warnings).toEqual([]);
+      expect(extracted.keys).toEqual([
+        { keyName: 'key1', namespace: 'billing', line: 5 },
+      ]);
+    });
+  });
 });

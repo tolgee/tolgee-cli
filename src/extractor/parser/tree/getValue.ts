@@ -18,6 +18,14 @@ export function getValue<T extends string = GeneralTokenType>(
         end: ['expression.end'] as T[],
       });
 
+    case 'variable': {
+      const resolved = context.constants.get(token.token);
+      if (resolved !== undefined) {
+        return { type: 'primitive', line, value: resolved };
+      }
+      return { type: 'expr', line, values: [] };
+    }
+
     default:
       return { type: 'expr', line, values: [] };
   }

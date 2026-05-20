@@ -89,6 +89,7 @@ export type ParserContext<T extends string = GeneralTokenType> = {
   withLabel: <S extends any[], U>(fn: (...args: S) => U) => (...args: S) => U;
   ruleMap: RuleMap<T>;
   blocks: BlocksType;
+  constants: Map<string, string>;
 };
 
 export type ExtractorInternal = (
