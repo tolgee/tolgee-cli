@@ -24,6 +24,7 @@ import { closingTagMerger } from './tokenMergers/closingTagMerger.js';
 import { typesAsMerger } from './tokenMergers/typesAsMerger.js';
 import { typesCastMerger } from './tokenMergers/typesCastMerger.js';
 import { customTCallMerger } from './tokenMergers/customTCallMerger.js';
+import { extractConstants } from './extractConstants.js';
 
 export const DEFAULT_BLOCKS = {
   'block.begin': ['block.end'],
@@ -57,6 +58,7 @@ type ParseOptions<T extends string = GeneralTokenType> = {
   tokens: Iterable<Token<any>>;
   onAccept?: IteratorListener<T>;
   options: ExtractOptions;
+  code?: string;
 };
 
 export const Parser = <T extends string = GeneralTokenType>({
@@ -78,7 +80,7 @@ export const Parser = <T extends string = GeneralTokenType>({
   }
 
   return {
-    parse({ tokens, onAccept, options }: ParseOptions<T>) {
+    parse({ tokens, onAccept, options, code }: ParseOptions<T>) {
       for (const t of tokens) {
         // use first mapper, which gives some result
         const type = mappers.find((mapper) => mapper(t))?.(t);
@@ -124,6 +126,7 @@ export const Parser = <T extends string = GeneralTokenType>({
         withLabel,
         ruleMap,
         blocks,
+        constants: code ? extractConstants(code) : new Map(),
       };
 
       let depth = 0;
