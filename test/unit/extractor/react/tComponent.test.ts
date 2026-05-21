@@ -396,5 +396,21 @@ describe.each(['jsx', 'tsx'])('<T> (.%s)', (ext) => {
         { keyName: 'key1', namespace: 'billing', line: 5 },
       ]);
     });
+
+    it('resolves member access on a const object used as `ns` prop', async () => {
+      const code = `
+        import { T } from '@tolgee/react'
+        const NS = { AUTH: 'auth', NAMESPACED: 'namespaced' } as const
+        function Test () {
+          return <T keyName="key1" ns={NS.NAMESPACED} />
+        }
+      `;
+
+      const extracted = await extractReactKeys(code, FILE_NAME);
+      expect(extracted.warnings).toEqual([]);
+      expect(extracted.keys).toEqual([
+        { keyName: 'key1', namespace: 'namespaced', line: 5 },
+      ]);
+    });
   });
 });

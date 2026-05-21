@@ -585,6 +585,58 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])('useTranslate (.%s)', (ext) => {
       ]);
     });
 
+    it('resolves member access on a const object (`as const`)', async () => {
+      const code = `
+        import '@tolgee/react'
+        const NS = { AUTH: 'auth', BILLING: 'billing' } as const
+        function Test () {
+          const { t } = useTranslate(NS.BILLING)
+          t('key1')
+        }
+      `;
+
+      const extracted = await extractReactKeys(code, FILE_NAME);
+      expect(extracted.warnings).toEqual([]);
+      expect(extracted.keys).toEqual([
+        { keyName: 'key1', namespace: 'billing', line: 6 },
+      ]);
+    });
+
+    it('resolves member access on a plain const object (no `as const`)', async () => {
+      const code = `
+        import '@tolgee/react'
+        const NS = { AUTH: 'auth' }
+        function Test () {
+          const { t } = useTranslate(NS.AUTH)
+          t('key1')
+        }
+      `;
+
+      const extracted = await extractReactKeys(code, FILE_NAME);
+      expect(extracted.warnings).toEqual([]);
+      expect(extracted.keys).toEqual([
+        { keyName: 'key1', namespace: 'auth', line: 6 },
+      ]);
+    });
+
+    it('still warns for member access on an unknown property', async () => {
+      const code = `
+        import '@tolgee/react'
+        const NS = { AUTH: 'auth' } as const
+        function Test () {
+          const { t } = useTranslate(NS.BILLING)
+          t('key1')
+        }
+      `;
+
+      const extracted = await extractReactKeys(code, FILE_NAME);
+      expect(extracted.warnings).toEqual([
+        { warning: 'W_DYNAMIC_NAMESPACE', line: 5 },
+        { warning: 'W_UNRESOLVABLE_NAMESPACE', line: 6 },
+      ]);
+      expect(extracted.keys).toEqual([]);
+    });
+
     it('still emits a warning for identifiers without a const declaration', async () => {
       const code = `
         import '@tolgee/react'
