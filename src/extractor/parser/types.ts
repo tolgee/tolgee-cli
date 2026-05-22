@@ -43,6 +43,8 @@ export type NamespaceInfoNode = NodeCommon & {
   type: 'nsInfo';
   name?: GeneralNode;
   values: GeneralNode[];
+  /** Destructured binding bound to this useTranslate, e.g. `t` or `tCommon`. */
+  alias?: string;
 };
 export type KeyInfoNode = NodeCommon & {
   type: 'keyInfo';
@@ -52,6 +54,8 @@ export type KeyInfoNode = NodeCommon & {
   defaultValue?: GeneralNode;
   values: GeneralNode[];
   optionsDynamic?: boolean;
+  /** Function alias used at the call site, e.g. `t` or `tCommon`. */
+  alias?: string;
 };
 
 export type ExtractGeneralOptions<T extends string = GeneralTokenType> = {
@@ -90,6 +94,10 @@ export type ParserContext<T extends string = GeneralTokenType> = {
   ruleMap: RuleMap<T>;
   blocks: BlocksType;
   constants: Map<string, string>;
+  translateAliases: {
+    aliasMap: Map<string, string>;
+    lineAliasMap: Map<number, string>;
+  };
 };
 
 export type ExtractorInternal = (

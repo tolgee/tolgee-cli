@@ -52,7 +52,8 @@ function keyInfoFromComment(context: Context, info: MagicKeyComment) {
 function reportKey(
   context: Context,
   node: KeyInfoNode,
-  contextNs: NamespaceInfoNode | undefined
+  contextNs: NamespaceInfoNode | undefined,
+  nsByAlias: Map<string, NamespaceInfoNode>
 ) {
   const { strictNamespace, defaultNamespace } = context.options;
   const { keys, warnings } = context;
@@ -63,7 +64,14 @@ function reportKey(
     line,
     dependsOnContext,
     optionsDynamic,
+    alias,
   } = node;
+  // Prefer the nsInfo bound to the same destructured alias as the call
+  // site, so multiple `useTranslate(...)` declarations in one scope route
+  // their keys to the right namespace instead of all collapsing onto the
+  // most recently emitted nsInfo.
+  const aliasContextNs = alias ? nsByAlias.get(alias) : undefined;
+  const effectiveContextNs = aliasContextNs ?? contextNs;
 
   if (shouldBeIgnored(context, line)) {
     return { keys, warnings };
@@ -83,7 +91,7 @@ function reportKey(
     return;
   }
 
-  if (dependsOnContext && !contextNs && !keyNs && strictNamespace) {
+  if (dependsOnContext && !effectiveContextNs && !keyNs && strictNamespace) {
     // there is no namespace source so namespace is ambiguous
     warnings.push({ line, warning: 'W_MISSING_T_SOURCE' });
     return;
@@ -95,10 +103,11 @@ function reportKey(
     return;
   }
 
-  const namespace = keyNs ?? (dependsOnContext ? contextNs?.name : undefined);
+  const namespace =
+    keyNs ?? (dependsOnContext ? effectiveContextNs?.name : undefined);
   if (namespace && !isString(namespace)) {
     // namespace is dynamic
-    if (namespace === contextNs?.name) {
+    if (namespace === effectiveContextNs?.name) {
       // namespace coming from context
       warnings.push({ line, warning: 'W_UNRESOLVABLE_NAMESPACE' });
     } else {
@@ -136,48 +145,56 @@ function reportNs(context: Context, node: NamespaceInfoNode) {
 function reportGeneral(
   context: Context,
   node: GeneralNode | undefined,
-  contextNs: NamespaceInfoNode | undefined
+  contextNs: NamespaceInfoNode | undefined,
+  nsByAlias: Map<string, NamespaceInfoNode>
 ) {
   if (!node) {
     return;
   }
   if (node.type === 'expr' || node.type === 'array') {
     let namespace = contextNs;
+    // Per-alias tracking lives in a child scope so cousin branches don't
+    // see each other's bindings, but later siblings within the same expr
+    // do — same shape as the existing `namespace` walker.
+    const childNsByAlias = new Map(nsByAlias);
     for (const item of node.values) {
       if (item.type === 'nsInfo') {
         const oldNamespace = namespace;
         if (!shouldBeIgnored(context, item.line)) {
           reportNs(context, item);
           namespace = item;
+          if (item.alias) {
+            childNsByAlias.set(item.alias, item);
+          }
         }
 
         // there might be nested stuff
-        reportGeneral(context, item.name, oldNamespace);
+        reportGeneral(context, item.name, oldNamespace, childNsByAlias);
         for (const i of item.values) {
-          reportGeneral(context, i, oldNamespace);
+          reportGeneral(context, i, oldNamespace, childNsByAlias);
         }
       } else {
-        reportGeneral(context, item, namespace);
+        reportGeneral(context, item, namespace, childNsByAlias);
       }
     }
   } else if (node.type === 'keyInfo') {
-    reportKey(context, node, contextNs);
+    reportKey(context, node, contextNs, nsByAlias);
 
     // there might be nested stuff
-    reportGeneral(context, node.keyName, contextNs);
-    reportGeneral(context, node.namespace, contextNs);
-    reportGeneral(context, node.defaultValue, contextNs);
+    reportGeneral(context, node.keyName, contextNs, nsByAlias);
+    reportGeneral(context, node.namespace, contextNs, nsByAlias);
+    reportGeneral(context, node.defaultValue, contextNs, nsByAlias);
 
     for (const i of node.values) {
-      reportGeneral(context, i, contextNs);
+      reportGeneral(context, i, contextNs, nsByAlias);
     }
   } else if (node.type === 'dict') {
     for (const item of Object.values(node.value)) {
-      reportGeneral(context, item, contextNs);
+      reportGeneral(context, item, contextNs, nsByAlias);
     }
     // go through values with unknown keynames
     for (const item of node.unknown) {
-      reportGeneral(context, item, contextNs);
+      reportGeneral(context, item, contextNs, nsByAlias);
     }
   }
 }
@@ -208,7 +225,7 @@ export function generateReport({
     warnings: [],
   };
 
-  reportGeneral(context, node, contextNs);
+  reportGeneral(context, node, contextNs, new Map());
 
   unusedComments.forEach((value) => {
     if (value.type === 'WARNING') {

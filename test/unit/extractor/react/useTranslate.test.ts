@@ -537,6 +537,89 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])('useTranslate (.%s)', (ext) => {
     });
   });
 
+  describe('multiple useTranslate aliases in the same scope', () => {
+    it('routes each alias to its own namespace (rename pattern)', async () => {
+      const code = `
+        import '@tolgee/react'
+        function Example () {
+          const { t } = useTranslate('defaultNamespace')
+          const { t: tCommon } = useTranslate('common')
+          t('some.key.from.default')
+          tCommon('some.shared.label')
+        }
+      `;
+
+      const extracted = await extractReactKeys(code, FILE_NAME);
+      expect(extracted.warnings).toEqual([]);
+      expect(extracted.keys).toEqual([
+        {
+          keyName: 'some.key.from.default',
+          namespace: 'defaultNamespace',
+          line: 6,
+        },
+        { keyName: 'some.shared.label', namespace: 'common', line: 7 },
+      ]);
+    });
+
+    it('handles three aliases with mixed rename / no-rename', async () => {
+      const code = `
+        import '@tolgee/react'
+        function Example () {
+          const { t } = useTranslate('feature')
+          const { t: tCommon } = useTranslate('common')
+          const { t: tShared } = useTranslate('shared')
+          t('feature.key')
+          tCommon('common.key')
+          tShared('shared.key')
+        }
+      `;
+
+      const extracted = await extractReactKeys(code, FILE_NAME);
+      expect(extracted.warnings).toEqual([]);
+      expect(extracted.keys).toEqual([
+        { keyName: 'feature.key', namespace: 'feature', line: 7 },
+        { keyName: 'common.key', namespace: 'common', line: 8 },
+        { keyName: 'shared.key', namespace: 'shared', line: 9 },
+      ]);
+    });
+
+    it('resolves aliases when the namespace is a top-level const', async () => {
+      const code = `
+        import '@tolgee/react'
+        const NS = { FEATURE: 'feature', COMMON: 'common' } as const
+        function Example () {
+          const { t } = useTranslate(NS.FEATURE)
+          const { t: tCommon } = useTranslate(NS.COMMON)
+          t('feature.key')
+          tCommon('common.key')
+        }
+      `;
+
+      const extracted = await extractReactKeys(code, FILE_NAME);
+      expect(extracted.warnings).toEqual([]);
+      expect(extracted.keys).toEqual([
+        { keyName: 'feature.key', namespace: 'feature', line: 7 },
+        { keyName: 'common.key', namespace: 'common', line: 8 },
+      ]);
+    });
+
+    it('handles multi-property destructure { t, isLoading }', async () => {
+      const code = `
+        import '@tolgee/react'
+        function Example () {
+          const { isLoading, t } = useTranslate('feature')
+          t('feature.key')
+        }
+      `;
+
+      const extracted = await extractReactKeys(code, FILE_NAME);
+      expect(extracted.warnings).toEqual([]);
+      expect(extracted.keys).toEqual([
+        { keyName: 'feature.key', namespace: 'feature', line: 5 },
+      ]);
+    });
+  });
+
   describe('global tolgee.t function', () => {
     it('detects global tolgee.t function', async () => {
       const code = `

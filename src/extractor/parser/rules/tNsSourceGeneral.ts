@@ -12,6 +12,7 @@ import { NamespaceInfoNode, ParserContext } from '../types.js';
  */
 export const tNsSourceGeneral = (context: ParserContext<any>) => {
   const line = context.getCurrentLine();
+  const alias = context.translateAliases.lineAliasMap.get(line);
   const args = parseList(context, 'expression.end');
 
   if (args.type !== 'array') {
@@ -23,6 +24,7 @@ export const tNsSourceGeneral = (context: ParserContext<any>) => {
     type: 'nsInfo',
     line,
     values: [],
+    alias,
   };
 
   const [firstArg, ...otherArgs] = args.values;
