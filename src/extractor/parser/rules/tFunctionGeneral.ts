@@ -9,6 +9,12 @@ export const tFunctionGeneral = (
   dependsOnContext: boolean
 ) => {
   const line = context.getCurrentLine();
+  // The merged trigger token text is the alias name plus `(`, e.g. `t(` or
+  // `tCommon(`. Strip the paren to recover the alias used at the call site.
+  const triggerToken = context.tokens.current()?.token ?? 't(';
+  const alias = triggerToken.endsWith('(')
+    ? triggerToken.slice(0, -1)
+    : triggerToken;
   const args = parseList(context, 'expression.end');
 
   if (args.type !== 'array') {
@@ -28,6 +34,7 @@ export const tFunctionGeneral = (
     dependsOnContext,
     values: [],
     optionsDynamic,
+    alias,
   };
 
   // read props

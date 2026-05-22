@@ -25,6 +25,10 @@ import { typesAsMerger } from './tokenMergers/typesAsMerger.js';
 import { typesCastMerger } from './tokenMergers/typesCastMerger.js';
 import { customTCallMerger } from './tokenMergers/customTCallMerger.js';
 import { extractConstants } from './extractConstants.js';
+import {
+  extractTranslateAliases,
+  TranslateAliases,
+} from './extractTranslateAliases.js';
 
 export const DEFAULT_BLOCKS = {
   'block.begin': ['block.end'],
@@ -58,6 +62,7 @@ type ParseOptions<T extends string = GeneralTokenType> = {
   tokens: Iterable<Token<any>>;
   onAccept?: IteratorListener<T>;
   options: ExtractOptions;
+  code?: string;
 };
 
 export const Parser = <T extends string = GeneralTokenType>({
@@ -79,7 +84,7 @@ export const Parser = <T extends string = GeneralTokenType>({
   }
 
   return {
-    parse({ tokens, onAccept, options }: ParseOptions<T>) {
+    parse({ tokens, onAccept, options, code }: ParseOptions<T>) {
       for (const t of tokens) {
         // use first mapper, which gives some result
         const type = mappers.find((mapper) => mapper(t))?.(t);
@@ -117,7 +122,40 @@ export const Parser = <T extends string = GeneralTokenType>({
         return true;
       });
 
-      iterator = createIterator(filteredIgnored);
+      const constants = extractConstants(filteredIgnored);
+      const translateAliases: TranslateAliases = code
+        ? extractTranslateAliases(code, constants)
+        : { aliasMap: new Map(), lineAliasMap: new Map() };
+
+      // Retag aliased function calls (e.g. `tCommon(`) as trigger.t.function.
+      // The original tFunctionMerger only matches the literal name `t`; once
+      // we know the alias set, we can retroactively promote those calls so
+      // the existing rule pipeline processes them like a plain `t(...)`.
+      // The merged-token `.token` carries the alias name (e.g. `tCommon(`),
+      // which the tFunction rule strips to attribute the call.
+      const aliasedTokens: Token<any>[] = [];
+      for (let i = 0; i < filteredIgnored.length; i++) {
+        const tok = filteredIgnored[i] as Token<any>;
+        const nextTok = filteredIgnored[i + 1] as Token<any> | undefined;
+        const isPotentialAliasCall =
+          tok.customType === 'function.call' &&
+          tok.token !== 't' &&
+          translateAliases.aliasMap.has(tok.token) &&
+          nextTok?.customType === 'expression.begin';
+        if (isPotentialAliasCall) {
+          aliasedTokens.push({
+            ...tok,
+            customType: 'trigger.t.function' as any,
+            token: `${tok.token}(`,
+            endIndex: nextTok!.endIndex,
+          });
+          i += 1; // consumed the `(` token
+        } else {
+          aliasedTokens.push(tok);
+        }
+      }
+
+      iterator = createIterator(aliasedTokens as Token<T>[]);
 
       const context: ParserContext<T> = {
         tokens: iterator,
@@ -125,7 +163,8 @@ export const Parser = <T extends string = GeneralTokenType>({
         withLabel,
         ruleMap,
         blocks,
-        constants: extractConstants(filteredIgnored),
+        constants,
+        translateAliases,
       };
 
       let depth = 0;
