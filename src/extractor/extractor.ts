@@ -48,7 +48,6 @@ export async function extractTreeAndReport(
     tokens,
     onAccept,
     options,
-    code,
   });
 
   if (debug) {

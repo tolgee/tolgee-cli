@@ -619,6 +619,31 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])('useTranslate (.%s)', (ext) => {
       ]);
     });
 
+    it('ignores const declarations nested inside function bodies', async () => {
+      // A function-local `const NS` must not shadow what the consumer
+      // would see at module scope. Here there is no module-level NS,
+      // so the call site should produce the existing dynamic-namespace
+      // warning, not be silently resolved to the inner literal.
+      const code = `
+        import '@tolgee/react'
+        function helper () {
+          const NS = 'inner-only'
+          return NS
+        }
+        function Test () {
+          const { t } = useTranslate(NS)
+          t('key1')
+        }
+      `;
+
+      const extracted = await extractReactKeys(code, FILE_NAME);
+      expect(extracted.warnings).toEqual([
+        { warning: 'W_DYNAMIC_NAMESPACE', line: 8 },
+        { warning: 'W_UNRESOLVABLE_NAMESPACE', line: 9 },
+      ]);
+      expect(extracted.keys).toEqual([]);
+    });
+
     it('still warns for member access on an unknown property', async () => {
       const code = `
         import '@tolgee/react'
