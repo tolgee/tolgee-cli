@@ -87,11 +87,10 @@ function resetCapture(ctx: Context): void {
 
 function finalizeObjectCapture(ctx: Context): void {
   if (!ctx.abandonedObject) {
+    // Mirror JS object-literal semantics: a later property with the same
+    // name overwrites earlier ones, so always assign.
     for (const { key, value } of ctx.captureProps) {
-      const composed = `${ctx.captureName}.${key}`;
-      if (!ctx.result.has(composed)) {
-        ctx.result.set(composed, value);
-      }
+      ctx.result.set(`${ctx.captureName}.${key}`, value);
     }
   }
   resetCapture(ctx);
