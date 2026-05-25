@@ -636,6 +636,27 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])('useTranslate (.%s)', (ext) => {
       ]);
     });
 
+    it('keeps capturing after a top-level array destructure', async () => {
+      // Regression: `const [a, b] = ...` is a list-destructure pattern.
+      // It must not leave the walker stuck in skip mode, otherwise the
+      // subsequent `const NS = ...` would silently fail to be captured.
+      const code = `
+        import '@tolgee/react'
+        const [first, second] = ['x', 'y']
+        const NS = 'after-destructure'
+        function Test () {
+          const { t } = useTranslate(NS)
+          t('key1')
+        }
+      `;
+
+      const extracted = await extractReactKeys(code, FILE_NAME);
+      expect(extracted.warnings).toEqual([]);
+      expect(extracted.keys).toEqual([
+        { keyName: 'key1', namespace: 'after-destructure', line: 7 },
+      ]);
+    });
+
     it('ignores const declarations nested inside function bodies', async () => {
       // A function-local `const NS` must not shadow what the consumer
       // would see at module scope. Here there is no module-level NS,

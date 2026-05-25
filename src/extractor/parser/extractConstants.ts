@@ -52,6 +52,11 @@ type Context = {
   // > 0, top-level const-detection is suspended; only block.begin/end
   // are tracked so we know when we resurface.
   funcDepth: number;
+  // Depth of a square-bracket pattern (array literal or array
+  // destructure) we're currently skipping. Tracked separately from
+  // funcDepth so list.begin/end never leaks into block depth and vice
+  // versa.
+  listDepth: number;
   // Depth of the object literal currently being captured (1 = top of
   // the object body). Tracked separately from funcDepth so a nested
   // object literal value abandons capture without leaking depth.
@@ -69,6 +74,7 @@ function createContext(): Context {
     result: new Map(),
     state: 'Idle',
     funcDepth: 0,
+    listDepth: 0,
     objectDepth: 0,
     captureName: '',
     captureProps: [],
@@ -100,6 +106,12 @@ function finalizeObjectCapture(ctx: Context): void {
 function stepInFunctionBody(ctx: Context, token: AnyToken): void {
   if (token.customType === 'block.begin') ctx.funcDepth++;
   else if (token.customType === 'block.end') ctx.funcDepth--;
+}
+
+/** Skip an array literal / array destructure pattern at top level. */
+function stepInListSkip(ctx: Context, token: AnyToken): void {
+  if (token.customType === 'list.begin') ctx.listDepth++;
+  else if (token.customType === 'list.end') ctx.listDepth--;
 }
 
 /** Walk the body of a `const NS = { ... }` capture. */
@@ -162,10 +174,18 @@ function stepAtTopLevel(ctx: Context, token: AnyToken): void {
       if (c === 'variable') {
         ctx.captureName = token.token;
         ctx.state = 'AfterName';
-      } else if (c === 'block.begin' || c === 'list.begin') {
-        // Destructure pattern like `const { x } = ...` — skip until
-        // the destructure pattern closes by piggybacking on funcDepth.
+      } else if (c === 'block.begin') {
+        // Object destructure pattern like `const { x } = ...` — skip
+        // until the matching block.end via funcDepth.
         ctx.funcDepth = 1;
+        ctx.state = 'Idle';
+      } else if (c === 'list.begin') {
+        // Array destructure pattern like `const [x] = ...` — skip
+        // until the matching list.end via listDepth. Tracked
+        // separately from funcDepth because stepInFunctionBody only
+        // consumes block.begin/end and would never see the closing
+        // bracket, leaving funcDepth permanently > 0.
+        ctx.listDepth = 1;
         ctx.state = 'Idle';
       } else {
         ctx.state = 'Idle';
@@ -219,6 +239,8 @@ export function extractConstants(
   for (const token of tokens) {
     if (ctx.funcDepth > 0) {
       stepInFunctionBody(ctx, token);
+    } else if (ctx.listDepth > 0) {
+      stepInListSkip(ctx, token);
     } else if (ctx.objectDepth > 0) {
       stepInObjectBody(ctx, token);
     } else {
