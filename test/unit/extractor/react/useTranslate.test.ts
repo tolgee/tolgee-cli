@@ -619,6 +619,23 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])('useTranslate (.%s)', (ext) => {
       ]);
     });
 
+    it('matches JS last-write-wins for duplicate object keys', async () => {
+      const code = `
+        import '@tolgee/react'
+        const NS = { K: 'first', K: 'second' } as const
+        function Test () {
+          const { t } = useTranslate(NS.K)
+          t('key1')
+        }
+      `;
+
+      const extracted = await extractReactKeys(code, FILE_NAME);
+      expect(extracted.warnings).toEqual([]);
+      expect(extracted.keys).toEqual([
+        { keyName: 'key1', namespace: 'second', line: 6 },
+      ]);
+    });
+
     it('ignores const declarations nested inside function bodies', async () => {
       // A function-local `const NS` must not shadow what the consumer
       // would see at module scope. Here there is no module-level NS,
