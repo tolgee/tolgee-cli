@@ -3,6 +3,7 @@ import { resolve } from 'path';
 import { Option, InvalidArgumentError } from 'commander';
 import { createTolgeeClient } from './client/TolgeeClient.js';
 import { VerboseOption } from './extractor/index.js';
+import { parseExtraHeadersArg } from './utils/extraHeaders.js';
 
 function parseProjectId(v: string) {
   const val = Number(v);
@@ -39,6 +40,7 @@ export type BaseOptions = {
   patterns: string[] | undefined;
   strictNamespace: boolean | undefined;
   verbose: VerboseOption[] | boolean | undefined;
+  extraHeaders?: Record<string, string>;
 };
 
 export const API_KEY_OPT = new Option(
@@ -141,3 +143,10 @@ export const VERBOSE = new Option(
   '-v, --verbose [rules...]',
   'Enable verbose logging. If you want more info to be logged pass an option.'
 ).choices(['extractor']);
+
+export const EXTRA_HEADERS = new Option(
+  '--extra-headers <headers>',
+  "Additional HTTP headers to send with every Tolgee API request. Accepts comma-separated Name=Value pairs (e.g. 'X-Foo=bar,X-Baz=qux'). Useful for traversing Cloudflare Access, WAFs, or other gateways."
+)
+  .env('TOLGEE_EXTRA_HEADERS')
+  .argParser(parseExtraHeadersArg);

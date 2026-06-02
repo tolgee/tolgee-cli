@@ -55,6 +55,7 @@ export type ApiClientProps = {
   apiKey?: string;
   projectId?: number | undefined;
   autoThrow?: boolean;
+  extraHeaders?: Record<string, string>;
 };
 
 export function createApiClient({
@@ -62,6 +63,7 @@ export function createApiClient({
   apiKey,
   projectId,
   autoThrow = false,
+  extraHeaders,
 }: ApiClientProps) {
   const computedProjectId =
     projectId ?? (apiKey ? projectIdFromKey(apiKey) : undefined);
@@ -70,6 +72,7 @@ export function createApiClient({
     headers: {
       'user-agent': USER_AGENT,
       'x-api-key': apiKey,
+      ...extraHeaders,
     },
   });
 
@@ -110,7 +113,7 @@ export function createApiClient({
       return getApiKeyInformation(apiClient, apiKey!);
     },
     getSettings(): ApiClientProps {
-      return { baseUrl, apiKey, projectId, autoThrow };
+      return { baseUrl, apiKey, projectId, autoThrow, extraHeaders };
     },
   };
 }
