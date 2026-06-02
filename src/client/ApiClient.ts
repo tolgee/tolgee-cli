@@ -70,9 +70,9 @@ export function createApiClient({
   const apiClient = createClient<paths>({
     baseUrl,
     headers: {
+      ...extraHeaders,
       'user-agent': USER_AGENT,
       'x-api-key': apiKey,
-      ...extraHeaders,
     },
   });
 
