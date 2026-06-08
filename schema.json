@@ -44,6 +44,13 @@
       "description": "Override parser detection.",
       "enum": ["react", "vue", "svelte", "ngx"]
     },
+    "headers": {
+      "description": "Custom HTTP headers added to every request to the Tolgee API, e.g. when the platform is behind a custom auth/proxy layer.\n\nThe `user-agent`, `x-api-key` and `content-type` headers are reserved and ignored/overridden by the CLI. Custom headers are additive to the Tolgee API key (which is still required).",
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
     "push": {
       "type": "object",
       "properties": {

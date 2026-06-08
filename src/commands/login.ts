@@ -10,39 +10,44 @@ import { debug, exitWithError, success } from '../utils/logger.js';
 import { createTolgeeClient } from '../client/TolgeeClient.js';
 import { printApiKeyLists } from '../utils/apiKeyList.js';
 import { getStackTrace } from '../utils/getStackTrace.js';
+import { mergeHeaders } from '../utils/headers.js';
+import { Schema } from '../schema.js';
 
 type Options = {
   apiUrl: URL;
   all: boolean;
   list: boolean;
+  extraHeader?: string[];
 };
 
-async function loginHandler(this: Command, key?: string) {
-  const opts: Options = this.optsWithGlobals();
+const loginHandler = (config: Schema) =>
+  async function (this: Command, key?: string) {
+    const opts: Options = this.optsWithGlobals();
 
-  if (opts.list) {
-    printApiKeyLists();
-    return;
-  } else if (!key) {
-    exitWithError('Missing argument [API Key]');
-  }
+    if (opts.list) {
+      printApiKeyLists();
+      return;
+    } else if (!key) {
+      exitWithError('Missing argument [API Key]');
+    }
 
-  debug(
-    `Logging in with API key ${key?.slice(0, 5)}...${key?.slice(-4)}.\n${getStackTrace()}`
-  );
+    debug(
+      `Logging in with API key ${key?.slice(0, 5)}...${key?.slice(-4)}.\n${getStackTrace()}`
+    );
 
-  const keyInfo = await createTolgeeClient({
-    baseUrl: opts.apiUrl.toString(),
-    apiKey: key,
-  }).getApiKeyInfo();
+    const keyInfo = await createTolgeeClient({
+      baseUrl: opts.apiUrl.toString(),
+      apiKey: key,
+      headers: mergeHeaders(config.headers, opts.extraHeader),
+    }).getApiKeyInfo();
 
-  await saveApiKey(opts.apiUrl, keyInfo);
-  success(
-    keyInfo.type === 'PAK'
-      ? `Logged in as ${keyInfo.username} on ${ansi.blue(opts.apiUrl.hostname)} for project ${ansi.blue(String(keyInfo.project.id))} (${keyInfo.project.name}). Welcome back!`
-      : `Logged in as ${keyInfo.username} on ${ansi.blue(opts.apiUrl.hostname)}. Welcome back!`
-  );
-}
+    await saveApiKey(opts.apiUrl, keyInfo);
+    success(
+      keyInfo.type === 'PAK'
+        ? `Logged in as ${keyInfo.username} on ${ansi.blue(opts.apiUrl.hostname)} for project ${ansi.blue(String(keyInfo.project.id))} (${keyInfo.project.name}). Welcome back!`
+        : `Logged in as ${keyInfo.username} on ${ansi.blue(opts.apiUrl.hostname)}. Welcome back!`
+    );
+  };
 
 async function logoutHandler(this: Command) {
   const opts: Options = this.optsWithGlobals();
@@ -59,17 +64,18 @@ async function logoutHandler(this: Command) {
   success(`You're now logged out of ${opts.apiUrl.hostname}.`);
 }
 
-export const Login = new Command()
-  .name('login')
-  .description(
-    'Login to Tolgee with an API key. You can be logged into multiple Tolgee instances at the same time by using --api-url'
-  )
-  .option('-l, --list', 'List existing api keys')
-  .argument(
-    '[API Key]',
-    'The API key. Can be either a personal access token, or a project key'
-  )
-  .action(loginHandler);
+export const Login = (config: Schema) =>
+  new Command()
+    .name('login')
+    .description(
+      'Login to Tolgee with an API key. You can be logged into multiple Tolgee instances at the same time by using --api-url'
+    )
+    .option('-l, --list', 'List existing api keys')
+    .argument(
+      '[API Key]',
+      'The API key. Can be either a personal access token, or a project key'
+    )
+    .action(loginHandler(config));
 
 export const Logout = new Command()
   .name('logout')

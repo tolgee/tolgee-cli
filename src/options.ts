@@ -2,6 +2,7 @@ import { existsSync } from 'fs';
 import { resolve } from 'path';
 import { Option, InvalidArgumentError } from 'commander';
 import { createTolgeeClient } from './client/TolgeeClient.js';
+import { parseHeaderList } from './utils/headers.js';
 import { VerboseOption } from './extractor/index.js';
 
 function parseProjectId(v: string) {
@@ -29,6 +30,15 @@ function parsePath(v: string) {
   return path;
 }
 
+function accumulateHeader(v: string, previous: string[] = []) {
+  try {
+    parseHeaderList([v]);
+  } catch (e: any) {
+    throw new InvalidArgumentError(e.message);
+  }
+  return [...previous, v];
+}
+
 export type BaseOptions = {
   apiUrl: URL;
   apiKey: string;
@@ -39,6 +49,7 @@ export type BaseOptions = {
   patterns: string[] | undefined;
   strictNamespace: boolean | undefined;
   verbose: VerboseOption[] | boolean | undefined;
+  extraHeader?: string[];
 };
 
 export const API_KEY_OPT = new Option(
@@ -141,3 +152,8 @@ export const VERBOSE = new Option(
   '-v, --verbose [rules...]',
   'Enable verbose logging. If you want more info to be logged pass an option.'
 ).choices(['extractor']);
+
+export const EXTRA_HEADER = new Option(
+  '-H, --extra-header <header>',
+  'Extra HTTP header added to every request to the Tolgee API, e.g. "Authorization: Bearer <token>". Repeatable. The user-agent, x-api-key and content-type headers are reserved and ignored.'
+).argParser(accumulateHeader);

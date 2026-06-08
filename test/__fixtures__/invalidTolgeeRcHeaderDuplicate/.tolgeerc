@@ -1,0 +1,6 @@
+{
+  "headers": {
+    "Authorization": "a",
+    "authorization": "b"
+  }
+}

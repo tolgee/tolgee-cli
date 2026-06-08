@@ -103,4 +103,71 @@ describe('.tolgeerc', () => {
 
     expect(cfg?.branch).toBe('config-branch');
   });
+
+  it('loads and normalizes custom headers', async () => {
+    const testWd = fileURLToPath(
+      new URL('./validTolgeeRcHeaders', FIXTURES_PATH)
+    );
+    cwd.mockReturnValue(testWd);
+
+    const cfg = await loadTolgeeRc();
+    expect(cfg?.headers).toEqual({ 'x-custom': 'bar', 'x-padded': 'v' });
+  });
+
+  it('accepts an empty headers object', async () => {
+    const testWd = fileURLToPath(
+      new URL('./validTolgeeRcHeadersEmpty', FIXTURES_PATH)
+    );
+    cwd.mockReturnValue(testWd);
+
+    const cfg = await loadTolgeeRc();
+    expect(cfg?.headers).toEqual({});
+  });
+
+  it('rejects an invalid header name', async () => {
+    const testWd = fileURLToPath(
+      new URL('./invalidTolgeeRcHeaderName', FIXTURES_PATH)
+    );
+    cwd.mockReturnValue(testWd);
+
+    return expect(loadTolgeeRc()).rejects.toThrow(/invalid header name/);
+  });
+
+  it('rejects a header value with control characters', async () => {
+    const testWd = fileURLToPath(
+      new URL('./invalidTolgeeRcHeaderValue', FIXTURES_PATH)
+    );
+    cwd.mockReturnValue(testWd);
+
+    return expect(loadTolgeeRc()).rejects.toThrow(/control characters/);
+  });
+
+  it('rejects headers that collide only by case', async () => {
+    const testWd = fileURLToPath(
+      new URL('./invalidTolgeeRcHeaderDuplicate', FIXTURES_PATH)
+    );
+    cwd.mockReturnValue(testWd);
+
+    return expect(loadTolgeeRc()).rejects.toThrow(/duplicate header/);
+  });
+
+  it('defers a non-string header value to schema validation', async () => {
+    const testWd = fileURLToPath(
+      new URL('./invalidTolgeeRcHeaderType', FIXTURES_PATH)
+    );
+    cwd.mockReturnValue(testWd);
+
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const exitSpy = vi.spyOn(process, 'exit').mockImplementation((() => {
+      throw new Error('process.exit');
+    }) as any);
+
+    await expect(loadTolgeeRc()).rejects.toThrow('process.exit');
+    expect(logSpy).toHaveBeenCalledWith(
+      expect.stringMatching(/Tolgee config:/)
+    );
+
+    logSpy.mockRestore();
+    exitSpy.mockRestore();
+  });
 });

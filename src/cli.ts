@@ -14,6 +14,7 @@ import {
   CONFIG_OPT,
   DEFAULT_NAMESPACE,
   EXTRACTOR,
+  EXTRA_HEADER,
   FILE_PATTERNS,
   FORMAT_OPT,
   STRICT_NAMESPACE,
@@ -41,6 +42,7 @@ import BranchCommand from './commands/branch.js';
 import MergeCommand from './commands/merge.js';
 
 import { getSingleOption } from './utils/getSingleOption.js';
+import { mergeHeaders } from './utils/headers.js';
 import { Schema } from './schema.js';
 import { createTolgeeClient } from './client/TolgeeClient.js';
 import { projectIdFromKey } from './client/ApiClient.js';
@@ -150,6 +152,7 @@ const preHandler = (config: Schema) =>
             : config.projectId !== undefined
               ? Number(config.projectId)
               : undefined,
+        headers: mergeHeaders(config.headers, opts.extraHeader),
       });
 
       cmd.setOptionValue('client', client);
@@ -191,9 +194,12 @@ async function run() {
     program.addOption(STRICT_NAMESPACE.default(config.strictNamespace ?? true));
     program.addOption(STRICT_NAMESPACE_NEGATION);
     program.addOption(DEFAULT_NAMESPACE.default(config.defaultNamespace));
+    program.addOption(EXTRA_HEADER);
 
     // Register commands
-    program.addCommand(Login);
+    program.addCommand(
+      Login(config).configureHelp({ showGlobalOptions: true })
+    );
     program.addCommand(Logout);
     program.addCommand(
       PushCommand(config).configureHelp({ showGlobalOptions: true })

@@ -11,6 +11,11 @@ import { dirname, join, resolve } from 'node:path';
 import { error, exitWithError } from '../utils/logger.js';
 import type { Schema } from '../schema.js';
 import { valueToArray } from '../utils/valueToArray.js';
+import {
+  normalizeHeaderName,
+  validateHeaderName,
+  validateHeaderValue,
+} from '../utils/headers.js';
 import { Ajv } from 'ajv';
 
 const explorer = cosmiconfig('tolgee', {
@@ -83,6 +88,42 @@ function parseConfig(input: Schema, configDir: string) {
   // convert relative paths in config to absolute
   if (rc.pull?.path !== undefined) {
     rc.pull.path = resolve(configDir, rc.pull.path).replace(/\\/g, '/');
+  }
+
+  if (
+    rc.headers !== undefined &&
+    typeof rc.headers === 'object' &&
+    rc.headers !== null &&
+    !Array.isArray(rc.headers)
+  ) {
+    const asConfigError = <T>(fn: () => T): T => {
+      try {
+        return fn();
+      } catch (e: any) {
+        throw new Error(`Invalid config: ${e.message}`);
+      }
+    };
+
+    const seen = new Set<string>();
+    const normalized: Record<string, string> = {};
+    for (const [name, value] of Object.entries(rc.headers)) {
+      asConfigError(() => validateHeaderName(name));
+      const key = normalizeHeaderName(name);
+      if (seen.has(key)) {
+        throw new Error(
+          `Invalid config: duplicate header '${key}' (header names are case-insensitive)`
+        );
+      }
+      seen.add(key);
+      // Non-string values are left for ajv to reject with a 'Tolgee config:' error.
+      if (typeof value === 'string') {
+        asConfigError(() => validateHeaderValue(value));
+        normalized[key] = value.trim();
+      } else {
+        normalized[key] = value;
+      }
+    }
+    rc.headers = normalized;
   }
 
   return rc;
