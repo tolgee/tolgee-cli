@@ -56,6 +56,10 @@ describe('parseHeaderList', () => {
     expect(() => parseHeaderList([`X-Foo: a${nul}b`])).toThrow();
   });
 
+  it('throws on trailing CRLF rather than silently trimming it', () => {
+    expect(() => parseHeaderList(['X-Foo: bar\r\n'])).toThrow();
+  });
+
   it('allows a horizontal tab in the value (RFC 7230 field-content)', () => {
     expect(parseHeaderList(['X-Foo: a\tb'])).toEqual({ 'x-foo': 'a\tb' });
   });

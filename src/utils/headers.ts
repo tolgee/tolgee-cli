@@ -61,10 +61,10 @@ export function parseHeaderList(
       throw new Error(`invalid header "${entry}", expected "Name: Value"`);
     }
     const name = entry.slice(0, separator);
-    const value = entry.slice(separator + 1).trim();
+    const rawValue = entry.slice(separator + 1);
     validateHeaderName(name);
-    validateHeaderValue(value);
-    out[normalizeHeaderName(name)] = value;
+    validateHeaderValue(rawValue);
+    out[normalizeHeaderName(name)] = rawValue.trim();
   }
   return out;
 }
