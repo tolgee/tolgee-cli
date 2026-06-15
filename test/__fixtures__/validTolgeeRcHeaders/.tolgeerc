@@ -1,0 +1,8 @@
+{
+  "apiUrl": "https://app.tolgee.io",
+  "projectId": 1337,
+  "headers": {
+    "X-Custom": "bar",
+    " X-Padded ": "v"
+  }
+}

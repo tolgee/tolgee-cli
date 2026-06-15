@@ -118,6 +118,14 @@ export interface Schema {
    * Override parser detection.
    */
   parser?: "react" | "vue" | "svelte" | "ngx";
+  /**
+   * Custom HTTP headers added to every request to the Tolgee API, e.g. when the platform is behind a custom auth/proxy layer.
+   *
+   * The `user-agent`, `x-api-key` and `content-type` headers are reserved and ignored/overridden by the CLI. Custom headers are additive to the Tolgee API key (which is still required).
+   */
+  headers?: {
+    [k: string]: string;
+  };
   push?: {
     /**
      * A template that describes the structure of the local files and their location with file [structure template format](https://docs.tolgee.io/tolgee-cli/push-pull-strings#file-structure-template-format).

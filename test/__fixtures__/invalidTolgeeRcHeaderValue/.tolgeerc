@@ -1,0 +1,5 @@
+{
+  "headers": {
+    "X-Foo": "a\r\nInjected: b"
+  }
+}

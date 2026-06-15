@@ -169,17 +169,21 @@ describe('project 3', () => {
 
     const stored = tolgeeDataToDict(keys.data);
 
-    // Keys in the "food" namespace should not be removed
-    expect(Object.keys(stored)).toEqual([
-      'table',
-      'chair',
-      'plate',
-      'fork',
-      'water',
-      'salad',
-      'tomato',
-      'onions',
-    ]);
+    // Keys in the "food" namespace should not be removed.
+    // Key creation order during import is not guaranteed and the translations
+    // endpoint orders by key id, so compare the key set, not its order.
+    expect(Object.keys(stored).sort()).toEqual(
+      [
+        'table',
+        'chair',
+        'plate',
+        'fork',
+        'water',
+        'salad',
+        'tomato',
+        'onions',
+      ].sort()
+    );
   });
 
   it('removes other keys (config)', async () => {
@@ -217,16 +221,18 @@ describe('project 3', () => {
     const stored = tolgeeDataToDict(keys.data);
 
     // Keys in the "food" namespace should not be removed
-    expect(Object.keys(stored)).toEqual([
-      'table',
-      'chair',
-      'plate',
-      'fork',
-      'water',
-      'salad',
-      'tomato',
-      'onions',
-    ]);
+    expect(Object.keys(stored).sort()).toEqual(
+      [
+        'table',
+        'chair',
+        'plate',
+        'fork',
+        'water',
+        'salad',
+        'tomato',
+        'onions',
+      ].sort()
+    );
   });
 
   it("doesn't remove other keys when filtered by namespace", async () => {
@@ -270,16 +276,18 @@ describe('project 3', () => {
 
     const stored = tolgeeDataToDict(keys.data);
 
-    expect(Object.keys(stored)).toEqual([
-      'table',
-      'chair',
-      'plate',
-      'fork',
-      'knife',
-      'water',
-      'salad',
-      'tomato',
-      'onions',
-    ]);
+    expect(Object.keys(stored).sort()).toEqual(
+      [
+        'table',
+        'chair',
+        'plate',
+        'fork',
+        'knife',
+        'water',
+        'salad',
+        'tomato',
+        'onions',
+      ].sort()
+    );
   });
 });

@@ -6,6 +6,10 @@ import { API_KEY_PAK_PREFIX, USER_AGENT } from '../constants.js';
 import { getApiKeyInformation } from './getApiKeyInformation.js';
 import { debug, isDebugEnabled } from '../utils/logger.js';
 import { errorFromLoadable } from './errorFromLoadable.js';
+import { normalizeHeaderKeys } from '../utils/headers.js';
+
+// Headers the CLI controls and that custom headers must never override.
+const RESERVED_HEADERS = ['user-agent', 'content-type', 'x-api-key'];
 
 async function parseResponse(response: Response, parseAs: ParseAs) {
   // handle empty content
@@ -55,6 +59,7 @@ export type ApiClientProps = {
   apiKey?: string;
   projectId?: number | undefined;
   autoThrow?: boolean;
+  headers?: Record<string, string>;
 };
 
 export function createApiClient({
@@ -62,12 +67,24 @@ export function createApiClient({
   apiKey,
   projectId,
   autoThrow = false,
+  headers,
 }: ApiClientProps) {
   const computedProjectId =
     projectId ?? (apiKey ? projectIdFromKey(apiKey) : undefined);
+
+  const custom = normalizeHeaderKeys(headers);
+  const ignored = RESERVED_HEADERS.filter((name) => name in custom);
+  if (ignored.length) {
+    debug(`[HTTP] Ignoring reserved custom header(s): ${ignored.join(', ')}`);
+  }
+  for (const name of ignored) {
+    delete custom[name];
+  }
+
   const apiClient = createClient<paths>({
     baseUrl,
     headers: {
+      ...custom,
       'user-agent': USER_AGENT,
       'x-api-key': apiKey,
     },
@@ -110,7 +127,7 @@ export function createApiClient({
       return getApiKeyInformation(apiClient, apiKey!);
     },
     getSettings(): ApiClientProps {
-      return { baseUrl, apiKey, projectId, autoThrow };
+      return { baseUrl, apiKey, projectId, autoThrow, headers };
     },
   };
 }
