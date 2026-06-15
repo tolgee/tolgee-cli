@@ -1,3 +1,10 @@
+# [2.18.0](https://github.com/tolgee/tolgee-cli/compare/v2.17.0...v2.18.0) (2026-06-15)
+
+
+### Features
+
+* add export formats Apple SDK and Android SDK ([#184](https://github.com/tolgee/tolgee-cli/issues/184)) ([8325426](https://github.com/tolgee/tolgee-cli/commit/8325426575596eb83a3d0bff17697297629c2311))
+
 # [2.17.0](https://github.com/tolgee/tolgee-cli/compare/v2.16.1...v2.17.0) (2026-06-15)
 
 
