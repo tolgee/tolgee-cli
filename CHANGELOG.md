@@ -1,3 +1,10 @@
+# [2.17.0](https://github.com/tolgee/tolgee-cli/compare/v2.16.1...v2.17.0) (2026-06-15)
+
+
+### Features
+
+* allow custom HTTP headers on every request ([#206](https://github.com/tolgee/tolgee-cli/issues/206)) ([0d9833b](https://github.com/tolgee/tolgee-cli/commit/0d9833b79a50258ca6f8a77ad33d363ad666221b)), closes [#180](https://github.com/tolgee/tolgee-cli/issues/180)
+
 ## [2.16.1](https://github.com/tolgee/tolgee-cli/compare/v2.16.0...v2.16.1) (2026-02-19)
 
 
