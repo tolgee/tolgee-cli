@@ -99,6 +99,7 @@ export const FORMAT_OPT = new Option(
   'PO_ICU',
   'PO_RUBY',
   'PO_PYTHON',
+  'PO_PYTHON_BRACE',
   'APPLE_STRINGS',
   'APPLE_XLIFF',
   'APPLE_XCSTRINGS',

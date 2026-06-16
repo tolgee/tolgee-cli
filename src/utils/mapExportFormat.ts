@@ -53,6 +53,8 @@ export const mapExportFormat = (format: Schema['format']): FormatResult => {
       return { format: 'PO', messageFormat: 'RUBY_SPRINTF' };
     case 'PO_PYTHON':
       return { format: 'PO', messageFormat: 'PYTHON_PERCENT' };
+    case 'PO_PYTHON_BRACE':
+      return { format: 'PO', messageFormat: 'PYTHON_BRACE' };
     case 'PROPERTIES_ICU':
       return {
         format: 'PROPERTIES',
