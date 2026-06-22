@@ -123,6 +123,15 @@ describe('push and pull with different formats (with filesTemplate used)', () =>
     });
   });
 
+  it('works with po-python-brace format', async () => {
+    await testWithConfig({
+      config: 'po-python-brace',
+      inPlatform: 'You have {count, number} items',
+      fileLocation: 'en.po',
+      inFile: 'You have {count:d} items',
+    });
+  });
+
   it('works with apple-strings icu format', async () => {
     await testWithConfig({
       config: 'apple-strings',

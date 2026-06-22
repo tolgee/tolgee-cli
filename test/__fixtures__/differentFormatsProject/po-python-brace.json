@@ -1,0 +1,7 @@
+{
+  "$schema": "../../../schema.json",
+  "format": "PO_PYTHON_BRACE",
+  "push": {
+    "filesTemplate": "./po-python-brace/{languageTag}.po"
+  }
+}

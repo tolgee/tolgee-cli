@@ -452,7 +452,7 @@ export interface paths {
          * Create API key
          * @description Creates new API key with provided scopes
          */
-        post: operations["create_17"];
+        post: operations["create_19"];
         delete?: never;
         options?: never;
         head?: never;
@@ -525,10 +525,10 @@ export interface paths {
         };
         get?: never;
         /** Update API key */
-        put: operations["update_11"];
+        put: operations["update_13"];
         post?: never;
         /** Delete API key */
-        delete: operations["delete_10"];
+        delete: operations["delete_12"];
         options?: never;
         head?: never;
         patch?: never;
@@ -562,7 +562,7 @@ export interface paths {
          * Get one API key
          * @description Returns specific API key info
          */
-        get: operations["get_24"];
+        get: operations["get_26"];
         put?: never;
         post?: never;
         delete?: never;
@@ -747,7 +747,7 @@ export interface paths {
         put?: never;
         post?: never;
         /** Delete uploaded images */
-        delete: operations["delete_17"];
+        delete: operations["delete_19"];
         options?: never;
         head?: never;
         patch?: never;
@@ -878,15 +878,15 @@ export interface paths {
             cookie?: never;
         };
         /** Get one organization */
-        get: operations["get_15"];
+        get: operations["get_17"];
         /** Update organization data */
-        put: operations["update_10"];
+        put: operations["update_12"];
         post?: never;
         /**
          * Delete organization
          * @description Deletes organization and all its data including projects
          */
-        delete: operations["delete_9"];
+        delete: operations["delete_11"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1018,10 +1018,10 @@ export interface paths {
             cookie?: never;
         };
         /** Get all organization glossaries */
-        get: operations["getAll_12"];
+        get: operations["getAll_13"];
         put?: never;
         /** Create glossary */
-        post: operations["create_15"];
+        post: operations["create_17"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1036,7 +1036,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get all organization glossaries with some additional statistics */
-        get: operations["getAllWithStats"];
+        get: operations["getAllWithStats_1"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1053,12 +1053,12 @@ export interface paths {
             cookie?: never;
         };
         /** Get glossary */
-        get: operations["get_13"];
+        get: operations["get_15"];
         /** Update glossary */
-        put: operations["update_8"];
+        put: operations["update_10"];
         post?: never;
         /** Delete glossary */
-        delete: operations["delete_7"];
+        delete: operations["delete_9"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1072,7 +1072,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get all projects assigned to glossary */
-        get: operations["getAssignedProjects"];
+        get: operations["getAssignedProjects_1"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1140,10 +1140,10 @@ export interface paths {
             cookie?: never;
         };
         /** Get all glossary terms */
-        get: operations["getAll_13"];
+        get: operations["getAll_14"];
         put?: never;
         /** Create a new glossary term */
-        post: operations["create_16"];
+        post: operations["create_18"];
         /** Batch delete multiple terms */
         delete: operations["deleteMultiple"];
         options?: never;
@@ -1159,12 +1159,12 @@ export interface paths {
             cookie?: never;
         };
         /** Get glossary term */
-        get: operations["get_14"];
+        get: operations["get_16"];
         /** Update glossary term */
-        put: operations["update_9"];
+        put: operations["update_11"];
         post?: never;
         /** Delete glossary term */
-        delete: operations["delete_8"];
+        delete: operations["delete_10"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1180,7 +1180,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Set a new glossary term translation for language */
-        post: operations["update_12"];
+        post: operations["update_14"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1195,7 +1195,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get glossary term translation for language */
-        get: operations["get_23"];
+        get: operations["get_25"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1283,7 +1283,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get all organization-specific providers */
-        get: operations["getAll_11"];
+        get: operations["getAll_12"];
         put?: never;
         /** Create organization-specific provider */
         post: operations["createProvider"];
@@ -1527,6 +1527,255 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v2/organizations/{organizationId}/translation-memories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get all translation memories in the organization */
+        get: operations["getAll_11"];
+        put?: never;
+        /** Create shared translation memory */
+        post: operations["create_15"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/organizations/{organizationId}/translation-memories-with-stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get all translation memories with statistics */
+        get: operations["getAllWithStats"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/organizations/{organizationId}/translation-memories/entry-counts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get entry counts for a set of translation memories
+         * @description Returns the entry count for each requested TM id (stored + virtual). Unknown ids are omitted from the response. Separate from the list endpoint so the list can render without waiting on the per-TM virtual-row aggregation.
+         */
+        get: operations["getEntryCounts"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/organizations/{organizationId}/translation-memories/{translationMemoryId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get translation memory */
+        get: operations["get_13"];
+        /** Update shared translation memory */
+        put: operations["update_8"];
+        post?: never;
+        /** Delete shared translation memory */
+        delete: operations["delete_7"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/organizations/{organizationId}/translation-memories/{translationMemoryId}/assigned-projects": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get projects assigned to a translation memory */
+        get: operations["getAssignedProjects"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/organizations/{organizationId}/translation-memories/{translationMemoryId}/entries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List rows of a translation memory (paginated)
+         * @description Pagination is row-level: each STORED bucket (manual entries on a source collapse into one row; each TMX `tuid` is its own row) and each VIRTUAL origin (one row per project key) gets its own page item. The `targetLanguageTag` filter narrows the *cells* of a row to a subset of target languages; rows themselves still appear with empty cells so the user can add a translation.
+         */
+        get: operations["list_3"];
+        put?: never;
+        /** Create a translation memory entry */
+        post: operations["create_16"];
+        /**
+         * Batch delete translation memory entry groups
+         * @description For every entry ID in the payload, deletes the entire group that shares the same source text (and key). The request is deduplicated to distinct groups so passing multiple entries from the same row is a no-op past the first one.
+         */
+        delete: operations["deleteMultipleGroups"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/organizations/{organizationId}/translation-memories/{translationMemoryId}/entries/entryIds": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List representative entry IDs for every stored row
+         * @description Returns one entry ID per stored row matching the optional `search` filter — the same row identities that the paged endpoint exposes, but flattened to a single long list for client-side `Select all` flows. Virtual rows are not included (they have no entry IDs).
+         */
+        get: operations["getAllStoredEntryIds"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/organizations/{organizationId}/translation-memories/{translationMemoryId}/entries/multiple": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create translation memory entries for multiple target languages
+         * @description Atomic counterpart to the per-language POST. All entries land in one transaction, or none do — replaces the UI's previous per-language loop which could leave a partial result if a later language failed. The same target language must not appear twice in the same request.
+         */
+        post: operations["createMultiple"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/organizations/{organizationId}/translation-memories/{translationMemoryId}/entries/{entryId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a single translation memory entry */
+        get: operations["get_14"];
+        /** Update a translation memory entry */
+        put: operations["update_9"];
+        post?: never;
+        /** Delete a translation memory entry */
+        delete: operations["delete_8"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/organizations/{organizationId}/translation-memories/{translationMemoryId}/entries/{entryId}/group": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete a whole translation memory entry group
+         * @description Deletes every entry that shares the same source text (and key) as the given entry — i.e. the entire translation-unit group visible as one row in the UI.
+         */
+        delete: operations["deleteGroup"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/organizations/{organizationId}/translation-memories/{translationMemoryId}/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Export translation memory as TMX file */
+        get: operations["exportTmx"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/organizations/{organizationId}/translation-memories/{translationMemoryId}/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Import TMX file into translation memory */
+        post: operations["importTmx"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/organizations/{organizationId}/translation-memories/{translationMemoryId}/write-only-reviewed": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Toggle the reviewed-only flag on any TM in the organization
+         * @description Sets `writeOnlyReviewed` on the given TM. Unlike the main update endpoint, this accepts PROJECT-type TMs too, so org maintainers can edit this single setting from the org-level TM list without switching into project settings.
+         */
+        put: operations["setWriteOnlyReviewed"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v2/organizations/{organizationId}/usage": {
         parameters: {
             query?: never;
@@ -1592,7 +1841,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get organization by slug */
-        get: operations["get_22"];
+        get: operations["get_24"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2004,7 +2253,7 @@ export interface paths {
             cookie?: never;
         };
         /** List batch operations */
-        get: operations["list_3"];
+        get: operations["list_4"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2021,7 +2270,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get batch operation */
-        get: operations["get_20"];
+        get: operations["get_22"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2082,6 +2331,23 @@ export interface paths {
         put?: never;
         /** Create branch */
         post: operations["create_11"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/projects/{projectId}/branches/find": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get branch by name, or the default branch if name is not provided */
+        get: operations["find"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -2287,7 +2553,7 @@ export interface paths {
         /** Rename branch */
         post: operations["rename"];
         /** Delete branch */
-        delete: operations["delete_13"];
+        delete: operations["delete_15"];
         options?: never;
         head?: never;
         patch?: never;
@@ -2925,7 +3191,7 @@ export interface paths {
          * Delete one or multiple keys (post)
          * @description Delete one or multiple keys by their IDs in request body. Useful for larger requests esxceeding allowed URL length.
          */
-        delete: operations["delete_11"];
+        delete: operations["delete_13"];
         options?: never;
         head?: never;
         patch?: never;
@@ -3054,6 +3320,91 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v2/projects/{projectId}/keys/trash": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List trashed keys */
+        get: operations["list_8"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/projects/{projectId}/keys/trash/deleters": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List users who deleted keys */
+        get: operations["listDeleters"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/projects/{projectId}/keys/trash/select-all": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Select all trashed key IDs matching the filter */
+        get: operations["selectAll"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/projects/{projectId}/keys/trash/{keyId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Permanently delete a trashed key */
+        delete: operations["permanentlyDelete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/projects/{projectId}/keys/trash/{keyId}/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Restore a trashed key */
+        put: operations["restore"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v2/projects/{projectId}/keys/{ids}": {
         parameters: {
             query?: never;
@@ -3065,7 +3416,7 @@ export interface paths {
         put?: never;
         post?: never;
         /** Delete one or multiple keys */
-        delete: operations["delete_15"];
+        delete: operations["delete_17"];
         options?: never;
         head?: never;
         patch?: never;
@@ -3734,6 +4085,128 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v2/projects/{projectId}/qa-settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get QA check settings for the project */
+        get: operations["getSettings"];
+        /** Update QA check settings for the project */
+        put: operations["updateSettings"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/projects/{projectId}/qa-settings/check-types": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get QA check types grouped by category */
+        get: operations["getCheckTypes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/projects/{projectId}/qa-settings/enabled": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Enable or disable QA checks for the project */
+        put: operations["setQaEnabled"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/projects/{projectId}/qa-settings/languages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get per-language QA settings overrides for all project languages */
+        get: operations["getAllLanguageSettings"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/projects/{projectId}/qa-settings/languages/{languageId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get QA settings overrides for a specific language */
+        get: operations["getLanguageSettings"];
+        /** Set per-language QA settings override */
+        put: operations["updateLanguageSettings"];
+        post?: never;
+        /** Reset language QA settings to global defaults */
+        delete: operations["deleteLanguageSettings"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/projects/{projectId}/qa-settings/languages/{languageId}/enabled": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Enable or disable QA checks for a specific language */
+        put: operations["setLanguageQaEnabled"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/projects/{projectId}/qa-settings/languages/{languageId}/resolved": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get resolved QA settings for a specific language */
+        get: operations["getLanguageSettingsResolved"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v2/projects/{projectId}/single-step-import": {
         parameters: {
             query?: never;
@@ -3862,6 +4335,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v2/projects/{projectId}/start-batch-job/hard-delete-keys": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Permanently delete soft-deleted keys */
+        post: operations["hardDeleteKeys"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v2/projects/{projectId}/start-batch-job/machine-translate": {
         parameters: {
             query?: never;
@@ -3892,10 +4382,44 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Pre-translate by TM
+         * Translate from memory
          * @description Pre-translate provided keys to provided languages by TM.
          */
         post: operations["translate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/projects/{projectId}/start-batch-job/qa-check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Rerun QA checks for translations of selected keys */
+        post: operations["qaCheck"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/projects/{projectId}/start-batch-job/restore-keys": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Restore soft-deleted keys */
+        post: operations["restoreKeys"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4021,6 +4545,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v2/projects/{projectId}/stats/qa-issue-counts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get QA issue counts grouped by check type for a language */
+        get: operations["getQaIssueCountsByCheckType"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v2/projects/{projectId}/suggest/machine-translations": {
         parameters: {
             query?: never;
@@ -4106,7 +4647,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get tags */
-        get: operations["getAll_14"];
+        get: operations["getAll_15"];
         put?: never;
         post?: never;
         delete?: never;
@@ -4411,6 +4952,68 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v2/projects/{projectId}/translation-memories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List all translation memory assignments for the project
+         * @description Always readable. When the TRANSLATION_MEMORY feature is not enabled for the organization, only the project-type assignment (if any) is returned so the settings page can still show the row that already drives in-project suggestions.
+         */
+        get: operations["list_6"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/projects/{projectId}/translation-memories/project-tm-settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Update the project's own TM settings
+         * @description Sets TM-level flags on the project's own PROJECT-type TM. The shared-TM update endpoint rejects PROJECT TMs; this narrow endpoint exists so project admins can toggle the `writeOnlyReviewed` flag without org-level privileges.
+         */
+        put: operations["updateProjectTmSettings"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/projects/{projectId}/translation-memories/{translationMemoryId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Update project's translation memory assignment (read/write/priority) */
+        put: operations["updateAssignment"];
+        /** Assign a shared translation memory to the project */
+        post: operations["assign"];
+        /**
+         * Unassign a shared translation memory from the project
+         * @description Removes the assignment between the project and the shared translation memory. The shared TM and its entries remain intact for other projects.
+         */
+        delete: operations["unassign"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v2/projects/{projectId}/translations": {
         parameters: {
             query?: never;
@@ -4623,6 +5226,75 @@ export interface paths {
         post?: never;
         /** Remove label from translation */
         delete: operations["unassignLabel"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/projects/{projectId}/translations/{translationId}/qa-issues": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get persisted QA issues for a translation */
+        get: operations["getIssues"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/projects/{projectId}/translations/{translationId}/qa-issues/suppressions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create a QA issue suppression by match parameters */
+        post: operations["createSuppression"];
+        /** Remove a QA issue suppression by match parameters */
+        delete: operations["removeSuppression"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/projects/{projectId}/translations/{translationId}/qa-issues/{issueId}/ignore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Ignore a QA issue */
+        put: operations["ignoreIssue"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v2/projects/{projectId}/translations/{translationId}/qa-issues/{issueId}/unignore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Unignore a QA issue */
+        put: operations["unignoreIssue"];
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -4878,7 +5550,7 @@ export interface paths {
             cookie?: never;
         };
         /** @description Return server configuration properties documentation */
-        get: operations["get_19"];
+        get: operations["get_21"];
         put?: never;
         post?: never;
         delete?: never;
@@ -4894,7 +5566,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["get_18"];
+        get: operations["get_20"];
         put?: never;
         post?: never;
         delete?: never;
@@ -4914,7 +5586,7 @@ export interface paths {
          * Get initial data
          * @description Returns initial data required by the UI to load
          */
-        get: operations["get_17"];
+        get: operations["get_19"];
         put?: never;
         post?: never;
         delete?: never;
@@ -5244,7 +5916,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get user's preferences */
-        get: operations["get_16"];
+        get: operations["get_18"];
         put?: never;
         post?: never;
         delete?: never;
@@ -5525,7 +6197,7 @@ export interface components {
         };
         AnnouncementDto: {
             /** @enum {string} */
-            type: "FEATURE_BATCH_OPERATIONS" | "FEATURE_MT_FORMALITY" | "FEATURE_CONTENT_DELIVERY_AND_WEBHOOKS" | "NEW_PRICING" | "FEATURE_AI_CUSTOMIZATION" | "FEATURE_VISUAL_EDITOR" | "FEATURE_CLI_2" | "FEATURE_TASKS" | "FEATURE_LLM_PROVIDERS_AND_PLAYGROUND" | "FEATURE_GLOSSARIES_AND_PLAYGROUND" | "FEATURE_LABELS" | "FEATURE_SUGGESTIONS_AND_LABELS" | "FEATURE_IMPROVED_FIGMA_ANDROID_AND_IOS";
+            type: "FEATURE_BATCH_OPERATIONS" | "FEATURE_MT_FORMALITY" | "FEATURE_CONTENT_DELIVERY_AND_WEBHOOKS" | "NEW_PRICING" | "FEATURE_AI_CUSTOMIZATION" | "FEATURE_VISUAL_EDITOR" | "FEATURE_CLI_2" | "FEATURE_TASKS" | "FEATURE_LLM_PROVIDERS_AND_PLAYGROUND" | "FEATURE_GLOSSARIES_AND_PLAYGROUND" | "FEATURE_LABELS" | "FEATURE_SUGGESTIONS_AND_LABELS" | "FEATURE_IMPROVED_FIGMA_ANDROID_AND_IOS" | "FEATURE_BRANCHING" | "FEATURE_TRANSLATION_MEMORY_MANAGEMENT" | "FEATURE_QA_CHECKS_AND_TRANSLATION_MEMORY";
         };
         ApiKeyModel: {
             /** @description Description */
@@ -5623,6 +6295,8 @@ export interface components {
             viewLanguageIds?: number[];
         };
         ApiKeyWithLanguagesModel: {
+            /** @description Whether branching is enabled and active on this project. */
+            branchingEnabled: boolean;
             description: string;
             /** Format: int64 */
             expiresAt?: number;
@@ -5644,6 +6318,22 @@ export interface components {
         };
         ApplyBranchMergeRequest: {
             deleteBranch: boolean;
+        };
+        AssignSharedTranslationMemoryRequest: {
+            /**
+             * Format: int32
+             * @description Per-assignment penalty override (0–100). When null, the TM's default penalty applies.
+             */
+            penalty?: number;
+            /**
+             * Format: int32
+             * @description Priority in suggestion results (lower = higher priority). When null, the assignment is placed after every existing one (max + 1) so it stacks at the bottom of the list.
+             */
+            priority?: number;
+            /** @description Whether this project can read from the TM */
+            readAccess: boolean;
+            /** @description Whether this project writes new translations to the TM */
+            writeAccess: boolean;
         };
         AuthInfoModel: {
             isReadOnly: boolean;
@@ -5739,7 +6429,7 @@ export interface components {
              * @description Type of the batch job
              * @enum {string}
              */
-            type: "AI_PLAYGROUND_TRANSLATE" | "PRE_TRANSLATE_BT_TM" | "MACHINE_TRANSLATE" | "AUTO_TRANSLATE" | "DELETE_KEYS" | "SET_TRANSLATIONS_STATE" | "CLEAR_TRANSLATIONS" | "COPY_TRANSLATIONS" | "TAG_KEYS" | "UNTAG_KEYS" | "SET_KEYS_NAMESPACE" | "AUTOMATION" | "BILLING_TRIAL_EXPIRATION_NOTICE" | "ASSIGN_TRANSLATION_LABEL" | "UNASSIGN_TRANSLATION_LABEL" | "NO_OP";
+            type: "AI_PLAYGROUND_TRANSLATE" | "PRE_TRANSLATE_BT_TM" | "MACHINE_TRANSLATE" | "AUTO_TRANSLATE" | "DELETE_KEYS" | "RESTORE_KEYS" | "HARD_DELETE_KEYS" | "SET_TRANSLATIONS_STATE" | "CLEAR_TRANSLATIONS" | "COPY_TRANSLATIONS" | "TAG_KEYS" | "UNTAG_KEYS" | "SET_KEYS_NAMESPACE" | "AUTOMATION" | "BILLING_TRIAL_EXPIRATION_NOTICE" | "ASSIGN_TRANSLATION_LABEL" | "UNASSIGN_TRANSLATION_LABEL" | "QA_CHECK" | "NO_OP";
             /**
              * Format: int64
              * @description The time when the job was last updated (status change)
@@ -6073,6 +6763,16 @@ export interface components {
                 transferOptions?: components["schemas"]["ProjectTransferOptionModel"][];
             };
         };
+        CollectionModelProjectTranslationMemoryAssignmentModel: {
+            _embedded?: {
+                translationMemoryAssignments?: components["schemas"]["ProjectTranslationMemoryAssignmentModel"][];
+            };
+        };
+        CollectionModelQaIssueModel: {
+            _embedded?: {
+                qaIssues?: components["schemas"]["QaIssueModel"][];
+            };
+        };
         CollectionModelQueueItemModel: {
             _embedded?: {
                 queueItemModelList?: components["schemas"]["QueueItemModel"][];
@@ -6098,6 +6798,21 @@ export interface components {
                 projects?: components["schemas"]["SimpleProjectModel"][];
             };
         };
+        CollectionModelSimpleUserAccountModel: {
+            _embedded?: {
+                users?: components["schemas"]["SimpleUserAccountModel"][];
+            };
+        };
+        CollectionModelTmAssignedProjectModel: {
+            _embedded?: {
+                assignedProjects?: components["schemas"]["TmAssignedProjectModel"][];
+            };
+        };
+        CollectionModelTranslationMemoryEntryModel: {
+            _embedded?: {
+                translationMemoryEntries?: components["schemas"]["TranslationMemoryEntryModel"][];
+            };
+        };
         CollectionModelUsedNamespaceModel: {
             _embedded?: {
                 namespaces?: components["schemas"]["UsedNamespaceModel"][];
@@ -6119,6 +6834,11 @@ export interface components {
             description?: string;
             /** @description If key is pluralized. If it will be reflected in the editor. If null, value won't be modified. */
             isPlural?: boolean;
+            /**
+             * Format: int32
+             * @description Maximum character limit. Null = don't modify. 0 = remove limit.
+             */
+            maxCharLimit?: number;
             /** @description Name of the key */
             name: string;
             namespace?: string;
@@ -6234,6 +6954,8 @@ export interface components {
         };
         ContentDeliveryConfigModel: {
             autoPublish: boolean;
+            /** @description Branch name this CDN config is associated with. Null means default branch or no branching. */
+            branchName?: string;
             /** @description If true, HTML tags are escaped in the exported file. (Supported in the XLIFF format only).
              *
              *     e.g. Key <b>hello</b> will be exported as &lt;b&gt;hello&lt;/b&gt; */
@@ -6300,7 +7022,7 @@ export interface components {
              *     For specific formats like `YAML_RUBY` it's ignored.
              * @enum {string}
              */
-            messageFormat?: "C_SPRINTF" | "PHP_SPRINTF" | "JAVA_STRING_FORMAT" | "APPLE_SPRINTF" | "RUBY_SPRINTF" | "I18NEXT" | "ICU" | "PYTHON_PERCENT";
+            messageFormat?: "C_SPRINTF" | "PHP_SPRINTF" | "JAVA_STRING_FORMAT" | "APPLE_SPRINTF" | "RUBY_SPRINTF" | "I18NEXT" | "ICU" | "PYTHON_PERCENT" | "PYTHON_BRACE";
             name: string;
             pruneBeforePublish: boolean;
             publicUrl?: string;
@@ -6388,7 +7110,7 @@ export interface components {
              *     For specific formats like `YAML_RUBY` it's ignored.
              * @enum {string}
              */
-            messageFormat?: "C_SPRINTF" | "PHP_SPRINTF" | "JAVA_STRING_FORMAT" | "APPLE_SPRINTF" | "RUBY_SPRINTF" | "I18NEXT" | "ICU" | "PYTHON_PERCENT";
+            messageFormat?: "C_SPRINTF" | "PHP_SPRINTF" | "JAVA_STRING_FORMAT" | "APPLE_SPRINTF" | "RUBY_SPRINTF" | "I18NEXT" | "ICU" | "PYTHON_PERCENT" | "PYTHON_BRACE";
             name: string;
             /** @description Whether the data in the CDN should be pruned before publishing new data.
              *
@@ -6498,6 +7220,11 @@ export interface components {
             description?: string;
             /** @description If key is pluralized. If it will be reflected in the editor */
             isPlural: boolean;
+            /**
+             * Format: int32
+             * @description Maximum character limit for translations of this key. Null means no limit.
+             */
+            maxCharLimit?: number;
             /** @description Name of the key */
             name: string;
             namespace?: string;
@@ -6522,6 +7249,27 @@ export interface components {
         };
         CreateMultipleTasksRequest: {
             tasks: components["schemas"]["CreateTaskRequest"][];
+        };
+        CreateMultipleTranslationMemoryEntriesRequest: {
+            /**
+             * @description Source text (in the TM's source language)
+             * @example Hello world
+             */
+            sourceText: string;
+            /** @description Target translations to create, one per target language */
+            translations: components["schemas"]["CreateMultipleTranslationMemoryEntriesTranslationRequest"][];
+        };
+        CreateMultipleTranslationMemoryEntriesTranslationRequest: {
+            /**
+             * @description Target language tag according to BCP 47 definition
+             * @example de
+             */
+            targetLanguageTag: string;
+            /**
+             * @description Target translation text
+             * @example Hallo Welt
+             */
+            targetText: string;
         };
         CreatePatDto: {
             /** @description Description of the PAT */
@@ -6626,6 +7374,9 @@ export interface components {
         DeleteMultipleGlossaryTermsRequest: {
             termIds: number[];
         };
+        DeleteMultipleTranslationMemoryEntriesRequest: {
+            entryIds: number[];
+        };
         DocItem: {
             description?: string;
             displayName?: string;
@@ -6650,6 +7401,11 @@ export interface components {
              * @example This key is used on homepage. It's a label of sign up button.
              */
             description?: string;
+            /**
+             * Format: int32
+             * @description Maximum character limit for translations of this key. Null means no limit.
+             */
+            maxCharLimit?: number;
             name: string;
             namespace?: string;
         };
@@ -6673,6 +7429,8 @@ export interface components {
              * @enum {string}
              */
             translationProtection: "NONE" | "PROTECT_REVIEWED";
+            /** @description When true, the request is allowed to unassign shared translation memories whose source language differs from the new base language. Without this flag, such a conflict is rejected with `cannot_change_project_base_language_tm_conflict`. The frontend should only set this after the user explicitly confirms in the conflict dialog. */
+            unassignConflictingTms?: boolean;
             useBranching: boolean;
             useNamespaces: boolean;
         };
@@ -6682,7 +7440,7 @@ export interface components {
             currentPeriodEnd?: number;
             /** Format: int64 */
             currentUserCount: number;
-            enabledFeatures: ("GRANULAR_PERMISSIONS" | "PRIORITIZED_FEATURE_REQUESTS" | "PREMIUM_SUPPORT" | "DEDICATED_SLACK_CHANNEL" | "ASSISTED_UPDATES" | "DEPLOYMENT_ASSISTANCE" | "BACKUP_CONFIGURATION" | "TEAM_TRAINING" | "ACCOUNT_MANAGER" | "STANDARD_SUPPORT" | "PROJECT_LEVEL_CONTENT_STORAGES" | "WEBHOOKS" | "MULTIPLE_CONTENT_DELIVERY_CONFIGS" | "AI_PROMPT_CUSTOMIZATION" | "SLACK_INTEGRATION" | "TASKS" | "SSO" | "ORDER_TRANSLATION" | "GLOSSARY" | "TRANSLATION_LABELS" | "BRANCHING")[];
+            enabledFeatures: ("GRANULAR_PERMISSIONS" | "PRIORITIZED_FEATURE_REQUESTS" | "PREMIUM_SUPPORT" | "DEDICATED_SLACK_CHANNEL" | "ASSISTED_UPDATES" | "DEPLOYMENT_ASSISTANCE" | "BACKUP_CONFIGURATION" | "TEAM_TRAINING" | "ACCOUNT_MANAGER" | "STANDARD_SUPPORT" | "PROJECT_LEVEL_CONTENT_STORAGES" | "WEBHOOKS" | "MULTIPLE_CONTENT_DELIVERY_CONFIGS" | "AI_PROMPT_CUSTOMIZATION" | "SLACK_INTEGRATION" | "TASKS" | "SSO" | "ORDER_TRANSLATION" | "GLOSSARY" | "TRANSLATION_LABELS" | "BRANCHING" | "QA_CHECKS" | "TRANSLATION_MEMORY")[];
             isPayAsYouGo: boolean;
             /** Format: date-time */
             lastValidCheck?: string;
@@ -6706,7 +7464,7 @@ export interface components {
         };
         ErrorResponseTyped: {
             /** @enum {string} */
-            code: "unauthenticated" | "api_access_forbidden" | "api_key_not_found" | "invalid_api_key" | "invalid_project_api_key" | "project_api_key_expired" | "bad_credentials" | "mfa_enabled" | "invalid_otp_code" | "mfa_not_enabled" | "can_not_revoke_own_permissions" | "data_corrupted" | "invitation_code_does_not_exist_or_expired" | "language_tag_exists" | "language_name_exists" | "language_not_found" | "operation_not_permitted" | "registrations_not_allowed" | "project_not_found" | "resource_not_found" | "scope_not_found" | "key_exists" | "third_party_auth_error_message" | "third_party_auth_no_email" | "third_party_auth_non_matching_email" | "third_party_auth_no_sub" | "third_party_auth_unknown_error" | "email_already_verified" | "third_party_unauthorized" | "third_party_google_workspace_mismatch" | "third_party_switch_initiated" | "third_party_switch_conflict" | "username_already_exists" | "username_or_password_invalid" | "user_already_has_permissions" | "user_already_has_role" | "user_not_found" | "file_not_image" | "file_too_big" | "invalid_timestamp" | "email_not_verified" | "missing_callback_url" | "invalid_jwt_token" | "expired_jwt_token" | "general_jwt_error" | "cannot_find_suitable_address_part" | "slug_not_unique" | "user_is_not_member_of_organization" | "organization_has_no_other_owner" | "user_has_no_project_access" | "user_is_organization_owner" | "cannot_set_your_own_permissions" | "user_is_organization_member" | "property_not_mutable" | "import_language_not_from_project" | "existing_language_not_selected" | "conflict_is_not_resolved" | "language_already_selected" | "cannot_parse_file" | "could_not_resolve_property" | "cannot_add_more_then_100_languages" | "no_languages_provided" | "language_with_base_language_tag_not_found" | "language_not_from_project" | "namespace_not_from_project" | "cannot_delete_base_language" | "key_not_from_project" | "max_screenshots_exceeded" | "translation_not_from_project" | "can_edit_only_own_comment" | "request_parse_error" | "filter_by_value_state_not_valid" | "import_has_expired" | "tag_not_from_project" | "translation_text_too_long" | "invalid_recaptcha_token" | "cannot_leave_owning_project" | "cannot_leave_project_with_organization_role" | "dont_have_direct_permissions" | "tag_too_log" | "too_many_uploaded_images" | "one_or_more_images_not_found" | "screenshot_not_of_key" | "service_not_found" | "too_many_requests" | "translation_not_found" | "out_of_credits" | "key_not_found" | "organization_not_found" | "cannot_find_base_language" | "base_language_not_found" | "no_exported_result" | "cannot_set_your_own_role" | "only_translate_review_or_view_permission_accepts_view_languages" | "oauth2_token_url_not_set" | "oauth2_user_url_not_set" | "email_already_invited_or_member" | "price_not_found" | "invoice_not_from_organization" | "invoice_not_found" | "plan_not_found" | "plan_not_available_any_more" | "no_auto_translation_method" | "cannot_translate_base_language" | "pat_not_found" | "invalid_pat" | "pat_expired" | "operation_unavailable_for_account_type" | "validation_email_is_not_valid" | "current_password_required" | "cannot_create_organization" | "wrong_current_password" | "wrong_param_type" | "user_missing_password" | "expired_super_jwt_token" | "cannot_delete_your_own_account" | "cannot_sort_by_this_column" | "namespace_not_found" | "namespace_exists" | "invalid_authentication_method" | "unknown_sort_property" | "only_review_permission_accepts_state_change_languages" | "only_translate_or_review_permission_accepts_translate_languages" | "cannot_set_language_permissions_for_admin_scope" | "cannot_set_view_languages_without_translations_view_scope" | "cannot_set_translate_languages_without_translations_edit_scope" | "cannot_set_state_change_languages_without_translations_state_edit_scope" | "language_not_permitted" | "scopes_has_to_be_set" | "set_exactly_one_of_scopes_or_type" | "translation_exists" | "import_keys_error" | "provide_only_one_of_screenshots_and_screenshot_uploaded_image_ids" | "multiple_projects_not_supported" | "plan_translation_limit_exceeded" | "feature_not_enabled" | "license_key_not_found" | "cannot_set_view_languages_without_for_level_based_permissions" | "cannot_set_different_translate_and_state_change_languages_for_level_based_permissions" | "cannot_disable_your_own_account" | "subscription_not_found" | "invoice_does_not_have_usage" | "customer_not_found" | "subscription_not_active" | "organization_already_subscribed" | "organization_not_subscribed" | "license_key_used_by_another_instance" | "translation_spending_limit_exceeded" | "credit_spending_limit_exceeded" | "seats_spending_limit_exceeded" | "this_instance_is_already_licensed" | "big_meta_not_from_project" | "mt_service_not_enabled" | "project_not_selected" | "organization_not_selected" | "plan_has_subscribers" | "translation_failed" | "batch_job_not_found" | "key_exists_in_namespace" | "tag_is_blank" | "execution_failed_on_management_error" | "translation_api_rate_limit" | "cannot_finalize_activity" | "formality_not_supported_by_service" | "language_not_supported_by_service" | "rate_limited" | "pat_access_not_allowed" | "pak_access_not_allowed" | "cannot_modify_disabled_translation" | "azure_config_required" | "s3_config_required" | "content_storage_config_required" | "content_storage_test_failed" | "content_storage_config_invalid" | "invalid_connection_string" | "cannot_create_azure_storage_client" | "s3_access_key_required" | "azure_connection_string_required" | "s3_secret_key_required" | "cannot_store_file_to_content_storage" | "unexpected_error_while_publishing_to_content_storage" | "webhook_responded_with_non_200_status" | "unexpected_error_while_executing_webhook" | "content_storage_is_in_use" | "cannot_set_state_for_missing_translation" | "no_project_id_provided" | "license_key_not_provided" | "subscription_already_canceled" | "user_is_subscribed_to_paid_plan" | "cannot_create_free_plan_without_fixed_type" | "cannot_modify_plan_free_status" | "key_id_not_provided" | "free_self_hosted_seat_limit_exceeded" | "advanced_params_not_supported" | "plural_forms_not_found_for_language" | "nested_plurals_not_supported" | "message_is_not_plural" | "content_outside_plural_forms" | "invalid_plural_form" | "multiple_plurals_not_supported" | "custom_values_json_too_long" | "unsupported_po_message_format" | "plural_forms_data_loss" | "current_user_does_not_own_image" | "user_cannot_view_this_organization" | "user_is_not_owner_of_organization" | "user_is_not_owner_or_maintainer_of_organization" | "pak_created_for_different_project" | "custom_slug_is_only_applicable_for_custom_storage" | "invalid_slug_format" | "batch_job_cancellation_timeout" | "import_failed" | "cannot_add_more_then_1000_languages" | "no_data_to_import" | "multiple_namespaces_mapped_to_single_file" | "multiple_mappings_for_same_file_language_name" | "multiple_mappings_for_null_file_language_name" | "too_many_mappings_for_file" | "missing_placeholder_in_template" | "tag_not_found" | "cannot_parse_encrypted_slack_login_data" | "slack_workspace_not_found" | "cannot_fetch_user_details_from_slack" | "slack_missing_scope" | "slack_not_connected_to_your_account" | "slack_invalid_command" | "slack_not_subscribed_yet" | "slack_connection_failed" | "tolgee_account_already_connected" | "slack_not_configured" | "slack_workspace_already_connected" | "slack_connection_error" | "email_verification_code_not_valid" | "cannot_subscribe_to_free_plan" | "plan_auto_assignment_only_for_free_plans" | "plan_auto_assignment_only_for_private_plans" | "task_not_found" | "task_not_finished" | "task_not_open" | "translation_agency_not_found" | "this_feature_is_not_implemented_in_oss" | "sso_token_exchange_failed" | "sso_user_info_retrieval_failed" | "sso_id_token_expired" | "sso_user_cannot_create_organization" | "sso_cant_verify_user" | "sso_auth_missing_domain" | "sso_domain_not_found_or_disabled" | "authentication_method_disabled" | "native_authentication_disabled" | "invitation_organization_mismatch" | "user_is_managed_by_organization" | "cannot_set_sso_provider_missing_fields" | "namespaces_cannot_be_disabled_when_namespace_exists" | "namespace_cannot_be_used_when_feature_is_disabled" | "sso_domain_not_allowed" | "sso_login_forced_for_this_account" | "use_sso_for_authentication_instead" | "date_has_to_be_in_the_future" | "custom_plan_and_plan_id_cannot_be_set_together" | "specify_plan_id_or_custom_plan" | "custom_plans_has_to_be_private" | "cannot_create_free_plan_with_prices" | "subscription_not_scheduled_for_cancellation" | "cannot_cancel_trial" | "cannot_update_without_modification" | "current_subscription_is_not_trialing" | "sorting_and_paging_is_not_supported_when_using_cursor" | "strings_metric_are_not_supported" | "plan_key_limit_exceeded" | "keys_spending_limit_exceeded" | "plan_seat_limit_exceeded" | "instance_not_using_license_key" | "invalid_path" | "llm_provider_not_found" | "llm_provider_error" | "prompt_not_found" | "llm_provider_not_returned_json" | "llm_template_parsing_error" | "llm_rate_limited" | "llm_provider_timeout" | "no_llm_provider_configured" | "glossary_not_found" | "glossary_term_not_found" | "glossary_term_translation_not_found" | "glossary_non_translatable_term_cannot_be_translated" | "llm_content_filter" | "llm_provider_empty_response" | "label_not_found" | "label_not_from_project" | "label_already_exists" | "filter_by_value_label_not_valid" | "suggestion_not_found" | "user_can_only_delete_his_suggestions" | "cannot_modify_reviewed_translation" | "cannot_modify_keys" | "expect_no_conflict_failed" | "suggestion_cant_be_plural" | "suggestion_must_be_plural" | "duplicate_suggestion" | "unsupported_media_type" | "impersonation_of_admin_by_supporter_not_allowed" | "already_impersonating_user" | "operation_not_permitted_in_read_only_mode" | "file_processing_failed" | "multiple_items_in_chunk_failed" | "branch_not_found" | "cannot_delete_default_branch" | "cannot_delete_branch_with_children" | "branch_already_exists" | "origin_branch_not_found" | "branch_merge_not_found" | "branch_merge_change_not_found" | "branch_merge_revision_not_valid" | "branch_merge_conflicts_not_resolved" | "branch_merge_already_merged" | "branching_not_enabled_for_project";
+            code: "unauthenticated" | "api_access_forbidden" | "api_key_not_found" | "invalid_api_key" | "invalid_project_api_key" | "project_api_key_expired" | "bad_credentials" | "mfa_enabled" | "invalid_otp_code" | "mfa_not_enabled" | "can_not_revoke_own_permissions" | "data_corrupted" | "invitation_code_does_not_exist_or_expired" | "invitation_email_mismatch" | "language_tag_exists" | "language_name_exists" | "language_not_found" | "operation_not_permitted" | "registrations_not_allowed" | "project_not_found" | "resource_not_found" | "scope_not_found" | "key_exists" | "third_party_auth_error_message" | "third_party_auth_no_email" | "third_party_auth_non_matching_email" | "third_party_auth_no_sub" | "third_party_auth_unknown_error" | "email_already_verified" | "third_party_unauthorized" | "third_party_google_workspace_mismatch" | "third_party_switch_initiated" | "third_party_switch_conflict" | "username_already_exists" | "email_domain_not_allowed" | "username_or_password_invalid" | "user_already_has_permissions" | "user_already_has_role" | "user_not_found" | "file_not_image" | "file_too_big" | "invalid_timestamp" | "email_not_verified" | "missing_callback_url" | "invalid_jwt_token" | "expired_jwt_token" | "general_jwt_error" | "cannot_find_suitable_address_part" | "slug_not_unique" | "user_is_not_member_of_organization" | "organization_has_no_other_owner" | "user_has_no_project_access" | "user_is_organization_owner" | "cannot_set_your_own_permissions" | "user_is_organization_member" | "property_not_mutable" | "import_language_not_from_project" | "existing_language_not_selected" | "conflict_is_not_resolved" | "language_already_selected" | "cannot_parse_file" | "could_not_resolve_property" | "cannot_add_more_then_100_languages" | "no_languages_provided" | "language_with_base_language_tag_not_found" | "language_not_from_project" | "namespace_not_from_project" | "cannot_delete_base_language" | "key_not_from_project" | "max_screenshots_exceeded" | "translation_not_from_project" | "can_edit_only_own_comment" | "request_parse_error" | "request_validation_error" | "filter_by_value_state_not_valid" | "filter_by_value_qa_check_type_not_valid" | "import_has_expired" | "tag_not_from_project" | "translation_text_too_long" | "invalid_recaptcha_token" | "cannot_leave_owning_project" | "cannot_leave_project_with_organization_role" | "dont_have_direct_permissions" | "tag_too_log" | "too_many_uploaded_images" | "one_or_more_images_not_found" | "screenshot_not_of_key" | "service_not_found" | "too_many_requests" | "translation_not_found" | "out_of_credits" | "key_not_found" | "organization_not_found" | "cannot_find_base_language" | "base_language_not_found" | "no_exported_result" | "cannot_set_your_own_role" | "only_translate_review_or_view_permission_accepts_view_languages" | "oauth2_token_url_not_set" | "oauth2_user_url_not_set" | "email_already_invited_or_member" | "price_not_found" | "invoice_not_from_organization" | "invoice_not_found" | "plan_not_found" | "plan_not_available_any_more" | "no_auto_translation_method" | "cannot_translate_base_language" | "pat_not_found" | "invalid_pat" | "pat_expired" | "operation_unavailable_for_account_type" | "validation_email_is_not_valid" | "current_password_required" | "cannot_create_organization" | "wrong_current_password" | "wrong_param_type" | "user_missing_password" | "expired_super_jwt_token" | "cannot_delete_your_own_account" | "cannot_sort_by_this_column" | "namespace_not_found" | "namespace_exists" | "invalid_authentication_method" | "unknown_sort_property" | "only_review_permission_accepts_state_change_languages" | "only_translate_or_review_permission_accepts_translate_languages" | "cannot_set_language_permissions_for_admin_scope" | "cannot_set_view_languages_without_translations_view_scope" | "cannot_set_translate_languages_without_translations_edit_scope" | "cannot_set_state_change_languages_without_translations_state_edit_scope" | "language_not_permitted" | "scopes_has_to_be_set" | "set_exactly_one_of_scopes_or_type" | "translation_exists" | "import_keys_error" | "provide_only_one_of_screenshots_and_screenshot_uploaded_image_ids" | "multiple_projects_not_supported" | "plan_translation_limit_exceeded" | "feature_not_enabled" | "license_key_not_found" | "cannot_set_view_languages_without_for_level_based_permissions" | "cannot_set_different_translate_and_state_change_languages_for_level_based_permissions" | "cannot_disable_your_own_account" | "user_account_disabled" | "subscription_not_found" | "invoice_does_not_have_usage" | "customer_not_found" | "subscription_not_active" | "organization_already_subscribed" | "organization_not_subscribed" | "license_key_used_by_another_instance" | "translation_spending_limit_exceeded" | "credit_spending_limit_exceeded" | "seats_spending_limit_exceeded" | "this_instance_is_already_licensed" | "big_meta_not_from_project" | "mt_service_not_enabled" | "project_not_selected" | "organization_not_selected" | "plan_has_subscribers" | "translation_failed" | "batch_job_not_found" | "no_translations_to_recheck" | "key_exists_in_namespace" | "tag_is_blank" | "execution_failed_on_management_error" | "translation_api_rate_limit" | "cannot_finalize_activity" | "formality_not_supported_by_service" | "language_not_supported_by_service" | "rate_limited" | "pat_access_not_allowed" | "pak_access_not_allowed" | "cannot_modify_disabled_translation" | "azure_config_required" | "s3_config_required" | "content_storage_config_required" | "content_storage_test_failed" | "content_storage_config_invalid" | "invalid_connection_string" | "cannot_create_azure_storage_client" | "s3_access_key_required" | "azure_connection_string_required" | "s3_secret_key_required" | "cannot_store_file_to_content_storage" | "unexpected_error_while_publishing_to_content_storage" | "webhook_responded_with_non_200_status" | "unexpected_error_while_executing_webhook" | "content_storage_is_in_use" | "cannot_set_state_for_missing_translation" | "no_project_id_provided" | "license_key_not_provided" | "subscription_already_canceled" | "user_is_subscribed_to_paid_plan" | "cannot_create_free_plan_without_fixed_type" | "cannot_modify_plan_free_status" | "key_id_not_provided" | "free_self_hosted_seat_limit_exceeded" | "advanced_params_not_supported" | "plural_forms_not_found_for_language" | "nested_plurals_not_supported" | "message_is_not_plural" | "content_outside_plural_forms" | "invalid_plural_form" | "multiple_plurals_not_supported" | "custom_values_json_too_long" | "unsupported_po_message_format" | "plural_forms_data_loss" | "current_user_does_not_own_image" | "user_cannot_view_this_organization" | "user_is_not_owner_of_organization" | "user_is_not_owner_or_maintainer_of_organization" | "pak_created_for_different_project" | "custom_slug_is_only_applicable_for_custom_storage" | "invalid_slug_format" | "batch_job_cancellation_timeout" | "import_failed" | "cannot_add_more_then_1000_languages" | "no_data_to_import" | "multiple_namespaces_mapped_to_single_file" | "multiple_mappings_for_same_file_language_name" | "multiple_mappings_for_null_file_language_name" | "too_many_mappings_for_file" | "missing_placeholder_in_template" | "tag_not_found" | "cannot_parse_encrypted_slack_login_data" | "slack_workspace_not_found" | "cannot_fetch_user_details_from_slack" | "slack_missing_scope" | "slack_not_connected_to_your_account" | "slack_invalid_command" | "slack_not_subscribed_yet" | "slack_connection_failed" | "tolgee_account_already_connected" | "slack_not_configured" | "slack_workspace_already_connected" | "slack_connection_error" | "email_verification_code_not_valid" | "cannot_subscribe_to_free_plan" | "plan_auto_assignment_only_for_free_plans" | "plan_auto_assignment_only_for_private_plans" | "task_not_found" | "task_not_finished" | "task_not_open" | "translation_agency_not_found" | "this_feature_is_not_implemented_in_oss" | "sso_token_exchange_failed" | "sso_user_info_retrieval_failed" | "sso_id_token_expired" | "sso_user_cannot_create_organization" | "sso_cant_verify_user" | "sso_auth_missing_domain" | "sso_domain_not_found_or_disabled" | "authentication_method_disabled" | "native_authentication_disabled" | "invitation_organization_mismatch" | "user_is_managed_by_organization" | "cannot_set_sso_provider_missing_fields" | "namespaces_cannot_be_disabled_when_namespace_exists" | "namespace_cannot_be_used_when_feature_is_disabled" | "sso_domain_not_allowed" | "sso_login_forced_for_this_account" | "use_sso_for_authentication_instead" | "date_has_to_be_in_the_future" | "custom_plan_and_plan_id_cannot_be_set_together" | "specify_plan_id_or_custom_plan" | "custom_plans_has_to_be_private" | "cannot_create_free_plan_with_prices" | "subscription_not_scheduled_for_cancellation" | "cannot_cancel_trial" | "cannot_update_without_modification" | "current_subscription_is_not_trialing" | "sorting_and_paging_is_not_supported_when_using_cursor" | "strings_metric_are_not_supported" | "plan_key_limit_exceeded" | "keys_spending_limit_exceeded" | "plan_seat_limit_exceeded" | "instance_not_using_license_key" | "invalid_path" | "llm_provider_not_found" | "llm_provider_error" | "prompt_not_found" | "llm_provider_not_returned_json" | "llm_template_parsing_error" | "llm_rate_limited" | "llm_provider_timeout" | "no_llm_provider_configured" | "glossary_not_found" | "glossary_term_not_found" | "glossary_term_translation_not_found" | "glossary_non_translatable_term_cannot_be_translated" | "translation_memory_name_already_exists" | "translation_memory_not_found" | "translation_memory_project_assignment_not_found" | "cannot_unassign_project_from_own_translation_memory" | "cannot_modify_project_translation_memory" | "translation_memory_already_assigned_to_project" | "translation_memory_duplicate_project_assignment" | "translation_memory_base_language_mismatch" | "cannot_change_tm_base_language_while_assigned" | "cannot_change_project_base_language_tm_conflict" | "project_translation_memory_not_found" | "translation_memory_entry_not_found" | "translation_memory_entry_read_only" | "translation_memory_entry_duplicate_target_language" | "translation_memory_import_empty" | "llm_content_filter" | "llm_provider_empty_response" | "label_not_found" | "label_not_from_project" | "label_already_exists" | "filter_by_value_label_not_valid" | "suggestion_not_found" | "user_can_only_delete_his_suggestions" | "cannot_modify_reviewed_translation" | "cannot_modify_keys" | "expect_no_conflict_failed" | "suggestion_cant_be_plural" | "suggestion_must_be_plural" | "duplicate_suggestion" | "unsupported_media_type" | "impersonation_of_admin_by_supporter_not_allowed" | "already_impersonating_user" | "operation_not_permitted_in_read_only_mode" | "file_processing_failed" | "multiple_items_in_chunk_failed" | "content_delivery_prune_failed" | "branch_not_found" | "cannot_delete_default_branch" | "cannot_delete_branch_with_children" | "branch_already_exists" | "origin_branch_not_found" | "branch_merge_not_found" | "branch_merge_change_not_found" | "branch_merge_revision_not_valid" | "branch_merge_conflicts_not_resolved" | "branch_merge_already_merged" | "feature_not_enabled_for_project" | "export_key_plural_suffix_collision" | "translation_exceeds_char_limit" | "url_not_valid" | "qa_checks_not_enabled" | "plan_migration_not_found" | "plan_has_migrations" | "source_and_target_plan_must_be_different";
             params?: unknown[];
         };
         ExistenceEntityDescription: {
@@ -6790,7 +7548,7 @@ export interface components {
              *     For specific formats like `YAML_RUBY` it's ignored.
              * @enum {string}
              */
-            messageFormat?: "C_SPRINTF" | "PHP_SPRINTF" | "JAVA_STRING_FORMAT" | "APPLE_SPRINTF" | "RUBY_SPRINTF" | "I18NEXT" | "ICU" | "PYTHON_PERCENT";
+            messageFormat?: "C_SPRINTF" | "PHP_SPRINTF" | "JAVA_STRING_FORMAT" | "APPLE_SPRINTF" | "RUBY_SPRINTF" | "I18NEXT" | "ICU" | "PYTHON_PERCENT" | "PYTHON_BRACE";
             /** @description Delimiter to structure file content.
              *
              *     e.g. For key "home.header.title" would result in {"home": {"header": "title": {"Hello"}}} structure.
@@ -6875,6 +7633,9 @@ export interface components {
             languageTag: string;
             text: string;
         };
+        HardDeleteKeysRequest: {
+            keyIds: number[];
+        };
         HierarchyItem: {
             requires: components["schemas"]["HierarchyItem"][];
             /** @enum {string} */
@@ -6896,7 +7657,7 @@ export interface components {
             id: number;
             params: components["schemas"]["ImportFileIssueParamModel"][];
             /** @enum {string} */
-            type: "KEY_IS_NOT_STRING" | "MULTIPLE_VALUES_FOR_KEY_AND_LANGUAGE" | "VALUE_IS_NOT_STRING" | "KEY_IS_EMPTY" | "VALUE_IS_EMPTY" | "PO_MSGCTXT_NOT_SUPPORTED" | "ID_ATTRIBUTE_NOT_PROVIDED" | "TARGET_NOT_PROVIDED" | "TRANSLATION_TOO_LONG" | "KEY_IS_BLANK" | "TRANSLATION_DEFINED_IN_ANOTHER_FILE" | "INVALID_CUSTOM_VALUES" | "DESCRIPTION_TOO_LONG";
+            type: "KEY_IS_NOT_STRING" | "MULTIPLE_VALUES_FOR_KEY_AND_LANGUAGE" | "VALUE_IS_NOT_STRING" | "KEY_IS_EMPTY" | "VALUE_IS_EMPTY" | "PO_MSGCTXT_NOT_SUPPORTED" | "ID_ATTRIBUTE_NOT_PROVIDED" | "TARGET_NOT_PROVIDED" | "TRANSLATION_TOO_LONG" | "KEY_IS_BLANK" | "TRANSLATION_DEFINED_IN_ANOTHER_FILE" | "INVALID_CUSTOM_VALUES" | "DESCRIPTION_TOO_LONG" | "TRANSLATION_EXCEEDS_CHAR_LIMIT";
         };
         ImportFileIssueParamModel: {
             /** @enum {string} */
@@ -6912,7 +7673,7 @@ export interface components {
              *     It is recommended to provide these values to prevent any issues with format detection.
              * @enum {string}
              */
-            format?: "CSV_ICU" | "CSV_JAVA" | "CSV_PHP" | "CSV_RUBY" | "JSON_I18NEXT" | "JSON_ICU" | "JSON_JAVA" | "JSON_PHP" | "JSON_RUBY" | "JSON_C" | "PO_PHP" | "PO_C" | "PO_JAVA" | "PO_ICU" | "PO_RUBY" | "PO_PYTHON" | "STRINGS" | "STRINGSDICT" | "APPLE_XLIFF" | "APPLE_XCSTRINGS" | "PROPERTIES_ICU" | "PROPERTIES_JAVA" | "PROPERTIES_UNKNOWN" | "ANDROID_XML" | "COMPOSE_XML" | "FLUTTER_ARB" | "YAML_RUBY" | "YAML_JAVA" | "YAML_ICU" | "YAML_PHP" | "YAML_UNKNOWN" | "XLIFF_ICU" | "XLIFF_JAVA" | "XLIFF_PHP" | "XLIFF_RUBY" | "RESX_ICU" | "XLSX_ICU" | "XLSX_JAVA" | "XLSX_PHP" | "XLSX_RUBY";
+            format?: "CSV_ICU" | "CSV_JAVA" | "CSV_PHP" | "CSV_RUBY" | "JSON_I18NEXT" | "JSON_ICU" | "JSON_JAVA" | "JSON_PHP" | "JSON_RUBY" | "JSON_C" | "PO_PHP" | "PO_C" | "PO_JAVA" | "PO_ICU" | "PO_RUBY" | "PO_PYTHON" | "PO_PYTHON_BRACE" | "STRINGS" | "STRINGSDICT" | "APPLE_XLIFF" | "APPLE_XCSTRINGS" | "PROPERTIES_ICU" | "PROPERTIES_JAVA" | "PROPERTIES_UNKNOWN" | "ANDROID_XML" | "COMPOSE_XML" | "FLUTTER_ARB" | "YAML_RUBY" | "YAML_JAVA" | "YAML_ICU" | "YAML_PHP" | "YAML_UNKNOWN" | "XLIFF_ICU" | "XLIFF_JAVA" | "XLIFF_PHP" | "XLIFF_RUBY" | "RESX_ICU" | "XLSX_ICU" | "XLSX_JAVA" | "XLSX_PHP" | "XLSX_RUBY";
             /** @description The existing language tag in the Tolgee platform to which the imported language should be mapped.
              *
              *     When null, Tolgee will try to guess the language from the file contents or file name. */
@@ -7017,16 +7778,12 @@ export interface components {
             unresolvedConflicts?: components["schemas"]["SimpleImportConflictResult"][];
         };
         ImportSettingsModel: {
-            /** @description If true, placeholders from other formats will be converted to ICU when possible */
-            convertPlaceholdersToIcu: boolean;
             /** @description If false, only updates keys, skipping the creation of new keys */
             createNewKeys: boolean;
             /** @description If true, key descriptions will be overridden by the import */
             overrideKeyDescriptions: boolean;
         };
         ImportSettingsRequest: {
-            /** @description If true, placeholders from other formats will be converted to ICU when possible */
-            convertPlaceholdersToIcu: boolean;
             /** @description If false, only updates keys, skipping the creation of new keys */
             createNewKeys: boolean;
             /** @description If true, key descriptions will be overridden by the import */
@@ -7079,6 +7836,7 @@ export interface components {
             eeSubscription?: components["schemas"]["InitialDataEeSubscriptionModel"];
             languageTag?: string;
             preferredOrganization?: components["schemas"]["PrivateOrganizationModel"];
+            qaCheckCategories?: components["schemas"]["QaCheckCategoryModel"][];
             serverConfiguration: components["schemas"]["PublicConfigurationDTO"];
             ssoInfo?: components["schemas"]["PublicSsoTenantModel"];
             userInfo?: components["schemas"]["PrivateUserAccountModel"];
@@ -7091,7 +7849,7 @@ export interface components {
             /** @enum {string} */
             status: "PENDING" | "RUNNING" | "SUCCESS" | "FAILED" | "CANCELLED";
             /** @enum {string} */
-            type: "AI_PLAYGROUND_TRANSLATE" | "PRE_TRANSLATE_BT_TM" | "MACHINE_TRANSLATE" | "AUTO_TRANSLATE" | "DELETE_KEYS" | "SET_TRANSLATIONS_STATE" | "CLEAR_TRANSLATIONS" | "COPY_TRANSLATIONS" | "TAG_KEYS" | "UNTAG_KEYS" | "SET_KEYS_NAMESPACE" | "AUTOMATION" | "BILLING_TRIAL_EXPIRATION_NOTICE" | "ASSIGN_TRANSLATION_LABEL" | "UNASSIGN_TRANSLATION_LABEL" | "NO_OP";
+            type: "AI_PLAYGROUND_TRANSLATE" | "PRE_TRANSLATE_BT_TM" | "MACHINE_TRANSLATE" | "AUTO_TRANSLATE" | "DELETE_KEYS" | "RESTORE_KEYS" | "HARD_DELETE_KEYS" | "SET_TRANSLATIONS_STATE" | "CLEAR_TRANSLATIONS" | "COPY_TRANSLATIONS" | "TAG_KEYS" | "UNTAG_KEYS" | "SET_KEYS_NAMESPACE" | "AUTOMATION" | "BILLING_TRIAL_EXPIRATION_NOTICE" | "ASSIGN_TRANSLATION_LABEL" | "UNASSIGN_TRANSLATION_LABEL" | "QA_CHECK" | "NO_OP";
         };
         JsonNode: unknown;
         JwtAuthenticationResponse: {
@@ -7192,6 +7950,11 @@ export interface components {
              */
             id: number;
             /**
+             * Format: int32
+             * @description Maximum character limit for translations of this key
+             */
+            maxCharLimit?: number;
+            /**
              * @description Name of key
              * @example this_is_super_key
              */
@@ -7213,20 +7976,38 @@ export interface components {
         };
         KeySearchResultView: {
             baseTranslation?: string;
+            /** Format: date-time */
+            deletedAt?: string;
+            deletedByUserAvatarHash?: string;
+            deletedByUserDeleted?: boolean;
+            /** Format: int64 */
+            deletedByUserId?: number;
+            deletedByUserName?: string;
+            deletedByUserUsername?: string;
             description?: string;
             /** Format: int64 */
             id: number;
             name: string;
             namespace?: string;
+            plural?: boolean;
             translation?: string;
         };
         KeySearchSearchResultModel: {
             baseTranslation?: string;
+            /** Format: date-time */
+            deletedAt?: string;
+            deletedByUserAvatarHash?: string;
+            deletedByUserDeleted?: boolean;
+            /** Format: int64 */
+            deletedByUserId?: number;
+            deletedByUserName?: string;
+            deletedByUserUsername?: string;
             description?: string;
             /** Format: int64 */
             id: number;
             name: string;
             namespace?: string;
+            plural?: boolean;
             translation?: string;
             view?: components["schemas"]["KeySearchResultView"];
         };
@@ -7282,6 +8063,11 @@ export interface components {
             id: number;
             /** @description If key is pluralized. If it will be reflected in the editor */
             isPlural: boolean;
+            /**
+             * Format: int32
+             * @description Maximum character limit for translations of this key
+             */
+            maxCharLimit?: number;
             /**
              * @description Name of key
              * @example this_is_super_key
@@ -7339,6 +8125,11 @@ export interface components {
              * @example true
              */
             keyIsPlural: boolean;
+            /**
+             * Format: int32
+             * @description Maximum character limit for translations of this key
+             */
+            keyMaxCharLimit?: number;
             /**
              * @description Name of key
              * @example this_is_super_key
@@ -7520,6 +8311,13 @@ export interface components {
              */
             tag: string;
         };
+        LanguageQaConfigModel: {
+            customSettings?: {
+                [key: string]: "WARNING" | "OFF";
+            };
+            enabled: boolean;
+            language: components["schemas"]["LanguageModel"];
+        };
         LanguageRequest: {
             /**
              * @description Language flag emoji as UTF-8 emoji
@@ -7549,6 +8347,10 @@ export interface components {
             languageName?: string;
             languageOriginalName?: string;
             languageTag?: string;
+            /** Format: int64 */
+            qaChecksStaleCount: number;
+            /** Format: int64 */
+            qaIssueCount: number;
             /** Format: int64 */
             reviewedKeyCount: number;
             /** Format: double */
@@ -7602,6 +8404,10 @@ export interface components {
         LlmProviderSimpleModel: {
             name: string;
             source?: string;
+            /** Format: double */
+            tokenPriceInCreditsInput?: number;
+            /** Format: double */
+            tokenPriceInCreditsOutput?: number;
             /** @enum {string} */
             type: "OPENAI" | "OPENAI_AZURE" | "TOLGEE" | "ANTHROPIC" | "GOOGLE_AI";
         };
@@ -8021,6 +8827,12 @@ export interface components {
             };
             page?: components["schemas"]["PageMetadata"];
         };
+        PagedModelSimpleTranslationMemoryModel: {
+            _embedded?: {
+                translationMemories?: components["schemas"]["SimpleTranslationMemoryModel"][];
+            };
+            page?: components["schemas"]["PageMetadata"];
+        };
         PagedModelSimpleUserAccountModel: {
             _embedded?: {
                 users?: components["schemas"]["SimpleUserAccountModel"][];
@@ -8063,9 +8875,27 @@ export interface components {
             };
             page?: components["schemas"]["PageMetadata"];
         };
+        PagedModelTranslationMemoryRowModel: {
+            _embedded?: {
+                translationMemoryRows?: components["schemas"]["TranslationMemoryRowModel"][];
+            };
+            page?: components["schemas"]["PageMetadata"];
+        };
+        PagedModelTranslationMemoryWithStatsModel: {
+            _embedded?: {
+                translationMemories?: components["schemas"]["TranslationMemoryWithStatsModel"][];
+            };
+            page?: components["schemas"]["PageMetadata"];
+        };
         PagedModelTranslationSuggestionModel: {
             _embedded?: {
                 suggestions?: components["schemas"]["TranslationSuggestionModel"][];
+            };
+            page?: components["schemas"]["PageMetadata"];
+        };
+        PagedModelTrashedKeyWithTranslationsModel: {
+            _embedded?: {
+                keys?: components["schemas"]["TrashedKeyWithTranslationsModel"][];
             };
             page?: components["schemas"]["PageMetadata"];
         };
@@ -8302,7 +9132,7 @@ export interface components {
             /** @example This is a beautiful organization full of beautiful and clever people */
             description?: string;
             /** @example Features organization has enabled */
-            enabledFeatures: ("GRANULAR_PERMISSIONS" | "PRIORITIZED_FEATURE_REQUESTS" | "PREMIUM_SUPPORT" | "DEDICATED_SLACK_CHANNEL" | "ASSISTED_UPDATES" | "DEPLOYMENT_ASSISTANCE" | "BACKUP_CONFIGURATION" | "TEAM_TRAINING" | "ACCOUNT_MANAGER" | "STANDARD_SUPPORT" | "PROJECT_LEVEL_CONTENT_STORAGES" | "WEBHOOKS" | "MULTIPLE_CONTENT_DELIVERY_CONFIGS" | "AI_PROMPT_CUSTOMIZATION" | "SLACK_INTEGRATION" | "TASKS" | "SSO" | "ORDER_TRANSLATION" | "GLOSSARY" | "TRANSLATION_LABELS" | "BRANCHING")[];
+            enabledFeatures: ("GRANULAR_PERMISSIONS" | "PRIORITIZED_FEATURE_REQUESTS" | "PREMIUM_SUPPORT" | "DEDICATED_SLACK_CHANNEL" | "ASSISTED_UPDATES" | "DEPLOYMENT_ASSISTANCE" | "BACKUP_CONFIGURATION" | "TEAM_TRAINING" | "ACCOUNT_MANAGER" | "STANDARD_SUPPORT" | "PROJECT_LEVEL_CONTENT_STORAGES" | "WEBHOOKS" | "MULTIPLE_CONTENT_DELIVERY_CONFIGS" | "AI_PROMPT_CUSTOMIZATION" | "SLACK_INTEGRATION" | "TASKS" | "SSO" | "ORDER_TRANSLATION" | "GLOSSARY" | "TRANSLATION_LABELS" | "BRANCHING" | "QA_CHECKS" | "TRANSLATION_MEMORY")[];
             /** Format: int64 */
             id: number;
             /** @example Beautiful organization */
@@ -8356,14 +9186,30 @@ export interface components {
             /** Format: int64 */
             timestamp: number;
             /** @enum {string} */
-            type: "UNKNOWN" | "SET_TRANSLATION_STATE" | "SET_TRANSLATIONS" | "DISMISS_AUTO_TRANSLATED_STATE" | "SET_OUTDATED_FLAG" | "TRANSLATION_COMMENT_ADD" | "TRANSLATION_COMMENT_DELETE" | "TRANSLATION_COMMENT_EDIT" | "TRANSLATION_COMMENT_SET_STATE" | "SCREENSHOT_DELETE" | "SCREENSHOT_ADD" | "KEY_TAGS_EDIT" | "KEY_NAME_EDIT" | "KEY_DELETE" | "CREATE_KEY" | "COMPLEX_EDIT" | "IMPORT" | "CREATE_LANGUAGE" | "EDIT_LANGUAGE" | "DELETE_LANGUAGE" | "HARD_DELETE_LANGUAGE" | "CREATE_PROJECT" | "EDIT_PROJECT" | "NAMESPACE_EDIT" | "BATCH_PRE_TRANSLATE_BY_TM" | "BATCH_MACHINE_TRANSLATE" | "AUTO_TRANSLATE" | "BATCH_CLEAR_TRANSLATIONS" | "BATCH_COPY_TRANSLATIONS" | "BATCH_SET_TRANSLATION_STATE" | "BATCH_TAG_KEYS" | "BATCH_UNTAG_KEYS" | "BATCH_SET_KEYS_NAMESPACE" | "BATCH_ASSIGN_TRANSLATION_LABEL" | "BATCH_UNASSIGN_TRANSLATION_LABEL" | "AUTOMATION" | "CONTENT_DELIVERY_CONFIG_CREATE" | "CONTENT_DELIVERY_CONFIG_UPDATE" | "CONTENT_DELIVERY_CONFIG_DELETE" | "CONTENT_STORAGE_CREATE" | "CONTENT_STORAGE_UPDATE" | "CONTENT_STORAGE_DELETE" | "WEBHOOK_CONFIG_CREATE" | "WEBHOOK_CONFIG_UPDATE" | "WEBHOOK_CONFIG_DELETE" | "COMPLEX_TAG_OPERATION" | "TASKS_CREATE" | "TASK_CREATE" | "TASK_UPDATE" | "TASK_KEYS_UPDATE" | "TASK_FINISH" | "TASK_CLOSE" | "TASK_REOPEN" | "TASK_KEY_UPDATE" | "ORDER_TRANSLATION" | "GLOSSARY_CREATE" | "GLOSSARY_UPDATE" | "GLOSSARY_DELETE" | "GLOSSARY_IMPORT" | "GLOSSARY_TERM_CREATE" | "GLOSSARY_TERM_UPDATE" | "GLOSSARY_TERM_DELETE" | "GLOSSARY_TERM_TRANSLATION_UPDATE" | "TRANSLATION_LABELS_EDIT" | "TRANSLATION_LABEL_ASSIGN" | "TRANSLATION_LABEL_CREATE" | "TRANSLATION_LABEL_UPDATE" | "TRANSLATION_LABEL_DELETE" | "CREATE_SUGGESTION" | "DECLINE_SUGGESTION" | "ACCEPT_SUGGESTION" | "REVERSE_SUGGESTION" | "DELETE_SUGGESTION" | "SUGGESTION_SET_ACTIVE" | "AI_PROMPT_CREATE" | "AI_PROMPT_UPDATE" | "AI_PROMPT_DELETE" | "BRANCH_CREATE" | "BRANCH_RENAME" | "BRANCH_DELETE" | "BRANCH_PROTECTION_CHANGE" | "BRANCH_MERGE";
+            type: "UNKNOWN" | "SET_TRANSLATION_STATE" | "SET_TRANSLATIONS" | "DISMISS_AUTO_TRANSLATED_STATE" | "SET_OUTDATED_FLAG" | "TRANSLATION_COMMENT_ADD" | "TRANSLATION_COMMENT_DELETE" | "TRANSLATION_COMMENT_EDIT" | "TRANSLATION_COMMENT_SET_STATE" | "SCREENSHOT_DELETE" | "SCREENSHOT_ADD" | "KEY_TAGS_EDIT" | "KEY_NAME_EDIT" | "KEY_CHARACTER_LIMIT_EDIT" | "KEY_DELETE" | "KEY_SOFT_DELETE" | "KEY_RESTORE" | "KEY_HARD_DELETE" | "BATCH_KEY_RESTORE" | "BATCH_KEY_HARD_DELETE" | "CREATE_KEY" | "COMPLEX_EDIT" | "IMPORT" | "CREATE_LANGUAGE" | "EDIT_LANGUAGE" | "DELETE_LANGUAGE" | "HARD_DELETE_LANGUAGE" | "CREATE_PROJECT" | "EDIT_PROJECT" | "NAMESPACE_EDIT" | "BATCH_PRE_TRANSLATE_BY_TM" | "BATCH_MACHINE_TRANSLATE" | "AUTO_TRANSLATE" | "BATCH_CLEAR_TRANSLATIONS" | "BATCH_COPY_TRANSLATIONS" | "BATCH_SET_TRANSLATION_STATE" | "BATCH_TAG_KEYS" | "BATCH_UNTAG_KEYS" | "BATCH_SET_KEYS_NAMESPACE" | "BATCH_ASSIGN_TRANSLATION_LABEL" | "BATCH_UNASSIGN_TRANSLATION_LABEL" | "AUTOMATION" | "CONTENT_DELIVERY_CONFIG_CREATE" | "CONTENT_DELIVERY_CONFIG_UPDATE" | "CONTENT_DELIVERY_CONFIG_DELETE" | "CONTENT_STORAGE_CREATE" | "CONTENT_STORAGE_UPDATE" | "CONTENT_STORAGE_DELETE" | "WEBHOOK_CONFIG_CREATE" | "WEBHOOK_CONFIG_UPDATE" | "WEBHOOK_CONFIG_DELETE" | "COMPLEX_TAG_OPERATION" | "TASKS_CREATE" | "TASK_CREATE" | "TASK_UPDATE" | "TASK_KEYS_UPDATE" | "TASK_FINISH" | "TASK_CLOSE" | "TASK_REOPEN" | "TASK_KEY_UPDATE" | "ORDER_TRANSLATION" | "GLOSSARY_CREATE" | "GLOSSARY_UPDATE" | "GLOSSARY_DELETE" | "GLOSSARY_IMPORT" | "GLOSSARY_TERM_CREATE" | "GLOSSARY_TERM_UPDATE" | "GLOSSARY_TERM_DELETE" | "GLOSSARY_TERM_TRANSLATION_UPDATE" | "TRANSLATION_MEMORY_CREATE" | "TRANSLATION_MEMORY_UPDATE" | "TRANSLATION_MEMORY_DELETE" | "TRANSLATION_MEMORY_ASSIGN_PROJECT" | "TRANSLATION_MEMORY_UNASSIGN_PROJECT" | "TRANSLATION_MEMORY_UPDATE_PROJECT_CONFIG" | "TRANSLATION_MEMORY_ENTRY_CREATE" | "TRANSLATION_MEMORY_ENTRY_UPDATE" | "TRANSLATION_MEMORY_ENTRY_DELETE" | "TRANSLATION_MEMORY_IMPORT" | "TRANSLATION_MEMORY_COPY_FROM_PROJECT" | "TRANSLATION_LABELS_EDIT" | "TRANSLATION_LABEL_ASSIGN" | "TRANSLATION_LABEL_CREATE" | "TRANSLATION_LABEL_UPDATE" | "TRANSLATION_LABEL_DELETE" | "CREATE_SUGGESTION" | "DECLINE_SUGGESTION" | "ACCEPT_SUGGESTION" | "REVERSE_SUGGESTION" | "DELETE_SUGGESTION" | "SUGGESTION_SET_ACTIVE" | "AI_PROMPT_CREATE" | "AI_PROMPT_UPDATE" | "AI_PROMPT_DELETE" | "BRANCH_CREATE" | "BRANCH_RENAME" | "BRANCH_DELETE" | "BRANCH_PROTECTION_CHANGE" | "BRANCH_MERGE" | "QA_ISSUE_IGNORE" | "QA_ISSUE_UNIGNORE";
         };
         ProjectAiPromptCustomizationModel: {
             /**
-             * @description The project description used in the  prompt that helps AI translator to understand the context of your project.
-             * @example We are Dunder Mifflin, a paper company. We sell paper. This is an project of translations for out paper selling app.
+             * @description The project description used in the prompt that helps AI translator to understand the context of your project.
+             * @example We are Dunder Mifflin, a paper company. We sell paper. This is a project of translations for our paper selling app.
              */
             description?: string;
+        };
+        ProjectAssignmentDto: {
+            /**
+             * Format: int32
+             * @description Per-assignment penalty override (0–100). When null, the TM's default penalty applies.
+             */
+            penalty?: number;
+            /**
+             * Format: int64
+             * @description Project ID
+             */
+            projectId: number;
+            /** @description Whether the project can read from this TM */
+            readAccess: boolean;
+            /** @description Whether the project can write to this TM */
+            writeAccess: boolean;
         };
         ProjectInvitationModel: {
             code?: string;
@@ -8462,6 +9308,7 @@ export interface components {
             translationProtection: "NONE" | "PROTECT_REVIEWED";
             useBranching: boolean;
             useNamespaces: boolean;
+            useQaChecks: boolean;
         };
         ProjectStatistics: {
             /** Format: int64 */
@@ -8470,6 +9317,10 @@ export interface components {
             languageCount: number;
             /** Format: int64 */
             projectId: number;
+            /** Format: int64 */
+            qaChecksStaleCount: number;
+            /** Format: int64 */
+            qaIssueCount: number;
             translationStatePercentages: {
                 [key: string]: number;
             };
@@ -8500,6 +9351,23 @@ export interface components {
             id: number;
             name: string;
             slug: string;
+        };
+        ProjectTranslationMemoryAssignmentModel: {
+            /** Format: int32 */
+            defaultPenalty: number;
+            /** Format: int32 */
+            penalty?: number;
+            /** Format: int32 */
+            priority: number;
+            readAccess: boolean;
+            sourceLanguageTag: string;
+            /** Format: int64 */
+            translationMemoryId: number;
+            translationMemoryName: string;
+            /** @enum {string} */
+            type: "PROJECT" | "SHARED";
+            writeAccess: boolean;
+            writeOnlyReviewed: boolean;
         };
         ProjectWithStatsModel: {
             avatar?: components["schemas"]["Avatar"];
@@ -8582,11 +9450,12 @@ export interface components {
         };
         PublicBillingConfigurationDTO: {
             enabled: boolean;
+            minUsageInvoiceAmount?: number;
         };
         PublicCloudPlanModel: {
             /** Format: date-time */
             archivedAt?: string;
-            enabledFeatures: ("GRANULAR_PERMISSIONS" | "PRIORITIZED_FEATURE_REQUESTS" | "PREMIUM_SUPPORT" | "DEDICATED_SLACK_CHANNEL" | "ASSISTED_UPDATES" | "DEPLOYMENT_ASSISTANCE" | "BACKUP_CONFIGURATION" | "TEAM_TRAINING" | "ACCOUNT_MANAGER" | "STANDARD_SUPPORT" | "PROJECT_LEVEL_CONTENT_STORAGES" | "WEBHOOKS" | "MULTIPLE_CONTENT_DELIVERY_CONFIGS" | "AI_PROMPT_CUSTOMIZATION" | "SLACK_INTEGRATION" | "TASKS" | "SSO" | "ORDER_TRANSLATION" | "GLOSSARY" | "TRANSLATION_LABELS" | "BRANCHING")[];
+            enabledFeatures: ("GRANULAR_PERMISSIONS" | "PRIORITIZED_FEATURE_REQUESTS" | "PREMIUM_SUPPORT" | "DEDICATED_SLACK_CHANNEL" | "ASSISTED_UPDATES" | "DEPLOYMENT_ASSISTANCE" | "BACKUP_CONFIGURATION" | "TEAM_TRAINING" | "ACCOUNT_MANAGER" | "STANDARD_SUPPORT" | "PROJECT_LEVEL_CONTENT_STORAGES" | "WEBHOOKS" | "MULTIPLE_CONTENT_DELIVERY_CONFIGS" | "AI_PROMPT_CUSTOMIZATION" | "SLACK_INTEGRATION" | "TASKS" | "SSO" | "ORDER_TRANSLATION" | "GLOSSARY" | "TRANSLATION_LABELS" | "BRANCHING" | "QA_CHECKS" | "TRANSLATION_MEMORY")[];
             free: boolean;
             /** Format: int64 */
             id: number;
@@ -8653,6 +9522,7 @@ export interface components {
             createdBy?: components["schemas"]["SimpleUserAccountModel"];
             /** Format: int64 */
             id: number;
+            inviteeEmail?: string;
             organizationName?: string;
             projectName?: string;
         };
@@ -8758,6 +9628,73 @@ export interface components {
              */
             usedMtCredits: number;
         };
+        QaCheckCategoryModel: {
+            /** @enum {string} */
+            category: "TEXT" | "TECHNICAL";
+            checkTypes: ("EMPTY_TRANSLATION" | "MISSING_PLURAL_CATEGORIES" | "CHARACTER_CASE_MISMATCH" | "REPEATED_WORDS" | "PUNCTUATION_MISMATCH" | "TRIM_CHECK" | "SPACES_MISMATCH" | "UNMATCHED_NEWLINES" | "MISSING_NUMBERS" | "SPECIAL_CHARACTER_MISMATCH" | "BRACKETS_MISMATCH" | "BRACKETS_UNBALANCED" | "SPELLING" | "GRAMMAR" | "KEY_LENGTH_LIMIT" | "DIFFERENT_URLS" | "INCONSISTENT_PLACEHOLDERS" | "INCONSISTENT_HTML" | "HTML_SYNTAX" | "ICU_SYNTAX")[];
+        };
+        QaCheckIssueIgnoreRequest: {
+            /** @enum {string} */
+            message: "qa_empty_translation" | "qa_missing_plural_category" | "qa_check_failed" | "qa_spaces_leading_added" | "qa_spaces_leading_removed" | "qa_spaces_trailing_added" | "qa_spaces_trailing_removed" | "qa_spaces_doubled" | "qa_spaces_non_breaking_added" | "qa_spaces_non_breaking_removed" | "qa_punctuation_add" | "qa_punctuation_remove" | "qa_punctuation_replace" | "qa_case_capitalize" | "qa_case_lowercase" | "qa_numbers_missing" | "qa_leading_spaces" | "qa_trailing_spaces" | "qa_leading_newlines" | "qa_trailing_newlines" | "qa_newlines_missing" | "qa_newlines_extra" | "qa_newlines_too_many_sections" | "qa_newlines_too_few_sections" | "qa_brackets_missing" | "qa_brackets_extra" | "qa_brackets_unclosed" | "qa_brackets_unmatched_close" | "qa_special_char_missing" | "qa_special_char_added" | "qa_url_missing" | "qa_url_extra" | "qa_url_replace" | "qa_repeated_word" | "qa_placeholders_missing" | "qa_placeholders_extra" | "qa_placeholders_replace" | "qa_html_tag_missing" | "qa_html_tag_extra" | "qa_html_unclosed_tag" | "qa_html_unopened_tag" | "qa_icu_syntax_error" | "qa_spelling_error" | "qa_grammar_error" | "qa_key_length_limit_exceeded";
+            params?: {
+                [key: string]: string;
+            };
+            pluralVariant?: string;
+            /** Format: int32 */
+            positionEnd?: number;
+            /** Format: int32 */
+            positionStart?: number;
+            replacement?: string;
+            /** @enum {string} */
+            type: "EMPTY_TRANSLATION" | "MISSING_PLURAL_CATEGORIES" | "CHARACTER_CASE_MISMATCH" | "REPEATED_WORDS" | "PUNCTUATION_MISMATCH" | "TRIM_CHECK" | "SPACES_MISMATCH" | "UNMATCHED_NEWLINES" | "MISSING_NUMBERS" | "SPECIAL_CHARACTER_MISMATCH" | "BRACKETS_MISMATCH" | "BRACKETS_UNBALANCED" | "SPELLING" | "GRAMMAR" | "KEY_LENGTH_LIMIT" | "DIFFERENT_URLS" | "INCONSISTENT_PLACEHOLDERS" | "INCONSISTENT_HTML" | "HTML_SYNTAX" | "ICU_SYNTAX";
+        };
+        QaEnabledRequest: {
+            enabled: boolean;
+        };
+        QaIssueModel: {
+            /** Format: int64 */
+            id: number;
+            /** @enum {string} */
+            message: "qa_empty_translation" | "qa_missing_plural_category" | "qa_check_failed" | "qa_spaces_leading_added" | "qa_spaces_leading_removed" | "qa_spaces_trailing_added" | "qa_spaces_trailing_removed" | "qa_spaces_doubled" | "qa_spaces_non_breaking_added" | "qa_spaces_non_breaking_removed" | "qa_punctuation_add" | "qa_punctuation_remove" | "qa_punctuation_replace" | "qa_case_capitalize" | "qa_case_lowercase" | "qa_numbers_missing" | "qa_leading_spaces" | "qa_trailing_spaces" | "qa_leading_newlines" | "qa_trailing_newlines" | "qa_newlines_missing" | "qa_newlines_extra" | "qa_newlines_too_many_sections" | "qa_newlines_too_few_sections" | "qa_brackets_missing" | "qa_brackets_extra" | "qa_brackets_unclosed" | "qa_brackets_unmatched_close" | "qa_special_char_missing" | "qa_special_char_added" | "qa_url_missing" | "qa_url_extra" | "qa_url_replace" | "qa_repeated_word" | "qa_placeholders_missing" | "qa_placeholders_extra" | "qa_placeholders_replace" | "qa_html_tag_missing" | "qa_html_tag_extra" | "qa_html_unclosed_tag" | "qa_html_unopened_tag" | "qa_icu_syntax_error" | "qa_spelling_error" | "qa_grammar_error" | "qa_key_length_limit_exceeded";
+            params?: {
+                [key: string]: string;
+            };
+            pluralVariant?: string;
+            /** Format: int32 */
+            positionEnd?: number;
+            /** Format: int32 */
+            positionStart?: number;
+            replacement?: string;
+            /** @enum {string} */
+            state: "OPEN" | "IGNORED";
+            /** @enum {string} */
+            type: "EMPTY_TRANSLATION" | "MISSING_PLURAL_CATEGORIES" | "CHARACTER_CASE_MISMATCH" | "REPEATED_WORDS" | "PUNCTUATION_MISMATCH" | "TRIM_CHECK" | "SPACES_MISMATCH" | "UNMATCHED_NEWLINES" | "MISSING_NUMBERS" | "SPECIAL_CHARACTER_MISMATCH" | "BRACKETS_MISMATCH" | "BRACKETS_UNBALANCED" | "SPELLING" | "GRAMMAR" | "KEY_LENGTH_LIMIT" | "DIFFERENT_URLS" | "INCONSISTENT_PLACEHOLDERS" | "INCONSISTENT_HTML" | "HTML_SYNTAX" | "ICU_SYNTAX";
+        };
+        QaLanguageSettingsModel: {
+            settings?: {
+                [key: string]: "WARNING" | "OFF";
+            };
+        };
+        QaLanguageSettingsRequest: {
+            /** @description Map of check types to their severity. Null values mean 'inherit from global settings'. */
+            settings: {
+                [key: string]: "WARNING" | "OFF";
+            };
+        };
+        QaRecheckByKeysRequest: {
+            keyIds: number[];
+            languageIds?: number[];
+        };
+        QaSettingsModel: {
+            settings: {
+                [key: string]: "WARNING" | "OFF";
+            };
+        };
+        QaSettingsRequest: {
+            settings: {
+                [key: string]: "WARNING" | "OFF";
+            };
+        };
         QueueItemModel: {
             /** Format: int64 */
             chunkExecutionId: number;
@@ -8827,6 +9764,9 @@ export interface components {
              * @enum {string}
              */
             resolve: "SOURCE" | "TARGET";
+        };
+        RestoreKeysRequest: {
+            keyIds: number[];
         };
         RevealedApiKeyModel: {
             description: string;
@@ -8914,7 +9854,7 @@ export interface components {
         SelfHostedEePlanModel: {
             /** Format: date-time */
             archivedAt?: string;
-            enabledFeatures: ("GRANULAR_PERMISSIONS" | "PRIORITIZED_FEATURE_REQUESTS" | "PREMIUM_SUPPORT" | "DEDICATED_SLACK_CHANNEL" | "ASSISTED_UPDATES" | "DEPLOYMENT_ASSISTANCE" | "BACKUP_CONFIGURATION" | "TEAM_TRAINING" | "ACCOUNT_MANAGER" | "STANDARD_SUPPORT" | "PROJECT_LEVEL_CONTENT_STORAGES" | "WEBHOOKS" | "MULTIPLE_CONTENT_DELIVERY_CONFIGS" | "AI_PROMPT_CUSTOMIZATION" | "SLACK_INTEGRATION" | "TASKS" | "SSO" | "ORDER_TRANSLATION" | "GLOSSARY" | "TRANSLATION_LABELS" | "BRANCHING")[];
+            enabledFeatures: ("GRANULAR_PERMISSIONS" | "PRIORITIZED_FEATURE_REQUESTS" | "PREMIUM_SUPPORT" | "DEDICATED_SLACK_CHANNEL" | "ASSISTED_UPDATES" | "DEPLOYMENT_ASSISTANCE" | "BACKUP_CONFIGURATION" | "TEAM_TRAINING" | "ACCOUNT_MANAGER" | "STANDARD_SUPPORT" | "PROJECT_LEVEL_CONTENT_STORAGES" | "WEBHOOKS" | "MULTIPLE_CONTENT_DELIVERY_CONFIGS" | "AI_PROMPT_CUSTOMIZATION" | "SLACK_INTEGRATION" | "TASKS" | "SSO" | "ORDER_TRANSLATION" | "GLOSSARY" | "TRANSLATION_LABELS" | "BRANCHING" | "QA_CHECKS" | "TRANSLATION_MEMORY")[];
             free: boolean;
             hasYearlyPrice: boolean;
             /** Format: int64 */
@@ -8945,7 +9885,7 @@ export interface components {
         };
         SetLanguagePromptCustomizationRequest: {
             /**
-             * @description The language description used in the  prompt that helps AI translator to fine tune results for specific language
+             * @description The language description used in the prompt that helps AI translator to fine tune results for specific language
              * @example For arabic language, we are super formal. Always use these translations:
              *     Paper -> ورقة
              *     Office -> مكتب
@@ -9038,6 +9978,27 @@ export interface components {
             translations: {
                 [key: string]: string;
             };
+        };
+        SharedTranslationMemoryRequest: {
+            /** @description Project assignments with access settings. */
+            assignedProjects?: components["schemas"]["ProjectAssignmentDto"][];
+            /**
+             * Format: int32
+             * @description Default penalty (0–100) subtracted from match scores for every assignment that does not define its own override. Defaults to 0.
+             */
+            defaultPenalty?: number;
+            /**
+             * @description Translation memory name
+             * @example Marketing TM
+             */
+            name: string;
+            /**
+             * @description Source language tag according to BCP 47 definition
+             * @example en
+             */
+            sourceLanguageTag: string;
+            /** @description When true, only translations whose state is REVIEWED are written to this TM. Translations that drop back to TRANSLATED or UNTRANSLATED also remove the entry. TMX import and direct TM-browser edits bypass this filter. Defaults to false. */
+            writeOnlyReviewed?: boolean;
         };
         SignUpDto: {
             callbackUrl?: string;
@@ -9141,6 +10102,18 @@ export interface components {
             name: string;
             slug?: string;
         };
+        SimpleTranslationMemoryModel: {
+            /** Format: int64 */
+            id: number;
+            name: string;
+            /**
+             * @description Source language tag of the translation memory
+             * @example en
+             */
+            sourceLanguageTag: string;
+            /** @enum {string} */
+            type: "PROJECT" | "SHARED";
+        };
         SimpleUserAccountModel: {
             avatar?: components["schemas"]["Avatar"];
             deleted: boolean;
@@ -9217,6 +10190,8 @@ export interface components {
             };
         };
         SingleStepImportResolvableRequest: {
+            /** @description Branch to import keys into. If not specified, default branch is used. */
+            branch?: string;
             /** @description If `false`, import will apply all `non-failed` overrides and reports `unresolvedConflict`
              *     .If `true`, import will fail completely on unresolved conflict and won't apply any changes. Unresolved conflicts are reported in the `params` of the error response */
             errorOnUnresolvedConflict?: boolean;
@@ -9298,7 +10273,7 @@ export interface components {
         };
         StorageTestResult: {
             /** @enum {string} */
-            message?: "unauthenticated" | "api_access_forbidden" | "api_key_not_found" | "invalid_api_key" | "invalid_project_api_key" | "project_api_key_expired" | "bad_credentials" | "mfa_enabled" | "invalid_otp_code" | "mfa_not_enabled" | "can_not_revoke_own_permissions" | "data_corrupted" | "invitation_code_does_not_exist_or_expired" | "language_tag_exists" | "language_name_exists" | "language_not_found" | "operation_not_permitted" | "registrations_not_allowed" | "project_not_found" | "resource_not_found" | "scope_not_found" | "key_exists" | "third_party_auth_error_message" | "third_party_auth_no_email" | "third_party_auth_non_matching_email" | "third_party_auth_no_sub" | "third_party_auth_unknown_error" | "email_already_verified" | "third_party_unauthorized" | "third_party_google_workspace_mismatch" | "third_party_switch_initiated" | "third_party_switch_conflict" | "username_already_exists" | "username_or_password_invalid" | "user_already_has_permissions" | "user_already_has_role" | "user_not_found" | "file_not_image" | "file_too_big" | "invalid_timestamp" | "email_not_verified" | "missing_callback_url" | "invalid_jwt_token" | "expired_jwt_token" | "general_jwt_error" | "cannot_find_suitable_address_part" | "slug_not_unique" | "user_is_not_member_of_organization" | "organization_has_no_other_owner" | "user_has_no_project_access" | "user_is_organization_owner" | "cannot_set_your_own_permissions" | "user_is_organization_member" | "property_not_mutable" | "import_language_not_from_project" | "existing_language_not_selected" | "conflict_is_not_resolved" | "language_already_selected" | "cannot_parse_file" | "could_not_resolve_property" | "cannot_add_more_then_100_languages" | "no_languages_provided" | "language_with_base_language_tag_not_found" | "language_not_from_project" | "namespace_not_from_project" | "cannot_delete_base_language" | "key_not_from_project" | "max_screenshots_exceeded" | "translation_not_from_project" | "can_edit_only_own_comment" | "request_parse_error" | "filter_by_value_state_not_valid" | "import_has_expired" | "tag_not_from_project" | "translation_text_too_long" | "invalid_recaptcha_token" | "cannot_leave_owning_project" | "cannot_leave_project_with_organization_role" | "dont_have_direct_permissions" | "tag_too_log" | "too_many_uploaded_images" | "one_or_more_images_not_found" | "screenshot_not_of_key" | "service_not_found" | "too_many_requests" | "translation_not_found" | "out_of_credits" | "key_not_found" | "organization_not_found" | "cannot_find_base_language" | "base_language_not_found" | "no_exported_result" | "cannot_set_your_own_role" | "only_translate_review_or_view_permission_accepts_view_languages" | "oauth2_token_url_not_set" | "oauth2_user_url_not_set" | "email_already_invited_or_member" | "price_not_found" | "invoice_not_from_organization" | "invoice_not_found" | "plan_not_found" | "plan_not_available_any_more" | "no_auto_translation_method" | "cannot_translate_base_language" | "pat_not_found" | "invalid_pat" | "pat_expired" | "operation_unavailable_for_account_type" | "validation_email_is_not_valid" | "current_password_required" | "cannot_create_organization" | "wrong_current_password" | "wrong_param_type" | "user_missing_password" | "expired_super_jwt_token" | "cannot_delete_your_own_account" | "cannot_sort_by_this_column" | "namespace_not_found" | "namespace_exists" | "invalid_authentication_method" | "unknown_sort_property" | "only_review_permission_accepts_state_change_languages" | "only_translate_or_review_permission_accepts_translate_languages" | "cannot_set_language_permissions_for_admin_scope" | "cannot_set_view_languages_without_translations_view_scope" | "cannot_set_translate_languages_without_translations_edit_scope" | "cannot_set_state_change_languages_without_translations_state_edit_scope" | "language_not_permitted" | "scopes_has_to_be_set" | "set_exactly_one_of_scopes_or_type" | "translation_exists" | "import_keys_error" | "provide_only_one_of_screenshots_and_screenshot_uploaded_image_ids" | "multiple_projects_not_supported" | "plan_translation_limit_exceeded" | "feature_not_enabled" | "license_key_not_found" | "cannot_set_view_languages_without_for_level_based_permissions" | "cannot_set_different_translate_and_state_change_languages_for_level_based_permissions" | "cannot_disable_your_own_account" | "subscription_not_found" | "invoice_does_not_have_usage" | "customer_not_found" | "subscription_not_active" | "organization_already_subscribed" | "organization_not_subscribed" | "license_key_used_by_another_instance" | "translation_spending_limit_exceeded" | "credit_spending_limit_exceeded" | "seats_spending_limit_exceeded" | "this_instance_is_already_licensed" | "big_meta_not_from_project" | "mt_service_not_enabled" | "project_not_selected" | "organization_not_selected" | "plan_has_subscribers" | "translation_failed" | "batch_job_not_found" | "key_exists_in_namespace" | "tag_is_blank" | "execution_failed_on_management_error" | "translation_api_rate_limit" | "cannot_finalize_activity" | "formality_not_supported_by_service" | "language_not_supported_by_service" | "rate_limited" | "pat_access_not_allowed" | "pak_access_not_allowed" | "cannot_modify_disabled_translation" | "azure_config_required" | "s3_config_required" | "content_storage_config_required" | "content_storage_test_failed" | "content_storage_config_invalid" | "invalid_connection_string" | "cannot_create_azure_storage_client" | "s3_access_key_required" | "azure_connection_string_required" | "s3_secret_key_required" | "cannot_store_file_to_content_storage" | "unexpected_error_while_publishing_to_content_storage" | "webhook_responded_with_non_200_status" | "unexpected_error_while_executing_webhook" | "content_storage_is_in_use" | "cannot_set_state_for_missing_translation" | "no_project_id_provided" | "license_key_not_provided" | "subscription_already_canceled" | "user_is_subscribed_to_paid_plan" | "cannot_create_free_plan_without_fixed_type" | "cannot_modify_plan_free_status" | "key_id_not_provided" | "free_self_hosted_seat_limit_exceeded" | "advanced_params_not_supported" | "plural_forms_not_found_for_language" | "nested_plurals_not_supported" | "message_is_not_plural" | "content_outside_plural_forms" | "invalid_plural_form" | "multiple_plurals_not_supported" | "custom_values_json_too_long" | "unsupported_po_message_format" | "plural_forms_data_loss" | "current_user_does_not_own_image" | "user_cannot_view_this_organization" | "user_is_not_owner_of_organization" | "user_is_not_owner_or_maintainer_of_organization" | "pak_created_for_different_project" | "custom_slug_is_only_applicable_for_custom_storage" | "invalid_slug_format" | "batch_job_cancellation_timeout" | "import_failed" | "cannot_add_more_then_1000_languages" | "no_data_to_import" | "multiple_namespaces_mapped_to_single_file" | "multiple_mappings_for_same_file_language_name" | "multiple_mappings_for_null_file_language_name" | "too_many_mappings_for_file" | "missing_placeholder_in_template" | "tag_not_found" | "cannot_parse_encrypted_slack_login_data" | "slack_workspace_not_found" | "cannot_fetch_user_details_from_slack" | "slack_missing_scope" | "slack_not_connected_to_your_account" | "slack_invalid_command" | "slack_not_subscribed_yet" | "slack_connection_failed" | "tolgee_account_already_connected" | "slack_not_configured" | "slack_workspace_already_connected" | "slack_connection_error" | "email_verification_code_not_valid" | "cannot_subscribe_to_free_plan" | "plan_auto_assignment_only_for_free_plans" | "plan_auto_assignment_only_for_private_plans" | "task_not_found" | "task_not_finished" | "task_not_open" | "translation_agency_not_found" | "this_feature_is_not_implemented_in_oss" | "sso_token_exchange_failed" | "sso_user_info_retrieval_failed" | "sso_id_token_expired" | "sso_user_cannot_create_organization" | "sso_cant_verify_user" | "sso_auth_missing_domain" | "sso_domain_not_found_or_disabled" | "authentication_method_disabled" | "native_authentication_disabled" | "invitation_organization_mismatch" | "user_is_managed_by_organization" | "cannot_set_sso_provider_missing_fields" | "namespaces_cannot_be_disabled_when_namespace_exists" | "namespace_cannot_be_used_when_feature_is_disabled" | "sso_domain_not_allowed" | "sso_login_forced_for_this_account" | "use_sso_for_authentication_instead" | "date_has_to_be_in_the_future" | "custom_plan_and_plan_id_cannot_be_set_together" | "specify_plan_id_or_custom_plan" | "custom_plans_has_to_be_private" | "cannot_create_free_plan_with_prices" | "subscription_not_scheduled_for_cancellation" | "cannot_cancel_trial" | "cannot_update_without_modification" | "current_subscription_is_not_trialing" | "sorting_and_paging_is_not_supported_when_using_cursor" | "strings_metric_are_not_supported" | "plan_key_limit_exceeded" | "keys_spending_limit_exceeded" | "plan_seat_limit_exceeded" | "instance_not_using_license_key" | "invalid_path" | "llm_provider_not_found" | "llm_provider_error" | "prompt_not_found" | "llm_provider_not_returned_json" | "llm_template_parsing_error" | "llm_rate_limited" | "llm_provider_timeout" | "no_llm_provider_configured" | "glossary_not_found" | "glossary_term_not_found" | "glossary_term_translation_not_found" | "glossary_non_translatable_term_cannot_be_translated" | "llm_content_filter" | "llm_provider_empty_response" | "label_not_found" | "label_not_from_project" | "label_already_exists" | "filter_by_value_label_not_valid" | "suggestion_not_found" | "user_can_only_delete_his_suggestions" | "cannot_modify_reviewed_translation" | "cannot_modify_keys" | "expect_no_conflict_failed" | "suggestion_cant_be_plural" | "suggestion_must_be_plural" | "duplicate_suggestion" | "unsupported_media_type" | "impersonation_of_admin_by_supporter_not_allowed" | "already_impersonating_user" | "operation_not_permitted_in_read_only_mode" | "file_processing_failed" | "multiple_items_in_chunk_failed" | "branch_not_found" | "cannot_delete_default_branch" | "cannot_delete_branch_with_children" | "branch_already_exists" | "origin_branch_not_found" | "branch_merge_not_found" | "branch_merge_change_not_found" | "branch_merge_revision_not_valid" | "branch_merge_conflicts_not_resolved" | "branch_merge_already_merged" | "branching_not_enabled_for_project";
+            message?: "unauthenticated" | "api_access_forbidden" | "api_key_not_found" | "invalid_api_key" | "invalid_project_api_key" | "project_api_key_expired" | "bad_credentials" | "mfa_enabled" | "invalid_otp_code" | "mfa_not_enabled" | "can_not_revoke_own_permissions" | "data_corrupted" | "invitation_code_does_not_exist_or_expired" | "invitation_email_mismatch" | "language_tag_exists" | "language_name_exists" | "language_not_found" | "operation_not_permitted" | "registrations_not_allowed" | "project_not_found" | "resource_not_found" | "scope_not_found" | "key_exists" | "third_party_auth_error_message" | "third_party_auth_no_email" | "third_party_auth_non_matching_email" | "third_party_auth_no_sub" | "third_party_auth_unknown_error" | "email_already_verified" | "third_party_unauthorized" | "third_party_google_workspace_mismatch" | "third_party_switch_initiated" | "third_party_switch_conflict" | "username_already_exists" | "email_domain_not_allowed" | "username_or_password_invalid" | "user_already_has_permissions" | "user_already_has_role" | "user_not_found" | "file_not_image" | "file_too_big" | "invalid_timestamp" | "email_not_verified" | "missing_callback_url" | "invalid_jwt_token" | "expired_jwt_token" | "general_jwt_error" | "cannot_find_suitable_address_part" | "slug_not_unique" | "user_is_not_member_of_organization" | "organization_has_no_other_owner" | "user_has_no_project_access" | "user_is_organization_owner" | "cannot_set_your_own_permissions" | "user_is_organization_member" | "property_not_mutable" | "import_language_not_from_project" | "existing_language_not_selected" | "conflict_is_not_resolved" | "language_already_selected" | "cannot_parse_file" | "could_not_resolve_property" | "cannot_add_more_then_100_languages" | "no_languages_provided" | "language_with_base_language_tag_not_found" | "language_not_from_project" | "namespace_not_from_project" | "cannot_delete_base_language" | "key_not_from_project" | "max_screenshots_exceeded" | "translation_not_from_project" | "can_edit_only_own_comment" | "request_parse_error" | "request_validation_error" | "filter_by_value_state_not_valid" | "filter_by_value_qa_check_type_not_valid" | "import_has_expired" | "tag_not_from_project" | "translation_text_too_long" | "invalid_recaptcha_token" | "cannot_leave_owning_project" | "cannot_leave_project_with_organization_role" | "dont_have_direct_permissions" | "tag_too_log" | "too_many_uploaded_images" | "one_or_more_images_not_found" | "screenshot_not_of_key" | "service_not_found" | "too_many_requests" | "translation_not_found" | "out_of_credits" | "key_not_found" | "organization_not_found" | "cannot_find_base_language" | "base_language_not_found" | "no_exported_result" | "cannot_set_your_own_role" | "only_translate_review_or_view_permission_accepts_view_languages" | "oauth2_token_url_not_set" | "oauth2_user_url_not_set" | "email_already_invited_or_member" | "price_not_found" | "invoice_not_from_organization" | "invoice_not_found" | "plan_not_found" | "plan_not_available_any_more" | "no_auto_translation_method" | "cannot_translate_base_language" | "pat_not_found" | "invalid_pat" | "pat_expired" | "operation_unavailable_for_account_type" | "validation_email_is_not_valid" | "current_password_required" | "cannot_create_organization" | "wrong_current_password" | "wrong_param_type" | "user_missing_password" | "expired_super_jwt_token" | "cannot_delete_your_own_account" | "cannot_sort_by_this_column" | "namespace_not_found" | "namespace_exists" | "invalid_authentication_method" | "unknown_sort_property" | "only_review_permission_accepts_state_change_languages" | "only_translate_or_review_permission_accepts_translate_languages" | "cannot_set_language_permissions_for_admin_scope" | "cannot_set_view_languages_without_translations_view_scope" | "cannot_set_translate_languages_without_translations_edit_scope" | "cannot_set_state_change_languages_without_translations_state_edit_scope" | "language_not_permitted" | "scopes_has_to_be_set" | "set_exactly_one_of_scopes_or_type" | "translation_exists" | "import_keys_error" | "provide_only_one_of_screenshots_and_screenshot_uploaded_image_ids" | "multiple_projects_not_supported" | "plan_translation_limit_exceeded" | "feature_not_enabled" | "license_key_not_found" | "cannot_set_view_languages_without_for_level_based_permissions" | "cannot_set_different_translate_and_state_change_languages_for_level_based_permissions" | "cannot_disable_your_own_account" | "user_account_disabled" | "subscription_not_found" | "invoice_does_not_have_usage" | "customer_not_found" | "subscription_not_active" | "organization_already_subscribed" | "organization_not_subscribed" | "license_key_used_by_another_instance" | "translation_spending_limit_exceeded" | "credit_spending_limit_exceeded" | "seats_spending_limit_exceeded" | "this_instance_is_already_licensed" | "big_meta_not_from_project" | "mt_service_not_enabled" | "project_not_selected" | "organization_not_selected" | "plan_has_subscribers" | "translation_failed" | "batch_job_not_found" | "no_translations_to_recheck" | "key_exists_in_namespace" | "tag_is_blank" | "execution_failed_on_management_error" | "translation_api_rate_limit" | "cannot_finalize_activity" | "formality_not_supported_by_service" | "language_not_supported_by_service" | "rate_limited" | "pat_access_not_allowed" | "pak_access_not_allowed" | "cannot_modify_disabled_translation" | "azure_config_required" | "s3_config_required" | "content_storage_config_required" | "content_storage_test_failed" | "content_storage_config_invalid" | "invalid_connection_string" | "cannot_create_azure_storage_client" | "s3_access_key_required" | "azure_connection_string_required" | "s3_secret_key_required" | "cannot_store_file_to_content_storage" | "unexpected_error_while_publishing_to_content_storage" | "webhook_responded_with_non_200_status" | "unexpected_error_while_executing_webhook" | "content_storage_is_in_use" | "cannot_set_state_for_missing_translation" | "no_project_id_provided" | "license_key_not_provided" | "subscription_already_canceled" | "user_is_subscribed_to_paid_plan" | "cannot_create_free_plan_without_fixed_type" | "cannot_modify_plan_free_status" | "key_id_not_provided" | "free_self_hosted_seat_limit_exceeded" | "advanced_params_not_supported" | "plural_forms_not_found_for_language" | "nested_plurals_not_supported" | "message_is_not_plural" | "content_outside_plural_forms" | "invalid_plural_form" | "multiple_plurals_not_supported" | "custom_values_json_too_long" | "unsupported_po_message_format" | "plural_forms_data_loss" | "current_user_does_not_own_image" | "user_cannot_view_this_organization" | "user_is_not_owner_of_organization" | "user_is_not_owner_or_maintainer_of_organization" | "pak_created_for_different_project" | "custom_slug_is_only_applicable_for_custom_storage" | "invalid_slug_format" | "batch_job_cancellation_timeout" | "import_failed" | "cannot_add_more_then_1000_languages" | "no_data_to_import" | "multiple_namespaces_mapped_to_single_file" | "multiple_mappings_for_same_file_language_name" | "multiple_mappings_for_null_file_language_name" | "too_many_mappings_for_file" | "missing_placeholder_in_template" | "tag_not_found" | "cannot_parse_encrypted_slack_login_data" | "slack_workspace_not_found" | "cannot_fetch_user_details_from_slack" | "slack_missing_scope" | "slack_not_connected_to_your_account" | "slack_invalid_command" | "slack_not_subscribed_yet" | "slack_connection_failed" | "tolgee_account_already_connected" | "slack_not_configured" | "slack_workspace_already_connected" | "slack_connection_error" | "email_verification_code_not_valid" | "cannot_subscribe_to_free_plan" | "plan_auto_assignment_only_for_free_plans" | "plan_auto_assignment_only_for_private_plans" | "task_not_found" | "task_not_finished" | "task_not_open" | "translation_agency_not_found" | "this_feature_is_not_implemented_in_oss" | "sso_token_exchange_failed" | "sso_user_info_retrieval_failed" | "sso_id_token_expired" | "sso_user_cannot_create_organization" | "sso_cant_verify_user" | "sso_auth_missing_domain" | "sso_domain_not_found_or_disabled" | "authentication_method_disabled" | "native_authentication_disabled" | "invitation_organization_mismatch" | "user_is_managed_by_organization" | "cannot_set_sso_provider_missing_fields" | "namespaces_cannot_be_disabled_when_namespace_exists" | "namespace_cannot_be_used_when_feature_is_disabled" | "sso_domain_not_allowed" | "sso_login_forced_for_this_account" | "use_sso_for_authentication_instead" | "date_has_to_be_in_the_future" | "custom_plan_and_plan_id_cannot_be_set_together" | "specify_plan_id_or_custom_plan" | "custom_plans_has_to_be_private" | "cannot_create_free_plan_with_prices" | "subscription_not_scheduled_for_cancellation" | "cannot_cancel_trial" | "cannot_update_without_modification" | "current_subscription_is_not_trialing" | "sorting_and_paging_is_not_supported_when_using_cursor" | "strings_metric_are_not_supported" | "plan_key_limit_exceeded" | "keys_spending_limit_exceeded" | "plan_seat_limit_exceeded" | "instance_not_using_license_key" | "invalid_path" | "llm_provider_not_found" | "llm_provider_error" | "prompt_not_found" | "llm_provider_not_returned_json" | "llm_template_parsing_error" | "llm_rate_limited" | "llm_provider_timeout" | "no_llm_provider_configured" | "glossary_not_found" | "glossary_term_not_found" | "glossary_term_translation_not_found" | "glossary_non_translatable_term_cannot_be_translated" | "translation_memory_name_already_exists" | "translation_memory_not_found" | "translation_memory_project_assignment_not_found" | "cannot_unassign_project_from_own_translation_memory" | "cannot_modify_project_translation_memory" | "translation_memory_already_assigned_to_project" | "translation_memory_duplicate_project_assignment" | "translation_memory_base_language_mismatch" | "cannot_change_tm_base_language_while_assigned" | "cannot_change_project_base_language_tm_conflict" | "project_translation_memory_not_found" | "translation_memory_entry_not_found" | "translation_memory_entry_read_only" | "translation_memory_entry_duplicate_target_language" | "translation_memory_import_empty" | "llm_content_filter" | "llm_provider_empty_response" | "label_not_found" | "label_not_from_project" | "label_already_exists" | "filter_by_value_label_not_valid" | "suggestion_not_found" | "user_can_only_delete_his_suggestions" | "cannot_modify_reviewed_translation" | "cannot_modify_keys" | "expect_no_conflict_failed" | "suggestion_cant_be_plural" | "suggestion_must_be_plural" | "duplicate_suggestion" | "unsupported_media_type" | "impersonation_of_admin_by_supporter_not_allowed" | "already_impersonating_user" | "operation_not_permitted_in_read_only_mode" | "file_processing_failed" | "multiple_items_in_chunk_failed" | "content_delivery_prune_failed" | "branch_not_found" | "cannot_delete_default_branch" | "cannot_delete_branch_with_children" | "branch_already_exists" | "origin_branch_not_found" | "branch_merge_not_found" | "branch_merge_change_not_found" | "branch_merge_revision_not_valid" | "branch_merge_conflicts_not_resolved" | "branch_merge_already_merged" | "feature_not_enabled_for_project" | "export_key_plural_suffix_collision" | "translation_exceeds_char_limit" | "url_not_valid" | "qa_checks_not_enabled" | "plan_migration_not_found" | "plan_has_migrations" | "source_and_target_plan_must_be_different";
             params?: unknown[];
             success: boolean;
         };
@@ -9453,6 +10428,25 @@ export interface components {
             type: "TRANSLATE" | "REVIEW";
         };
         TextNode: unknown;
+        TmAssignedProjectModel: {
+            /** Format: int32 */
+            penalty?: number;
+            /** Format: int32 */
+            priority: number;
+            /** Format: int64 */
+            projectId: number;
+            projectName: string;
+            readAccess: boolean;
+            writeAccess: boolean;
+        };
+        TmxImportResult: {
+            /** Format: int32 */
+            created: number;
+            /** Format: int32 */
+            skipped: number;
+            /** Format: int32 */
+            updated: number;
+        };
         TranslationAgencySimpleModel: {
             avatar?: components["schemas"]["Avatar"];
             /** Format: int64 */
@@ -9527,12 +10521,161 @@ export interface components {
             /** Format: int64 */
             languageId: number;
         };
+        TranslationMemoryEntryCountsModel: {
+            /** @description Entry counts keyed by translation memory id. TM ids not visible to the caller are omitted from the response. */
+            counts: {
+                [key: string]: number;
+            };
+        };
+        TranslationMemoryEntryModel: {
+            /**
+             * Format: int64
+             * @description Creation timestamp
+             */
+            createdAt: number;
+            /** Format: int64 */
+            id: number;
+            /**
+             * @description Source text in the TM's source language
+             * @example Hello world
+             */
+            sourceText: string;
+            /**
+             * @description Target language tag (BCP 47)
+             * @example de
+             */
+            targetLanguageTag: string;
+            /**
+             * @description Translated target text
+             * @example Hallo Welt
+             */
+            targetText: string;
+            /**
+             * Format: int64
+             * @description Last update timestamp
+             */
+            updatedAt: number;
+        };
+        TranslationMemoryEntryRequest: {
+            /**
+             * @description Source text (in the TM's source language)
+             * @example Hello world
+             */
+            sourceText: string;
+            /**
+             * @description Target language tag according to BCP 47 definition
+             * @example de
+             */
+            targetLanguageTag: string;
+            /**
+             * @description Target translation text
+             * @example Hallo Welt
+             */
+            targetText: string;
+        };
         TranslationMemoryItemModel: {
             baseText: string;
             keyName: string;
             /** Format: float */
+            rawSimilarity: number;
+            /** Format: float */
             similarity: number;
             targetText: string;
+            translationMemoryName?: string;
+            /** Format: date-time */
+            updatedAt?: string;
+        };
+        TranslationMemoryModel: {
+            /**
+             * Format: int32
+             * @description Default penalty (0–100) subtracted from match scores for every assignment that does not define its own override.
+             */
+            defaultPenalty: number;
+            /** Format: int64 */
+            id: number;
+            name: string;
+            organizationOwner: components["schemas"]["SimpleOrganizationModel"];
+            /**
+             * @description Source language tag of the translation memory
+             * @example en
+             */
+            sourceLanguageTag: string;
+            /** @enum {string} */
+            type: "PROJECT" | "SHARED";
+            /** @description When true, only translations in REVIEWED state contribute to this TM. */
+            writeOnlyReviewed: boolean;
+        };
+        TranslationMemoryRowCellModel: {
+            /**
+             * Format: int64
+             * @description Id of the underlying TM entry when the cell is editable. Absent for read-only cells mirrored from project translations.
+             * @example 12345
+             */
+            entryId?: number;
+            /**
+             * @description Target language tag (BCP 47)
+             * @example de
+             */
+            targetLanguageTag: string;
+            /**
+             * @description Translated target text
+             * @example Hallo Welt
+             */
+            targetText: string;
+        };
+        TranslationMemoryRowModel: {
+            /** @description Cells of this row, already filtered by the requested languages */
+            cells: components["schemas"]["TranslationMemoryRowCellModel"][];
+            /**
+             * @description Whether the row can be edited (manual TM entries) or is read-only (mirrored from a project key — change it in the project).
+             * @example true
+             */
+            editable: boolean;
+            /**
+             * @description Originating project key name when the row mirrors a project key
+             * @example greeting.hello
+             */
+            keyName?: string;
+            /**
+             * Format: int64
+             * @description Originating project id when the row mirrors a project key
+             * @example 42
+             */
+            projectId?: number;
+            /**
+             * @description Originating project name when the row mirrors a project key
+             * @example My project
+             */
+            projectName?: string;
+            /**
+             * @description Source text in the TM's source language
+             * @example Hello world
+             */
+            sourceText: string;
+        };
+        TranslationMemoryWithStatsModel: {
+            /** @description Names of all assigned projects (size = total assignment count) */
+            assignedProjectNames: string[];
+            /**
+             * Format: int32
+             * @description Default penalty (0–100) subtracted from match scores unless an assignment overrides it.
+             */
+            defaultPenalty: number;
+            /** Format: int64 */
+            id: number;
+            name: string;
+            /**
+             * @description Source language tag
+             * @example en
+             */
+            sourceLanguageTag: string;
+            /**
+             * @description PROJECT or SHARED
+             * @example SHARED
+             */
+            type: string;
+            /** @description When true, only REVIEWED translations contribute to this TM. */
+            writeOnlyReviewed: boolean;
         };
         TranslationModel: {
             /** @description Was translated using Translation Memory or Machine translation service? */
@@ -9616,6 +10759,15 @@ export interface components {
             mtProvider?: "GOOGLE" | "AWS" | "DEEPL" | "AZURE" | "BAIDU" | "PROMPT";
             /** @description Whether base language translation was changed after this translation was updated */
             outdated: boolean;
+            /** @description Whether QA checks are stale and need re-running */
+            qaChecksStale: boolean;
+            /**
+             * Format: int64
+             * @description Number of open QA issues
+             */
+            qaIssueCount: number;
+            /** @description Detailed QA issues for inline highlighting (only when includeQaIssues=true) */
+            qaIssues?: components["schemas"]["QaIssueModel"][];
             /**
              * @description State of translation
              * @enum {string}
@@ -9639,6 +10791,47 @@ export interface components {
         TranslationWithCommentModel: {
             comment: components["schemas"]["TranslationCommentModel"];
             translation: components["schemas"]["TranslationModel"];
+        };
+        TrashedKeyWithTranslationsModel: {
+            /**
+             * Format: date-time
+             * @description When the key was deleted
+             */
+            deletedAt: string;
+            /** @description User who deleted the key */
+            deletedBy?: components["schemas"]["SimpleUserAccountModel"];
+            /** @description Description of the key */
+            description?: string;
+            /**
+             * Format: int64
+             * @description Id of key record
+             */
+            id: number;
+            /** @description Whether the key is plural */
+            isPlural: boolean;
+            /**
+             * @description Name of key
+             * @example this_is_super_key
+             */
+            name: string;
+            /**
+             * @description Namespace of key
+             * @example homepage
+             */
+            namespace?: string;
+            /**
+             * Format: date-time
+             * @description When the key will be permanently deleted
+             */
+            permanentDeleteAt: string;
+            /** @description Screenshots of the key */
+            screenshots: components["schemas"]["ScreenshotModel"][];
+            /** @description Tags of key */
+            tags: components["schemas"]["TagModel"][];
+            /** @description Translations object keyed by language tag */
+            translations: {
+                [key: string]: components["schemas"]["TranslationViewModel"];
+            };
         };
         UntagKeysRequest: {
             keyIds: number[];
@@ -9689,6 +10882,26 @@ export interface components {
             /** @description New description of the PAT */
             description: string;
         };
+        UpdateProjectTmSettingsRequest: {
+            /** @description When true, only translations whose state is REVIEWED are written to this project's own TM. Translations that drop back to TRANSLATED or UNTRANSLATED also remove the entry. TMX import and direct TM-browser edits bypass this filter. */
+            writeOnlyReviewed: boolean;
+        };
+        UpdateProjectTranslationMemoryAssignmentRequest: {
+            /**
+             * Format: int32
+             * @description Per-assignment penalty override (0–100). When null, the TM's default penalty applies.
+             */
+            penalty?: number;
+            /**
+             * Format: int32
+             * @description Priority in suggestion results (lower = higher priority). Omit to leave the current priority unchanged.
+             */
+            priority?: number;
+            /** @description Whether this project can read from the TM */
+            readAccess: boolean;
+            /** @description Whether this project writes new translations to the TM */
+            writeAccess: boolean;
+        };
         UpdateTaskKeyRequest: {
             done: boolean;
         };
@@ -9728,6 +10941,8 @@ export interface components {
         UsageModel: {
             /** @description Relevant for invoices only. When there are applied stripe credits, we need to reduce the total price by this amount. */
             appliedStripeCredits?: number;
+            /** @description Relevant for invoices only. Total amount deferred from previous billing periods that is included in this invoice. */
+            carryOverTotal?: number;
             credits?: components["schemas"]["SumUsageItemModel"];
             keys: components["schemas"]["AverageProportionalUsageItemModel"];
             seats: components["schemas"]["AverageProportionalUsageItemModel"];
@@ -9828,6 +11043,10 @@ export interface components {
             data: components["schemas"]["PromptVariableDto"][];
         };
         WebhookConfigModel: {
+            /** @description Whether the webhook was automatically disabled due to persistent failures. */
+            autoDisabled: boolean;
+            /** @description Whether the webhook is enabled. Disabled webhooks are not executed. */
+            enabled: boolean;
             /**
              * Format: int64
              * @description Date of the first failed webhook request. If the last webhook request is successful, this value is set to null.
@@ -9844,6 +11063,7 @@ export interface components {
             webhookSecret: string;
         };
         WebhookConfigRequest: {
+            enabled?: boolean;
             url: string;
         };
         WebhookTestResponse: {
@@ -11263,7 +12483,7 @@ export interface operations {
             };
         };
     };
-    create_17: {
+    create_19: {
         parameters: {
             query?: never;
             header?: never;
@@ -11494,7 +12714,7 @@ export interface operations {
             };
         };
     };
-    update_11: {
+    update_13: {
         parameters: {
             query?: never;
             header?: never;
@@ -11556,7 +12776,7 @@ export interface operations {
             };
         };
     };
-    delete_10: {
+    delete_12: {
         parameters: {
             query?: never;
             header?: never;
@@ -11674,7 +12894,7 @@ export interface operations {
             };
         };
     };
-    get_24: {
+    get_26: {
         parameters: {
             query?: never;
             header?: never;
@@ -12418,7 +13638,7 @@ export interface operations {
             };
         };
     };
-    delete_17: {
+    delete_19: {
         parameters: {
             query?: never;
             header?: never;
@@ -13011,7 +14231,7 @@ export interface operations {
             };
         };
     };
-    get_15: {
+    get_17: {
         parameters: {
             query?: never;
             header?: never;
@@ -13069,7 +14289,7 @@ export interface operations {
             };
         };
     };
-    update_10: {
+    update_12: {
         parameters: {
             query?: never;
             header?: never;
@@ -13131,7 +14351,7 @@ export interface operations {
             };
         };
     };
-    delete_9: {
+    delete_11: {
         parameters: {
             query?: never;
             header?: never;
@@ -13438,6 +14658,12 @@ export interface operations {
                 /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
                 sort?: string[];
                 search?: string;
+                /** @description Filter projects by id */
+                filterId?: number[];
+                /** @description Filter projects without id */
+                filterNotId?: number[];
+                /** @description Filter projects whose base language tag matches */
+                filterBaseLanguageTag?: string;
             };
             header?: never;
             path: {
@@ -13627,7 +14853,7 @@ export interface operations {
             };
         };
     };
-    getAll_12: {
+    getAll_13: {
         parameters: {
             query?: {
                 /** @description Zero-based page index (0..N) */
@@ -13693,7 +14919,7 @@ export interface operations {
             };
         };
     };
-    create_15: {
+    create_17: {
         parameters: {
             query?: never;
             header?: never;
@@ -13755,7 +14981,7 @@ export interface operations {
             };
         };
     };
-    getAllWithStats: {
+    getAllWithStats_1: {
         parameters: {
             query?: {
                 /** @description Zero-based page index (0..N) */
@@ -13821,7 +15047,7 @@ export interface operations {
             };
         };
     };
-    get_13: {
+    get_15: {
         parameters: {
             query?: never;
             header?: never;
@@ -13880,7 +15106,7 @@ export interface operations {
             };
         };
     };
-    update_8: {
+    update_10: {
         parameters: {
             query?: never;
             header?: never;
@@ -13943,7 +15169,7 @@ export interface operations {
             };
         };
     };
-    delete_7: {
+    delete_9: {
         parameters: {
             query?: never;
             header?: never;
@@ -14000,7 +15226,7 @@ export interface operations {
             };
         };
     };
-    getAssignedProjects: {
+    getAssignedProjects_1: {
         parameters: {
             query?: never;
             header?: never;
@@ -14245,7 +15471,7 @@ export interface operations {
             };
         };
     };
-    getAll_13: {
+    getAll_14: {
         parameters: {
             query?: {
                 /** @description Zero-based page index (0..N) */
@@ -14313,7 +15539,7 @@ export interface operations {
             };
         };
     };
-    create_16: {
+    create_18: {
         parameters: {
             query?: never;
             header?: never;
@@ -14437,7 +15663,7 @@ export interface operations {
             };
         };
     };
-    get_14: {
+    get_16: {
         parameters: {
             query?: never;
             header?: never;
@@ -14497,7 +15723,7 @@ export interface operations {
             };
         };
     };
-    update_9: {
+    update_11: {
         parameters: {
             query?: never;
             header?: never;
@@ -14561,7 +15787,7 @@ export interface operations {
             };
         };
     };
-    delete_8: {
+    delete_10: {
         parameters: {
             query?: never;
             header?: never;
@@ -14619,7 +15845,7 @@ export interface operations {
             };
         };
     };
-    update_12: {
+    update_14: {
         parameters: {
             query?: never;
             header?: never;
@@ -14683,7 +15909,7 @@ export interface operations {
             };
         };
     };
-    get_23: {
+    get_25: {
         parameters: {
             query?: never;
             header?: never;
@@ -14999,7 +16225,7 @@ export interface operations {
             };
         };
     };
-    getAll_11: {
+    getAll_12: {
         parameters: {
             query?: never;
             header?: never;
@@ -15954,6 +17180,1243 @@ export interface operations {
             };
         };
     };
+    getAll_11: {
+        parameters: {
+            query?: {
+                /** @description Zero-based page index (0..N) */
+                page?: number;
+                /** @description The size of the page to be returned */
+                size?: number;
+                /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+                sort?: string[];
+                search?: string;
+            };
+            header?: never;
+            path: {
+                organizationId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PagedModelSimpleTranslationMemoryModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+        };
+    };
+    create_15: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                organizationId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SharedTranslationMemoryRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TranslationMemoryModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+        };
+    };
+    getAllWithStats: {
+        parameters: {
+            query?: {
+                /** @description Zero-based page index (0..N) */
+                page?: number;
+                /** @description The size of the page to be returned */
+                size?: number;
+                /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+                sort?: string[];
+                search?: string;
+                type?: string;
+            };
+            header?: never;
+            path: {
+                organizationId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PagedModelTranslationMemoryWithStatsModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+        };
+    };
+    getEntryCounts: {
+        parameters: {
+            query: {
+                ids: number[];
+            };
+            header?: never;
+            path: {
+                organizationId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TranslationMemoryEntryCountsModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+        };
+    };
+    get_13: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                organizationId: number;
+                translationMemoryId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TranslationMemoryModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+        };
+    };
+    update_8: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                organizationId: number;
+                translationMemoryId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SharedTranslationMemoryRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TranslationMemoryModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+        };
+    };
+    delete_7: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                organizationId: number;
+                translationMemoryId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+        };
+    };
+    getAssignedProjects: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                organizationId: number;
+                translationMemoryId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CollectionModelTmAssignedProjectModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+        };
+    };
+    list_3: {
+        parameters: {
+            query?: {
+                search?: string;
+                targetLanguageTag?: string;
+                /** @description Zero-based page index (0..N) */
+                page?: number;
+                /** @description The size of the page to be returned */
+                size?: number;
+                /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+                sort?: string[];
+            };
+            header?: never;
+            path: {
+                organizationId: number;
+                translationMemoryId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PagedModelTranslationMemoryRowModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+        };
+    };
+    create_16: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                organizationId: number;
+                translationMemoryId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TranslationMemoryEntryRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TranslationMemoryEntryModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+        };
+    };
+    deleteMultipleGroups: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                organizationId: number;
+                translationMemoryId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DeleteMultipleTranslationMemoryEntriesRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+        };
+    };
+    getAllStoredEntryIds: {
+        parameters: {
+            query?: {
+                search?: string;
+            };
+            header?: never;
+            path: {
+                organizationId: number;
+                translationMemoryId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CollectionModelLong"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+        };
+    };
+    createMultiple: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                organizationId: number;
+                translationMemoryId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateMultipleTranslationMemoryEntriesRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CollectionModelTranslationMemoryEntryModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+        };
+    };
+    get_14: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                organizationId: number;
+                translationMemoryId: number;
+                entryId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TranslationMemoryEntryModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+        };
+    };
+    update_9: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                organizationId: number;
+                translationMemoryId: number;
+                entryId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TranslationMemoryEntryRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TranslationMemoryEntryModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+        };
+    };
+    delete_8: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                organizationId: number;
+                translationMemoryId: number;
+                entryId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+        };
+    };
+    deleteGroup: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                organizationId: number;
+                translationMemoryId: number;
+                entryId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+        };
+    };
+    exportTmx: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                organizationId: number;
+                translationMemoryId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string;
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+        };
+    };
+    importTmx: {
+        parameters: {
+            query?: {
+                overrideExisting?: boolean;
+            };
+            header?: never;
+            path: {
+                organizationId: number;
+                translationMemoryId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TmxImportResult"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+        };
+    };
+    setWriteOnlyReviewed: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                organizationId: number;
+                translationMemoryId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateProjectTmSettingsRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+        };
+    };
     getUsage: {
         parameters: {
             query?: never;
@@ -16130,7 +18593,7 @@ export interface operations {
             };
         };
     };
-    get_22: {
+    get_24: {
         parameters: {
             query?: never;
             header?: never;
@@ -16198,6 +18661,12 @@ export interface operations {
                 /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
                 sort?: string[];
                 search?: string;
+                /** @description Filter projects by id */
+                filterId?: number[];
+                /** @description Filter projects without id */
+                filterNotId?: number[];
+                /** @description Filter projects whose base language tag matches */
+                filterBaseLanguageTag?: string;
             };
             header?: never;
             path: {
@@ -16800,6 +19269,8 @@ export interface operations {
                 filterId?: number[];
                 /** @description Filter projects without id */
                 filterNotId?: number[];
+                /** @description Filter projects whose base language tag matches */
+                filterBaseLanguageTag?: string;
                 /** @description Zero-based page index (0..N) */
                 page?: number;
                 /** @description The size of the page to be returned */
@@ -17960,7 +20431,7 @@ export interface operations {
             };
         };
     };
-    list_3: {
+    list_4: {
         parameters: {
             query?: {
                 /** @description Zero-based page index (0..N) */
@@ -18025,7 +20496,7 @@ export interface operations {
             };
         };
     };
-    get_20: {
+    get_22: {
         parameters: {
             query?: never;
             header?: never;
@@ -18281,6 +20752,66 @@ export interface operations {
                 "application/json": components["schemas"]["CreateBranchModel"];
             };
         };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BranchModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+        };
+    };
+    find: {
+        parameters: {
+            query?: {
+                name?: string;
+            };
+            header?: never;
+            path: {
+                projectId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
         responses: {
             /** @description OK */
             200: {
@@ -19070,7 +21601,7 @@ export interface operations {
             };
         };
     };
-    delete_13: {
+    delete_15: {
         parameters: {
             query?: never;
             header?: never;
@@ -20089,7 +22620,7 @@ export interface operations {
                  *
                  *     This property is honored only for generic formats like JSON or YAML.
                  *     For specific formats like `YAML_RUBY` it's ignored. */
-                messageFormat?: "C_SPRINTF" | "PHP_SPRINTF" | "JAVA_STRING_FORMAT" | "APPLE_SPRINTF" | "RUBY_SPRINTF" | "I18NEXT" | "ICU" | "PYTHON_PERCENT";
+                messageFormat?: "C_SPRINTF" | "PHP_SPRINTF" | "JAVA_STRING_FORMAT" | "APPLE_SPRINTF" | "RUBY_SPRINTF" | "I18NEXT" | "ICU" | "PYTHON_PERCENT" | "PYTHON_BRACE";
                 /** @description This is a template that defines the structure of the resulting .zip file content.
                  *
                  *     The template is a string that can contain the following placeholders: {namespace}, {languageTag},
@@ -21763,7 +24294,7 @@ export interface operations {
             };
         };
     };
-    delete_11: {
+    delete_13: {
         parameters: {
             query?: never;
             header?: never;
@@ -21949,7 +24480,9 @@ export interface operations {
     };
     importKeys: {
         parameters: {
-            query?: never;
+            query?: {
+                branch?: string;
+            };
             header?: never;
             path: {
                 projectId: number;
@@ -22189,6 +24722,10 @@ export interface operations {
                 filterHasScreenshot?: boolean;
                 /** @description Selects only keys without screenshots */
                 filterHasNoScreenshot?: boolean;
+                /** @description Selects only keys with a description */
+                filterHasDescription?: boolean;
+                /** @description Selects only keys without a description */
+                filterHasNoDescription?: boolean;
                 /** @description Selects only keys with provided namespaces.
                  *
                  *     To filter default namespace, set to empty string.
@@ -22235,12 +24772,24 @@ export interface operations {
                  * @example labelId1,labelId2
                  */
                 filterLabel?: string[];
+                /** @description Filter keys with open QA issues in lang */
+                filterHasQaIssuesInLang?: string[];
+                /** @description Filter keys with specific QA check type issues in the format: languageTag,checkType.
+                 *     You can use this parameter multiple times.
+                 *
+                 *     A key matches if any of the selected check types is present in any of the selected languages.
+                 *          */
+                filterQaCheckType?: string[];
+                /** @description Filter keys whose QA checks are stale (pending recomputation) in lang. When set, only keys with at least one stale translation in any of the provided languages are returned. */
+                filterQaChecksStaleInLang?: string[];
                 /** @description Filter keys with any suggestions in lang */
                 filterHasSuggestionsInLang?: string[];
                 /** @description Filter keys with no suggestions in lang */
                 filterHasNoSuggestionsInLang?: string[];
                 /** @description Selects only keys from specified branch */
                 branch?: string;
+                /** @description Filter trashed keys by who deleted them (user IDs) */
+                filterDeletedByUserId?: number[];
             };
             header?: never;
             path: {
@@ -22297,7 +24846,529 @@ export interface operations {
             };
         };
     };
-    delete_15: {
+    list_8: {
+        parameters: {
+            query?: {
+                /** @description Zero-based page index (0..N) */
+                page?: number;
+                /** @description The size of the page to be returned */
+                size?: number;
+                /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+                sort?: string[];
+                /** @description Translation state in the format: languageTag,state. You can use this parameter multiple times.
+                 *
+                 *     When used with multiple states for same language it is applied with logical OR.
+                 *
+                 *     When used with multiple languages, it is applied with logical AND.
+                 *          */
+                filterState?: string[];
+                /**
+                 * @description Languages to be contained in response.
+                 *
+                 *     To add multiple languages, repeat this param (eg. ?languages=en&languages=de)
+                 * @example en
+                 */
+                languages?: string[];
+                /** @description String to search in key name or translation text */
+                search?: string;
+                /** @description Selects key with provided names. Use this param multiple times to fetch more keys. */
+                filterKeyName?: string[];
+                /** @description Selects key with provided ID. Use this param multiple times to fetch more keys. */
+                filterKeyId?: number[];
+                /** @description Selects only keys for which the translation is missing in any returned language. It only filters for translations included in returned languages. */
+                filterUntranslatedAny?: boolean;
+                /** @description Selects only keys, where translation is provided in any language */
+                filterTranslatedAny?: boolean;
+                /**
+                 * @description Selects only keys where the translation is missing for the specified language. The specified language must be included in the returned languages. Otherwise, this filter doesn't apply.
+                 * @example en-US
+                 */
+                filterUntranslatedInLang?: string;
+                /**
+                 * @description Selects only keys, where translation is provided in specified language
+                 * @example en-US
+                 */
+                filterTranslatedInLang?: string;
+                /**
+                 * @description Selects only keys, where translation was auto translated for specified languages.
+                 * @example en-US
+                 */
+                filterAutoTranslatedInLang?: string[];
+                /** @description Selects only keys with screenshots */
+                filterHasScreenshot?: boolean;
+                /** @description Selects only keys without screenshots */
+                filterHasNoScreenshot?: boolean;
+                /** @description Selects only keys with a description */
+                filterHasDescription?: boolean;
+                /** @description Selects only keys without a description */
+                filterHasNoDescription?: boolean;
+                /** @description Selects only keys with provided namespaces.
+                 *
+                 *     To filter default namespace, set to empty string.
+                 *        */
+                filterNamespace?: string[];
+                /** @description Selects only keys without provided namespaces.
+                 *
+                 *     To filter default namespace, set to empty string.
+                 *        */
+                filterNoNamespace?: string[];
+                /** @description Selects only keys with provided tag */
+                filterTag?: string[];
+                /** @description Selects only keys without provided tag */
+                filterNoTag?: string[];
+                /**
+                 * @description Selects only keys, where translation in provided langs is in outdated state
+                 * @example en-US
+                 */
+                filterOutdatedLanguage?: string[];
+                /**
+                 * @description Selects only keys, where translation in provided langs is not in outdated state
+                 * @example en-US
+                 */
+                filterNotOutdatedLanguage?: string[];
+                /**
+                 * @description Selects only key affected by activity with specidfied revision ID
+                 * @example 1234567
+                 */
+                filterRevisionId?: number[];
+                /** @description Select only keys which were not successfully translated by batch job with provided id */
+                filterFailedKeysOfJob?: number;
+                /** @description Select only keys which are in specified task */
+                filterTaskNumber?: number[];
+                /** @description Filter task keys which are `not done` */
+                filterTaskKeysNotDone?: boolean;
+                /** @description Filter task keys which are `done` */
+                filterTaskKeysDone?: boolean;
+                /** @description Filter keys with unresolved comments in lang */
+                filterHasUnresolvedCommentsInLang?: string[];
+                /** @description Filter keys with any comments in lang */
+                filterHasCommentsInLang?: string[];
+                /**
+                 * @description Filter key translations with labels
+                 * @example labelId1,labelId2
+                 */
+                filterLabel?: string[];
+                /** @description Filter keys with open QA issues in lang */
+                filterHasQaIssuesInLang?: string[];
+                /** @description Filter keys with specific QA check type issues in the format: languageTag,checkType.
+                 *     You can use this parameter multiple times.
+                 *
+                 *     A key matches if any of the selected check types is present in any of the selected languages.
+                 *          */
+                filterQaCheckType?: string[];
+                /** @description Filter keys whose QA checks are stale (pending recomputation) in lang. When set, only keys with at least one stale translation in any of the provided languages are returned. */
+                filterQaChecksStaleInLang?: string[];
+                /** @description Filter keys with any suggestions in lang */
+                filterHasSuggestionsInLang?: string[];
+                /** @description Filter keys with no suggestions in lang */
+                filterHasNoSuggestionsInLang?: string[];
+                /** @description Selects only keys from specified branch */
+                branch?: string;
+                /** @description Filter trashed keys by who deleted them (user IDs) */
+                filterDeletedByUserId?: number[];
+            };
+            header?: never;
+            path: {
+                projectId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PagedModelTrashedKeyWithTranslationsModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+        };
+    };
+    listDeleters: {
+        parameters: {
+            query?: {
+                branch?: string;
+            };
+            header?: never;
+            path: {
+                projectId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CollectionModelSimpleUserAccountModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+        };
+    };
+    selectAll: {
+        parameters: {
+            query?: {
+                /** @description Translation state in the format: languageTag,state. You can use this parameter multiple times.
+                 *
+                 *     When used with multiple states for same language it is applied with logical OR.
+                 *
+                 *     When used with multiple languages, it is applied with logical AND.
+                 *          */
+                filterState?: string[];
+                /**
+                 * @description Languages to be contained in response.
+                 *
+                 *     To add multiple languages, repeat this param (eg. ?languages=en&languages=de)
+                 * @example en
+                 */
+                languages?: string[];
+                /** @description String to search in key name or translation text */
+                search?: string;
+                /** @description Selects key with provided names. Use this param multiple times to fetch more keys. */
+                filterKeyName?: string[];
+                /** @description Selects key with provided ID. Use this param multiple times to fetch more keys. */
+                filterKeyId?: number[];
+                /** @description Selects only keys for which the translation is missing in any returned language. It only filters for translations included in returned languages. */
+                filterUntranslatedAny?: boolean;
+                /** @description Selects only keys, where translation is provided in any language */
+                filterTranslatedAny?: boolean;
+                /**
+                 * @description Selects only keys where the translation is missing for the specified language. The specified language must be included in the returned languages. Otherwise, this filter doesn't apply.
+                 * @example en-US
+                 */
+                filterUntranslatedInLang?: string;
+                /**
+                 * @description Selects only keys, where translation is provided in specified language
+                 * @example en-US
+                 */
+                filterTranslatedInLang?: string;
+                /**
+                 * @description Selects only keys, where translation was auto translated for specified languages.
+                 * @example en-US
+                 */
+                filterAutoTranslatedInLang?: string[];
+                /** @description Selects only keys with screenshots */
+                filterHasScreenshot?: boolean;
+                /** @description Selects only keys without screenshots */
+                filterHasNoScreenshot?: boolean;
+                /** @description Selects only keys with a description */
+                filterHasDescription?: boolean;
+                /** @description Selects only keys without a description */
+                filterHasNoDescription?: boolean;
+                /** @description Selects only keys with provided namespaces.
+                 *
+                 *     To filter default namespace, set to empty string.
+                 *        */
+                filterNamespace?: string[];
+                /** @description Selects only keys without provided namespaces.
+                 *
+                 *     To filter default namespace, set to empty string.
+                 *        */
+                filterNoNamespace?: string[];
+                /** @description Selects only keys with provided tag */
+                filterTag?: string[];
+                /** @description Selects only keys without provided tag */
+                filterNoTag?: string[];
+                /**
+                 * @description Selects only keys, where translation in provided langs is in outdated state
+                 * @example en-US
+                 */
+                filterOutdatedLanguage?: string[];
+                /**
+                 * @description Selects only keys, where translation in provided langs is not in outdated state
+                 * @example en-US
+                 */
+                filterNotOutdatedLanguage?: string[];
+                /**
+                 * @description Selects only key affected by activity with specidfied revision ID
+                 * @example 1234567
+                 */
+                filterRevisionId?: number[];
+                /** @description Select only keys which were not successfully translated by batch job with provided id */
+                filterFailedKeysOfJob?: number;
+                /** @description Select only keys which are in specified task */
+                filterTaskNumber?: number[];
+                /** @description Filter task keys which are `not done` */
+                filterTaskKeysNotDone?: boolean;
+                /** @description Filter task keys which are `done` */
+                filterTaskKeysDone?: boolean;
+                /** @description Filter keys with unresolved comments in lang */
+                filterHasUnresolvedCommentsInLang?: string[];
+                /** @description Filter keys with any comments in lang */
+                filterHasCommentsInLang?: string[];
+                /**
+                 * @description Filter key translations with labels
+                 * @example labelId1,labelId2
+                 */
+                filterLabel?: string[];
+                /** @description Filter keys with open QA issues in lang */
+                filterHasQaIssuesInLang?: string[];
+                /** @description Filter keys with specific QA check type issues in the format: languageTag,checkType.
+                 *     You can use this parameter multiple times.
+                 *
+                 *     A key matches if any of the selected check types is present in any of the selected languages.
+                 *          */
+                filterQaCheckType?: string[];
+                /** @description Filter keys whose QA checks are stale (pending recomputation) in lang. When set, only keys with at least one stale translation in any of the provided languages are returned. */
+                filterQaChecksStaleInLang?: string[];
+                /** @description Filter keys with any suggestions in lang */
+                filterHasSuggestionsInLang?: string[];
+                /** @description Filter keys with no suggestions in lang */
+                filterHasNoSuggestionsInLang?: string[];
+                /** @description Selects only keys from specified branch */
+                branch?: string;
+                /** @description Filter trashed keys by who deleted them (user IDs) */
+                filterDeletedByUserId?: number[];
+            };
+            header?: never;
+            path: {
+                projectId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SelectAllResponse"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+        };
+    };
+    permanentlyDelete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                keyId: number;
+                projectId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+        };
+    };
+    restore: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                keyId: number;
+                projectId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["KeyModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+        };
+    };
+    delete_17: {
         parameters: {
             query?: never;
             header?: never;
@@ -25416,6 +28487,601 @@ export interface operations {
             };
         };
     };
+    getSettings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QaSettingsModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+        };
+    };
+    updateSettings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QaSettingsRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QaSettingsModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+        };
+    };
+    getCheckTypes: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QaCheckCategoryModel"][];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+        };
+    };
+    setQaEnabled: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QaEnabledRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+        };
+    };
+    getAllLanguageSettings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LanguageQaConfigModel"][];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+        };
+    };
+    getLanguageSettings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                languageId: number;
+                projectId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QaLanguageSettingsModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+        };
+    };
+    updateLanguageSettings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                languageId: number;
+                projectId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QaLanguageSettingsRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QaLanguageSettingsModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+        };
+    };
+    deleteLanguageSettings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                languageId: number;
+                projectId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+        };
+    };
+    setLanguageQaEnabled: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                languageId: number;
+                projectId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QaEnabledRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+        };
+    };
+    getLanguageSettingsResolved: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                languageId: number;
+                projectId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QaSettingsModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+        };
+    };
     singleStepFromFiles: {
         parameters: {
             query?: never;
@@ -25853,6 +29519,68 @@ export interface operations {
             };
         };
     };
+    hardDeleteKeys: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HardDeleteKeysRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BatchJobModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+        };
+    };
     machineTranslation: {
         parameters: {
             query?: never;
@@ -25927,6 +29655,130 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["PreTranslationByTmRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BatchJobModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+        };
+    };
+    qaCheck: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QaRecheckByKeysRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BatchJobModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+        };
+    };
+    restoreKeys: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RestoreKeysRequest"];
             };
         };
         responses: {
@@ -26407,6 +30259,69 @@ export interface operations {
             };
         };
     };
+    getQaIssueCountsByCheckType: {
+        parameters: {
+            query: {
+                languageId: number;
+                branch?: string;
+            };
+            header?: never;
+            path: {
+                projectId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: number;
+                    };
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+        };
+    };
     suggestMachineTranslations: {
         parameters: {
             query?: never;
@@ -26662,7 +30577,7 @@ export interface operations {
             };
         };
     };
-    getAll_14: {
+    getAll_15: {
         parameters: {
             query?: {
                 search?: string;
@@ -27925,11 +31840,314 @@ export interface operations {
             };
         };
     };
+    list_6: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CollectionModelProjectTranslationMemoryAssignmentModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+        };
+    };
+    updateProjectTmSettings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateProjectTmSettingsRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+        };
+    };
+    updateAssignment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                translationMemoryId: number;
+                projectId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateProjectTranslationMemoryAssignmentRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProjectTranslationMemoryAssignmentModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+        };
+    };
+    assign: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                translationMemoryId: number;
+                projectId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AssignSharedTranslationMemoryRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProjectTranslationMemoryAssignmentModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+        };
+    };
+    unassign: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                translationMemoryId: number;
+                projectId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+        };
+    };
     getTranslations: {
         parameters: {
             query?: {
                 /** @description Cursor to get next data */
                 cursor?: string;
+                /** @description Include detailed QA issues for inline highlighting */
+                includeQaIssues?: boolean;
                 /** @description Translation state in the format: languageTag,state. You can use this parameter multiple times.
                  *
                  *     When used with multiple states for same language it is applied with logical OR.
@@ -27973,6 +32191,10 @@ export interface operations {
                 filterHasScreenshot?: boolean;
                 /** @description Selects only keys without screenshots */
                 filterHasNoScreenshot?: boolean;
+                /** @description Selects only keys with a description */
+                filterHasDescription?: boolean;
+                /** @description Selects only keys without a description */
+                filterHasNoDescription?: boolean;
                 /** @description Selects only keys with provided namespaces.
                  *
                  *     To filter default namespace, set to empty string.
@@ -28019,12 +32241,24 @@ export interface operations {
                  * @example labelId1,labelId2
                  */
                 filterLabel?: string[];
+                /** @description Filter keys with open QA issues in lang */
+                filterHasQaIssuesInLang?: string[];
+                /** @description Filter keys with specific QA check type issues in the format: languageTag,checkType.
+                 *     You can use this parameter multiple times.
+                 *
+                 *     A key matches if any of the selected check types is present in any of the selected languages.
+                 *          */
+                filterQaCheckType?: string[];
+                /** @description Filter keys whose QA checks are stale (pending recomputation) in lang. When set, only keys with at least one stale translation in any of the provided languages are returned. */
+                filterQaChecksStaleInLang?: string[];
                 /** @description Filter keys with any suggestions in lang */
                 filterHasSuggestionsInLang?: string[];
                 /** @description Filter keys with no suggestions in lang */
                 filterHasNoSuggestionsInLang?: string[];
                 /** @description Selects only keys from specified branch */
                 branch?: string;
+                /** @description Filter trashed keys by who deleted them (user IDs) */
+                filterDeletedByUserId?: number[];
                 /** @description Zero-based page index (0..N) */
                 page?: number;
                 /** @description The size of the page to be returned */
@@ -28381,6 +32615,10 @@ export interface operations {
                 filterHasScreenshot?: boolean;
                 /** @description Selects only keys without screenshots */
                 filterHasNoScreenshot?: boolean;
+                /** @description Selects only keys with a description */
+                filterHasDescription?: boolean;
+                /** @description Selects only keys without a description */
+                filterHasNoDescription?: boolean;
                 /** @description Selects only keys with provided namespaces.
                  *
                  *     To filter default namespace, set to empty string.
@@ -28427,12 +32665,24 @@ export interface operations {
                  * @example labelId1,labelId2
                  */
                 filterLabel?: string[];
+                /** @description Filter keys with open QA issues in lang */
+                filterHasQaIssuesInLang?: string[];
+                /** @description Filter keys with specific QA check type issues in the format: languageTag,checkType.
+                 *     You can use this parameter multiple times.
+                 *
+                 *     A key matches if any of the selected check types is present in any of the selected languages.
+                 *          */
+                filterQaCheckType?: string[];
+                /** @description Filter keys whose QA checks are stale (pending recomputation) in lang. When set, only keys with at least one stale translation in any of the provided languages are returned. */
+                filterQaChecksStaleInLang?: string[];
                 /** @description Filter keys with any suggestions in lang */
                 filterHasSuggestionsInLang?: string[];
                 /** @description Filter keys with no suggestions in lang */
                 filterHasNoSuggestionsInLang?: string[];
                 /** @description Selects only keys from specified branch */
                 branch?: string;
+                /** @description Filter trashed keys by who deleted them (user IDs) */
+                filterDeletedByUserId?: number[];
             };
             header?: never;
             path: {
@@ -29143,6 +33393,303 @@ export interface operations {
                 translationId: number;
                 labelId: number;
                 projectId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+        };
+    };
+    getIssues: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: number;
+                translationId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CollectionModelQaIssueModel"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+        };
+    };
+    createSuppression: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: number;
+                translationId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QaCheckIssueIgnoreRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+        };
+    };
+    removeSuppression: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: number;
+                translationId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QaCheckIssueIgnoreRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+        };
+    };
+    ignoreIssue: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: number;
+                translationId: number;
+                issueId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string & (components["schemas"]["ErrorResponseTyped"] | components["schemas"]["ErrorResponseBody"]);
+                };
+            };
+        };
+    };
+    unignoreIssue: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: number;
+                translationId: number;
+                issueId: number;
             };
             cookie?: never;
         };
@@ -30173,7 +34720,7 @@ export interface operations {
             };
         };
     };
-    get_19: {
+    get_21: {
         parameters: {
             query?: never;
             header?: never;
@@ -30229,7 +34776,7 @@ export interface operations {
             };
         };
     };
-    get_18: {
+    get_20: {
         parameters: {
             query?: never;
             header?: never;
@@ -30285,7 +34832,7 @@ export interface operations {
             };
         };
     };
-    get_17: {
+    get_19: {
         parameters: {
             query?: never;
             header?: never;
@@ -31460,7 +36007,7 @@ export interface operations {
             };
         };
     };
-    get_16: {
+    get_18: {
         parameters: {
             query?: never;
             header?: never;
