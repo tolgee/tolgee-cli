@@ -1,3 +1,10 @@
+# [2.19.0](https://github.com/tolgee/tolgee-cli/compare/v2.18.0...v2.19.0) (2026-06-22)
+
+
+### Features
+
+* add Python brace localization format ([#207](https://github.com/tolgee/tolgee-cli/issues/207)) ([9408f11](https://github.com/tolgee/tolgee-cli/commit/9408f11113e59a526ac23b39e856389e599390da))
+
 # [2.18.0](https://github.com/tolgee/tolgee-cli/compare/v2.17.0...v2.18.0) (2026-06-15)
 
 
