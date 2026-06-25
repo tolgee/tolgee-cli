@@ -37,6 +37,9 @@ export const generalMapper = (token: Token) => {
     // variables
     case 'variable.other.object.ts':
     case 'variable.other.constant.ts':
+    case 'variable.other.constant.object.ts':
+    case 'variable.other.constant.property.ts':
+    case 'variable.other.property.ts':
     case 'variable.language.this.ts':
       return 'variable';
 

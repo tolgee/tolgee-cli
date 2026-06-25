@@ -24,6 +24,7 @@ import { closingTagMerger } from './tokenMergers/closingTagMerger.js';
 import { typesAsMerger } from './tokenMergers/typesAsMerger.js';
 import { typesCastMerger } from './tokenMergers/typesCastMerger.js';
 import { customTCallMerger } from './tokenMergers/customTCallMerger.js';
+import { extractConstants } from './extractConstants.js';
 
 export const DEFAULT_BLOCKS = {
   'block.begin': ['block.end'],
@@ -124,6 +125,7 @@ export const Parser = <T extends string = GeneralTokenType>({
         withLabel,
         ruleMap,
         blocks,
+        constants: extractConstants(filteredIgnored),
       };
 
       let depth = 0;

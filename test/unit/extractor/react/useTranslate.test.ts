@@ -549,4 +549,172 @@ describe.each(['js', 'ts', 'jsx', 'tsx'])('useTranslate (.%s)', (ext) => {
       expect(extracted.warnings).toEqual([]);
     });
   });
+
+  describe('top-level const namespace identifiers', () => {
+    it('resolves a plain const string to its literal value', async () => {
+      const code = `
+        import '@tolgee/react'
+        const NS = 'my-namespace'
+        function Test () {
+          const { t } = useTranslate(NS)
+          t('key1')
+        }
+      `;
+
+      const extracted = await extractReactKeys(code, FILE_NAME);
+      expect(extracted.warnings).toEqual([]);
+      expect(extracted.keys).toEqual([
+        { keyName: 'key1', namespace: 'my-namespace', line: 6 },
+      ]);
+    });
+
+    it('resolves an exported `as const` declaration', async () => {
+      const code = `
+        import '@tolgee/react'
+        export const NS = 'billing' as const
+        function Test () {
+          const { t } = useTranslate(NS)
+          t('key1')
+        }
+      `;
+
+      const extracted = await extractReactKeys(code, FILE_NAME);
+      expect(extracted.warnings).toEqual([]);
+      expect(extracted.keys).toEqual([
+        { keyName: 'key1', namespace: 'billing', line: 6 },
+      ]);
+    });
+
+    it('resolves member access on a const object (`as const`)', async () => {
+      const code = `
+        import '@tolgee/react'
+        const NS = { AUTH: 'auth', BILLING: 'billing' } as const
+        function Test () {
+          const { t } = useTranslate(NS.BILLING)
+          t('key1')
+        }
+      `;
+
+      const extracted = await extractReactKeys(code, FILE_NAME);
+      expect(extracted.warnings).toEqual([]);
+      expect(extracted.keys).toEqual([
+        { keyName: 'key1', namespace: 'billing', line: 6 },
+      ]);
+    });
+
+    it('resolves member access on a plain const object (no `as const`)', async () => {
+      const code = `
+        import '@tolgee/react'
+        const NS = { AUTH: 'auth' }
+        function Test () {
+          const { t } = useTranslate(NS.AUTH)
+          t('key1')
+        }
+      `;
+
+      const extracted = await extractReactKeys(code, FILE_NAME);
+      expect(extracted.warnings).toEqual([]);
+      expect(extracted.keys).toEqual([
+        { keyName: 'key1', namespace: 'auth', line: 6 },
+      ]);
+    });
+
+    it('matches JS last-write-wins for duplicate object keys', async () => {
+      const code = `
+        import '@tolgee/react'
+        const NS = { K: 'first', K: 'second' } as const
+        function Test () {
+          const { t } = useTranslate(NS.K)
+          t('key1')
+        }
+      `;
+
+      const extracted = await extractReactKeys(code, FILE_NAME);
+      expect(extracted.warnings).toEqual([]);
+      expect(extracted.keys).toEqual([
+        { keyName: 'key1', namespace: 'second', line: 6 },
+      ]);
+    });
+
+    it('keeps capturing after a top-level array destructure', async () => {
+      // Regression: `const [a, b] = ...` is a list-destructure pattern.
+      // It must not leave the walker stuck in skip mode, otherwise the
+      // subsequent `const NS = ...` would silently fail to be captured.
+      const code = `
+        import '@tolgee/react'
+        const [first, second] = ['x', 'y']
+        const NS = 'after-destructure'
+        function Test () {
+          const { t } = useTranslate(NS)
+          t('key1')
+        }
+      `;
+
+      const extracted = await extractReactKeys(code, FILE_NAME);
+      expect(extracted.warnings).toEqual([]);
+      expect(extracted.keys).toEqual([
+        { keyName: 'key1', namespace: 'after-destructure', line: 7 },
+      ]);
+    });
+
+    it('ignores const declarations nested inside function bodies', async () => {
+      // A function-local `const NS` must not shadow what the consumer
+      // would see at module scope. Here there is no module-level NS,
+      // so the call site should produce the existing dynamic-namespace
+      // warning, not be silently resolved to the inner literal.
+      const code = `
+        import '@tolgee/react'
+        function helper () {
+          const NS = 'inner-only'
+          return NS
+        }
+        function Test () {
+          const { t } = useTranslate(NS)
+          t('key1')
+        }
+      `;
+
+      const extracted = await extractReactKeys(code, FILE_NAME);
+      expect(extracted.warnings).toEqual([
+        { warning: 'W_DYNAMIC_NAMESPACE', line: 8 },
+        { warning: 'W_UNRESOLVABLE_NAMESPACE', line: 9 },
+      ]);
+      expect(extracted.keys).toEqual([]);
+    });
+
+    it('still warns for member access on an unknown property', async () => {
+      const code = `
+        import '@tolgee/react'
+        const NS = { AUTH: 'auth' } as const
+        function Test () {
+          const { t } = useTranslate(NS.BILLING)
+          t('key1')
+        }
+      `;
+
+      const extracted = await extractReactKeys(code, FILE_NAME);
+      expect(extracted.warnings).toEqual([
+        { warning: 'W_DYNAMIC_NAMESPACE', line: 5 },
+        { warning: 'W_UNRESOLVABLE_NAMESPACE', line: 6 },
+      ]);
+      expect(extracted.keys).toEqual([]);
+    });
+
+    it('still emits a warning for identifiers without a const declaration', async () => {
+      const code = `
+        import '@tolgee/react'
+        function Test () {
+          const { t } = useTranslate(unknownNs)
+          t('key1')
+        }
+      `;
+
+      const extracted = await extractReactKeys(code, FILE_NAME);
+      expect(extracted.warnings).toEqual([
+        { warning: 'W_DYNAMIC_NAMESPACE', line: 4 },
+        { warning: 'W_UNRESOLVABLE_NAMESPACE', line: 5 },
+      ]);
+      expect(extracted.keys).toEqual([]);
+    });
+  });
 });
