@@ -1,3 +1,10 @@
+# [2.20.0](https://github.com/tolgee/tolgee-cli/compare/v2.19.0...v2.20.0) (2026-06-25)
+
+
+### Features
+
+* **extractor:** resolve const namespace identifiers and NS.KEY member access ([#202](https://github.com/tolgee/tolgee-cli/issues/202)) ([51e16fc](https://github.com/tolgee/tolgee-cli/commit/51e16fc56a157ca744de4c21bc88af1caf91bdf4))
+
 # [2.19.0](https://github.com/tolgee/tolgee-cli/compare/v2.18.0...v2.19.0) (2026-06-22)
 
 
