@@ -1,0 +1,6 @@
+{
+  "$schema": "../../../schema.json",
+  "apiUrl": "https://app.tolgee.io",
+  "projectId": 1337,
+  "patterns": ["./src/**/*.tsx", "!./src/excluded.tsx"]
+}

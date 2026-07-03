@@ -84,6 +84,19 @@ describe('.tolgeerc', () => {
     }
   });
 
+  it('preserves negation prefix when resolving patterns', async () => {
+    const path = fileURLToPath(
+      new URL('./validTolgeeRc/withNegationPattern.json', FIXTURES_PATH)
+    );
+
+    const cfg = (await loadTolgeeRc(path))!;
+
+    expect(cfg.patterns!.some((p) => p.startsWith('!'))).toBe(true);
+    for (const pattern of cfg.patterns!) {
+      expect(pattern.lastIndexOf('!')).toBeLessThanOrEqual(0);
+    }
+  });
+
   it('converts projectId to number', async () => {
     const path = fileURLToPath(
       new URL('./validTolgeeRc/withProjectIdString.json', FIXTURES_PATH)
