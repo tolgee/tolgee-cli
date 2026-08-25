@@ -160,7 +160,13 @@ async function fetchZipBlob(opts: PullOptions, ifNoneMatch?: string) {
     filterBranch: opts.branch,
   });
 
-  handleLoadableError(loadable);
+  // 412 is not modified for POST request
+  // https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/412
+  // 304 is not modified for GET request
+  const notModified = [412, 304].includes(loadable.response?.status ?? 0);
+  if (!notModified) {
+    handleLoadableError(loadable);
+  }
   const etag = loadable.response
     ? extractETagFromResponse(loadable.response)
     : undefined;
@@ -168,10 +174,7 @@ async function fetchZipBlob(opts: PullOptions, ifNoneMatch?: string) {
   return {
     data: loadable.data,
     etag,
-    // 412 is not modified for POST request
-    // https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/412
-    // 304 is not modified for GET request
-    notModified: [412, 304].includes(loadable.response?.status ?? 0),
+    notModified,
   };
 }
 
