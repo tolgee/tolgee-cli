@@ -1,6 +1,12 @@
 import ansi from 'ansi-colors';
 
-import { loadStore, ProjectDetails, Token } from '../config/credentials.js';
+import {
+  isOAuthSession,
+  loadStore,
+  OAuthSession,
+  ProjectDetails,
+  Token,
+} from '../config/credentials.js';
 
 function getProjectName(
   projectId: string,
@@ -35,6 +41,17 @@ function printToken(
   console.log(result);
 }
 
+function printOAuthSession(session: OAuthSession) {
+  const who = session.userName ? ` as ${session.userName}` : '';
+  console.log(
+    ansi.magenta('OAuth') +
+      '\t ' +
+      ansi.yellow('<all projects>') +
+      '\t ' +
+      ansi.grey(`browser login${who}`)
+  );
+}
+
 export async function printApiKeyLists() {
   const store = await loadStore();
   const list = Object.entries(store);
@@ -46,7 +63,11 @@ export async function printApiKeyLists() {
   for (const [origin, server] of list) {
     console.log(ansi.white('[') + ansi.red(origin) + ansi.white(']'));
     if (server.user) {
-      printToken('PAT', server.user);
+      if (isOAuthSession(server.user)) {
+        printOAuthSession(server.user);
+      } else {
+        printToken('PAT', server.user);
+      }
     }
     if (server.projects) {
       for (const [project, token] of Object.entries(server.projects)) {
