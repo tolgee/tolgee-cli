@@ -2,7 +2,7 @@ import { existsSync } from 'fs';
 import { resolve } from 'path';
 import { Option, InvalidArgumentError } from 'commander';
 import { createTolgeeClient } from './client/TolgeeClient.js';
-import type { OAuthSession } from './config/credentials.js';
+import type { OAuthSessionHandle } from './oauth/session.js';
 import { parseHeaderList } from './utils/headers.js';
 import { VerboseOption } from './extractor/index.js';
 import { DEFAULT_API_URL } from './constants.js';
@@ -53,7 +53,7 @@ export type BaseOptions = {
   apiUrl: URL;
   /** Empty when the user is logged in through the browser; `oauthSession` carries the credential then. */
   apiKey: string;
-  oauthSession?: OAuthSession;
+  oauthSession?: OAuthSessionHandle;
   projectId: number;
   branch?: string;
   client: ReturnType<typeof createTolgeeClient>;

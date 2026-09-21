@@ -29,6 +29,18 @@ export async function loadStore() {
   return store.list();
 }
 
+export async function getHostCredentials(apiUrl: URL) {
+  return store.get(apiUrl.hostname);
+}
+
+/** The session in this instance's slot, whichever instance issued it. */
+export async function storedSessionFor(
+  apiUrl: URL
+): Promise<OAuthSession | undefined> {
+  const user = (await getHostCredentials(apiUrl))?.user;
+  return user && isOAuthSession(user) ? user : undefined;
+}
+
 async function updateHost(
   instance: URL,
   update: (current: HostCredentials) => HostCredentials
@@ -72,6 +84,11 @@ export async function savePat(instance: URL, pat?: Token) {
 
 export async function saveOAuthSession(instance: URL, session: OAuthSession) {
   return storeUser(instance, session);
+}
+
+/** Clears the host's user-level credential, leaving its project api keys in place. */
+export async function clearUserCredentials(instance: URL) {
+  return storeUser(instance, undefined);
 }
 
 export async function savePak(

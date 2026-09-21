@@ -159,3 +159,107 @@ describe('createApiClient OAuth', () => {
     expect(req.headers.get('authorization')).toBe('Bearer supplied');
   });
 });
+
+describe('createApiClient 401 replay', () => {
+  function stubFetch(statuses: number[], seen: any[]) {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (request: Request) => {
+        seen.push({
+          authorization: request.headers.get('authorization'),
+          body: await request.clone().text(),
+        });
+        return new Response('{}', {
+          status: statuses[seen.length - 1] ?? 200,
+          headers: { 'content-type': 'application/json' },
+        });
+      })
+    );
+  }
+
+  it('sends the request again with the token the refresh produced', async () => {
+    const seen: any[] = [];
+    stubFetch([401, 200], seen);
+    let token = 'tgoat_old';
+
+    const client = createApiClient({
+      baseUrl: 'http://localhost',
+      getAccessToken: () => token,
+      onUnauthorized: async () => {
+        token = 'tgoat_new';
+        return true;
+      },
+    });
+    await (client as any).GET('/v2/projects');
+
+    expect(seen.map((call) => call.authorization)).toEqual([
+      'Bearer tgoat_old',
+      'Bearer tgoat_new',
+    ]);
+  });
+
+  it('replays the body too', async () => {
+    const seen: any[] = [];
+    stubFetch([401, 200], seen);
+    let token = 'tgoat_old';
+
+    const client = createApiClient({
+      baseUrl: 'http://localhost',
+      getAccessToken: () => token,
+      onUnauthorized: async () => {
+        token = 'tgoat_new';
+        return true;
+      },
+    });
+    await (client as any).POST('/v2/projects', { body: { name: 'a project' } });
+
+    expect(seen).toHaveLength(2);
+    expect(seen[1].body).toBe(seen[0].body);
+    expect(seen[1].body).toContain('a project');
+  });
+
+  it('gives up when the session could not be refreshed', async () => {
+    const seen: any[] = [];
+    stubFetch([401, 200], seen);
+
+    const client = createApiClient({
+      baseUrl: 'http://localhost',
+      getAccessToken: () => 'tgoat_old',
+      onUnauthorized: async () => false,
+    });
+    await (client as any).GET('/v2/projects');
+
+    expect(seen).toHaveLength(1);
+  });
+
+  it('never replays an api key request', async () => {
+    const seen: any[] = [];
+    stubFetch([401, 200], seen);
+    const onUnauthorized = vi.fn(async () => true);
+
+    const client = createApiClient({
+      baseUrl: 'http://localhost',
+      apiKey: 'tgpak_test',
+      onUnauthorized,
+    });
+    await (client as any).GET('/v2/projects');
+
+    expect(seen).toHaveLength(1);
+    expect(onUnauthorized).not.toHaveBeenCalled();
+  });
+});
+
+describe('createApiClient settings', () => {
+  it('round-trips the browser session, so a rebuilt client still authenticates', async () => {
+    const getAccessToken = () => 'tgoat_token';
+    const settings = createApiClient({
+      baseUrl: 'http://localhost',
+      getAccessToken,
+    }).getSettings();
+
+    const req = await get(settings);
+
+    expect(settings.getAccessToken).toBe(getAccessToken);
+    expect(req.headers.get('authorization')).toBe('Bearer tgoat_token');
+  });
+});

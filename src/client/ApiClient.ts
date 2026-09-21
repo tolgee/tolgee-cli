@@ -59,6 +59,8 @@ export type ApiClientProps = {
   apiKey?: string;
   /** Read per request rather than captured, so a token rotated mid-command is the one that gets sent. */
   getAccessToken?: () => string | undefined;
+  /** Given the token that was refused, answers whether the request is worth sending again. */
+  onUnauthorized?: (usedToken: string) => Promise<boolean>;
   projectId?: number | undefined;
   autoThrow?: boolean;
   headers?: Record<string, string>;
@@ -68,6 +70,7 @@ export function createApiClient({
   baseUrl,
   apiKey,
   getAccessToken,
+  onUnauthorized,
   projectId,
   autoThrow = false,
   headers,
@@ -84,8 +87,39 @@ export function createApiClient({
     delete custom[name];
   }
 
+  // An explicitly supplied authorization header outranks a stored session, the same way --api-key does.
+  const hasCustomAuthorization = 'authorization' in custom;
+
+  function authorized(request: Request) {
+    const token = hasCustomAuthorization ? undefined : getAccessToken?.();
+    if (!token) {
+      return { request, token: undefined };
+    }
+    const authorizedRequest = new Request(request);
+    authorizedRequest.headers.set('authorization', `Bearer ${token}`);
+    return { request: authorizedRequest, token };
+  }
+
+  // The access token is applied here rather than in middleware so that the replay below carries the token the
+  // refresh produced, not the one that was just refused.
+  async function fetchWithAuth(request: Request): Promise<Response> {
+    const attempt = authorized(request.clone());
+    const response = await fetch(attempt.request);
+
+    if (response.status !== 401 || !onUnauthorized || !attempt.token) {
+      return response;
+    }
+    if (!(await onUnauthorized(attempt.token))) {
+      return response;
+    }
+
+    debug('[HTTP] Retrying with a refreshed access token');
+    return fetch(authorized(request.clone()).request);
+  }
+
   const apiClient = createClient<paths>({
     baseUrl,
+    fetch: fetchWithAuth,
     headers: {
       ...custom,
       'user-agent': USER_AGENT,
@@ -93,19 +127,9 @@ export function createApiClient({
     },
   });
 
-  // An explicitly supplied authorization header outranks a stored session, the same way --api-key does.
-  const hasCustomAuthorization = 'authorization' in custom;
-
   apiClient.use({
     onRequest: ({ request }) => {
-      const accessToken = hasCustomAuthorization
-        ? undefined
-        : getAccessToken?.();
-      if (accessToken) {
-        request.headers.set('authorization', `Bearer ${accessToken}`);
-      }
       debug(`[HTTP] Requesting: ${request.method} ${request.url}`);
-      return request;
     },
     onResponse: async ({ response, options }) => {
       let responseText = `[HTTP] Response: ${response.url} [${response.status}]`;
@@ -139,8 +163,18 @@ export function createApiClient({
     getApiKeyInfo() {
       return getApiKeyInformation(apiClient, apiKey!);
     },
+    // Complete enough to build an equivalent client from: leaving the credential out would hand back one that
+    // authenticates with nothing for a user logged in through the browser.
     getSettings(): ApiClientProps {
-      return { baseUrl, apiKey, projectId, autoThrow, headers };
+      return {
+        baseUrl,
+        apiKey,
+        getAccessToken,
+        onUnauthorized,
+        projectId,
+        autoThrow,
+        headers,
+      };
     },
   };
 }

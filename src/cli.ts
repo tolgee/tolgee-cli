@@ -47,6 +47,7 @@ import { Schema } from './schema.js';
 import { createTolgeeClient } from './client/TolgeeClient.js';
 import { projectIdFromKey } from './client/ApiClient.js';
 import { printApiKeyLists } from './utils/apiKeyList.js';
+import { createOAuthSessionHandle } from './oauth/session.js';
 
 const NO_KEY_COMMANDS = ['login', 'logout', 'extract'];
 
@@ -72,7 +73,10 @@ async function loadCredentials(cmd: Command) {
   if (!credentials) return;
 
   if (credentials.type === 'oauth') {
-    cmd.setOptionValue('oauthSession', credentials.session);
+    cmd.setOptionValue(
+      'oauthSession',
+      createOAuthSessionHandle(opts.apiUrl, credentials.session)
+    );
     return;
   }
 
@@ -149,11 +153,15 @@ const preHandler = (config: Schema) =>
       validateOptions(cmd);
 
       const opts = cmd.optsWithGlobals();
+      // Rotating before the command starts keeps a long push or pull from beginning with a token about to expire.
+      await opts.oauthSession?.ensureFresh();
       const client = createTolgeeClient({
         baseUrl: opts.apiUrl?.toString() ?? config.apiUrl?.toString(),
         apiKey: opts.apiKey,
-        getAccessToken: opts.oauthSession
-          ? () => opts.oauthSession.accessToken
+        getAccessToken: () => opts.oauthSession?.getAccessToken(),
+        onUnauthorized: opts.oauthSession
+          ? (usedToken: string) =>
+              opts.oauthSession.refreshAfterUnauthorized(usedToken)
           : undefined,
         projectId:
           opts.projectId !== undefined
