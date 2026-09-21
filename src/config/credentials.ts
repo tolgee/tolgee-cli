@@ -70,6 +70,10 @@ export async function savePat(instance: URL, pat?: Token) {
   return storeUser(instance, pat);
 }
 
+export async function saveOAuthSession(instance: URL, session: OAuthSession) {
+  return storeUser(instance, session);
+}
+
 export async function savePak(
   instance: URL,
   project: ApiKeyProject,

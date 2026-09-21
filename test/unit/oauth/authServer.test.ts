@@ -122,6 +122,87 @@ describe('discovery', () => {
   });
 });
 
+describe('discovery validation', () => {
+  it('refuses a document that names no issuer', async () => {
+    stubFetch(() => ({ body: { ...DISCOVERY_BODY, issuer: undefined } }));
+
+    await expect(fetchAuthServerMetadata(API_URL)).rejects.toMatchObject({
+      kind: 'unsupported',
+    });
+  });
+
+  it('refuses a document that claims to be another issuer', async () => {
+    stubFetch(() => ({
+      body: { ...DISCOVERY_BODY, issuer: 'https://evil.example' },
+    }));
+
+    await expect(fetchAuthServerMetadata(API_URL)).rejects.toMatchObject({
+      kind: 'unsupported',
+    });
+  });
+
+  it.each(['authorization_endpoint', 'token_endpoint', 'revocation_endpoint'])(
+    'refuses a %s somewhere else',
+    async (field) => {
+      stubFetch(() => ({
+        body: { ...DISCOVERY_BODY, [field]: 'https://evil.example/x' },
+      }));
+
+      await expect(fetchAuthServerMetadata(API_URL)).rejects.toMatchObject({
+        kind: 'unsupported',
+      });
+    }
+  );
+
+  it('carries the caller headers, which the CLI applies to every Tolgee request', async () => {
+    stubFetch(() => ({ body: DISCOVERY_BODY }));
+
+    await fetchAuthServerMetadata(API_URL, { 'x-proxy': 'yes' });
+
+    expect((calls[0].init!.headers as any)['x-proxy']).toBe('yes');
+  });
+});
+
+describe('token lifetime', () => {
+  it('assumes a short life when the server reports none', async () => {
+    stubFetch(() => ({ body: { ...TOKEN_BODY, expires_in: undefined } }));
+    const before = Date.now();
+
+    const tokens = await exchangeCode(METADATA, {
+      clientId: 'tolgee-cli',
+      code: 'the-code',
+      redirectUri: 'http://127.0.0.1:1/callback',
+      codeVerifier: 'v',
+    });
+
+    expect(tokens.accessExpires).toBeGreaterThan(before + 60_000);
+  });
+});
+
+describe('a refused token request', () => {
+  it('reads a transport-level refusal as a blip rather than a dead grant', async () => {
+    stubFetch(() => ({ status: 503, body: { message: 'upstream down' } }));
+
+    await expect(
+      refreshTokens(METADATA, {
+        clientId: 'tolgee-cli',
+        refreshToken: 'tgort_x',
+      })
+    ).rejects.toMatchObject({ kind: 'network' });
+  });
+
+  it('still reads a stated refusal as one', async () => {
+    stubFetch(() => ({ status: 400, body: { error: 'invalid_grant' } }));
+
+    await expect(
+      refreshTokens(METADATA, {
+        clientId: 'tolgee-cli',
+        refreshToken: 'tgort_x',
+      })
+    ).rejects.toMatchObject({ kind: 'oauth', message: 'invalid_grant' });
+  });
+});
+
 describe('code exchange', () => {
   const PARAMS = {
     clientId: 'tolgee-cli',
