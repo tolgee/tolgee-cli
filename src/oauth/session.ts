@@ -69,11 +69,10 @@ export function createOAuthSessionHandle(
     }
 
     current = {
-      type: 'oauth',
+      ...current,
       accessToken: tokens.accessToken,
       accessExpires: tokens.accessExpires,
       refreshToken: tokens.refreshToken,
-      userName: current.userName,
     };
     await saveOAuthSession(apiUrl, current);
   }

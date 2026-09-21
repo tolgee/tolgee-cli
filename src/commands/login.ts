@@ -13,6 +13,7 @@ import {
   handleLoadableError,
 } from '../client/TolgeeClient.js';
 import { browserLogin } from '../oauth/browserLogin.js';
+import { revokeAllSessions, revokeSessionFor } from '../oauth/revoke.js';
 import { OAuthError } from '../oauth/authServer.js';
 import { printApiKeyLists } from '../utils/apiKeyList.js';
 import { getStackTrace } from '../utils/getStackTrace.js';
@@ -103,6 +104,7 @@ async function loginWithBrowser(opts: Options, config: Schema) {
     accessExpires: tokens.accessExpires,
     refreshToken: tokens.refreshToken,
     userName,
+    apiUrl: opts.apiUrl.toString(),
   });
 
   success(
@@ -114,6 +116,7 @@ async function logoutHandler(this: Command) {
   const opts: Options = this.optsWithGlobals();
 
   if (opts.all) {
+    await revokeAllSessions();
     await clearAuthStore();
     success(
       "You've been logged out of all Tolgee instances you were logged in."
@@ -121,6 +124,7 @@ async function logoutHandler(this: Command) {
     return;
   }
 
+  await revokeSessionFor(opts.apiUrl);
   await removeApiKeys(opts.apiUrl);
   success(`You're now logged out of ${opts.apiUrl.hostname}.`);
 }

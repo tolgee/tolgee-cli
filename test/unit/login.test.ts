@@ -107,6 +107,8 @@ describe('browser login', () => {
       refreshToken: 'tgort_refresh',
       accessExpires: 1234,
       userName: 'Sleepy Cat',
+      // Recorded so `logout --all` can address this instance again; the store is keyed by hostname alone.
+      apiUrl: 'http://localhost/',
     });
   });
 

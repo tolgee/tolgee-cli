@@ -12,6 +12,12 @@ export type OAuthSession = {
   accessExpires: number;
   refreshToken: string;
   userName?: string;
+  /**
+   * The instance this was issued by. The store is keyed by hostname alone, which is not enough to address the
+   * token endpoint again — `logout --all` has no other way to know whether a host was reached over http or https,
+   * or on which port.
+   */
+  apiUrl?: string;
 };
 
 /**
