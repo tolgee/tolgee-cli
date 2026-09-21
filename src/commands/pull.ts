@@ -114,6 +114,9 @@ const pullHandler = () =>
     await startWatching({
       apiUrl: opts.apiUrl,
       apiKey: opts.apiKey,
+      getAccessToken: opts.oauthSession
+        ? () => opts.oauthSession?.accessToken
+        : undefined,
       projectId: opts.projectId,
       client: opts.client,
       doPull: async () => {

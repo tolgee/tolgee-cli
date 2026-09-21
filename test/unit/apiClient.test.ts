@@ -122,3 +122,40 @@ describe('createApiClient headers', () => {
     expect(settings.headers).toEqual({ 'x-foo': 'bar' });
   });
 });
+
+describe('createApiClient OAuth', () => {
+  it('sends the access token as a bearer credential', async () => {
+    const req = await get({ getAccessToken: () => 'tgoat_token' });
+    expect(req.headers.get('authorization')).toBe('Bearer tgoat_token');
+    expect(req.headers.get('x-api-key')).toBeNull();
+  });
+
+  it('reads the token again for every request', async () => {
+    const tokens = ['tgoat_first', 'tgoat_second'];
+    const client = createApiClient({
+      baseUrl: 'http://localhost',
+      getAccessToken: () => tokens.shift(),
+    });
+
+    await (client as any).GET('/v2/projects');
+    const first = captured!.headers.get('authorization');
+    await (client as any).GET('/v2/projects');
+    const second = captured!.headers.get('authorization');
+
+    expect(first).toBe('Bearer tgoat_first');
+    expect(second).toBe('Bearer tgoat_second');
+  });
+
+  it('sends no authorization header when there is no token', async () => {
+    const req = await get({ getAccessToken: () => undefined });
+    expect(req.headers.get('authorization')).toBeNull();
+  });
+
+  it('lets an explicit authorization header win over the session', async () => {
+    const req = await get({
+      getAccessToken: () => 'tgoat_token',
+      headers: { authorization: 'Bearer supplied' },
+    });
+    expect(req.headers.get('authorization')).toBe('Bearer supplied');
+  });
+});

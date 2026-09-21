@@ -10,6 +10,8 @@ type WebsocketClientOptions = {
   authentication: {
     jwtToken?: string;
     apiKey?: string;
+    /** Called on every connect, so a reconnect after a refresh carries the token that is current then. */
+    getAccessToken?: () => string | undefined;
   };
   onConnected?: (message: any) => void;
   onError?: (error: any) => void;
@@ -163,9 +165,14 @@ export const WebsocketClient = (options: WebsocketClientOptions) => {
   return Object.freeze({ subscribe, deactivate, connectIfNotAlready });
 };
 
-function getAuthentication(options: WebsocketClientOptions) {
+export function getAuthentication(options: WebsocketClientOptions) {
   if (options.authentication.jwtToken) {
     return { jwtToken: options.authentication.jwtToken };
+  }
+
+  const accessToken = options.authentication.getAccessToken?.();
+  if (accessToken) {
+    return { authorization: `Bearer ${accessToken}` };
   }
 
   if (options.authentication.apiKey) {

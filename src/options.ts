@@ -2,8 +2,18 @@ import { existsSync } from 'fs';
 import { resolve } from 'path';
 import { Option, InvalidArgumentError } from 'commander';
 import { createTolgeeClient } from './client/TolgeeClient.js';
+import type { OAuthSession } from './config/credentials.js';
 import { parseHeaderList } from './utils/headers.js';
 import { VerboseOption } from './extractor/index.js';
+import { DEFAULT_API_URL } from './constants.js';
+
+/**
+ * Commander hands an option's default through untouched, so the config value
+ * has to be the URL the parser would have made of it.
+ */
+export function apiUrlOrDefault(configured?: string) {
+  return new URL(configured ?? DEFAULT_API_URL);
+}
 
 function parseProjectId(v: string) {
   const val = Number(v);
@@ -41,7 +51,9 @@ function accumulateHeader(v: string, previous: string[] = []) {
 
 export type BaseOptions = {
   apiUrl: URL;
+  /** Empty when the user is logged in through the browser; `oauthSession` carries the credential then. */
   apiKey: string;
+  oauthSession?: OAuthSession;
   projectId: number;
   branch?: string;
   client: ReturnType<typeof createTolgeeClient>;

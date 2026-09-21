@@ -122,3 +122,37 @@ describe('credential store', () => {
     expect(mode).toBe(0o600);
   });
 });
+
+describe('stored credentials', () => {
+  let getStoredCredentials: CredentialsModule['getStoredCredentials'];
+
+  beforeAll(async () => {
+    ({ getStoredCredentials } = await import('#cli/config/credentials.js'));
+  });
+
+  it('prefers a browser session over a project api key', async () => {
+    await fileCredentialStore.clear();
+    await fileCredentialStore.set('nya.local', {
+      user: {
+        type: 'oauth',
+        accessToken: 'tgoat_xxx',
+        accessExpires: 1234,
+        refreshToken: 'tgort_yyy',
+      },
+      projects: { '1': { token: 'tgpak_project', expires: 0 } },
+    });
+
+    const credentials = await getStoredCredentials('https://nya.local', 1);
+
+    expect(credentials).toMatchObject({ type: 'oauth' });
+  });
+
+  it('reports a personal access token as an api key', async () => {
+    await writeLegacyStore();
+
+    expect(await getStoredCredentials('https://app.tolgee.io', 1)).toEqual({
+      type: 'apiKey',
+      key: 'tgpat_legacy',
+    });
+  });
+});

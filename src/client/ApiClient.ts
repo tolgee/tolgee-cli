@@ -57,6 +57,8 @@ export function projectIdFromKey(key: string) {
 export type ApiClientProps = {
   baseUrl: string;
   apiKey?: string;
+  /** Read per request rather than captured, so a token rotated mid-command is the one that gets sent. */
+  getAccessToken?: () => string | undefined;
   projectId?: number | undefined;
   autoThrow?: boolean;
   headers?: Record<string, string>;
@@ -65,6 +67,7 @@ export type ApiClientProps = {
 export function createApiClient({
   baseUrl,
   apiKey,
+  getAccessToken,
   projectId,
   autoThrow = false,
   headers,
@@ -90,9 +93,19 @@ export function createApiClient({
     },
   });
 
+  // An explicitly supplied authorization header outranks a stored session, the same way --api-key does.
+  const hasCustomAuthorization = 'authorization' in custom;
+
   apiClient.use({
     onRequest: ({ request }) => {
+      const accessToken = hasCustomAuthorization
+        ? undefined
+        : getAccessToken?.();
+      if (accessToken) {
+        request.headers.set('authorization', `Bearer ${accessToken}`);
+      }
       debug(`[HTTP] Requesting: ${request.method} ${request.url}`);
+      return request;
     },
     onResponse: async ({ response, options }) => {
       let responseText = `[HTTP] Response: ${response.url} [${response.status}]`;

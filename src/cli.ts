@@ -3,7 +3,11 @@
 import { Command } from 'commander';
 import ansi from 'ansi-colors';
 
-import { getApiKey, savePak, savePat } from './config/credentials.js';
+import {
+  getStoredCredentials,
+  savePak,
+  savePat,
+} from './config/credentials.js';
 import loadTolgeeRc from './config/tolgeerc.js';
 
 import { setDebug, info, error, exitWithError } from './utils/logger.js';
@@ -23,13 +27,9 @@ import {
   PROJECT_BRANCH,
   STRICT_NAMESPACE_NEGATION,
   VERBOSE,
+  apiUrlOrDefault,
 } from './options.js';
-import {
-  API_KEY_PAK_PREFIX,
-  API_KEY_PAT_PREFIX,
-  DEFAULT_API_URL,
-  VERSION,
-} from './constants.js';
+import { API_KEY_PAK_PREFIX, API_KEY_PAT_PREFIX, VERSION } from './constants.js';
 
 import { Login, Logout } from './commands/login.js';
 import PushCommand from './commands/push.js';
@@ -58,19 +58,25 @@ function topLevelName(command: Command): string {
     : command.name();
 }
 
-async function loadApiKey(cmd: Command) {
+async function loadCredentials(cmd: Command) {
   const opts = cmd.optsWithGlobals();
 
   // API Key is already loaded
   if (opts.apiKey) return;
 
-  // Attempt to load --api-key from config store if not specified
+  // Attempt to load credentials from the config store if not specified
   // This is not done as part of the init routine or via the mandatory flag, as this is dependent on the API URL.
-  const key = await getApiKey(opts.apiUrl, opts.projectId);
+  const credentials = await getStoredCredentials(opts.apiUrl, opts.projectId);
 
-  // No key in store, stop here.
-  if (!key) return;
+  // Nothing in store, stop here.
+  if (!credentials) return;
 
+  if (credentials.type === 'oauth') {
+    cmd.setOptionValue('oauthSession', credentials.session);
+    return;
+  }
+
+  const key = credentials.key;
   cmd.setOptionValue('apiKey', key);
   program.setOptionValue('_removeApiKeyFromStore', () => {
     if (key.startsWith(API_KEY_PAT_PREFIX)) {
@@ -120,7 +126,7 @@ async function validateOptions(cmd: Command) {
     process.exit(1);
   }
 
-  if (!opts.apiKey) {
+  if (!opts.apiKey && !opts.oauthSession) {
     error(
       `Not authenticated for host ${ansi.blue(opts.apiUrl.hostname)} and project ${ansi.blue(opts.projectId)}.`
     );
@@ -138,7 +144,7 @@ async function validateOptions(cmd: Command) {
 const preHandler = (config: Schema) =>
   async function (prog: Command, cmd: Command) {
     if (!NO_KEY_COMMANDS.includes(topLevelName(cmd))) {
-      await loadApiKey(cmd);
+      await loadCredentials(cmd);
       loadProjectId(cmd);
       validateOptions(cmd);
 
@@ -146,6 +152,9 @@ const preHandler = (config: Schema) =>
       const client = createTolgeeClient({
         baseUrl: opts.apiUrl?.toString() ?? config.apiUrl?.toString(),
         apiKey: opts.apiKey,
+        getAccessToken: opts.oauthSession
+          ? () => opts.oauthSession.accessToken
+          : undefined,
         projectId:
           opts.projectId !== undefined
             ? Number(opts.projectId)
@@ -183,7 +192,7 @@ async function run() {
     // Global options
     program.addOption(VERBOSE);
     program.addOption(CONFIG_OPT);
-    program.addOption(API_URL_OPT.default(config.apiUrl ?? DEFAULT_API_URL));
+    program.addOption(API_URL_OPT.default(apiUrlOrDefault(config.apiUrl)));
     program.addOption(API_KEY_OPT.default(config.apiKey));
     program.addOption(PROJECT_ID_OPT.default(config.projectId ?? -1));
     program.addOption(PROJECT_BRANCH.default(config.branch));

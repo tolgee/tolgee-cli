@@ -8,6 +8,7 @@ import {
   isOAuthSession,
   type CredentialStore,
   type HostCredentials,
+  type OAuthSession,
   type Token,
   type UserCredentials,
 } from './credentialStore.js';
@@ -77,10 +78,14 @@ export async function savePak(
   return storePak(instance, project, pak);
 }
 
-export async function getApiKey(
+export type StoredCredentials =
+  | { type: 'apiKey'; key: string }
+  | { type: 'oauth'; session: OAuthSession };
+
+export async function getStoredCredentials(
   apiUrl: string,
   projectId: number
-): Promise<string | null> {
+): Promise<StoredCredentials | null> {
   const apiUrlObj = new URL(apiUrl);
   const scopedStore = await store.get(apiUrlObj.hostname);
 
@@ -89,14 +94,18 @@ export async function getApiKey(
   }
 
   const user = scopedStore.user;
-  if (user && !isOAuthSession(user)) {
+  if (user && isOAuthSession(user)) {
+    return { type: 'oauth', session: user };
+  }
+
+  if (user) {
     if (user.expires !== 0 && Date.now() > user.expires) {
       warn(`Your personal access token for ${apiUrlObj.hostname} expired.`);
       await storeUser(apiUrlObj, undefined);
       return null;
     }
 
-    return user.token;
+    return { type: 'apiKey', key: user.token };
   }
 
   if (projectId <= 0) {
@@ -113,10 +122,18 @@ export async function getApiKey(
       return null;
     }
 
-    return pak.token;
+    return { type: 'apiKey', key: pak.token };
   }
 
   return null;
+}
+
+export async function getApiKey(
+  apiUrl: string,
+  projectId: number
+): Promise<string | null> {
+  const credentials = await getStoredCredentials(apiUrl, projectId);
+  return credentials?.type === 'apiKey' ? credentials.key : null;
 }
 
 export async function saveApiKey(instance: URL, token: ApiKeyInfo) {

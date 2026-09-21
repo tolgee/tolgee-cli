@@ -12,7 +12,8 @@ const SCHEDULE_PULL_DEBOUNCE_MS = 500;
 
 export type WatchHandlerOptions = {
   apiUrl: URL;
-  apiKey: string;
+  apiKey?: string;
+  getAccessToken?: () => string | undefined;
   projectId: number;
   client: ReturnType<typeof createTolgeeClient>;
   doPull: () => Promise<void>;
@@ -21,7 +22,7 @@ export type WatchHandlerOptions = {
 export async function startWatching(
   options: WatchHandlerOptions
 ): Promise<void> {
-  const { apiUrl, apiKey, projectId, doPull, client } = options;
+  const { apiUrl, apiKey, getAccessToken, projectId, doPull, client } = options;
 
   // Watch mode using WebsocketClient on translation-data-modified
   info('Watching for translation changes... Press Ctrl+C to stop.');
@@ -101,7 +102,7 @@ export async function startWatching(
 
   const wsClient = WebsocketClient({
     serverUrl: new URL(apiUrl).origin,
-    authentication: { apiKey: apiKey },
+    authentication: { apiKey, getAccessToken },
     onConnected: () => {
       debug(
         'WebSocket connected and subscriptions active. Performing initial pull...'
