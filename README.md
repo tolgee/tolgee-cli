@@ -45,6 +45,28 @@ options and arguments.
 
 Make sure to give the [docs](https://tolgee.io/tolgee-cli/usage) a look!
 
+## Authentication
+Run `tolgee login` with no arguments to sign in through your browser — you approve the CLI on a Tolgee consent
+screen and no key is generated, copied or pasted. It needs a browser on the same machine as the CLI, since the
+sign-in finishes by redirecting to a local address the CLI is listening on. With `--no-browser` the CLI prints the
+URL instead of opening one; the browser you open it in still has to reach this machine.
+
+```sh
+tolgee login                # browser sign-in
+tolgee login <API key>      # a Personal Access Token or Project API Key, as before
+tolgee login --list         # what you are signed in as, per instance
+tolgee logout               # ends the session on the server too
+tolgee logout --project     # drops only the API key stored for one project
+```
+
+On a machine with no browser — CI, a container, an SSH session without port forwarding — use an API key, either
+with `--api-key` or through the `TOLGEE_API_KEY` environment variable. Browser sign-in refuses outright in CI,
+`--no-browser` included, rather than waiting for an approval that cannot come. If the CI guess is wrong and someone
+can approve the sign-in, set `TOLGEE_BROWSER_LOGIN_IN_CI=1`.
+
+Browser sign-in requires a Tolgee instance running the OAuth authorization server; against one that does not, the
+CLI says so and points you at API keys.
+
 ## Contributing
 Contributions are welcome! Check out [HACKING.md](HACKING.md) for some information about the project internals and
 information about the workflow.
