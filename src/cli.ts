@@ -104,7 +104,27 @@ function loadProjectId(cmd: Command) {
 async function validateOptions(cmd: Command) {
   const opts = cmd.optsWithGlobals();
 
-  if (opts.projectId === -1) {
+  // Before the project id, which a credential can name by itself: a command
+  // aimed at an instance you are not logged in to would otherwise be reported
+  // as a missing project.
+  if (!opts.apiKey && !opts.oauthSession) {
+    const forProject =
+      opts.projectId > 0 ? ` and project ${ansi.blue(opts.projectId)}` : '';
+    error(
+      `Not authenticated for host ${ansi.blue(opts.apiUrl.hostname)}${forProject}.`
+    );
+    info(
+      'You must either provide api key via --api-key or login via `tolgee login`. Logged in to another instance? ' +
+        'Name it with --api-url, or with apiUrl in `.tolgeerc`.'
+    );
+
+    console.log('\nYou are logged into these projects:');
+    await printApiKeyLists();
+
+    process.exit(1);
+  }
+
+  if (opts.projectId === NO_PROJECT) {
     error(
       'No Project ID have been specified. You must either provide one via --project-id, or by setting up a `.tolgeerc` file.'
     );
@@ -115,20 +135,6 @@ async function validateOptions(cmd: Command) {
     info(
       'Learn more about configuring the CLI here: https://tolgee.io/tolgee-cli/project-configuration'
     );
-    process.exit(1);
-  }
-
-  if (!opts.apiKey && !opts.oauthSession) {
-    error(
-      `Not authenticated for host ${ansi.blue(opts.apiUrl.hostname)} and project ${ansi.blue(opts.projectId)}.`
-    );
-    info(
-      `You must either provide api key via --api-key or login via \`tolgee login\` (for correct api url and project)`
-    );
-
-    console.log('\nYou are logged into these projects:');
-    await printApiKeyLists();
-
     process.exit(1);
   }
 }

@@ -27,6 +27,7 @@ const AUTH_FILE_PATH = join(tmpdir(), '.tolgee-e2e', 'authentication.json');
 const AUTHORIZE_URL = /(http:\/\/\S*\/oauth2\/authorize\S*)/;
 
 let client: TolgeeClient;
+let serverBindsProject = false;
 
 async function readSession() {
   const store = JSON.parse(await readFile(AUTH_FILE_PATH, 'utf8'));
@@ -77,11 +78,31 @@ function loginApprovedForAllProjects() {
   return loginThroughBrowser((url) => approveAuthorization(url));
 }
 
+/**
+ * The token response names the approved project only from
+ * tolgee/tolgee-platform#3944 on. Against an older instance the tests that
+ * need it are skipped rather than failed. Decided before the test logs in:
+ * vitest runs no afterEach for a test that skipped itself, so a login made
+ * before the skip would leak into the next test.
+ */
+function skipUnlessServerBindsProject(ctx: { skip: () => void }) {
+  if (!serverBindsProject) {
+    ctx.skip();
+  }
+}
+
+async function removeAuthFile() {
+  await rm(AUTH_FILE_PATH, { force: true });
+}
+
 describe('browser login', () => {
   setupTemporaryFolder();
 
   beforeAll(async () => {
     client = await createProjectWithClient('OAuth Project', PROJECT_1);
+    await loginApproved();
+    serverBindsProject = (await readSession()).projectId !== undefined;
+    await removeAuthFile();
   });
 
   afterAll(async () => {
@@ -91,13 +112,7 @@ describe('browser login', () => {
 
   afterEach(async () => {
     await removeTmpFolder();
-    try {
-      await rm(AUTH_FILE_PATH);
-    } catch (e: any) {
-      if (e.code !== 'ENOENT') {
-        throw e;
-      }
-    }
+    await removeAuthFile();
   });
 
   it('signs the user in and stores a session rather than a key', async () => {
@@ -119,17 +134,38 @@ describe('browser login', () => {
     const out = await run(['login', '--list']);
 
     expect(out.stdout).toMatch(
-      `browser login as admin on ${new URL(API_URL).toString()}, for project #${client.getProjectId()}`
+      `browser login as admin on ${new URL(API_URL).toString()}`
     );
   });
 
-  it('takes the project from an approval that named one', async () => {
+  it('lists the project the login was approved for', async (ctx) => {
+    skipUnlessServerBindsProject(ctx);
+    await loginApproved();
+
+    const out = await run(['login', '--list']);
+
+    expect(out.stdout).toMatch(`, for project #${client.getProjectId()}`);
+  });
+
+  it('reports the missing credential before the missing project id', async () => {
+    const { tempFolder } = await createTmpFolderWithConfig({});
+
+    const out = await run(['pull', '--path', tempFolder]);
+
+    expect(out.code).toBe(1);
+    expect(out.stdout).toMatch(/Not authenticated for host/);
+    expect(out.stdout).not.toMatch(/No Project ID/);
+  });
+
+  it('takes the project from an approval that named one', async (ctx) => {
+    skipUnlessServerBindsProject(ctx);
     await loginApproved();
 
     expect((await readSession()).projectId).toBe(client.getProjectId());
   });
 
-  it('runs a command with no project id of its own', async () => {
+  it('runs a command with no project id of its own', async (ctx) => {
+    skipUnlessServerBindsProject(ctx);
     await loginApproved();
     const { tempFolder, configFile } = await createTmpFolderWithConfig({
       pull: { path: './data' },
@@ -144,7 +180,8 @@ describe('browser login', () => {
     expect(pulled.controller).toBe('Controller');
   });
 
-  it('refuses a project the approval did not name', async () => {
+  it('refuses a project the approval did not name', async (ctx) => {
+    skipUnlessServerBindsProject(ctx);
     await loginApproved();
     const { configFile } = await createTmpFolderWithConfig({
       projectId: client.getProjectId() + 1000,
@@ -154,7 +191,7 @@ describe('browser login', () => {
     const out = await run(['-c', configFile, 'pull']);
 
     expect(out.code).toBe(1);
-    expect(out.stderr).toMatch(/browser login cannot be used/i);
+    expect(out.stdout).toMatch(/browser login cannot be used/i);
   });
 
   it('uses the session for a command that needs the API', async () => {
@@ -290,6 +327,7 @@ describe('browser login', () => {
     await loginApproved();
     const { configFile } = await createTmpFolderWithConfig({
       apiUrl: API_URL,
+      projectId: client.getProjectId(),
       pull: { path: './data' },
     });
 
