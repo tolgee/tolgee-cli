@@ -60,7 +60,7 @@ async function storeUser(instance: URL, user?: UserCredentials) {
 async function savePak(
   instance: URL,
   project: ApiKeyProject,
-  pak?: Token
+  pak: Token
 ): Promise<void> {
   const id = project.id.toString(10);
   return updateHost(instance, (current) => ({
@@ -100,37 +100,14 @@ export async function getStoredCredentials(
   apiUrl: URL,
   projectId: number
 ): Promise<StoredCredentials | null> {
-  const scopedStore = await store.get(apiUrl.hostname);
-
-  if (!scopedStore) {
+  const host = await store.get(apiUrl.hostname);
+  if (!host) {
     return null;
   }
 
-  const user = scopedStore.user;
+  const user = host.user;
   if (user && isOAuthSession(user)) {
-    const session = usableSession(scopedStore, apiUrl);
-    if (!session) {
-      warn(
-        `The stored session for ${apiUrl.hostname} was issued by ${user.apiUrl}, not ${apiUrl.origin}.`
-      );
-      return usableProjectKey(apiUrl, scopedStore, projectId);
-    }
-
-    // A browser session covers the projects chosen on the consent screen, which the client is never told. A key
-    // issued for the project at hand names it, so it is the one that certainly reaches it.
-    const forThisProject = await usableProjectKey(
-      apiUrl,
-      scopedStore,
-      projectId
-    );
-    if (forThisProject) {
-      warn(
-        `Using the project API key stored for project ${projectId} rather than your browser login. ` +
-          `Run \`tolgee logout --project\` to drop that key, or pass --api-key to choose another credential.`
-      );
-      return forThisProject;
-    }
-    return { type: 'oauth', session };
+    return sessionOrProjectKey(apiUrl, host, user, projectId);
   }
 
   if (user) {
@@ -143,7 +120,39 @@ export async function getStoredCredentials(
     return { type: 'apiKey', key: user.token };
   }
 
-  return usableProjectKey(apiUrl, scopedStore, projectId);
+  return usableProjectKey(apiUrl, host, projectId);
+}
+
+/**
+ * A session approved for one project cannot reach another one, but a key
+ * stored for that other project can.
+ */
+async function sessionOrProjectKey(
+  apiUrl: URL,
+  host: HostCredentials,
+  user: OAuthSession,
+  projectId: number
+): Promise<StoredCredentials | null> {
+  const session = usableSession(host, apiUrl);
+  if (!session) {
+    warn(
+      `The stored session for ${apiUrl.hostname} was issued by ${user.apiUrl}, not ${apiUrl.origin}.`
+    );
+    return usableProjectKey(apiUrl, host, projectId);
+  }
+
+  const approvedElsewhere =
+    session.projectId !== undefined &&
+    projectId > 0 &&
+    session.projectId !== projectId;
+  if (approvedElsewhere) {
+    const key = await usableProjectKey(apiUrl, host, projectId);
+    if (key) {
+      return key;
+    }
+  }
+
+  return { type: 'oauth', session };
 }
 
 /**

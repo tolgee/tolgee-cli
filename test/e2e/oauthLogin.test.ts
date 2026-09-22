@@ -7,7 +7,6 @@ import { TolgeeClient } from '#cli/client/TolgeeClient.js';
 import { PROJECT_1 } from './utils/api/project1.js';
 import {
   API_URL,
-  createPak,
   createProjectWithClient,
   deleteProject,
 } from './utils/api/common.js';
@@ -74,6 +73,10 @@ function loginApproved(args: string[] = []) {
   );
 }
 
+function loginApprovedForAllProjects() {
+  return loginThroughBrowser((url) => approveAuthorization(url));
+}
+
 describe('browser login', () => {
   setupTemporaryFolder();
 
@@ -116,8 +119,42 @@ describe('browser login', () => {
     const out = await run(['login', '--list']);
 
     expect(out.stdout).toMatch(
-      `browser login as admin on ${new URL(API_URL).toString()}`
+      `browser login as admin on ${new URL(API_URL).toString()}, for project #${client.getProjectId()}`
     );
+  });
+
+  it('takes the project from an approval that named one', async () => {
+    await loginApproved();
+
+    expect((await readSession()).projectId).toBe(client.getProjectId());
+  });
+
+  it('runs a command with no project id of its own', async () => {
+    await loginApproved();
+    const { tempFolder, configFile } = await createTmpFolderWithConfig({
+      pull: { path: './data' },
+    });
+
+    const out = await run(['-c', configFile, 'pull']);
+
+    expect(out.code).toBe(0);
+    const pulled = JSON.parse(
+      await readFile(join(tempFolder, 'data', 'en.json'), 'utf8')
+    );
+    expect(pulled.controller).toBe('Controller');
+  });
+
+  it('refuses a project the approval did not name', async () => {
+    await loginApproved();
+    const { configFile } = await createTmpFolderWithConfig({
+      projectId: client.getProjectId() + 1000,
+      pull: { path: './data' },
+    });
+
+    const out = await run(['-c', configFile, 'pull']);
+
+    expect(out.code).toBe(1);
+    expect(out.stderr).toMatch(/browser login cannot be used/i);
   });
 
   it('uses the session for a command that needs the API', async () => {
@@ -228,12 +265,15 @@ describe('browser login', () => {
     expect(out.stdout).toMatch(/access_denied|denied/i);
   });
 
-  it('says which credential it used when a stored key shadows the session', async () => {
-    await loginApproved();
-    const pak = await createPak(client);
+  it('uses a login approved for every project over a key stored for the project', async () => {
+    await loginApprovedForAllProjects();
+    // A key the server would refuse, so only the session can make this pass.
     const store = JSON.parse(await readFile(AUTH_FILE_PATH, 'utf8'));
     store.localhost.projects = {
-      [String(client.getProjectId())]: { token: pak, expires: 0 },
+      [String(client.getProjectId())]: {
+        token: 'tgpak_no_such_key',
+        expires: 0,
+      },
     };
     await writeFile(AUTH_FILE_PATH, JSON.stringify(store), { mode: 0o600 });
 
@@ -244,6 +284,19 @@ describe('browser login', () => {
     const out = await run(['-c', configFile, 'pull']);
 
     expect(out.code).toBe(0);
-    expect(out.stdout).toMatch(/rather than your browser login/i);
+  });
+
+  it('finds the login for the instance named in .tolgeerc', async () => {
+    await loginApproved();
+    const { configFile } = await createTmpFolderWithConfig({
+      apiUrl: API_URL,
+      pull: { path: './data' },
+    });
+
+    const out = await run(['-c', configFile, 'pull'], undefined, 10e3, {
+      apiUrlFromConfig: true,
+    });
+
+    expect(out.code).toBe(0);
   });
 });

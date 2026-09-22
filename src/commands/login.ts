@@ -11,6 +11,7 @@ import {
   storedSessionFor,
   type OAuthSession,
 } from '../config/credentials.js';
+import { NO_PROJECT } from '../config/projectId.js';
 import { debug, exitWithError, info, success, warn } from '../utils/logger.js';
 import { createTolgeeClient } from '../client/TolgeeClient.js';
 import { errorFromLoadable } from '../client/errorFromLoadable.js';
@@ -103,6 +104,7 @@ async function loginWithBrowser(
     refreshToken: tokens.refreshToken,
     scopes: tokens.scopes,
     apiUrl: opts.apiUrl.toString(),
+    projectId: tokens.projectId,
   };
   // Stored before the old grant is ended: a write that fails must not leave a
   // live grant nothing on this machine holds.
@@ -167,10 +169,12 @@ async function greetableName(
 }
 
 function projectHint(opts: Options, config: Schema) {
-  const projectId = opts.projectId ?? config.projectId;
-  return projectId !== undefined && Number(projectId) > 0
-    ? String(projectId)
-    : undefined;
+  const projectId = configuredProject(opts, config);
+  return projectId > 0 ? String(projectId) : undefined;
+}
+
+function configuredProject(opts: Options, config: Schema) {
+  return Number(opts.projectId ?? config.projectId ?? NO_PROJECT);
 }
 
 const logoutHandler = (config: Schema) =>
@@ -179,7 +183,7 @@ const logoutHandler = (config: Schema) =>
     const headers = mergeHeaders(config.headers, opts.extraHeader);
 
     if (opts.project) {
-      const projectId = Number(opts.projectId ?? config.projectId ?? -1);
+      const projectId = configuredProject(opts, config);
       if (projectId <= 0) {
         exitWithError(
           'No project to log out of: pass --project-id, or set projectId in .tolgeerc.'

@@ -1,4 +1,7 @@
-import { SessionExpiredError } from '#cli/oauth/session.js';
+import {
+  SessionExpiredError,
+  type RefreshOutcome,
+} from '#cli/oauth/session.js';
 
 let websocketOptions: any;
 let onTheWire: string | undefined;
@@ -14,7 +17,7 @@ vi.mock('#cli/client/WebsocketClient.js', () => ({
       subscribe: () => () => {},
       deactivate: () => {},
       connectIfNotAlready: () => {},
-      connectedWith: () => onTheWire,
+      lastConnectToken: () => onTheWire,
     };
   },
 }));
@@ -61,7 +64,8 @@ function watch(
     }),
   } as any;
 
-  // startWatching never resolves: it ends by awaiting a promise nothing settles.
+  // startWatching never resolves: it ends by awaiting a promise nothing
+  // settles.
   void startWatching({
     apiUrl: new URL('http://localhost:8080'),
     projectId: 1,
@@ -81,16 +85,19 @@ async function waitFor(ready: () => boolean) {
 function sessionThatIsGone(): any {
   return {
     getAccessToken: () => 'tgoat_dead',
-    getUserName: () => undefined,
+    getProjectId: () => undefined,
     ensureFresh: async () => {
       throw new SessionExpiredError();
     },
-    refreshAfterUnauthorized: async () => false,
+    refreshAfterUnauthorized: async () => {
+      throw new SessionExpiredError();
+    },
+    adoptNewerSession: async () => false,
   };
 }
 
 async function watchRecordingRenewals(
-  answer: () => Promise<boolean> = async () => true
+  answer: () => Promise<RefreshOutcome> = async () => 'refreshed'
 ) {
   const asked: string[] = [];
   await watch({
@@ -107,9 +114,10 @@ async function watchRecordingRenewals(
 function liveSession(overrides: Record<string, unknown> = {}): any {
   return {
     getAccessToken: () => onTheWire,
-    getUserName: () => undefined,
+    getProjectId: () => undefined,
     ensureFresh: async () => {},
-    refreshAfterUnauthorized: async () => true,
+    refreshAfterUnauthorized: async () => 'refreshed',
+    adoptNewerSession: async () => false,
     ...overrides,
   };
 }
@@ -155,7 +163,9 @@ describe('a watch whose credential dies', () => {
     expect(errors.join('\n')).toMatch(/not authenticated/i);
     expect(exitCodes).toEqual([1]);
   });
+});
 
+describe('a watch whose credential is refused', () => {
   it('renews again once the last renewal has had time to hold', async () => {
     const asked = await watchRecordingRenewals();
 
@@ -173,6 +183,34 @@ describe('a watch whose credential dies', () => {
     const asked = await watchRecordingRenewals(async () => {
       throw new Error('connect ECONNREFUSED');
     });
+
+    await websocketOptions.onError(REFUSED);
+    await websocketOptions.onError(REFUSED);
+
+    expect(asked).toHaveLength(2);
+    expect(exitCodes).toEqual([]);
+  });
+
+  it('adopts a session another process stored, even right after a renewal', async () => {
+    let adoptions = 0;
+    await watch({
+      session: liveSession({
+        adoptNewerSession: async () => {
+          adoptions += 1;
+          return true;
+        },
+      }),
+    });
+
+    await websocketOptions.onError(REFUSED);
+    await websocketOptions.onError(REFUSED);
+
+    expect(adoptions).toBe(1);
+    expect(exitCodes).toEqual([]);
+  });
+
+  it('keeps the allowance when the tokens came from another process', async () => {
+    const asked = await watchRecordingRenewals(async () => 'adopted');
 
     await websocketOptions.onError(REFUSED);
     await websocketOptions.onError(REFUSED);

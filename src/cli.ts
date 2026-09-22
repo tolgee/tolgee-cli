@@ -4,6 +4,7 @@ import { Command } from 'commander';
 import ansi from 'ansi-colors';
 
 import { getStoredCredentials } from './config/credentials.js';
+import { NO_PROJECT, resolveProjectId } from './config/projectId.js';
 import loadTolgeeRc from './config/tolgeerc.js';
 
 import { setDebug, info, error } from './utils/logger.js';
@@ -83,24 +84,21 @@ async function loadCredentials(cmd: Command, headers: Record<string, string>) {
 function loadProjectId(cmd: Command) {
   const opts = cmd.optsWithGlobals();
 
-  if (opts.apiKey?.startsWith(API_KEY_PAK_PREFIX)) {
-    // Parse the key and ensure we can access the specified Project ID
-    const projectId = projectIdFromKey(opts.apiKey);
-    program.setOptionValue('projectId', projectId);
+  const { projectId, refusal } = resolveProjectId({
+    configured: opts.projectId,
+    apiKeyProject: opts.apiKey?.startsWith(API_KEY_PAK_PREFIX)
+      ? projectIdFromKey(opts.apiKey)
+      : undefined,
+    sessionProject: opts.oauthSession?.getProjectId(),
+  });
 
-    if (opts.projectId !== -1 && opts.projectId !== projectId) {
-      error(
-        'The specified API key cannot be used to perform operations on the specified project.'
-      );
-      info(
-        `The API key you specified is tied to project #${projectId}, you tried to perform operations on project #${opts.projectId}.`
-      );
-      info(
-        'Learn more about how API keys in Tolgee work here: https://tolgee.io/platform/account_settings/api_keys_and_pat_tokens'
-      );
-      process.exit(1);
-    }
+  if (refusal) {
+    error(refusal.error);
+    refusal.details.forEach(info);
+    process.exit(1);
   }
+
+  program.setOptionValue('projectId', projectId);
 }
 
 async function validateOptions(cmd: Command) {
@@ -111,7 +109,8 @@ async function validateOptions(cmd: Command) {
       'No Project ID have been specified. You must either provide one via --project-id, or by setting up a `.tolgeerc` file.'
     );
     info(
-      'If you provide Project Api Key (PAK) via `--api-key`, Project ID is derived automatically.'
+      'If you provide Project Api Key (PAK) via `--api-key`, Project ID is derived automatically. So is a browser ' +
+        'login approved for a single project.'
     );
     info(
       'Learn more about configuring the CLI here: https://tolgee.io/tolgee-cli/project-configuration'
@@ -185,7 +184,7 @@ async function run() {
     program.addOption(CONFIG_OPT);
     program.addOption(API_URL_OPT.default(apiUrlOrDefault(config.apiUrl)));
     program.addOption(API_KEY_OPT.default(config.apiKey));
-    program.addOption(PROJECT_ID_OPT.default(config.projectId ?? -1));
+    program.addOption(PROJECT_ID_OPT.default(config.projectId ?? NO_PROJECT));
     program.addOption(PROJECT_BRANCH.default(config.branch));
     program.addOption(FORMAT_OPT.default(config.format ?? 'JSON_TOLGEE'));
     program.addOption(EXTRACTOR.default(config.extractor));

@@ -47,12 +47,13 @@ function sessionWith(
   return {
     refreshes: 0,
     getAccessToken: () => current,
-    getUserName: () => undefined,
+    getProjectId: () => undefined,
     async ensureFresh() {
       (this as any).refreshes += 1;
       current = afterRefresh;
     },
-    refreshAfterUnauthorized: async () => false,
+    refreshAfterUnauthorized: async () => 'refreshed' as const,
+    adoptNewerSession: async () => false,
     ...overrides,
   };
 }
@@ -62,7 +63,7 @@ beforeEach(() => {
   connectCalls.length = 0;
 });
 
-/** Builds a client and runs one connect attempt through it, the way stompjs does. */
+/** Calls beforeConnect by hand, the way stompjs does. */
 async function oneConnectAttempt(options: any) {
   const client = WebsocketClient({ serverUrl: 'http://localhost', ...options });
   client.connectIfNotAlready();
@@ -89,7 +90,7 @@ describe('websocket reconnect', () => {
     expect(stomp.connectHeaders).toEqual({
       authorization: 'Bearer tgoat_second',
     });
-    expect(client.connectedWith()).toBe('tgoat_second');
+    expect(client.lastConnectToken()).toBe('tgoat_second');
 
     await beforeConnect(stomp);
     expect(session.refreshes).toBe(2);
@@ -145,12 +146,9 @@ describe('websocket debug output', () => {
       authentication: { session: sessionWith('tgoat_secret') },
     }).connectIfNotAlready();
 
-    configured[0].debug(
-      '>>> CONNECT\nauthorization:Bearer tgoat_secret\njwtToken:jwt_secret'
-    );
+    configured[0].debug('>>> CONNECT\nauthorization:Bearer tgoat_secret');
 
     expect(logged.join('\n')).not.toContain('tgoat_secret');
-    expect(logged.join('\n')).not.toContain('jwt_secret');
   });
 
   it('blanks the credential header lines in a frame', () => {

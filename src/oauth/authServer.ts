@@ -12,12 +12,19 @@ export type AuthServerMetadata = {
 export type OAuthTokens = {
   accessToken: string;
   refreshToken: string;
-  /** Epoch milliseconds; the server reports a duration in seconds. */
   accessExpires: number;
   scopes: string[];
+  /**
+   * The project the authorization was bound to, when it was bound to exactly
+   * one.
+   */
+  projectId?: number;
 };
 
-/** Short enough that a token which turns out to be dead is found out quickly, by the 401 replay. */
+/**
+ * Short enough that a token which turns out to be dead is found out quickly, by
+ * the 401 replay.
+ */
 const ASSUMED_LIFETIME_MS = 5 * 60 * 1000;
 
 export type OAuthErrorKind = 'unsupported' | 'no-browser' | 'oauth' | 'network';
@@ -241,7 +248,20 @@ async function readTokens(response: Response): Promise<OAuthTokens> {
       typeof body.scope === 'string' && body.scope !== ''
         ? body.scope.split(' ')
         : [],
+    projectId: boundProject(body.project_id),
   };
+}
+
+/**
+ * An instance older than the field, or one whose consent covered every project,
+ * sends nothing usable here.
+ */
+function boundProject(value: unknown) {
+  const projectId = Number(value);
+  if (!Number.isSafeInteger(projectId) || projectId <= 0) {
+    return undefined;
+  }
+  return projectId;
 }
 
 /**

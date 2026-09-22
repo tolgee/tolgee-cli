@@ -231,6 +231,21 @@ describe('code exchange', () => {
     expect(body.get('redirect_uri')).toBe('http://127.0.0.1:53211/callback');
   });
 
+  it('reads the project the authorization was bound to', async () => {
+    stubFetch(() => ({ body: { ...TOKEN_BODY, project_id: 12 } }));
+
+    expect((await exchangeCode(METADATA, PARAMS)).projectId).toBe(12);
+  });
+
+  it.each([undefined, 'all', 0, -3, 1.5])(
+    'reads no project from project_id=%s',
+    async (projectId) => {
+      stubFetch(() => ({ body: { ...TOKEN_BODY, project_id: projectId } }));
+
+      expect((await exchangeCode(METADATA, PARAMS)).projectId).toBeUndefined();
+    }
+  );
+
   it('returns the pair with an absolute expiry', async () => {
     stubFetch(() => ({ body: TOKEN_BODY }));
     const before = Date.now();

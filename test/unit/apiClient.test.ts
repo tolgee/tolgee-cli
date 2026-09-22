@@ -1,11 +1,24 @@
 import { createApiClient } from '#cli/client/ApiClient.js';
 import { createTolgeeClient } from '#cli/client/TolgeeClient.js';
 import { USER_AGENT } from '#cli/constants.js';
+import {
+  SessionExpiredError,
+  type OAuthSessionHandle,
+  type RefreshOutcome,
+} from '#cli/oauth/session.js';
+
+const { warnings } = vi.hoisted(() => ({ warnings: [] as string[] }));
+
+vi.mock('#cli/utils/logger.js', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('#cli/utils/logger.js')>()),
+  warn: (message: string) => warnings.push(String(message)),
+}));
 
 let captured: Request | undefined;
 
 beforeEach(() => {
   captured = undefined;
+  warnings.length = 0;
   vi.stubGlobal(
     'fetch',
     vi.fn(async (request: Request) => {
@@ -123,14 +136,16 @@ describe('createApiClient headers', () => {
 });
 
 function sessionOf(
-  token: string | undefined,
-  onUnauthorized: (used: string) => Promise<boolean> = async () => false
-) {
+  token: string | undefined | (() => string),
+  onUnauthorized: (used: string) => Promise<RefreshOutcome> = async () =>
+    'refreshed'
+): OAuthSessionHandle {
   return {
-    getAccessToken: () => token as string,
-    getUserName: () => undefined,
+    getAccessToken: () => (typeof token === 'function' ? token() : token!),
+    getProjectId: () => undefined,
     ensureFresh: async () => {},
     refreshAfterUnauthorized: onUnauthorized,
+    adoptNewerSession: async () => false,
   };
 }
 
@@ -145,12 +160,7 @@ describe('createApiClient OAuth', () => {
     const tokens = ['tgoat_first', 'tgoat_second'];
     const client = createApiClient({
       baseUrl: 'http://localhost',
-      session: {
-        getAccessToken: () => tokens.shift() as string,
-        getUserName: () => undefined,
-        ensureFresh: async () => {},
-        refreshAfterUnauthorized: async () => false,
-      },
+      session: sessionOf(() => tokens.shift() as string),
     });
 
     await (client as any).GET('/v2/projects');
@@ -173,6 +183,13 @@ describe('createApiClient OAuth', () => {
       headers: { authorization: 'Bearer supplied' },
     });
     expect(req.headers.get('authorization')).toBe('Bearer supplied');
+    expect(warnings.join('\n')).toMatch(/custom authorization header/i);
+  });
+
+  it('says nothing about the credential when no session is set aside', async () => {
+    await get({ apiKey: 'tgpak_x', headers: { authorization: 'Basic gw' } });
+
+    expect(warnings).toEqual([]);
   });
 });
 
@@ -200,15 +217,13 @@ describe('createApiClient 401 replay', () => {
     let token = 'tgoat_old';
     return createApiClient({
       baseUrl: 'http://localhost',
-      session: {
-        getAccessToken: () => token,
-        getUserName: () => undefined,
-        ensureFresh: async () => {},
-        refreshAfterUnauthorized: async () => {
+      session: sessionOf(
+        () => token,
+        async () => {
           token = 'tgoat_new';
-          return true;
-        },
-      },
+          return 'refreshed';
+        }
+      ),
     });
   }
 
@@ -235,15 +250,19 @@ describe('createApiClient 401 replay', () => {
     expect(seen[1].body).toContain('a project');
   });
 
-  it('gives up when the session could not be refreshed', async () => {
+  it('hands the dead session to the caller instead of sending the request again', async () => {
     const seen = stubFetch([401, 200]);
 
     const client = createApiClient({
       baseUrl: 'http://localhost',
-      session: sessionOf('tgoat_old'),
+      session: sessionOf('tgoat_old', async () => {
+        throw new SessionExpiredError();
+      }),
     });
-    await (client as any).GET('/v2/projects');
 
+    await expect((client as any).GET('/v2/projects')).rejects.toBeInstanceOf(
+      SessionExpiredError
+    );
     expect(seen).toHaveLength(1);
   });
 

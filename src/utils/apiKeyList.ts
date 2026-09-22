@@ -41,6 +41,10 @@ function printToken(
   console.log(result);
 }
 
+function forProject(session: OAuthSession) {
+  return session.projectId ? `, for project #${session.projectId}` : '';
+}
+
 function printOAuthSession(session: OAuthSession) {
   const who = session.userName ? ` as ${session.userName}` : '';
   const scopes = session.scopes.length
@@ -51,7 +55,9 @@ function printOAuthSession(session: OAuthSession) {
       '\t ' +
       ansi.yellow(scopes) +
       '\t ' +
-      ansi.grey(`browser login${who} on ${session.apiUrl}`)
+      ansi.grey(
+        `browser login${who} on ${session.apiUrl}${forProject(session)}`
+      )
   );
 }
 

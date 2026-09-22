@@ -14,13 +14,18 @@ export type OAuthSession = {
   refreshToken: string;
   scopes: string[];
   userName?: string;
-  /** The instance that issued this session; the hostname key cannot say which scheme or port reached it. */
+  /**
+   * The instance that issued this session; the hostname key cannot say which
+   * scheme or port reached it.
+   */
   apiUrl: string;
+  projectId?: number;
 };
 
 /**
- * A user slot with no `type` is a personal access token: that is what every file written before browser login existed
- * holds, and those files must keep parsing forever.
+ * A user slot with no `type` is a personal access token: that is what every
+ * file written before browser login existed holds, and those files must keep
+ * parsing forever.
  */
 export type UserCredentials = Token | OAuthSession;
 

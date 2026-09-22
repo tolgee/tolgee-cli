@@ -24,6 +24,7 @@ export type RefreshOutcome = 'refreshed' | 'adopted';
 
 export type OAuthSessionHandle = {
   getAccessToken(): string;
+  getProjectId(): number | undefined;
   ensureFresh(): Promise<void>;
   /** Rejects with SessionExpiredError once the grant is dead. */
   refreshAfterUnauthorized(usedToken: string): Promise<RefreshOutcome>;
@@ -87,6 +88,7 @@ export function createOAuthSessionHandle(
         accessExpires: tokens.accessExpires,
         refreshToken: tokens.refreshToken,
         scopes: tokens.scopes.length ? tokens.scopes : stored.scopes,
+        projectId: tokens.projectId ?? stored.projectId,
       };
     } catch (e) {
       if (e instanceof OAuthError && e.kind === 'oauth') {
@@ -113,6 +115,7 @@ export function createOAuthSessionHandle(
   return {
     getAccessToken: () => current.accessToken,
 
+    getProjectId: () => current.projectId,
 
     async ensureFresh() {
       if (current.accessExpires - Date.now() > REFRESH_MARGIN_MS) {

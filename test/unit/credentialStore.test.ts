@@ -6,8 +6,9 @@ import { readFile, stat, writeFile } from 'fs/promises';
 type StoreModule = typeof import('#cli/config/credentialStore.js');
 type CredentialsModule = typeof import('#cli/config/credentials.js');
 
-// The store resolves its path when the module is first loaded, so the config directory has to be set before the
-// import: the shared one the other suites use would race with them over authentication.json.
+// The store resolves its path when the module is first loaded, so the config
+// directory has to be set before the import: the shared one the other suites
+// use would race with them over authentication.json.
 const CONFIG_DIR = mkdtempSync(join(tmpdir(), 'tolgee-cli-store-'));
 process.env.TOLGEE_CLI_CONFIG_PATH = CONFIG_DIR;
 
@@ -155,25 +156,57 @@ describe('credential store', () => {
 });
 
 describe('stored credentials', () => {
-  it('prefers a key issued for the project over a browser session', async () => {
+  it('uses a session bound to the project at hand, whatever else is stored', async () => {
+    await fileCredentialStore.clear();
+    await setHost('nya.local', {
+      user: oauthSession({ projectId: 1 }),
+      projects: { '1': { token: 'tgpak_project', expires: 0 } },
+    });
+
+    // Named, and not named: a bound session answers both, since it says which
+    // project it reaches.
+    expect(
+      await getStoredCredentials(new URL('https://nya.local'), 1)
+    ).toMatchObject({ type: 'oauth' });
+    expect(
+      await getStoredCredentials(new URL('https://nya.local'), -1)
+    ).toMatchObject({ type: 'oauth' });
+  });
+
+  it('falls back to a key for a project the session is not bound to', async () => {
+    await fileCredentialStore.clear();
+    await setHost('nya.local', {
+      user: oauthSession({ projectId: 1 }),
+      projects: { '2': { token: 'tgpak_other', expires: 0 } },
+    });
+
+    expect(await getStoredCredentials(new URL('https://nya.local'), 2)).toEqual(
+      {
+        type: 'apiKey',
+        key: 'tgpak_other',
+      }
+    );
+  });
+
+  it('uses a session approved for every project over a key stored for one', async () => {
     await fileCredentialStore.clear();
     await setHost('nya.local', {
       user: oauthSession(),
       projects: { '1': { token: 'tgpak_project', expires: 0 } },
     });
 
-    expect(await getStoredCredentials(new URL('https://nya.local'), 1)).toEqual(
-      {
-        type: 'apiKey',
-        key: 'tgpak_project',
-      }
-    );
+    expect(
+      await getStoredCredentials(new URL('https://nya.local'), 1)
+    ).toMatchObject({ type: 'oauth' });
+  });
+
+  it('keeps the session when no key covers the project it was not approved for', async () => {
+    await fileCredentialStore.clear();
+    await setHost('nya.local', { user: oauthSession({ projectId: 1 }) });
 
     expect(
       await getStoredCredentials(new URL('https://nya.local'), 2)
-    ).toMatchObject({
-      type: 'oauth',
-    });
+    ).toMatchObject({ type: 'oauth' });
   });
 
   it('never hands a session to an instance that did not issue it', async () => {
