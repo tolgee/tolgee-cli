@@ -1,20 +1,18 @@
-import { CompatClient, Stomp } from '@stomp/stompjs';
+import { Client, CompatClient, Stomp } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { components } from './internal/schema.generated.js';
 import { debug, error } from '../utils/logger.js';
+import { SessionExpiredError } from '../oauth/session.js';
+import { credentialHeaders, type Credential } from './credential.js';
 
 type BatchJobModelStatus = components['schemas']['BatchJobModel']['status'];
 
 type WebsocketClientOptions = {
   serverUrl?: string;
-  authentication: {
-    jwtToken?: string;
-    apiKey?: string;
-    /** Called on every connect, so a reconnect after a refresh carries the token that is current then. */
-    getAccessToken?: () => string | undefined;
-  };
+  authentication: Credential;
   onConnected?: (message: any) => void;
   onError?: (error: any) => void;
+  onCredentialExpired?: (error: Error) => void;
   onConnectionClose?: () => void;
 };
 
@@ -37,6 +35,7 @@ export const WebsocketClient = (options: WebsocketClientOptions) => {
   let connected = false;
   let connecting = false;
   let subscriptions: Subscription<any>[] = [];
+  let lastConnectToken: string | undefined;
 
   const resubscribe = () => {
     if (deactivated) {
@@ -74,9 +73,29 @@ export const WebsocketClient = (options: WebsocketClientOptions) => {
     client.configure({
       reconnectDelay: 3000,
       debug: (msg: string) => {
-        debug(msg);
+        debug(redactCredentials(msg));
       },
+      // stompjs reconnects on its own and reuses the headers it was handed,
+      // so this is the only point where a watch outliving its access token
+      // can still put a live one on the wire.
+      beforeConnect: freshConnectHeaders,
     });
+  }
+
+  async function freshConnectHeaders(stomp: Client) {
+    // stompjs awaits this and nothing catches what it throws.
+    try {
+      await options.authentication.session?.ensureFresh();
+    } catch (e: any) {
+      if (e instanceof SessionExpiredError) {
+        options.onCredentialExpired?.(e);
+        return;
+      }
+      debug(`Could not refresh before connecting: ${e.message}`);
+    }
+    const { headers, accessToken } = credentialHeaders(options.authentication);
+    lastConnectToken = accessToken;
+    stomp.connectHeaders = headers;
   }
 
   function connectIfNotAlready() {
@@ -101,17 +120,12 @@ export const WebsocketClient = (options: WebsocketClientOptions) => {
       options.onConnectionClose?.();
     };
 
-    const onError = (error: any) => {
+    const onError = (err: any) => {
       connecting = false;
-      options.onError?.(error);
+      options.onError?.(err);
     };
 
-    client.connect(
-      getAuthentication(options),
-      onConnected,
-      onError,
-      onDisconnect
-    );
+    client.connect({}, onConnected, onError, onDisconnect);
   }
 
   const getClient = () => {
@@ -162,24 +176,20 @@ export const WebsocketClient = (options: WebsocketClientOptions) => {
     subscriptions = subscriptions.filter((it) => it !== subscription);
   }
 
-  return Object.freeze({ subscribe, deactivate, connectIfNotAlready });
+  return Object.freeze({
+    subscribe,
+    deactivate,
+    connectIfNotAlready,
+    lastConnectToken: () => lastConnectToken,
+  });
 };
 
-export function getAuthentication(options: WebsocketClientOptions) {
-  if (options.authentication.jwtToken) {
-    return { jwtToken: options.authentication.jwtToken };
-  }
-
-  const accessToken = options.authentication.getAccessToken?.();
-  if (accessToken) {
-    return { authorization: `Bearer ${accessToken}` };
-  }
-
-  if (options.authentication.apiKey) {
-    return { 'x-api-key': options.authentication.apiKey };
-  }
-
-  return {};
+/**
+ * stompjs logs whole frames, headers included, and `-v` output is what people
+ * paste into bug reports.
+ */
+export function redactCredentials(frame: string) {
+  return frame.replace(/^(authorization|x-api-key):.*$/gim, '$1:<redacted>');
 }
 
 export type EventTypeProject =

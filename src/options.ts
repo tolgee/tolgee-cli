@@ -51,7 +51,6 @@ function accumulateHeader(v: string, previous: string[] = []) {
 
 export type BaseOptions = {
   apiUrl: URL;
-  /** Empty when the user is logged in through the browser; `oauthSession` carries the credential then. */
   apiKey: string;
   oauthSession?: OAuthSessionHandle;
   projectId: number;

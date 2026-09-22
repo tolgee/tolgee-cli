@@ -1,18 +1,29 @@
-import { getAuthentication } from '#cli/client/WebsocketClient.js';
+import { authentication } from '#cli/client/WebsocketClient.js';
 
-// The STOMP connect headers are the second place the CLI authenticates; the REST client is the first. A token that
-// only reaches one of them makes `pull --watch` fail in a way no REST test can see.
+function sessionOf(token: string | undefined, next?: () => string) {
+  return {
+    getAccessToken: () => (next ? next() : (token as string)),
+    getUserName: () => undefined,
+    ensureFresh: async () => {},
+    refreshAfterUnauthorized: async () => false,
+  };
+}
+
+function headersOf(options: any) {
+  return authentication(options).headers;
+}
+
 describe('websocket authentication', () => {
   it('sends an api key as x-api-key', () => {
-    expect(
-      getAuthentication({ authentication: { apiKey: 'tgpak_x' } })
-    ).toEqual({ 'x-api-key': 'tgpak_x' });
+    expect(headersOf({ authentication: { apiKey: 'tgpak_x' } })).toEqual({
+      'x-api-key': 'tgpak_x',
+    });
   });
 
   it('sends an access token as a bearer credential', () => {
     expect(
-      getAuthentication({
-        authentication: { getAccessToken: () => 'tgoat_token' },
+      headersOf({
+        authentication: { session: sessionOf('tgoat_token') },
       })
     ).toEqual({ authorization: 'Bearer tgoat_token' });
   });
@@ -20,26 +31,28 @@ describe('websocket authentication', () => {
   it('asks for the token on every connect', () => {
     const tokens = ['tgoat_first', 'tgoat_second'];
     const options = {
-      authentication: { getAccessToken: () => tokens.shift() },
+      authentication: {
+        session: sessionOf(undefined, () => tokens.shift() as string),
+      },
     };
 
-    expect(getAuthentication(options)).toEqual({
+    expect(headersOf(options)).toEqual({
       authorization: 'Bearer tgoat_first',
     });
-    expect(getAuthentication(options)).toEqual({
+    expect(headersOf(options)).toEqual({
       authorization: 'Bearer tgoat_second',
     });
   });
 
   it('falls back to the api key when there is no session', () => {
     expect(
-      getAuthentication({
-        authentication: { apiKey: 'tgpak_x', getAccessToken: () => undefined },
+      headersOf({
+        authentication: { apiKey: 'tgpak_x', session: sessionOf(undefined) },
       })
     ).toEqual({ 'x-api-key': 'tgpak_x' });
   });
 
   it('sends nothing when there is no credential at all', () => {
-    expect(getAuthentication({ authentication: {} })).toEqual({});
+    expect(headersOf({ authentication: {} })).toEqual({});
   });
 });
