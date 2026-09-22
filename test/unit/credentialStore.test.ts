@@ -1,7 +1,16 @@
 import { tmpdir } from 'os';
 import { join } from 'path';
 import { mkdtempSync } from 'fs';
-import { readFile, stat, writeFile } from 'fs/promises';
+import { readFile, readdir, rename, stat, writeFile } from 'fs/promises';
+
+vi.mock('fs/promises', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('fs/promises')>();
+  return { ...actual, rename: vi.fn(actual.rename) };
+});
+
+function renameRefusal(code: string) {
+  return Object.assign(new Error(`rename ${code}`), { code });
+}
 
 type StoreModule = typeof import('#cli/config/credentialStore.js');
 type CredentialsModule = typeof import('#cli/config/credentials.js');
@@ -110,6 +119,23 @@ describe('credential store', () => {
     expect(await apiKeyFor('https://nya.local', 1)).toBeNull();
   });
 
+  it('says whether the host it was asked to delete was there', async () => {
+    await fileCredentialStore.clear();
+    await setHost('meow.local', { user: { token: 'tgpat_meow', expires: 0 } });
+
+    expect(await fileCredentialStore.delete('meow.local')).toBe(true);
+    expect(await fileCredentialStore.delete('meow.local')).toBe(false);
+    expect(await fileCredentialStore.delete('never.stored')).toBe(false);
+  });
+
+  it('says whether clearing had anything to clear', async () => {
+    await fileCredentialStore.clear();
+    await setHost('meow.local', { user: { token: 'tgpat_meow', expires: 0 } });
+
+    expect(await fileCredentialStore.clear()).toBe(true);
+    expect(await fileCredentialStore.clear()).toBe(false);
+  });
+
   it('deletes one host without disturbing the others', async () => {
     await writeLegacyStore();
     await setHost('meow.local', { user: { token: 'tgpat_meow', expires: 0 } });
@@ -147,12 +173,48 @@ describe('credential store', () => {
     expect(await fileCredentialStore.list()).toEqual({});
   });
 
-  it('keeps the store readable only by its owner', async () => {
+  it('writes through a rename Windows refuses while a reader has the file', async () => {
+    vi.mocked(rename).mockRejectedValueOnce(renameRefusal('EPERM'));
+
     await setHost('meow.local', { user: { token: 'tgpat_meow', expires: 0 } });
 
-    const mode = (await stat(AUTH_FILE)).mode & 0o777;
-    expect(mode).toBe(0o600);
+    expect((await fileCredentialStore.list())['meow.local']).toBeDefined();
+    expect(await readdir(CONFIG_DIR)).not.toContainEqual(
+      expect.stringMatching(/\.tmp$/)
+    );
   });
+
+  it('gives up on a rename that keeps being refused, leaving no temp file', async () => {
+    vi.mocked(rename).mockRejectedValue(renameRefusal('EBUSY'));
+    try {
+      await expect(
+        setHost('meow.local', { user: { token: 'tgpat_meow', expires: 0 } })
+      ).rejects.toMatchObject({ code: 'EBUSY' });
+    } finally {
+      vi.mocked(rename).mockReset();
+      vi.mocked(rename).mockImplementation(
+        (await vi.importActual<typeof import('fs/promises')>('fs/promises'))
+          .rename
+      );
+    }
+
+    expect(await readdir(CONFIG_DIR)).not.toContainEqual(
+      expect.stringMatching(/\.tmp$/)
+    );
+  });
+
+  // Windows has no POSIX file modes, so the mode the store asks for is lost.
+  it.skipIf(process.platform === 'win32')(
+    'keeps the store readable only by its owner',
+    async () => {
+      await setHost('meow.local', {
+        user: { token: 'tgpat_meow', expires: 0 },
+      });
+
+      const mode = (await stat(AUTH_FILE)).mode & 0o777;
+      expect(mode).toBe(0o600);
+    }
+  );
 });
 
 describe('stored credentials', () => {

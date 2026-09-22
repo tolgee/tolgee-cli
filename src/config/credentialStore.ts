@@ -52,8 +52,10 @@ export interface CredentialStore {
    * and the write are one section.
    */
   update<T>(host: string, change: Change<T>): Promise<T>;
-  delete(host: string): Promise<void>;
-  clear(): Promise<void>;
+  /** Whether the host had anything stored. */
+  delete(host: string): Promise<boolean>;
+  /** Whether any host had anything stored. */
+  clear(): Promise<boolean>;
 }
 
 export type Change<T> = (current: HostCredentials) => Promise<ChangeResult<T>>;
@@ -87,13 +89,22 @@ export const fileCredentialStore: CredentialStore = {
   async delete(host) {
     return withStoreLock(async () => {
       const store = await readAll();
-      delete store[host];
-      await writeAll(store);
+      if (!store[host]) {
+        return false;
+      }
+      await writeAll(without(store, host));
+      return true;
     });
   },
 
   async clear() {
-    return withStoreLock(() => writeAll({}));
+    return withStoreLock(async () => {
+      const held = Object.keys(await readAll()).length > 0;
+      if (held) {
+        await writeAll({});
+      }
+      return held;
+    });
   },
 };
 

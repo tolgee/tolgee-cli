@@ -1,6 +1,12 @@
 import { Command } from 'commander';
 import { Login, Logout } from '#cli/commands/login.js';
-import { API_URL_OPT, EXTRA_HEADER, PROJECT_ID_OPT } from '#cli/options.js';
+import {
+  API_KEY_OPT,
+  API_URL_OPT,
+  EXTRA_HEADER,
+  PROJECT_ID_OPT,
+  apiUrlOrDefault,
+} from '#cli/options.js';
 import { createTolgeeClient } from '#cli/client/TolgeeClient.js';
 import {
   clearAuthStore,
@@ -10,7 +16,19 @@ import {
   saveUserName,
 } from '#cli/config/credentials.js';
 import { browserLogin } from '#cli/oauth/browserLogin.js';
-import { revokeAllSessions, revokeSessionFor } from '#cli/oauth/revoke.js';
+import {
+  revokeAllSessions,
+  revokeReplacedSession,
+  revokeSessionFor,
+} from '#cli/oauth/revoke.js';
+import { storedSessionFor } from '#cli/config/credentials.js';
+
+const { warnings } = vi.hoisted(() => ({ warnings: [] as string[] }));
+
+vi.mock('#cli/utils/logger.js', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('#cli/utils/logger.js')>()),
+  warn: (message: string) => warnings.push(String(message)),
+}));
 
 vi.mock('#cli/client/TolgeeClient.js', () => ({
   createTolgeeClient: vi.fn(() => ({
@@ -34,10 +52,12 @@ vi.mock('#cli/config/credentials.js', () => ({
   removeProjectKey: vi.fn(),
   saveOAuthSession: vi.fn(),
   saveUserName: vi.fn(),
+  storedSessionFor: vi.fn(),
 }));
 
 vi.mock('#cli/oauth/revoke.js', () => ({
   revokeSessionFor: vi.fn(),
+  revokeReplacedSession: vi.fn(),
   revokeAllSessions: vi.fn(),
 }));
 
@@ -57,7 +77,8 @@ const mockedSaveSession = vi.mocked(saveOAuthSession);
 
 async function run(command: typeof Login, config: any, args: string[]) {
   const program = new Command();
-  program.addOption(API_URL_OPT);
+  program.addOption(API_URL_OPT.default(apiUrlOrDefault(config.apiUrl)));
+  program.addOption(API_KEY_OPT.default(config.apiKey));
   program.addOption(EXTRA_HEADER);
   program.addOption(PROJECT_ID_OPT.default(config.projectId ?? -1));
   program.addCommand(command(config));
@@ -69,6 +90,8 @@ const runLogout = (config: any, args: string[]) => run(Logout, config, args);
 
 beforeEach(() => {
   vi.clearAllMocks();
+  warnings.length = 0;
+  delete process.env.TOLGEE_API_KEY;
 });
 
 describe('login custom headers', () => {
@@ -114,6 +137,14 @@ describe('browser login', () => {
     );
   });
 
+  it('takes the instance from the config when --api-url is not passed', async () => {
+    await runLogin({ apiUrl: 'http://self.example' }, ['login']);
+
+    expect(mockedBrowserLogin.mock.calls[0][0].apiUrl.hostname).toBe(
+      'self.example'
+    );
+  });
+
   it('names the session after the user once it is stored', async () => {
     await runLogin({}, ['--api-url', 'http://localhost', 'login']);
 
@@ -122,14 +153,33 @@ describe('browser login', () => {
     expect(userName).toBe('Sleepy Cat');
   });
 
-  it('revokes the session it replaces, which is the last reference to that grant', async () => {
+  it('revokes the session it replaces once the new one is stored', async () => {
+    const replaced = { type: 'oauth', refreshToken: 'tgort_old' } as any;
+    vi.mocked(storedSessionFor).mockResolvedValueOnce(replaced);
+
     await runLogin({}, ['--api-url', 'http://localhost', 'login']);
 
-    const [instance] = vi.mocked(revokeSessionFor).mock.calls[0];
+    const [session, instance] = vi.mocked(revokeReplacedSession).mock.calls[0];
+    expect(session).toBe(replaced);
     expect(instance.hostname).toBe('localhost');
     expect(
-      vi.mocked(revokeSessionFor).mock.invocationCallOrder[0]
-    ).toBeLessThan(mockedSaveSession.mock.invocationCallOrder[0]);
+      vi.mocked(revokeReplacedSession).mock.invocationCallOrder[0]
+    ).toBeGreaterThan(mockedSaveSession.mock.invocationCallOrder[0]);
+  });
+
+  it('ends nothing when no session was stored before', async () => {
+    await runLogin({}, ['--api-url', 'http://localhost', 'login']);
+
+    expect(vi.mocked(revokeReplacedSession)).not.toHaveBeenCalled();
+  });
+
+  it('says when an API key in the environment will win over the new login', async () => {
+    process.env.TOLGEE_API_KEY = 'tgpat_from_the_shell';
+
+    await runLogin({}, ['--api-url', 'http://localhost', 'login']);
+
+    expect(mockedSaveSession).toHaveBeenCalledTimes(1);
+    expect(warnings.join('\n')).toMatch(/TOLGEE_API_KEY/);
   });
 
   it('stores the session before the greeting, which can fail on its own', async () => {
@@ -138,6 +188,17 @@ describe('browser login', () => {
         error: { code: 'nope' },
         response: { status: 500 },
       }),
+    } as any);
+
+    await runLogin({}, ['--api-url', 'http://localhost', 'login']);
+
+    expect(mockedSaveSession).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(saveUserName)).not.toHaveBeenCalled();
+  });
+
+  it('keeps the login when the greeting cannot be fetched at all', async () => {
+    mockedCreateClient.mockReturnValueOnce({
+      GET: vi.fn().mockRejectedValue(new Error('socket hang up')),
     } as any);
 
     await runLogin({}, ['--api-url', 'http://localhost', 'login']);
@@ -239,6 +300,45 @@ describe('api key login', () => {
   });
 });
 
+describe('logout', () => {
+  function printed() {
+    const lines: string[] = [];
+    vi.spyOn(console, 'log').mockImplementation((line: any) =>
+      lines.push(String(line))
+    );
+    return lines;
+  }
+
+  it('says it logged out of the instance it cleared', async () => {
+    vi.mocked(removeApiKeys).mockResolvedValueOnce(true);
+    const lines = printed();
+
+    await runLogout({}, ['--api-url', 'http://localhost', 'logout']);
+
+    expect(lines.join('\n')).toMatch(/logged out of localhost/);
+  });
+
+  it('says so when nothing was stored for it, and names the way to another one', async () => {
+    vi.mocked(removeApiKeys).mockResolvedValueOnce(false);
+    const lines = printed();
+
+    await runLogout({}, ['logout']);
+
+    expect(lines.join('\n')).toMatch(/were not logged in to app.tolgee.io/);
+    expect(lines.join('\n')).toMatch(/--api-url/);
+    expect(lines.join('\n')).not.toMatch(/now logged out/);
+  });
+
+  it('says so when no instance was stored at all', async () => {
+    vi.mocked(clearAuthStore).mockResolvedValueOnce(false);
+    const lines = printed();
+
+    await runLogout({}, ['--api-url', 'http://localhost', 'logout', '--all']);
+
+    expect(lines.join('\n')).toMatch(/not logged in to any Tolgee instance/);
+  });
+});
+
 describe('logout --all', () => {
   it('ends the grant on every instance before clearing the machine', async () => {
     await runLogout({}, ['--api-url', 'http://localhost', 'logout', '--all']);
@@ -260,9 +360,9 @@ describe('logout --all', () => {
       '--all',
     ]);
 
-    const [instance, headers] = vi.mocked(revokeAllSessions).mock.calls[0];
-    expect(instance!.hostname).toBe('localhost');
-    expect(headers).toEqual({ 'x-config': 'c', 'x-cli': 'v' });
+    const [configured] = vi.mocked(revokeAllSessions).mock.calls[0];
+    expect(configured!.instance.hostname).toBe('localhost');
+    expect(configured!.headers).toEqual({ 'x-config': 'c', 'x-cli': 'v' });
   });
 });
 

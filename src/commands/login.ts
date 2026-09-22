@@ -204,16 +204,26 @@ const logoutHandler = (config: Schema) =>
 
     if (opts.all) {
       await revokeAllSessions({ instance: opts.apiUrl, headers });
-      await clearAuthStore();
-      success(
-        "You've been logged out of all Tolgee instances you were logged in."
-      );
+      if (await clearAuthStore()) {
+        success(
+          "You've been logged out of all Tolgee instances you were logged in."
+        );
+      } else {
+        info('You were not logged in to any Tolgee instance.');
+      }
       return;
     }
 
     await revokeSessionFor(opts.apiUrl, headers);
-    await removeApiKeys(opts.apiUrl);
-    success(`You're now logged out of ${opts.apiUrl.hostname}.`);
+    if (await removeApiKeys(opts.apiUrl)) {
+      success(`You're now logged out of ${opts.apiUrl.hostname}.`);
+      return;
+    }
+
+    info(`You were not logged in to ${opts.apiUrl.hostname}.`);
+    info(
+      'Pass --api-url, or set apiUrl in `.tolgeerc`, to log out of another instance.'
+    );
   };
 
 export const Login = (config: Schema) =>
