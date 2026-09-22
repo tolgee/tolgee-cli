@@ -43,12 +43,15 @@ function printToken(
 
 function printOAuthSession(session: OAuthSession) {
   const who = session.userName ? ` as ${session.userName}` : '';
+  const scopes = session.scopes.length
+    ? session.scopes.join(', ')
+    : '<no scopes>';
   console.log(
     ansi.magenta('OAuth') +
       '\t ' +
-      ansi.yellow('<all projects>') +
+      ansi.yellow(scopes) +
       '\t ' +
-      ansi.grey(`browser login${who}`)
+      ansi.grey(`browser login${who} on ${session.apiUrl}`)
   );
 }
 
@@ -60,8 +63,8 @@ export async function printApiKeyLists() {
     console.log(ansi.gray('No records\n'));
   }
 
-  for (const [origin, server] of list) {
-    console.log(ansi.white('[') + ansi.red(origin) + ansi.white(']'));
+  for (const [host, server] of list) {
+    console.log(ansi.white('[') + ansi.red(host) + ansi.white(']'));
     if (server.user) {
       if (isOAuthSession(server.user)) {
         printOAuthSession(server.user);
@@ -78,5 +81,4 @@ export async function printApiKeyLists() {
     }
     console.log('\n');
   }
-  return;
 }

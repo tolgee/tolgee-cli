@@ -24,7 +24,6 @@ afterEach(() => {
 
 type Props = Parameters<typeof createApiClient>[0];
 
-// Fires a GET and returns the Request openapi-fetch actually handed to fetch.
 async function get(props: Omit<Props, 'baseUrl'>): Promise<Request> {
   const client = createApiClient({ baseUrl: 'http://localhost', ...props });
   await (client as any).GET('/v2/projects');
@@ -123,9 +122,21 @@ describe('createApiClient headers', () => {
   });
 });
 
+function sessionOf(
+  token: string | undefined,
+  onUnauthorized: (used: string) => Promise<boolean> = async () => false
+) {
+  return {
+    getAccessToken: () => token as string,
+    getUserName: () => undefined,
+    ensureFresh: async () => {},
+    refreshAfterUnauthorized: onUnauthorized,
+  };
+}
+
 describe('createApiClient OAuth', () => {
   it('sends the access token as a bearer credential', async () => {
-    const req = await get({ getAccessToken: () => 'tgoat_token' });
+    const req = await get({ session: sessionOf('tgoat_token') });
     expect(req.headers.get('authorization')).toBe('Bearer tgoat_token');
     expect(req.headers.get('x-api-key')).toBeNull();
   });
@@ -134,7 +145,12 @@ describe('createApiClient OAuth', () => {
     const tokens = ['tgoat_first', 'tgoat_second'];
     const client = createApiClient({
       baseUrl: 'http://localhost',
-      getAccessToken: () => tokens.shift(),
+      session: {
+        getAccessToken: () => tokens.shift() as string,
+        getUserName: () => undefined,
+        ensureFresh: async () => {},
+        refreshAfterUnauthorized: async () => false,
+      },
     });
 
     await (client as any).GET('/v2/projects');
@@ -147,13 +163,13 @@ describe('createApiClient OAuth', () => {
   });
 
   it('sends no authorization header when there is no token', async () => {
-    const req = await get({ getAccessToken: () => undefined });
+    const req = await get({ session: sessionOf(undefined) });
     expect(req.headers.get('authorization')).toBeNull();
   });
 
   it('lets an explicit authorization header win over the session', async () => {
     const req = await get({
-      getAccessToken: () => 'tgoat_token',
+      session: sessionOf('tgoat_token'),
       headers: { authorization: 'Bearer supplied' },
     });
     expect(req.headers.get('authorization')).toBe('Bearer supplied');
@@ -161,7 +177,8 @@ describe('createApiClient OAuth', () => {
 });
 
 describe('createApiClient 401 replay', () => {
-  function stubFetch(statuses: number[], seen: any[]) {
+  function stubFetch(statuses: number[]) {
+    const seen: any[] = [];
     vi.stubGlobal(
       'fetch',
       vi.fn(async (request: Request) => {
@@ -175,21 +192,30 @@ describe('createApiClient 401 replay', () => {
         });
       })
     );
+    return seen;
+  }
+
+  /** Answers with `tgoat_old` until a 401 makes it rotate to `tgoat_new`. */
+  function clientThatRotatesOnce() {
+    let token = 'tgoat_old';
+    return createApiClient({
+      baseUrl: 'http://localhost',
+      session: {
+        getAccessToken: () => token,
+        getUserName: () => undefined,
+        ensureFresh: async () => {},
+        refreshAfterUnauthorized: async () => {
+          token = 'tgoat_new';
+          return true;
+        },
+      },
+    });
   }
 
   it('sends the request again with the token the refresh produced', async () => {
-    const seen: any[] = [];
-    stubFetch([401, 200], seen);
-    let token = 'tgoat_old';
+    const seen = stubFetch([401, 200]);
+    const client = clientThatRotatesOnce();
 
-    const client = createApiClient({
-      baseUrl: 'http://localhost',
-      getAccessToken: () => token,
-      onUnauthorized: async () => {
-        token = 'tgoat_new';
-        return true;
-      },
-    });
     await (client as any).GET('/v2/projects');
 
     expect(seen.map((call) => call.authorization)).toEqual([
@@ -199,18 +225,9 @@ describe('createApiClient 401 replay', () => {
   });
 
   it('replays the body too', async () => {
-    const seen: any[] = [];
-    stubFetch([401, 200], seen);
-    let token = 'tgoat_old';
+    const seen = stubFetch([401, 200]);
+    const client = clientThatRotatesOnce();
 
-    const client = createApiClient({
-      baseUrl: 'http://localhost',
-      getAccessToken: () => token,
-      onUnauthorized: async () => {
-        token = 'tgoat_new';
-        return true;
-      },
-    });
     await (client as any).POST('/v2/projects', { body: { name: 'a project' } });
 
     expect(seen).toHaveLength(2);
@@ -219,13 +236,11 @@ describe('createApiClient 401 replay', () => {
   });
 
   it('gives up when the session could not be refreshed', async () => {
-    const seen: any[] = [];
-    stubFetch([401, 200], seen);
+    const seen = stubFetch([401, 200]);
 
     const client = createApiClient({
       baseUrl: 'http://localhost',
-      getAccessToken: () => 'tgoat_old',
-      onUnauthorized: async () => false,
+      session: sessionOf('tgoat_old'),
     });
     await (client as any).GET('/v2/projects');
 
@@ -233,33 +248,29 @@ describe('createApiClient 401 replay', () => {
   });
 
   it('never replays an api key request', async () => {
-    const seen: any[] = [];
-    stubFetch([401, 200], seen);
-    const onUnauthorized = vi.fn(async () => true);
+    const seen = stubFetch([401, 200]);
 
     const client = createApiClient({
       baseUrl: 'http://localhost',
       apiKey: 'tgpak_test',
-      onUnauthorized,
     });
     await (client as any).GET('/v2/projects');
 
     expect(seen).toHaveLength(1);
-    expect(onUnauthorized).not.toHaveBeenCalled();
   });
 });
 
 describe('createApiClient settings', () => {
   it('round-trips the browser session, so a rebuilt client still authenticates', async () => {
-    const getAccessToken = () => 'tgoat_token';
+    const session = sessionOf('tgoat_token');
     const settings = createApiClient({
       baseUrl: 'http://localhost',
-      getAccessToken,
+      session,
     }).getSettings();
 
     const req = await get(settings);
 
-    expect(settings.getAccessToken).toBe(getAccessToken);
+    expect(settings.session).toBe(session);
     expect(req.headers.get('authorization')).toBe('Bearer tgoat_token');
   });
 });

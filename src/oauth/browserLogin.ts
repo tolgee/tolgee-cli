@@ -20,11 +20,9 @@ import { createPkcePair, createState } from './pkce.js';
 export type BrowserLoginOptions = {
   apiUrl: URL;
   project?: string;
-  /** Permission rather than instruction: true still defers to what the environment looks capable of. */
   allowBrowserLaunch?: boolean;
   openBrowser?: BrowserOpener;
-  /** --extra-header and .tolgeerc headers, which the CLI documents as applying to every Tolgee API request. */
-  headers?: Record<string, string>;
+  extraHeaders?: Record<string, string>;
 };
 
 export async function browserLogin(
@@ -34,27 +32,32 @@ export async function browserLogin(
 
   const metadata = await fetchAuthServerMetadata(
     options.apiUrl,
-    options.headers
+    options.extraHeaders
   );
   const server = await startLoopbackServer();
 
   try {
     const { verifier, challenge } = createPkcePair();
     const state = createState();
+    const scopes = askableScopes(
+      metadata.scopesSupported,
+      options.apiUrl.hostname
+    );
 
     const authorizeUrl = buildAuthorizeUrl(metadata, {
       clientId: CLI_CLIENT_ID,
       redirectUri: server.redirectUri,
-      scopes: askableScopes(metadata.scopesSupported, options.apiUrl.hostname),
+      scopes,
       state,
       codeChallenge: challenge,
       project: options.project,
     });
 
-    // Listen before the browser is told where to go: the callback can arrive before the call to open it returns.
+    // Listen before the browser is told where to go: the callback can arrive
+    // before the call to open it returns.
     const waiting = server.waitForCode({ state, issuer: metadata.issuer });
-    // The await below is what observes this; the catch only keeps a rejection during the launch from being reported
-    // as unhandled.
+    // Keeps a rejection that arrives during the launch from being reported as
+    // unhandled; the await below is what observes it.
     waiting.catch(() => {});
 
     if (launching) {
@@ -76,7 +79,7 @@ export async function browserLogin(
         redirectUri: server.redirectUri,
         codeVerifier: verifier,
       },
-      options.headers
+      options.extraHeaders
     );
   } finally {
     await server.close();

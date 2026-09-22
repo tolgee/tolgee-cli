@@ -1,7 +1,8 @@
 import { join, dirname } from 'path';
-import { mkdir, readFile, writeFile } from 'fs/promises';
+import { mkdir, readFile, rename, rm, writeFile } from 'fs/promises';
 
 import { CONFIG_PATH } from '../constants.js';
+import { withStoreLock } from './storeLock.js';
 
 export type Token = { token: string; expires: number };
 export type ProjectDetails = { name: string };
@@ -11,13 +12,10 @@ export type OAuthSession = {
   accessToken: string;
   accessExpires: number;
   refreshToken: string;
+  scopes: string[];
   userName?: string;
-  /**
-   * The instance this was issued by. The store is keyed by hostname alone, which is not enough to address the
-   * token endpoint again — `logout --all` has no other way to know whether a host was reached over http or https,
-   * or on which port.
-   */
-  apiUrl?: string;
+  /** The instance that issued this session; the hostname key cannot say which scheme or port reached it. */
+  apiUrl: string;
 };
 
 /**
@@ -44,21 +42,70 @@ export function isOAuthSession(user: UserCredentials): user is OAuthSession {
 export interface CredentialStore {
   list(): Promise<Store>;
   get(host: string): Promise<HostCredentials | undefined>;
-  set(host: string, credentials: HostCredentials): Promise<void>;
+  /**
+   * The only way to change a host's credentials; see storeLock for why the read
+   * and the write are one section.
+   */
+  update<T>(host: string, change: Change<T>): Promise<T>;
   delete(host: string): Promise<void>;
   clear(): Promise<void>;
+}
+
+export type Change<T> = (current: HostCredentials) => Promise<ChangeResult<T>>;
+
+export type ChangeResult<T> = {
+  next?: HostCredentials;
+  result: T;
+};
+
+export const fileCredentialStore: CredentialStore = {
+  list: readAll,
+
+  async get(host) {
+    const store = await readAll();
+    return store[host];
+  },
+
+  update(host, change) {
+    return withStoreLock(async () => {
+      const store = await readAll();
+      const { next, result } = await change(store[host] ?? {});
+      if (next) {
+        await writeAll(
+          holdsNothing(next) ? without(store, host) : { ...store, [host]: next }
+        );
+      }
+      return result;
+    });
+  },
+
+  async delete(host) {
+    return withStoreLock(async () => {
+      const store = await readAll();
+      delete store[host];
+      await writeAll(store);
+    });
+  },
+
+  async clear() {
+    return withStoreLock(() => writeAll({}));
+  },
+};
+
+function without(store: Store, host: string): Store {
+  const { [host]: _dropped, ...others } = store;
+  return others;
+}
+
+function holdsNothing(host: HostCredentials) {
+  const keys = Object.values(host.projects ?? {}).filter(Boolean);
+  return !host.user && keys.length === 0;
 }
 
 const API_TOKENS_FILE = join(CONFIG_PATH, 'authentication.json');
 
 async function ensureConfigPath() {
-  try {
-    await mkdir(dirname(API_TOKENS_FILE));
-  } catch (e: any) {
-    if (e.code !== 'EEXIST') {
-      throw e;
-    }
-  }
+  await mkdir(dirname(API_TOKENS_FILE), { recursive: true });
 }
 
 async function readAll(): Promise<Store> {
@@ -76,33 +123,35 @@ async function readAll(): Promise<Store> {
 }
 
 async function writeAll(store: Store): Promise<void> {
-  const blob = JSON.stringify(store);
-  await writeFile(API_TOKENS_FILE, blob, {
+  await ensureConfigPath();
+  // A crash mid-write would otherwise leave the tokens truncated.
+  const pending = `${API_TOKENS_FILE}.${process.pid}.tmp`;
+  await writeFile(pending, JSON.stringify(store), {
     mode: 0o600,
     encoding: 'utf8',
   });
+  await renameOverStore(pending);
 }
 
-export const fileCredentialStore: CredentialStore = {
-  list: readAll,
+// Windows refuses to replace a file another process has open, and reads take
+// no lock, so a rotation can land while a sibling command is reading.
+async function renameOverStore(pending: string) {
+  for (let attempt = 1; ; attempt++) {
+    try {
+      await rename(pending, API_TOKENS_FILE);
+      return;
+    } catch (e: any) {
+      if (!RETRIABLE_RENAME_ERRORS.has(e.code) || attempt >= RENAME_ATTEMPTS) {
+        await rm(pending, { force: true });
+        throw e;
+      }
+      await new Promise((resolve) =>
+        setTimeout(resolve, RENAME_RETRY_MS * attempt)
+      );
+    }
+  }
+}
 
-  async get(host) {
-    const store = await readAll();
-    return store[host];
-  },
-
-  async set(host, credentials) {
-    const store = await readAll();
-    return writeAll({ ...store, [host]: credentials });
-  },
-
-  async delete(host) {
-    const store = await readAll();
-    delete store[host];
-    return writeAll(store);
-  },
-
-  async clear() {
-    return writeAll({});
-  },
-};
+const RETRIABLE_RENAME_ERRORS = new Set(['EPERM', 'EACCES', 'EBUSY']);
+const RENAME_ATTEMPTS = 5;
+const RENAME_RETRY_MS = 20;

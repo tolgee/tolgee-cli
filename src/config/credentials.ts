@@ -3,9 +3,11 @@ import type {
   ApiKeyProject,
 } from '../client/getApiKeyInformation.js';
 import { warn } from '../utils/logger.js';
+import { tryParseUrl } from '../utils/url.js';
 import {
   fileCredentialStore,
   isOAuthSession,
+  type Change,
   type CredentialStore,
   type HostCredentials,
   type OAuthSession,
@@ -45,15 +47,17 @@ async function updateHost(
   instance: URL,
   update: (current: HostCredentials) => HostCredentials
 ) {
-  const current = (await store.get(instance.hostname)) ?? {};
-  return store.set(instance.hostname, update(current));
+  return store.update(instance.hostname, async (current) => ({
+    next: update(current),
+    result: undefined,
+  }));
 }
 
 async function storeUser(instance: URL, user?: UserCredentials) {
   return updateHost(instance, (current) => ({ ...current, user }));
 }
 
-async function storePak(
+async function savePak(
   instance: URL,
   project: ApiKeyProject,
   pak?: Token
@@ -69,34 +73,23 @@ async function storePak(
   }));
 }
 
-async function removePak(instance: URL, projectId: number) {
-  const id = projectId.toString(10);
-  return updateHost(instance, (current) => {
-    delete current.projects?.[id];
-    delete current.projectDetails?.[id];
-    return current;
-  });
-}
-
-export async function savePat(instance: URL, pat?: Token) {
-  return storeUser(instance, pat);
-}
-
 export async function saveOAuthSession(instance: URL, session: OAuthSession) {
   return storeUser(instance, session);
 }
 
-/** Clears the host's user-level credential, leaving its project api keys in place. */
-export async function clearUserCredentials(instance: URL) {
-  return storeUser(instance, undefined);
+export async function updateHostCredentials<T>(
+  instance: URL,
+  change: Change<T>
+): Promise<T> {
+  return store.update(instance.hostname, change);
 }
 
-export async function savePak(
-  instance: URL,
-  project: ApiKeyProject,
-  pak?: Token
-) {
-  return storePak(instance, project, pak);
+export async function saveUserName(instance: URL, userName: string) {
+  return updateHost(instance, (current) => {
+    const user = usableSession(current, instance);
+    if (!user) return current;
+    return { ...current, user: { ...user, userName } };
+  });
 }
 
 export type StoredCredentials =
@@ -104,11 +97,10 @@ export type StoredCredentials =
   | { type: 'oauth'; session: OAuthSession };
 
 export async function getStoredCredentials(
-  apiUrl: string,
+  apiUrl: URL,
   projectId: number
 ): Promise<StoredCredentials | null> {
-  const apiUrlObj = new URL(apiUrl);
-  const scopedStore = await store.get(apiUrlObj.hostname);
+  const scopedStore = await store.get(apiUrl.hostname);
 
   if (!scopedStore) {
     return null;
@@ -116,45 +108,87 @@ export async function getStoredCredentials(
 
   const user = scopedStore.user;
   if (user && isOAuthSession(user)) {
-    return { type: 'oauth', session: user };
+    const session = usableSession(scopedStore, apiUrl);
+    if (!session) {
+      warn(
+        `The stored session for ${apiUrl.hostname} was issued by ${user.apiUrl}, not ${apiUrl.origin}.`
+      );
+      return usableProjectKey(apiUrl, scopedStore, projectId);
+    }
+
+    // A browser session covers the projects chosen on the consent screen, which the client is never told. A key
+    // issued for the project at hand names it, so it is the one that certainly reaches it.
+    const forThisProject = await usableProjectKey(
+      apiUrl,
+      scopedStore,
+      projectId
+    );
+    if (forThisProject) {
+      warn(
+        `Using the project API key stored for project ${projectId} rather than your browser login. ` +
+          `Run \`tolgee logout --project\` to drop that key, or pass --api-key to choose another credential.`
+      );
+      return forThisProject;
+    }
+    return { type: 'oauth', session };
   }
 
   if (user) {
     if (user.expires !== 0 && Date.now() > user.expires) {
-      warn(`Your personal access token for ${apiUrlObj.hostname} expired.`);
-      await storeUser(apiUrlObj, undefined);
+      warn(`Your personal access token for ${apiUrl.hostname} expired.`);
+      await storeUser(apiUrl, undefined);
       return null;
     }
 
     return { type: 'apiKey', key: user.token };
   }
 
+  return usableProjectKey(apiUrl, scopedStore, projectId);
+}
+
+/**
+ * The session in this slot, if it is this instance's to use. Hosts key the
+ * store, so the slot can hold one issued by another instance on the same
+ * hostname, whose tokens must never go out to this one.
+ */
+export function usableSession(
+  host: HostCredentials,
+  apiUrl: URL
+): OAuthSession | undefined {
+  const user = host.user;
+  if (!user || !isOAuthSession(user)) {
+    return undefined;
+  }
+  return issuedBy(user, apiUrl) ? user : undefined;
+}
+
+export function issuedBy(session: OAuthSession, apiUrl: URL) {
+  return tryParseUrl(session.apiUrl)?.origin === apiUrl.origin;
+}
+
+async function usableProjectKey(
+  apiUrl: URL,
+  host: HostCredentials,
+  projectId: number
+): Promise<{ type: 'apiKey'; key: string } | null> {
   if (projectId <= 0) {
     return null;
   }
 
-  const pak = scopedStore.projects?.[projectId.toString(10)];
-  if (pak) {
-    if (pak.expires !== 0 && Date.now() > pak.expires) {
-      warn(
-        `Your project API key for project #${projectId} on ${apiUrlObj.hostname} expired.`
-      );
-      await removePak(apiUrlObj, projectId);
-      return null;
-    }
-
-    return { type: 'apiKey', key: pak.token };
+  const pak = host.projects?.[projectId.toString(10)];
+  if (!pak) {
+    return null;
   }
 
-  return null;
-}
+  if (pak.expires !== 0 && Date.now() > pak.expires) {
+    warn(
+      `Your project API key for project #${projectId} on ${apiUrl.hostname} expired.`
+    );
+    await removeProjectKey(apiUrl, projectId);
+    return null;
+  }
 
-export async function getApiKey(
-  apiUrl: string,
-  projectId: number
-): Promise<string | null> {
-  const credentials = await getStoredCredentials(apiUrl, projectId);
-  return credentials?.type === 'apiKey' ? credentials.key : null;
+  return { type: 'apiKey', key: pak.token };
 }
 
 export async function saveApiKey(instance: URL, token: ApiKeyInfo) {
@@ -165,9 +199,29 @@ export async function saveApiKey(instance: URL, token: ApiKeyInfo) {
     });
   }
 
-  return storePak(instance, token.project, {
+  return savePak(instance, token.project, {
     token: token.key,
     expires: token.expires,
+  });
+}
+
+/** Whether there was a key to drop. */
+export async function removeProjectKey(
+  instance: URL,
+  projectId: number
+): Promise<boolean> {
+  return store.update(instance.hostname, async (current) => {
+    const id = projectId.toString(10);
+    if (!current.projects?.[id]) {
+      return { result: false };
+    }
+
+    const { [id]: _dropped, ...projects } = current.projects;
+    const { [id]: _named, ...projectDetails } = current.projectDetails ?? {};
+    return {
+      next: { ...current, projects, projectDetails },
+      result: true,
+    };
   });
 }
 

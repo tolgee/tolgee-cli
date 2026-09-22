@@ -15,13 +15,37 @@ const AUTH_FILE = join(CONFIG_DIR, 'authentication.json');
 
 let fileCredentialStore: StoreModule['fileCredentialStore'];
 let isOAuthSession: StoreModule['isOAuthSession'];
-let getApiKey: CredentialsModule['getApiKey'];
+let getStoredCredentials: CredentialsModule['getStoredCredentials'];
+
+function oauthSession(overrides: Record<string, unknown> = {}) {
+  return {
+    type: 'oauth',
+    accessToken: 'tgoat_xxx',
+    accessExpires: 1234,
+    refreshToken: 'tgort_yyy',
+    scopes: [] as string[],
+    apiUrl: 'https://nya.local',
+    ...overrides,
+  };
+}
+
+async function setHost(host: string, credentials: any) {
+  await fileCredentialStore.update(host, async () => ({
+    next: credentials,
+    result: undefined,
+  }));
+}
+
+async function apiKeyFor(url: string, projectId: number) {
+  const stored = await getStoredCredentials(new URL(url), projectId);
+  return stored?.type === 'apiKey' ? stored.key : null;
+}
 
 beforeAll(async () => {
   ({ fileCredentialStore, isOAuthSession } = await import(
     '#cli/config/credentialStore.js'
   ));
-  ({ getApiKey } = await import('#cli/config/credentials.js'));
+  ({ getStoredCredentials } = await import('#cli/config/credentials.js'));
 });
 
 const LEGACY_STORE = {
@@ -43,7 +67,7 @@ describe('credential store', () => {
   it('reads a store written before browser login existed', async () => {
     await writeLegacyStore();
 
-    expect(await getApiKey('https://app.tolgee.io', 1)).toBe('tgpat_legacy');
+    expect(await apiKeyFor('https://app.tolgee.io', 1)).toBe('tgpat_legacy');
     expect(await fileCredentialStore.get('app.tolgee.io')).toEqual(
       LEGACY_STORE['app.tolgee.io']
     );
@@ -52,9 +76,7 @@ describe('credential store', () => {
   it('leaves an existing host untouched when another one is written', async () => {
     await writeLegacyStore();
 
-    await fileCredentialStore.set('meow.local', {
-      user: { token: 'tgpat_meow', expires: 0 },
-    });
+    await setHost('meow.local', { user: { token: 'tgpat_meow', expires: 0 } });
 
     const saved = JSON.parse(await readFile(AUTH_FILE, 'utf8'));
     expect(saved['app.tolgee.io']).toEqual(LEGACY_STORE['app.tolgee.io']);
@@ -64,46 +86,32 @@ describe('credential store', () => {
   it('round-trips an OAuth session', async () => {
     await writeLegacyStore();
 
-    await fileCredentialStore.set('nya.local', {
-      user: {
-        type: 'oauth',
-        accessToken: 'tgoat_xxx',
-        accessExpires: 1234,
-        refreshToken: 'tgort_yyy',
+    await setHost('nya.local', {
+      user: oauthSession({
+        scopes: ['translations.edit'],
         userName: 'sleepycat',
-      },
+      }),
     });
 
     const user = (await fileCredentialStore.get('nya.local'))!.user!;
     expect(isOAuthSession(user)).toBe(true);
-    expect(user).toEqual({
-      type: 'oauth',
-      accessToken: 'tgoat_xxx',
-      accessExpires: 1234,
-      refreshToken: 'tgort_yyy',
-      userName: 'sleepycat',
-    });
+    expect(user).toEqual(
+      oauthSession({ scopes: ['translations.edit'], userName: 'sleepycat' })
+    );
   });
 
   it('never offers an OAuth session as an api key', async () => {
     await fileCredentialStore.clear();
-    await fileCredentialStore.set('nya.local', {
-      user: {
-        type: 'oauth',
-        accessToken: 'tgoat_xxx',
-        accessExpires: 1234,
-        refreshToken: 'tgort_yyy',
-      },
+    await setHost('nya.local', {
+      user: oauthSession(),
     });
 
-    expect(await getApiKey('https://nya.local', 1)).toBeNull();
+    expect(await apiKeyFor('https://nya.local', 1)).toBeNull();
   });
 
   it('deletes one host without disturbing the others', async () => {
     await writeLegacyStore();
-    await fileCredentialStore.set('meow.local', {
-      user: { token: 'tgpat_meow', expires: 0 },
-    });
+    await setHost('meow.local', { user: { token: 'tgpat_meow', expires: 0 } });
 
     await fileCredentialStore.delete('meow.local');
 
@@ -113,10 +121,33 @@ describe('credential store', () => {
     );
   });
 
-  it('keeps the store readable only by its owner', async () => {
-    await fileCredentialStore.set('meow.local', {
-      user: { token: 'tgpat_meow', expires: 0 },
+  it('does not create a host record for a change that stores nothing', async () => {
+    await fileCredentialStore.clear();
+
+    await fileCredentialStore.update('typo.local', async (current) => ({
+      next: current,
+      result: undefined,
+    }));
+
+    expect(await fileCredentialStore.list()).toEqual({});
+  });
+
+  it('forgets a host once its last credential is removed', async () => {
+    await fileCredentialStore.clear();
+    await setHost('meow.local', {
+      projects: { '1': { token: 'tgpak_meow', expires: 0 } },
     });
+
+    await fileCredentialStore.update('meow.local', async (current) => {
+      delete current.projects?.['1'];
+      return { next: current, result: undefined };
+    });
+
+    expect(await fileCredentialStore.list()).toEqual({});
+  });
+
+  it('keeps the store readable only by its owner', async () => {
+    await setHost('meow.local', { user: { token: 'tgpat_meow', expires: 0 } });
 
     const mode = (await stat(AUTH_FILE)).mode & 0o777;
     expect(mode).toBe(0o600);
@@ -124,33 +155,57 @@ describe('credential store', () => {
 });
 
 describe('stored credentials', () => {
-  let getStoredCredentials: CredentialsModule['getStoredCredentials'];
-
-  beforeAll(async () => {
-    ({ getStoredCredentials } = await import('#cli/config/credentials.js'));
-  });
-
-  it('prefers a browser session over a project api key', async () => {
+  it('prefers a key issued for the project over a browser session', async () => {
     await fileCredentialStore.clear();
-    await fileCredentialStore.set('nya.local', {
-      user: {
-        type: 'oauth',
-        accessToken: 'tgoat_xxx',
-        accessExpires: 1234,
-        refreshToken: 'tgort_yyy',
-      },
+    await setHost('nya.local', {
+      user: oauthSession(),
       projects: { '1': { token: 'tgpak_project', expires: 0 } },
     });
 
-    const credentials = await getStoredCredentials('https://nya.local', 1);
+    expect(await getStoredCredentials(new URL('https://nya.local'), 1)).toEqual(
+      {
+        type: 'apiKey',
+        key: 'tgpak_project',
+      }
+    );
 
-    expect(credentials).toMatchObject({ type: 'oauth' });
+    expect(
+      await getStoredCredentials(new URL('https://nya.local'), 2)
+    ).toMatchObject({
+      type: 'oauth',
+    });
+  });
+
+  it('never hands a session to an instance that did not issue it', async () => {
+    await fileCredentialStore.clear();
+    await setHost('localhost', {
+      user: oauthSession({
+        accessExpires: Date.now() + 60_000,
+        apiUrl: 'http://localhost:22222/',
+      }),
+      projects: { '1': { token: 'tgpak_for_one', expires: 0 } },
+    });
+
+    expect(
+      await getStoredCredentials(new URL('http://localhost:8080'), -1)
+    ).toBeNull();
+    expect(
+      await getStoredCredentials(new URL('http://localhost:8080'), 1)
+    ).toEqual({
+      type: 'apiKey',
+      key: 'tgpak_for_one',
+    });
+    expect(
+      await getStoredCredentials(new URL('http://localhost:22222'), -1)
+    ).toMatchObject({ type: 'oauth' });
   });
 
   it('reports a personal access token as an api key', async () => {
     await writeLegacyStore();
 
-    expect(await getStoredCredentials('https://app.tolgee.io', 1)).toEqual({
+    expect(
+      await getStoredCredentials(new URL('https://app.tolgee.io'), 1)
+    ).toEqual({
       type: 'apiKey',
       key: 'tgpat_legacy',
     });

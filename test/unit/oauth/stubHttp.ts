@@ -37,23 +37,21 @@ export async function closeServer(server: Server) {
 export type OAuthStub = {
   origin: string;
   revoked: URLSearchParams[];
-  /** The headers of every request it received, in order. */
-  received: IncomingHttpHeaders[];
+  receivedHeaders: IncomingHttpHeaders[];
   close(): Promise<void>;
 };
 
-/** A Tolgee instance that publishes a discovery document about itself and records what it is asked to revoke. */
 export async function startOAuthStub(
   revokeStatus: () => number = () => 200
 ): Promise<OAuthStub> {
   const revoked: URLSearchParams[] = [];
-  const received: IncomingHttpHeaders[] = [];
+  const receivedHeaders: IncomingHttpHeaders[] = [];
   let origin = '';
 
   const server = createServer(async (request, response) => {
     const url = new URL(request.url ?? '/', 'http://127.0.0.1');
     const json = jsonWriter(response);
-    received.push(request.headers);
+    receivedHeaders.push(request.headers);
 
     if (url.pathname === '/.well-known/oauth-authorization-server') {
       json(200, {
@@ -75,5 +73,10 @@ export async function startOAuthStub(
   });
 
   origin = await listenOnLoopback(server);
-  return { origin, revoked, received, close: () => closeServer(server) };
+  return {
+    origin,
+    revoked,
+    receivedHeaders,
+    close: () => closeServer(server),
+  };
 }

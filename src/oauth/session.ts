@@ -1,11 +1,11 @@
 import {
-  clearUserCredentials,
-  getStoredCredentials,
-  saveOAuthSession,
+  getHostCredentials,
+  usableSession,
+  updateHostCredentials,
+  type HostCredentials,
   type OAuthSession,
 } from '../config/credentials.js';
-import { withStoreLock } from '../config/storeLock.js';
-import { debug, exitWithError } from '../utils/logger.js';
+import { debug } from '../utils/logger.js';
 import {
   fetchAuthServerMetadata,
   OAuthError,
@@ -14,80 +14,105 @@ import {
 } from './authServer.js';
 import { CLI_CLIENT_ID } from './constants.js';
 
-/** Refreshed this long before it expires, so a request that takes a while does not start with a dying token. */
 const REFRESH_MARGIN_MS = 60_000;
+
+/**
+ * `refreshed` cost a round trip to the server; `adopted` took tokens another
+ * process or caller had already obtained.
+ */
+export type RefreshOutcome = 'refreshed' | 'adopted';
 
 export type OAuthSessionHandle = {
   getAccessToken(): string;
-  getUserName(): string | undefined;
-  /** Rotates the pair when the access token is about to expire. */
   ensureFresh(): Promise<void>;
-  /** Answers whether the request that got a 401 is worth sending again. */
-  refreshAfterUnauthorized(usedToken: string): Promise<boolean>;
+  /** Rejects with SessionExpiredError once the grant is dead. */
+  refreshAfterUnauthorized(usedToken: string): Promise<RefreshOutcome>;
+  adoptNewerSession(): Promise<boolean>;
 };
 
 export function createOAuthSessionHandle(
   apiUrl: URL,
-  initial: OAuthSession
+  initial: OAuthSession,
+  extraHeaders?: Record<string, string>
 ): OAuthSessionHandle {
   let current = initial;
   let metadata: AuthServerMetadata | undefined;
-  let inFlight: Promise<void> | undefined;
+  let inFlight: Promise<RefreshOutcome> | undefined;
 
   async function metadataFor() {
-    metadata ??= await fetchAuthServerMetadata(apiUrl);
+    metadata ??= await fetchAuthServerMetadata(apiUrl, extraHeaders);
     return metadata;
   }
 
   async function rotate() {
-    // Another process may have rotated while this one waited for the lock, which makes its own refresh token the
-    // spent one. Reading the store again inside the lock is what lets the loser carry on with the winner's pair
-    // instead of replaying a token the server has already retired.
-    const stored = await getStoredCredentials(apiUrl.toString(), -1);
-    if (!stored || stored.type !== 'oauth') {
-      sessionGone();
-    }
-    if (stored.session.refreshToken !== current.refreshToken) {
-      debug('[OAUTH] Another process rotated the session; using its tokens');
-      current = stored.session;
-      return;
-    }
+    const server = await metadataFor();
 
-    let tokens;
+    return updateHostCredentials(apiUrl, async (host: HostCredentials) => {
+      const stored = usableSession(host, apiUrl);
+      if (!stored) {
+        return { result: 'gone' as const };
+      }
+      if (stored.refreshToken !== current.refreshToken) {
+        debug('[OAUTH] Another process rotated the session; using its tokens');
+        current = stored;
+        return { result: 'adopted' as const };
+      }
+
+      const rotated = await rotatedFrom(server, stored);
+      if (!rotated) {
+        return {
+          next: { ...host, user: undefined },
+          result: 'gone' as const,
+        };
+      }
+
+      current = rotated;
+      return { next: { ...host, user: rotated }, result: 'refreshed' as const };
+    });
+  }
+
+  async function rotatedFrom(
+    server: AuthServerMetadata,
+    stored: OAuthSession
+  ): Promise<OAuthSession | null> {
     try {
-      tokens = await refreshTokens(await metadataFor(), {
-        clientId: CLI_CLIENT_ID,
-        refreshToken: current.refreshToken,
-      });
+      const tokens = await refreshTokens(
+        server,
+        { clientId: CLI_CLIENT_ID, refreshToken: stored.refreshToken },
+        extraHeaders
+      );
+      return {
+        ...stored,
+        accessToken: tokens.accessToken,
+        accessExpires: tokens.accessExpires,
+        refreshToken: tokens.refreshToken,
+        scopes: tokens.scopes.length ? tokens.scopes : stored.scopes,
+      };
     } catch (e) {
-      // The server refusing the grant is terminal: the token is spent, revoked, or the grant is gone.
       if (e instanceof OAuthError && e.kind === 'oauth') {
-        await clearUserCredentials(apiUrl);
-        sessionGone();
+        return null;
       }
       throw e;
     }
-
-    current = {
-      ...current,
-      accessToken: tokens.accessToken,
-      accessExpires: tokens.accessExpires,
-      refreshToken: tokens.refreshToken,
-    };
-    await saveOAuthSession(apiUrl, current);
   }
 
   function refresh() {
-    inFlight ??= withStoreLock(rotate).finally(() => {
-      inFlight = undefined;
-    });
+    inFlight ??= rotate()
+      .then((outcome) => {
+        if (outcome === 'gone') {
+          throw new SessionExpiredError();
+        }
+        return outcome;
+      })
+      .finally(() => {
+        inFlight = undefined;
+      });
     return inFlight;
   }
 
   return {
     getAccessToken: () => current.accessToken,
 
-    getUserName: () => current.userName,
 
     async ensureFresh() {
       if (current.accessExpires - Date.now() > REFRESH_MARGIN_MS) {
@@ -97,19 +122,30 @@ export function createOAuthSessionHandle(
     },
 
     async refreshAfterUnauthorized(usedToken) {
-      // Something already replaced the token this request went out with, so it is worth sending again as it is.
       if (current.accessToken !== usedToken) {
-        return true;
+        return 'adopted';
       }
+      return refresh();
+    },
 
-      await refresh();
-      return current.accessToken !== usedToken;
+    async adoptNewerSession() {
+      const host = (await getHostCredentials(apiUrl)) ?? {};
+      const stored = usableSession(host, apiUrl);
+      if (!stored || stored.refreshToken === current.refreshToken) {
+        return false;
+      }
+      debug('[OAUTH] Another process stored a newer session; using its tokens');
+      current = stored;
+      return true;
     },
   };
 }
 
-function sessionGone(): never {
-  return exitWithError(
-    'Your Tolgee session has expired. Run `tolgee login` to sign in again.'
-  );
+export class SessionExpiredError extends Error {
+  constructor() {
+    super(
+      'Your Tolgee session has expired. Run `tolgee login` to sign in again.'
+    );
+    this.name = 'SessionExpiredError';
+  }
 }
