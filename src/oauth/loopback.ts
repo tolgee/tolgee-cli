@@ -2,6 +2,7 @@ import { createServer, type Server, type ServerResponse } from 'http';
 import { AddressInfo } from 'net';
 
 import { OAuthError } from './authServer.js';
+import { LOGGED_IN_PAGE, LOGIN_FAILED_PAGE } from './loopbackPages.js';
 
 /**
  * RFC 8252 §7.3 and §8.3: the IP literal rather than `localhost`, whose
@@ -16,18 +17,6 @@ const CALLBACK_PATH = '/callback';
  * for past that.
  */
 const DEFAULT_TIMEOUT_MS = 15 * 60 * 1000;
-
-const SUCCESS_BODY = `<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><title>Tolgee CLI</title></head>
-<body style="font-family: system-ui, sans-serif; text-align: center; padding: 3rem">
-<h1>You are logged in</h1><p>You can close this tab and go back to your terminal.</p>
-</body></html>`;
-
-const FAILURE_BODY = `<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><title>Tolgee CLI</title></head>
-<body style="font-family: system-ui, sans-serif; text-align: center; padding: 3rem">
-<h1>Login failed</h1><p>Go back to your terminal to see what went wrong.</p>
-</body></html>`;
 
 export type LoopbackServer = {
   redirectUri: string;
@@ -71,12 +60,12 @@ export async function startLoopbackServer(
           clearTimeout(timer);
 
           if (outcome.kind === 'code') {
-            respond(response, 200, SUCCESS_BODY);
+            respond(response, 200, LOGGED_IN_PAGE);
             resolve(outcome.code);
             return;
           }
 
-          respond(response, 400, FAILURE_BODY);
+          respond(response, 400, LOGIN_FAILED_PAGE);
           reject(outcome.error);
         });
       });
