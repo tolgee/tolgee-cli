@@ -1,39 +1,52 @@
 import { debug, error } from '../logger.js';
+import { SessionExpiredError } from '../../oauth/session.js';
 import { isVersionAtLeast } from '../isVersionAtLeast.js';
 import { createTolgeeClient } from '../../client/TolgeeClient.js';
 
 export function AuthErrorHandler(
-  client: ReturnType<typeof createTolgeeClient>
+  client: ReturnType<typeof createTolgeeClient>,
+  options: { renewCredential?: () => Promise<boolean> } = {}
 ) {
-  async function handleAuthErrors(err: any, shutdown: () => void) {
+  async function handleAuthErrors(err: any, shutdown: (code?: number) => void) {
     if (err?.headers?.message == 'Unauthenticated') {
+      try {
+        if (await options.renewCredential?.()) {
+          debug('Reconnecting with a renewed credential.');
+          return;
+        }
+      } catch (e: any) {
+        if (e instanceof SessionExpiredError) {
+          error(e.message);
+          shutdown(1);
+          return;
+        }
+        debug(`Could not renew the credential: ${e.message}`);
+        return;
+      }
       await printUnauthenticatedError();
-      shutdown();
+      shutdown(1);
       return;
     }
     if (err?.headers?.message == 'Forbidden') {
       error("You're not authorized. Insufficient permissions?");
-      shutdown();
+      shutdown(1);
       return;
     }
   }
 
   async function printUnauthenticatedError() {
-    const { isSupported, serverVersion } = await isAppSupportedVersion(client);
+    const { isSupported, serverVersion } = await isAppSupportedVersion();
     if (isSupported) {
-      error("You're not authenticated. Invalid API key?");
+      error("You're not authenticated. Invalid credentials?");
       return;
     }
     error(
       `Server version ${serverVersion} does not support CLI watch mode. Please update your Tolgee server to version ${REQUIRED_VERSION} or higher.`
     );
-    return;
   }
 
-  async function isAppSupportedVersion(
-    client: ReturnType<typeof createTolgeeClient>
-  ) {
-    const serverVersion = await getTolgeeServerVersion(client);
+  async function isAppSupportedVersion() {
+    const serverVersion = await getTolgeeServerVersion();
 
     if (!serverVersion) {
       debug('Could not determine server version');
@@ -49,15 +62,13 @@ export function AuthErrorHandler(
     };
   }
 
-  async function getTolgeeServerVersion(
-    client: ReturnType<typeof createTolgeeClient>
-  ): Promise<string | null> {
+  async function getTolgeeServerVersion(): Promise<string | null> {
     try {
       const config = await client.GET('/api/public/configuration');
       const version = config.response?.headers.get('x-tolgee-version');
       return version || null;
-    } catch (error) {
-      debug('Failed to get server version: ' + error);
+    } catch (e) {
+      debug('Failed to get server version: ' + e);
       return null;
     }
   }

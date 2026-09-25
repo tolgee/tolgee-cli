@@ -4,16 +4,19 @@ import createClient, { ParseAs } from 'openapi-fetch';
 import base32Decode from 'base32-decode';
 import { API_KEY_PAK_PREFIX, USER_AGENT } from '../constants.js';
 import { getApiKeyInformation } from './getApiKeyInformation.js';
-import { debug, isDebugEnabled } from '../utils/logger.js';
+import { debug, isDebugEnabled, warn } from '../utils/logger.js';
 import { errorFromLoadable } from './errorFromLoadable.js';
 import { normalizeHeaderKeys } from '../utils/headers.js';
+import type { OAuthSessionHandle } from '../oauth/session.js';
+import { authenticatingFetch } from './credential.js';
 
 // Headers the CLI controls and that custom headers must never override.
 const RESERVED_HEADERS = ['user-agent', 'content-type', 'x-api-key'];
 
 async function parseResponse(response: Response, parseAs: ParseAs) {
   // handle empty content
-  // note: we return `{}` because we want user truthy checks for `.data` or `.error` to succeed
+  // note: we return `{}` because we want user truthy checks for `.data` or
+  // `.error` to succeed
   if (
     response.status === 204 ||
     response.headers.get('Content-Length') === '0'
@@ -57,6 +60,7 @@ export function projectIdFromKey(key: string) {
 export type ApiClientProps = {
   baseUrl: string;
   apiKey?: string;
+  session?: OAuthSessionHandle;
   projectId?: number | undefined;
   autoThrow?: boolean;
   headers?: Record<string, string>;
@@ -65,6 +69,7 @@ export type ApiClientProps = {
 export function createApiClient({
   baseUrl,
   apiKey,
+  session,
   projectId,
   autoThrow = false,
   headers,
@@ -72,21 +77,14 @@ export function createApiClient({
   const computedProjectId =
     projectId ?? (apiKey ? projectIdFromKey(apiKey) : undefined);
 
-  const custom = normalizeHeaderKeys(headers);
-  const ignored = RESERVED_HEADERS.filter((name) => name in custom);
-  if (ignored.length) {
-    debug(`[HTTP] Ignoring reserved custom header(s): ${ignored.join(', ')}`);
-  }
-  for (const name of ignored) {
-    delete custom[name];
-  }
+  const { custom, activeSession } = customHeaderPolicy(headers, session);
 
   const apiClient = createClient<paths>({
     baseUrl,
+    fetch: authenticatingFetch({ apiKey, session: activeSession }),
     headers: {
       ...custom,
       'user-agent': USER_AGENT,
-      'x-api-key': apiKey,
     },
   });
 
@@ -95,18 +93,10 @@ export function createApiClient({
       debug(`[HTTP] Requesting: ${request.method} ${request.url}`);
     },
     onResponse: async ({ response, options }) => {
-      let responseText = `[HTTP] Response: ${response.url} [${response.status}]`;
-      const apiVersion = response.headers.get('x-tolgee-version');
-      if (apiVersion) {
-        responseText += ` [${response.headers.get('x-tolgee-version')}]`;
+      await logResponse(response);
+      if (response.status === 403 && activeSession) {
+        hintAtScopesAddedSinceLogin(activeSession);
       }
-      if (!response.ok && isDebugEnabled()) {
-        const clonedBody = await response.clone().text();
-        if (clonedBody) {
-          responseText += ` [${clonedBody}]`;
-        }
-      }
-      debug(responseText);
       if (autoThrow && !response.ok) {
         const loadable = await parseResponse(response, options.parseAs);
         throw new Error(
@@ -127,9 +117,58 @@ export function createApiClient({
       return getApiKeyInformation(apiClient, apiKey!);
     },
     getSettings(): ApiClientProps {
-      return { baseUrl, apiKey, projectId, autoThrow, headers };
+      return { baseUrl, apiKey, session, projectId, autoThrow, headers };
     },
   };
+}
+
+function customHeaderPolicy(
+  headers: Record<string, string> | undefined,
+  session: OAuthSessionHandle | undefined
+) {
+  const custom = normalizeHeaderKeys(headers);
+  const ignored = RESERVED_HEADERS.filter((name) => name in custom);
+  if (ignored.length) {
+    debug(`[HTTP] Ignoring reserved custom header(s): ${ignored.join(', ')}`);
+  }
+  for (const name of ignored) {
+    delete custom[name];
+  }
+
+  const authorizationOverridden = 'authorization' in custom;
+  if (authorizationOverridden && session) {
+    warn(
+      'A custom authorization header replaces your browser login, so requests go out without it.'
+    );
+  }
+  return {
+    custom,
+    activeSession: authorizationOverridden ? undefined : session,
+  };
+}
+
+async function logResponse(response: Response) {
+  let responseText = `[HTTP] Response: ${response.url} [${response.status}]`;
+  const apiVersion = response.headers.get('x-tolgee-version');
+  if (apiVersion) {
+    responseText += ` [${apiVersion}]`;
+  }
+  if (!response.ok && isDebugEnabled()) {
+    const clonedBody = await response.clone().text();
+    if (clonedBody) {
+      responseText += ` [${clonedBody}]`;
+    }
+  }
+  debug(responseText);
+}
+
+function hintAtScopesAddedSinceLogin(session: OAuthSessionHandle) {
+  const added = session.scopesAddedSinceLogin();
+  if (added.length) {
+    warn(
+      `The CLI now asks for ${added.join(', ')}, which your browser login predates. Run \`tolgee login\` again to approve them.`
+    );
+  }
 }
 
 export type ApiClient = ReturnType<typeof createApiClient>;

@@ -20,7 +20,11 @@ describe('merge command', () => {
     client = await createProjectWithClient('Project 1', PROJECT_1, {
       useBranching: true,
     });
-    pak = await createPak(client, [...DEFAULT_SCOPES, 'project.edit']);
+    pak = await createPak(client, [
+      ...DEFAULT_SCOPES,
+      'project.edit',
+      'branch.management',
+    ]);
   });
 
   afterEach(async () => {

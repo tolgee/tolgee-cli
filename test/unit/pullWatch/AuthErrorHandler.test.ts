@@ -17,8 +17,6 @@ vi.mock('#cli/client/TolgeeClient.js', () => ({
   createTolgeeClient: vi.fn(),
 }));
 
-// Mock console.log to capture output (removed since it's not working properly with vi.mock)
-
 describe('AuthErrorHandler', () => {
   let mockClient: ReturnType<typeof createTolgeeClient>;
   let authErrorHandler: ReturnType<typeof AuthErrorHandler>;
@@ -70,7 +68,7 @@ describe('AuthErrorHandler', () => {
       expect(mockClient.GET).toHaveBeenCalledWith('/api/public/configuration');
       expect(mockIsVersionAtLeast).toHaveBeenCalledWith('3.143.0', '3.143.0');
       expect(mockError).toHaveBeenCalledWith(
-        "You're not authenticated. Invalid API key?"
+        "You're not authenticated. Invalid credentials?"
       );
       expect(mockShutdown).toHaveBeenCalled();
     });
@@ -213,7 +211,7 @@ describe('AuthErrorHandler', () => {
 
         if (testCase.expected) {
           expect(mockError).toHaveBeenCalledWith(
-            "You're not authenticated. Invalid API key?"
+            "You're not authenticated. Invalid credentials?"
           );
         } else {
           expect(mockError).toHaveBeenCalledWith(

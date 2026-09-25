@@ -1,180 +1,269 @@
-import { join, dirname } from 'path';
-import { mkdir, readFile, writeFile } from 'fs/promises';
-
 import type {
   ApiKeyInfo,
   ApiKeyProject,
 } from '../client/getApiKeyInformation.js';
 import { warn } from '../utils/logger.js';
-import { CONFIG_PATH } from '../constants.js';
+import { tryParseUrl } from '../utils/url.js';
+import {
+  fileCredentialStore,
+  isOAuthSession,
+  type Change,
+  type CredentialStore,
+  type HostCredentials,
+  type OAuthSession,
+  type Token,
+  type UserCredentials,
+} from './credentialStore.js';
 
-export type Token = { token: string; expires: number };
-export type ProjectDetails = { name: string };
+export type {
+  HostCredentials,
+  OAuthSession,
+  ProjectDetails,
+  Store,
+  Token,
+  UserCredentials,
+} from './credentialStore.js';
+export { isOAuthSession } from './credentialStore.js';
 
-export type Store = {
-  [scope: string]: {
-    user?: Token;
-    // keys cannot be numeric values in JSON
-    projects?: Record<string, Token | undefined>;
-    projectDetails?: Record<string, ProjectDetails>;
-  };
-};
+const store: CredentialStore = fileCredentialStore;
 
-const API_TOKENS_FILE = join(CONFIG_PATH, 'authentication.json');
-
-async function ensureConfigPath() {
-  try {
-    await mkdir(dirname(API_TOKENS_FILE));
-  } catch (e: any) {
-    if (e.code !== 'EEXIST') {
-      throw e;
-    }
-  }
+export async function loadStore() {
+  return store.list();
 }
 
-export async function loadStore(): Promise<Store> {
-  try {
-    await ensureConfigPath();
-    const storeData = await readFile(API_TOKENS_FILE, 'utf8');
-    return JSON.parse(storeData);
-  } catch (e: any) {
-    if (e.code !== 'ENOENT') {
-      throw e;
-    }
-  }
-
-  return {};
+export async function getHostCredentials(apiUrl: URL) {
+  return store.get(apiUrl.hostname);
 }
 
-async function saveStore(store: Store): Promise<void> {
-  const blob = JSON.stringify(store);
-  await writeFile(API_TOKENS_FILE, blob, {
-    mode: 0o600,
-    encoding: 'utf8',
-  });
+/** The session in this instance's slot, whichever instance issued it. */
+export async function storedSessionFor(
+  apiUrl: URL
+): Promise<OAuthSession | undefined> {
+  const user = (await getHostCredentials(apiUrl))?.user;
+  return user && isOAuthSession(user) ? user : undefined;
 }
 
-async function storePat(store: Store, instance: URL, pat?: Token) {
-  return saveStore({
-    ...store,
-    [instance.hostname]: {
-      ...(store[instance.hostname] || {}),
-      user: pat,
-    },
-  });
+async function updateHost(
+  instance: URL,
+  update: (current: HostCredentials) => HostCredentials
+) {
+  return store.update(instance.hostname, async (current) => ({
+    next: update(current),
+    result: undefined,
+  }));
 }
 
-async function storePak(
-  store: Store,
+async function storeUser(instance: URL, user?: UserCredentials) {
+  return updateHost(instance, (current) => ({ ...current, user }));
+}
+
+async function savePak(
   instance: URL,
   project: ApiKeyProject,
-  pak?: Token
-) {
-  return saveStore({
-    ...store,
-    [instance.hostname]: {
-      ...(store[instance.hostname] || {}),
-      projects: {
-        ...(store[instance.hostname]?.projects || {}),
-        [project.id.toString(10)]: pak,
-      },
-      projectDetails: {
-        ...(store[instance.hostname]?.projectDetails || {}),
-        [project.id.toString(10)]: { name: project.name },
-      },
+  pak: Token
+): Promise<void> {
+  const id = project.id.toString(10);
+  return updateHost(instance, (current) => ({
+    ...current,
+    projects: { ...(current.projects || {}), [id]: pak },
+    projectDetails: {
+      ...(current.projectDetails || {}),
+      [id]: { name: project.name },
     },
+  }));
+}
+
+export async function saveOAuthSession(instance: URL, session: OAuthSession) {
+  return storeUser(instance, session);
+}
+
+export async function updateHostCredentials<T>(
+  instance: URL,
+  change: Change<T>
+): Promise<T> {
+  return store.update(instance.hostname, change);
+}
+
+export async function saveUserName(instance: URL, userName: string) {
+  return updateHost(instance, (current) => {
+    const user = usableSession(current, instance);
+    if (!user) return current;
+    return { ...current, user: { ...user, userName } };
   });
 }
 
-async function removePak(store: Store, instance: URL, projectId: number) {
-  delete store[instance.hostname].projects?.[projectId.toString(10)];
-  delete store[instance.hostname].projectDetails?.[projectId.toString(10)];
-  return saveStore(store);
-}
+export type StoredCredentials =
+  | { type: 'apiKey'; key: string }
+  | { type: 'oauth'; session: OAuthSession };
 
-export async function savePat(instance: URL, pat?: Token) {
-  const store = await loadStore();
-  return storePat(store, instance, pat);
-}
-
-export async function savePak(
-  instance: URL,
-  project: ApiKeyProject,
-  pak?: Token
-) {
-  const store = await loadStore();
-  return storePak(store, instance, project, pak);
-}
-
-export async function getApiKey(
-  apiUrl: string,
+export async function getStoredCredentials(
+  apiUrl: URL,
   projectId: number
-): Promise<string | null> {
-  const store = await loadStore();
-
-  const apiUrlObj = new URL(apiUrl);
-
-  if (!store[apiUrlObj.hostname]) {
+): Promise<StoredCredentials | null> {
+  const host = await store.get(apiUrl.hostname);
+  if (!host) {
     return null;
   }
 
-  const scopedStore = store[apiUrlObj.hostname];
-  if (scopedStore.user) {
-    if (
-      scopedStore.user.expires !== 0 &&
-      Date.now() > scopedStore.user.expires
-    ) {
-      warn(`Your personal access token for ${apiUrlObj.hostname} expired.`);
-      await storePat(store, apiUrlObj, undefined);
+  const user = host.user;
+  if (user && isOAuthSession(user)) {
+    return sessionOrProjectKey(apiUrl, host, user, projectId);
+  }
+
+  if (user) {
+    if (user.expires !== 0 && Date.now() > user.expires) {
+      warn(`Your personal access token for ${apiUrl.hostname} expired.`);
+      await removeUserCredential(apiUrl, user.token);
       return null;
     }
 
-    return scopedStore.user.token;
+    return { type: 'apiKey', key: user.token };
   }
 
+  return usableProjectKey(apiUrl, host, projectId);
+}
+
+/**
+ * A session approved for one project cannot reach another one, but a key
+ * stored for that other project can.
+ */
+async function sessionOrProjectKey(
+  apiUrl: URL,
+  host: HostCredentials,
+  user: OAuthSession,
+  projectId: number
+): Promise<StoredCredentials | null> {
+  const session = usableSession(host, apiUrl);
+  if (!session) {
+    warn(
+      `The stored session for ${apiUrl.hostname} was issued by ${user.apiUrl}, not ${apiUrl.origin}.`
+    );
+    return usableProjectKey(apiUrl, host, projectId);
+  }
+
+  const approvedElsewhere =
+    session.projectId !== undefined &&
+    projectId > 0 &&
+    session.projectId !== projectId;
+  if (approvedElsewhere) {
+    const key = await usableProjectKey(apiUrl, host, projectId);
+    if (key) {
+      return key;
+    }
+  }
+
+  return { type: 'oauth', session };
+}
+
+/**
+ * The session in this slot, if it is this instance's to use. Hosts key the
+ * store, so the slot can hold one issued by another instance on the same
+ * hostname, whose tokens must never go out to this one.
+ */
+export function usableSession(
+  host: HostCredentials,
+  apiUrl: URL
+): OAuthSession | undefined {
+  const user = host.user;
+  if (!user || !isOAuthSession(user)) {
+    return undefined;
+  }
+  return issuedBy(user, apiUrl) ? user : undefined;
+}
+
+export function issuedBy(session: OAuthSession, apiUrl: URL) {
+  return tryParseUrl(session.apiUrl)?.origin === apiUrl.origin;
+}
+
+async function usableProjectKey(
+  apiUrl: URL,
+  host: HostCredentials,
+  projectId: number
+): Promise<{ type: 'apiKey'; key: string } | null> {
   if (projectId <= 0) {
     return null;
   }
 
-  const pak = scopedStore.projects?.[projectId.toString(10)];
-  if (pak) {
-    if (pak.expires !== 0 && Date.now() > pak.expires) {
-      warn(
-        `Your project API key for project #${projectId} on ${apiUrlObj.hostname} expired.`
-      );
-      await removePak(store, apiUrlObj, projectId);
-      return null;
-    }
-
-    return pak.token;
+  const pak = host.projects?.[projectId.toString(10)];
+  if (!pak) {
+    return null;
   }
 
-  return null;
+  if (pak.expires !== 0 && Date.now() > pak.expires) {
+    warn(
+      `Your project API key for project #${projectId} on ${apiUrl.hostname} expired.`
+    );
+    await removeProjectKey(apiUrl, projectId, pak.token);
+    return null;
+  }
+
+  return { type: 'apiKey', key: pak.token };
 }
 
 export async function saveApiKey(instance: URL, token: ApiKeyInfo) {
-  const store = await loadStore();
-
   if (token.type === 'PAT') {
-    return storePat(store, instance, {
+    return storeUser(instance, {
       token: token.key,
       expires: token.expires,
     });
   }
 
-  return storePak(store, instance, token.project, {
+  return savePak(instance, token.project, {
     token: token.key,
     expires: token.expires,
   });
 }
 
-export async function removeApiKeys(api: URL) {
-  const store = await loadStore();
-  delete store[api.hostname];
+/**
+ * Whether there was a key to drop. With `onlyIfToken`, a key another process
+ * stored since the caller read the slot is left alone.
+ */
+export async function removeProjectKey(
+  instance: URL,
+  projectId: number,
+  onlyIfToken?: string
+): Promise<boolean> {
+  return store.update(instance.hostname, async (current) => {
+    const id = projectId.toString(10);
+    const keys = current.projects ?? {};
+    const stored = keys[id];
+    if (
+      !stored ||
+      (onlyIfToken !== undefined && stored.token !== onlyIfToken)
+    ) {
+      return { result: false };
+    }
 
-  return saveStore(store);
+    const { [id]: _dropped, ...projects } = keys;
+    const { [id]: _named, ...projectDetails } = current.projectDetails ?? {};
+    return {
+      next: { ...current, projects, projectDetails },
+      result: true,
+    };
+  });
+}
+
+/**
+ * Drops the personal access token in the user slot, unless another process
+ * has stored a different credential there since the caller read it.
+ */
+export async function removeUserCredential(
+  instance: URL,
+  onlyIfToken: string
+): Promise<boolean> {
+  return store.update(instance.hostname, async (current) => {
+    const stored = current.user;
+    if (!stored || isOAuthSession(stored) || stored.token !== onlyIfToken) {
+      return { result: false };
+    }
+    return { next: { ...current, user: undefined }, result: true };
+  });
+}
+
+export async function removeApiKeys(api: URL) {
+  return store.delete(api.hostname);
 }
 
 export async function clearAuthStore() {
-  return saveStore({});
+  return store.clear();
 }

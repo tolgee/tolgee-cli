@@ -15,6 +15,8 @@ const CLI_INDEX = fileURLToPath(
   new URL('../../../dist/cli.js', import.meta.url)
 );
 const DEBUG_ENABLED = process.env.RUNNER_DEBUG === '1';
+const BACKEND_URL =
+  process.env.TOLGEE_TEST_BACKEND_URL || 'http://localhost:22222';
 
 export type RunResult = {
   code: number;
@@ -25,7 +27,8 @@ export type RunResult = {
 export function spawn(
   args: string[],
   stdin?: boolean,
-  env?: Record<string, string>
+  env?: Record<string, string>,
+  options: RunOptionsType = {}
 ) {
   const userEnv = env ?? {};
   return spawnProcess(
@@ -37,8 +40,7 @@ export function spawn(
       stdin && TTY_PRELOAD,
       CLI_INDEX,
       DEBUG_ENABLED && '--verbose',
-      '--api-url',
-      process.env.TOLGEE_TEST_BACKEND_URL || 'http://localhost:22222',
+      ...(options.apiUrlFromConfig ? [] : ['--api-url', BACKEND_URL]),
       ...args,
     ].filter(Boolean) as string[],
     {
@@ -106,9 +108,10 @@ export async function runWithStdin(
 export async function run(
   args: string[],
   env?: Record<string, string>,
-  timeout = 10e3
+  timeout = 10e3,
+  options: RunOptionsType = {}
 ) {
-  return runWithKill(args, env, timeout).promise;
+  return runWithKill(args, env, timeout, options).promise;
 }
 
 export function runWithKill(
@@ -117,7 +120,7 @@ export function runWithKill(
   timeout = 10e3,
   options: RunOptionsType = {}
 ) {
-  const cliProcess = spawn(args, false, env);
+  const cliProcess = spawn(args, false, env, options);
   return {
     promise: runProcess(cliProcess, timeout, options),
     kill: (signal: NodeJS.Signals) => cliProcess.kill(signal),
@@ -128,4 +131,6 @@ type RunOptionsType = {
   onStdout?: (chunk: Buffer) => void;
   onStderr?: (chunk: Buffer) => void;
   printOnExit?: boolean;
+  /** Leave --api-url out, so the instance comes from .tolgeerc. */
+  apiUrlFromConfig?: boolean;
 };

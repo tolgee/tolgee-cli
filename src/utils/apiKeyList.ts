@@ -1,6 +1,12 @@
 import ansi from 'ansi-colors';
 
-import { loadStore, ProjectDetails, Token } from '../config/credentials.js';
+import {
+  isOAuthSession,
+  loadStore,
+  OAuthSession,
+  ProjectDetails,
+  Token,
+} from '../config/credentials.js';
 
 function getProjectName(
   projectId: string,
@@ -35,6 +41,26 @@ function printToken(
   console.log(result);
 }
 
+function forProject(session: OAuthSession) {
+  return session.projectId ? `, for project #${session.projectId}` : '';
+}
+
+function printOAuthSession(session: OAuthSession) {
+  const who = session.userName ? ` as ${session.userName}` : '';
+  const scopes = session.scopes.length
+    ? session.scopes.join(', ')
+    : '<no scopes>';
+  console.log(
+    ansi.magenta('OAuth') +
+      '\t ' +
+      ansi.yellow(scopes) +
+      '\t ' +
+      ansi.grey(
+        `browser login${who} on ${session.apiUrl}${forProject(session)}`
+      )
+  );
+}
+
 export async function printApiKeyLists() {
   const store = await loadStore();
   const list = Object.entries(store);
@@ -43,10 +69,14 @@ export async function printApiKeyLists() {
     console.log(ansi.gray('No records\n'));
   }
 
-  for (const [origin, server] of list) {
-    console.log(ansi.white('[') + ansi.red(origin) + ansi.white(']'));
+  for (const [host, server] of list) {
+    console.log(ansi.white('[') + ansi.red(host) + ansi.white(']'));
     if (server.user) {
-      printToken('PAT', server.user);
+      if (isOAuthSession(server.user)) {
+        printOAuthSession(server.user);
+      } else {
+        printToken('PAT', server.user);
+      }
     }
     if (server.projects) {
       for (const [project, token] of Object.entries(server.projects)) {
@@ -57,5 +87,4 @@ export async function printApiKeyLists() {
     }
     console.log('\n');
   }
-  return;
 }
