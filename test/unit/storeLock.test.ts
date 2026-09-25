@@ -1,7 +1,7 @@
 import { tmpdir } from 'os';
 import { join } from 'path';
 import { mkdtempSync } from 'fs';
-import { rm, utimes, writeFile } from 'fs/promises';
+import { readFile, rm, utimes, writeFile } from 'fs/promises';
 
 type LockModule = typeof import('#cli/config/storeLock.js');
 
@@ -80,6 +80,15 @@ describe('credential store lock', () => {
 
     await rm(LOCK_FILE, { force: true });
     await waiting;
+  });
+
+  it('leaves a lock another process took over while it was judged stale', async () => {
+    await withStoreLock(async () => {
+      await writeFile(LOCK_FILE, String(2 ** 22 + 2));
+    });
+
+    expect(await readFile(LOCK_FILE, 'utf8')).toBe(String(2 ** 22 + 2));
+    await rm(LOCK_FILE, { force: true });
   });
 
   it('waits for a lock that is merely slow', async () => {
