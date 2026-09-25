@@ -103,6 +103,7 @@ async function loginWithBrowser(
     accessExpires: tokens.accessExpires,
     refreshToken: tokens.refreshToken,
     scopes: tokens.scopes,
+    requestedScopes: tokens.requestedScopes,
     apiUrl: opts.apiUrl.toString(),
     projectId: tokens.projectId,
   };

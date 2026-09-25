@@ -94,6 +94,9 @@ export function createApiClient({
     },
     onResponse: async ({ response, options }) => {
       await logResponse(response);
+      if (response.status === 403 && activeSession) {
+        hintAtScopesAddedSinceLogin(activeSession);
+      }
       if (autoThrow && !response.ok) {
         const loadable = await parseResponse(response, options.parseAs);
         throw new Error(
@@ -157,6 +160,15 @@ async function logResponse(response: Response) {
     }
   }
   debug(responseText);
+}
+
+function hintAtScopesAddedSinceLogin(session: OAuthSessionHandle) {
+  const added = session.scopesAddedSinceLogin();
+  if (added.length) {
+    warn(
+      `The CLI now asks for ${added.join(', ')}, which your browser login predates. Run \`tolgee login\` again to approve them.`
+    );
+  }
 }
 
 export type ApiClient = ReturnType<typeof createApiClient>;

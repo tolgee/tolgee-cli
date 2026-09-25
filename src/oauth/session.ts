@@ -12,7 +12,7 @@ import {
   refreshTokens,
   type AuthServerMetadata,
 } from './authServer.js';
-import { CLI_CLIENT_ID } from './constants.js';
+import { CLI_CLIENT_ID, CLI_SCOPES } from './constants.js';
 
 const REFRESH_MARGIN_MS = 60_000;
 
@@ -25,6 +25,11 @@ export type RefreshOutcome = 'refreshed' | 'adopted';
 export type OAuthSessionHandle = {
   getAccessToken(): string;
   getProjectId(): number | undefined;
+  /**
+   * Non-empty once a release extends CLI_SCOPES after this login was granted:
+   * the grant keeps the scopes asked for on that day.
+   */
+  scopesAddedSinceLogin(): string[];
   ensureFresh(): Promise<void>;
   /** Rejects with SessionExpiredError once the grant is dead. */
   refreshAfterUnauthorized(usedToken: string): Promise<RefreshOutcome>;
@@ -116,6 +121,14 @@ export function createOAuthSessionHandle(
     getAccessToken: () => current.accessToken,
 
     getProjectId: () => current.projectId,
+
+    scopesAddedSinceLogin() {
+      const requested = current.requestedScopes;
+      if (!requested) {
+        return [];
+      }
+      return CLI_SCOPES.filter((scope) => !requested.includes(scope));
+    },
 
     async ensureFresh() {
       if (current.accessExpires - Date.now() > REFRESH_MARGIN_MS) {

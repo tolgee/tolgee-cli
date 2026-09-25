@@ -143,6 +143,7 @@ function sessionOf(
   return {
     getAccessToken: () => (typeof token === 'function' ? token() : token!),
     getProjectId: () => undefined,
+    scopesAddedSinceLogin: () => [],
     ensureFresh: async () => {},
     refreshAfterUnauthorized: onUnauthorized,
     adoptNewerSession: async () => false,
@@ -188,6 +189,47 @@ describe('createApiClient OAuth', () => {
 
   it('says nothing about the credential when no session is set aside', async () => {
     await get({ apiKey: 'tgpak_x', headers: { authorization: 'Basic gw' } });
+
+    expect(warnings).toEqual([]);
+  });
+
+  function forbidden() {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(
+        async () =>
+          new Response('{}', {
+            status: 403,
+            headers: { 'content-type': 'application/json' },
+          })
+      )
+    );
+  }
+
+  it('hints at a fresh login when a 403 meets a login older than a scope the CLI asks for', async () => {
+    forbidden();
+    const client = createApiClient({
+      baseUrl: 'http://localhost',
+      session: {
+        ...sessionOf('tgoat_token'),
+        scopesAddedSinceLogin: () => ['keys.create'],
+      },
+    });
+
+    await (client as any).GET('/v2/projects');
+
+    expect(warnings.join('\n')).toContain('keys.create');
+    expect(warnings.join('\n')).toMatch(/tolgee login/);
+  });
+
+  it('leaves a 403 alone when the login asked for everything the CLI asks for', async () => {
+    forbidden();
+    const client = createApiClient({
+      baseUrl: 'http://localhost',
+      session: sessionOf('tgoat_token'),
+    });
+
+    await (client as any).GET('/v2/projects');
 
     expect(warnings).toEqual([]);
   });

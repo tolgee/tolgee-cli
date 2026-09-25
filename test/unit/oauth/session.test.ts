@@ -189,6 +189,32 @@ describe('session refresh', () => {
   });
 });
 
+describe('scopes the CLI added since the login', () => {
+  it('are the ones the login never asked for', async () => {
+    const handle = createOAuthSessionHandle(
+      apiUrl,
+      session({ requestedScopes: ['translations.edit'] })
+    );
+
+    expect(handle.scopesAddedSinceLogin()).not.toContain('translations.edit');
+    expect(handle.scopesAddedSinceLogin()).toContain('keys.create');
+  });
+
+  it('are none when the login recorded no request, or a full one', async () => {
+    const { CLI_SCOPES } = await import('#cli/oauth/constants.js');
+
+    expect(
+      createOAuthSessionHandle(apiUrl, session()).scopesAddedSinceLogin()
+    ).toEqual([]);
+    expect(
+      createOAuthSessionHandle(
+        apiUrl,
+        session({ requestedScopes: CLI_SCOPES })
+      ).scopesAddedSinceLogin()
+    ).toEqual([]);
+  });
+});
+
 describe('a session another process stored', () => {
   it('is adopted without asking the server', async () => {
     const initial = session();

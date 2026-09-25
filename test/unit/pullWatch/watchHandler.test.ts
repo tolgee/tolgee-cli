@@ -86,6 +86,7 @@ function sessionThatIsGone(): any {
   return {
     getAccessToken: () => 'tgoat_dead',
     getProjectId: () => undefined,
+    scopesAddedSinceLogin: () => [],
     ensureFresh: async () => {
       throw new SessionExpiredError();
     },
@@ -115,6 +116,7 @@ function liveSession(overrides: Record<string, unknown> = {}): any {
   return {
     getAccessToken: () => onTheWire,
     getProjectId: () => undefined,
+    scopesAddedSinceLogin: () => [],
     ensureFresh: async () => {},
     refreshAfterUnauthorized: async () => 'refreshed',
     adoptNewerSession: async () => false,
