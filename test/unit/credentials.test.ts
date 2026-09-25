@@ -5,6 +5,7 @@ import { readFile, rm } from 'fs/promises';
 import {
   getStoredCredentials,
   removeProjectKey,
+  removeUserCredential,
   saveApiKey,
   saveOAuthSession,
 } from '#cli/config/credentials.js';
@@ -153,6 +154,26 @@ describe('credentials', () => {
     });
   });
 
+  describe('dropping an expired personal access token', () => {
+    afterEach(async () => {
+      await rm(AUTH_FILE, { force: true });
+    });
+
+    it('drops the token that was read', async () => {
+      await saveApiKey(TG_1, PAT_1);
+
+      expect(await removeUserCredential(TG_1, PAT_1.key)).toBe(true);
+      expect(await getApiKey(TG_1.toString(), -1)).toBeNull();
+    });
+
+    it('leaves a credential another process stored in the meantime', async () => {
+      await saveApiKey(TG_1, PAT_2);
+
+      expect(await removeUserCredential(TG_1, PAT_1.key)).toBe(false);
+      expect(await getApiKey(TG_1.toString(), -1)).toBe(PAT_2.key);
+    });
+  });
+
   describe('removing one project key', () => {
     afterEach(async () => {
       await rm(AUTH_FILE, { force: true });
@@ -167,6 +188,17 @@ describe('credentials', () => {
       expect(await getApiKey(TG_1.toString(), PAK_1.project.id)).toBeNull();
       expect(await getApiKey(TG_1.toString(), PAK_2.project.id)).toBe(
         PAK_2.key
+      );
+    });
+
+    it('leaves a key another process stored in the meantime', async () => {
+      await saveApiKey(TG_1, PAK_1);
+
+      expect(
+        await removeProjectKey(TG_1, PAK_1.project.id, 'tgpak_stale')
+      ).toBe(false);
+      expect(await getApiKey(TG_1.toString(), PAK_1.project.id)).toBe(
+        PAK_1.key
       );
     });
 

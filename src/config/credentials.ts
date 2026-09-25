@@ -113,7 +113,7 @@ export async function getStoredCredentials(
   if (user) {
     if (user.expires !== 0 && Date.now() > user.expires) {
       warn(`Your personal access token for ${apiUrl.hostname} expired.`);
-      await storeUser(apiUrl, undefined);
+      await removeUserCredential(apiUrl, user.token);
       return null;
     }
 
@@ -193,7 +193,7 @@ async function usableProjectKey(
     warn(
       `Your project API key for project #${projectId} on ${apiUrl.hostname} expired.`
     );
-    await removeProjectKey(apiUrl, projectId);
+    await removeProjectKey(apiUrl, projectId, pak.token);
     return null;
   }
 
@@ -214,23 +214,49 @@ export async function saveApiKey(instance: URL, token: ApiKeyInfo) {
   });
 }
 
-/** Whether there was a key to drop. */
+/**
+ * Whether there was a key to drop. With `onlyIfToken`, a key another process
+ * stored since the caller read the slot is left alone.
+ */
 export async function removeProjectKey(
   instance: URL,
-  projectId: number
+  projectId: number,
+  onlyIfToken?: string
 ): Promise<boolean> {
   return store.update(instance.hostname, async (current) => {
     const id = projectId.toString(10);
-    if (!current.projects?.[id]) {
+    const keys = current.projects ?? {};
+    const stored = keys[id];
+    if (
+      !stored ||
+      (onlyIfToken !== undefined && stored.token !== onlyIfToken)
+    ) {
       return { result: false };
     }
 
-    const { [id]: _dropped, ...projects } = current.projects;
+    const { [id]: _dropped, ...projects } = keys;
     const { [id]: _named, ...projectDetails } = current.projectDetails ?? {};
     return {
       next: { ...current, projects, projectDetails },
       result: true,
     };
+  });
+}
+
+/**
+ * Drops the personal access token in the user slot, unless another process
+ * has stored a different credential there since the caller read it.
+ */
+export async function removeUserCredential(
+  instance: URL,
+  onlyIfToken: string
+): Promise<boolean> {
+  return store.update(instance.hostname, async (current) => {
+    const stored = current.user;
+    if (!stored || isOAuthSession(stored) || stored.token !== onlyIfToken) {
+      return { result: false };
+    }
+    return { next: { ...current, user: undefined }, result: true };
   });
 }
 
