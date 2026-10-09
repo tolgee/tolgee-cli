@@ -1,15 +1,14 @@
-import { createServer, type Server, type ServerResponse } from 'http';
-import { AddressInfo } from 'net';
-
-import { OAuthError } from './oauthError.js';
+import {
+  closeWithConnections,
+  listenOnLoopback,
+  LOOPBACK_HOST,
+  portOf,
+  requestUrl,
+  respondHtml,
+} from './loopbackHttp.js';
 import { LOGGED_IN_PAGE, LOGIN_FAILED_PAGE } from './loopbackPages.js';
+import { OAuthError } from './oauthError.js';
 
-/**
- * RFC 8252 §7.3 and §8.3: the IP literal rather than `localhost`, whose
- * resolution can put the listener on an interface other than the loopback one.
- * The server accepts a loopback redirect on any port, so the OS picks it.
- */
-const LOOPBACK_HOST = '127.0.0.1';
 const CALLBACK_PATH = '/callback';
 
 /**
@@ -29,9 +28,8 @@ type Expected = { state: string; issuer?: string };
 export async function startLoopbackServer(
   options: { timeoutMs?: number } = {}
 ): Promise<LoopbackServer> {
-  const server = await listening();
-  const { port } = server.address() as AddressInfo;
-  const redirectUri = `http://${LOOPBACK_HOST}:${port}${CALLBACK_PATH}`;
+  const server = await listenOnLoopback();
+  const redirectUri = `http://${LOOPBACK_HOST}:${portOf(server)}${CALLBACK_PATH}`;
 
   return {
     redirectUri,
@@ -46,13 +44,16 @@ export async function startLoopbackServer(
 
         server.on('request', (request, response) => {
           if (settled) {
-            respond(response, 404, 'Not found');
+            respondHtml(response, 404, 'Not found');
             return;
           }
 
-          const outcome = read(requestUrl(request.url, redirectUri), expected);
+          const outcome = classifyCallback(
+            requestUrl(request.url, redirectUri),
+            expected
+          );
           if (outcome.kind === 'ignore') {
-            respond(response, 404, 'Not found');
+            respondHtml(response, 404, 'Not found');
             return;
           }
 
@@ -60,36 +61,19 @@ export async function startLoopbackServer(
           clearTimeout(timer);
 
           if (outcome.kind === 'code') {
-            respond(response, 200, LOGGED_IN_PAGE);
+            respondHtml(response, 200, LOGGED_IN_PAGE);
             resolve(outcome.code);
             return;
           }
 
-          respond(response, 400, LOGIN_FAILED_PAGE);
+          respondHtml(response, 400, LOGIN_FAILED_PAGE);
           reject(outcome.error);
         });
       });
     },
 
-    async close() {
-      // Keep-alive sockets from the browser outlive close() on their own, and
-      // the process would hang with them.
-      server.closeAllConnections();
-      await new Promise<void>((resolve) => server.close(() => resolve()));
-    },
+    close: () => closeWithConnections(server),
   };
-}
-
-async function listening(): Promise<Server> {
-  const server = createServer();
-  await new Promise<void>((resolve, reject) => {
-    server.once('error', reject);
-    server.listen(0, LOOPBACK_HOST, () => {
-      server.removeListener('error', reject);
-      resolve();
-    });
-  });
-  return server;
 }
 
 function giveUpAfter(ms: number, reject: (error: OAuthError) => void) {
@@ -105,7 +89,7 @@ function giveUpAfter(ms: number, reject: (error: OAuthError) => void) {
   return timer;
 }
 
-type Outcome =
+type CallbackOutcome =
   | { kind: 'ignore' }
   | { kind: 'code'; code: string }
   | { kind: 'error'; error: OAuthError };
@@ -115,7 +99,10 @@ type Outcome =
  * to this authorization is ignored rather than failed: ending the login on one
  * would let a stray request cancel the callback still on its way.
  */
-function read(url: URL | undefined, expected: Expected): Outcome {
+function classifyCallback(
+  url: URL | undefined,
+  expected: Expected
+): CallbackOutcome {
   if (url === undefined || url.pathname !== CALLBACK_PATH) {
     return { kind: 'ignore' };
   }
@@ -158,22 +145,4 @@ function read(url: URL | undefined, expected: Expected): Outcome {
   }
 
   return { kind: 'code', code };
-}
-
-/** Node's parser passes on targets such as `//[` that `URL` refuses. */
-function requestUrl(target: string | undefined, base: string): URL | undefined {
-  try {
-    return new URL(target ?? '/', base);
-  } catch {
-    return undefined;
-  }
-}
-
-function respond(response: ServerResponse, status: number, body: string) {
-  response.writeHead(status, {
-    'content-type': 'text/html; charset=utf-8',
-    // The URL this renders carries the authorization code in its query string.
-    'cache-control': 'no-store',
-  });
-  response.end(body);
 }
