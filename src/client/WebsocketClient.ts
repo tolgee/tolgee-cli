@@ -78,11 +78,11 @@ export const WebsocketClient = (options: WebsocketClientOptions) => {
       // stompjs reconnects on its own and reuses the headers it was handed,
       // so this is the only point where a watch outliving its access token
       // can still put a live one on the wire.
-      beforeConnect: freshConnectHeaders,
+      beforeConnect: refreshAndApplyConnectHeaders,
     });
   }
 
-  async function freshConnectHeaders(stomp: Client) {
+  async function refreshAndApplyConnectHeaders(stomp: Client) {
     // stompjs awaits this and nothing catches what it throws.
     try {
       await options.authentication.session?.ensureFresh();
