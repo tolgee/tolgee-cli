@@ -50,32 +50,39 @@ const loginHandler = (config: Schema) =>
       return;
     }
 
-    if (!key) {
-      await loginWithBrowser(opts, config, headers);
+    if (key) {
+      await loginWithApiKey(key, opts, headers);
       return;
     }
-
-    debug(
-      `Logging in with API key ${key.slice(0, 5)}...${key.slice(-4)}.\n${getStackTrace()}`
-    );
-
-    const keyInfo = await createTolgeeClient({
-      baseUrl: opts.apiUrl.toString(),
-      apiKey: key,
-      headers,
-    }).getApiKeyInfo();
-
-    if (keyInfo.type === 'PAT') {
-      await revokeSessionFor(opts.apiUrl, headers);
-    }
-
-    await saveApiKey(opts.apiUrl, keyInfo);
-    success(
-      keyInfo.type === 'PAK'
-        ? `Logged in as ${keyInfo.username} on ${ansi.blue(opts.apiUrl.hostname)} for project ${ansi.blue(String(keyInfo.project.id))} (${keyInfo.project.name}). Welcome back!`
-        : `Logged in as ${keyInfo.username} on ${ansi.blue(opts.apiUrl.hostname)}. Welcome back!`
-    );
+    await loginWithBrowser(opts, config, headers);
   };
+
+async function loginWithApiKey(
+  key: string,
+  opts: Options,
+  headers: Record<string, string>
+) {
+  debug(
+    `Logging in with API key ${key.slice(0, 5)}...${key.slice(-4)}.\n${getStackTrace()}`
+  );
+
+  const keyInfo = await createTolgeeClient({
+    baseUrl: opts.apiUrl.toString(),
+    apiKey: key,
+    headers,
+  }).getApiKeyInfo();
+
+  if (keyInfo.type === 'PAT') {
+    await revokeSessionFor(opts.apiUrl, headers);
+  }
+
+  await saveApiKey(opts.apiUrl, keyInfo);
+  success(
+    keyInfo.type === 'PAK'
+      ? `Logged in as ${keyInfo.username} on ${ansi.blue(opts.apiUrl.hostname)} for project ${ansi.blue(String(keyInfo.project.id))} (${keyInfo.project.name}). Welcome back!`
+      : `Logged in as ${keyInfo.username} on ${ansi.blue(opts.apiUrl.hostname)}. Welcome back!`
+  );
+}
 
 async function loginWithBrowser(
   opts: Options,
@@ -173,10 +180,6 @@ function projectHint(opts: Options, config: Schema) {
   return projectId > 0 ? String(projectId) : undefined;
 }
 
-function configuredProject(opts: Options, config: Schema) {
-  return Number(opts.projectId ?? config.projectId ?? NO_PROJECT);
-}
-
 const logoutHandler = (config: Schema) =>
   async function (this: Command) {
     const opts: Options = this.optsWithGlobals();
@@ -225,6 +228,10 @@ const logoutHandler = (config: Schema) =>
       'Pass --api-url, or set apiUrl in `.tolgeerc`, to log out of another instance.'
     );
   };
+
+function configuredProject(opts: Options, config: Schema) {
+  return Number(opts.projectId ?? config.projectId ?? NO_PROJECT);
+}
 
 export const Login = (config: Schema) =>
   new Command()
