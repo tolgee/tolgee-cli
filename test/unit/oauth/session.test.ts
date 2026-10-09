@@ -328,7 +328,7 @@ describe('session after a 401', () => {
     const initial = session();
     await credentials.saveOAuthSession(apiUrl, initial);
     const handle = createOAuthSessionHandle(apiUrl, initial);
-    await credentials.removeApiKeys(apiUrl);
+    await credentials.removeHostCredentials(apiUrl);
 
     await expect(
       handle.refreshAfterUnauthorized('tgoat_stored')

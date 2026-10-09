@@ -3,7 +3,7 @@ import ansi from 'ansi-colors';
 
 import {
   clearAuthStore,
-  removeApiKeys,
+  removeHostCredentials,
   removeProjectKey,
   saveApiKey,
   saveOAuthSession,
@@ -215,7 +215,7 @@ const logoutHandler = (config: Schema) =>
     }
 
     await revokeSessionFor(opts.apiUrl, headers);
-    if (await removeApiKeys(opts.apiUrl)) {
+    if (await removeHostCredentials(opts.apiUrl)) {
       success(`You're now logged out of ${opts.apiUrl.hostname}.`);
       return;
     }

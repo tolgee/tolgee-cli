@@ -260,8 +260,9 @@ export async function removeUserCredential(
   });
 }
 
-export async function removeApiKeys(api: URL) {
-  return store.delete(api.hostname);
+/** The whole slot: the user credential and every project key. */
+export async function removeHostCredentials(instance: URL) {
+  return store.delete(instance.hostname);
 }
 
 export async function clearAuthStore() {

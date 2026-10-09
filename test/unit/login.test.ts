@@ -10,7 +10,7 @@ import {
 import { createTolgeeClient } from '#cli/client/TolgeeClient.js';
 import {
   clearAuthStore,
-  removeApiKeys,
+  removeHostCredentials,
   removeProjectKey,
   saveOAuthSession,
   saveUserName,
@@ -48,7 +48,7 @@ vi.mock('#cli/client/TolgeeClient.js', () => ({
 vi.mock('#cli/config/credentials.js', () => ({
   saveApiKey: vi.fn(),
   clearAuthStore: vi.fn(),
-  removeApiKeys: vi.fn(),
+  removeHostCredentials: vi.fn(),
   removeProjectKey: vi.fn(),
   saveOAuthSession: vi.fn(),
   saveUserName: vi.fn(),
@@ -310,7 +310,7 @@ describe('logout', () => {
   }
 
   it('says it logged out of the instance it cleared', async () => {
-    vi.mocked(removeApiKeys).mockResolvedValueOnce(true);
+    vi.mocked(removeHostCredentials).mockResolvedValueOnce(true);
     const lines = printed();
 
     await runLogout({}, ['--api-url', 'http://localhost', 'logout']);
@@ -319,7 +319,7 @@ describe('logout', () => {
   });
 
   it('says so when nothing was stored for it, and names the way to another one', async () => {
-    vi.mocked(removeApiKeys).mockResolvedValueOnce(false);
+    vi.mocked(removeHostCredentials).mockResolvedValueOnce(false);
     const lines = printed();
 
     await runLogout({}, ['logout']);
@@ -427,7 +427,7 @@ describe('logout --project', () => {
     ]);
 
     expect(vi.mocked(revokeSessionFor)).not.toHaveBeenCalled();
-    expect(vi.mocked(removeApiKeys)).not.toHaveBeenCalled();
+    expect(vi.mocked(removeHostCredentials)).not.toHaveBeenCalled();
     expect(vi.mocked(clearAuthStore)).not.toHaveBeenCalled();
   });
 
