@@ -78,7 +78,8 @@ export function createApiClient({
   const computedProjectId =
     projectId ?? (apiKey ? projectIdFromKey(apiKey) : undefined);
 
-  const { custom, activeSession } = customHeaderPolicy(headers, session);
+  const custom = withoutReservedHeaders(headers);
+  const activeSession = sessionUnlessAuthorizationOverridden(custom, session);
 
   const apiClient = createClient<paths>({
     baseUrl,
@@ -127,10 +128,7 @@ export function createApiClient({
   };
 }
 
-function customHeaderPolicy(
-  headers: Record<string, string> | undefined,
-  session: OAuthSessionHandle | undefined
-) {
+function withoutReservedHeaders(headers: Record<string, string> | undefined) {
   const custom = normalizeHeaderKeys(headers);
   const ignored = RESERVED_HEADERS.filter((name) => name in custom);
   if (ignored.length) {
@@ -139,17 +137,23 @@ function customHeaderPolicy(
   for (const name of ignored) {
     delete custom[name];
   }
+  return custom;
+}
 
-  const authorizationOverridden = 'authorization' in custom;
-  if (authorizationOverridden && session) {
+/** A custom `authorization` header turns the browser login off for this client. */
+function sessionUnlessAuthorizationOverridden(
+  custom: Record<string, string>,
+  session: OAuthSessionHandle | undefined
+) {
+  if (!('authorization' in custom)) {
+    return session;
+  }
+  if (session) {
     warn(
       'A custom authorization header replaces your browser login, so requests go out without it.'
     );
   }
-  return {
-    custom,
-    activeSession: authorizationOverridden ? undefined : session,
-  };
+  return undefined;
 }
 
 async function logResponse(response: Response) {
