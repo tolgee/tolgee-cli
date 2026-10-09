@@ -2,9 +2,7 @@ import { SessionExpiredError } from '../../oauth/session.js';
 import { debug, error } from '../logger.js';
 import { setETag } from '../eTagStorage.js';
 
-// Polling interval as backup when WebSocket is not available (in seconds)
 const POLLING_INTERVAL_SECONDS = 60;
-// Debounce delay for schedulePull in milliseconds
 const SCHEDULE_PULL_DEBOUNCE_MS = 500;
 
 export type PullScheduler = {
@@ -46,7 +44,6 @@ export function pullScheduler(options: {
     lastExecutionTime = Date.now();
     try {
       await doPull();
-      // Store ETag after successful pull
       if (etag) {
         setETag(projectId, etag);
       }
@@ -59,7 +56,6 @@ export function pullScheduler(options: {
       debug(e);
     } finally {
       pulling = false;
-      // If there was a pending pull (data changed when pulling), execute it now
       if (pending) {
         pending = false;
         const capturedEtag = pendingEtag;
@@ -72,12 +68,10 @@ export function pullScheduler(options: {
   const schedulePull = (etag?: string) => {
     const timeSinceLastExecution = Date.now() - lastExecutionTime;
 
-    // If last execution was more than 500ms ago, execute immediately
     if (timeSinceLastExecution >= SCHEDULE_PULL_DEBOUNCE_MS) {
       detached(executePull(etag));
       return;
     }
-    // Otherwise, schedule the update with debounce
     if (debounceTimer) clearTimeout(debounceTimer);
     debounceTimer = setTimeout(
       () => detached(executePull(etag)),
@@ -85,7 +79,6 @@ export function pullScheduler(options: {
     );
   };
 
-  // Polling mechanism as backup
   const startPolling = () => {
     if (pollingTimer) {
       clearInterval(pollingTimer);
