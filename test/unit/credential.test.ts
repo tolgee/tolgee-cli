@@ -4,7 +4,6 @@ function sessionOf(token: string | undefined, next?: () => string) {
   return {
     getAccessToken: () => (next ? next() : (token as string)),
     getProjectId: () => undefined,
-    scopesAddedSinceLogin: () => [],
     ensureFresh: async () => {},
     refreshAfterUnauthorized: async () => 'refreshed' as const,
     adoptNewerSession: async () => false,

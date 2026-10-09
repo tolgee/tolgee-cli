@@ -67,7 +67,6 @@ vi.mock('#cli/oauth/browserLogin.js', () => ({
     refreshToken: 'tgort_refresh',
     accessExpires: 1234,
     scopes: ['translations.edit'],
-    requestedScopes: ['translations.edit', 'keys.create'],
     projectId: 12,
   }),
 }));
@@ -219,7 +218,6 @@ describe('browser login', () => {
       refreshToken: 'tgort_refresh',
       accessExpires: 1234,
       scopes: ['translations.edit'],
-      requestedScopes: ['translations.edit', 'keys.create'],
       apiUrl: 'http://localhost/',
       projectId: 12,
     });

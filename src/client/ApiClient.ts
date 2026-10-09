@@ -1,6 +1,6 @@
 import type { paths } from './internal/schema.generated.js';
 
-import createClient, { ParseAs } from 'openapi-fetch';
+import createClient, { type Client, ParseAs } from 'openapi-fetch';
 import base32Decode from 'base32-decode';
 import { API_KEY_PAK_PREFIX, USER_AGENT } from '../constants.js';
 import { getApiKeyInformation } from './getApiKeyInformation.js';
@@ -9,6 +9,7 @@ import { errorFromLoadable } from './errorFromLoadable.js';
 import { normalizeHeaderKeys } from '../utils/headers.js';
 import type { OAuthSessionHandle } from '../oauth/session.js';
 import { authenticatingFetch } from './credential.js';
+import { CLI_SCOPES } from '../oauth/constants.js';
 
 // Headers the CLI controls and that custom headers must never override.
 const RESERVED_HEADERS = ['user-agent', 'content-type', 'x-api-key'];
@@ -92,10 +93,14 @@ export function createApiClient({
     onRequest: ({ request }) => {
       debug(`[HTTP] Requesting: ${request.method} ${request.url}`);
     },
-    onResponse: async ({ response, options }) => {
+    onResponse: async ({ request, response, options }) => {
       await logResponse(response);
       if (response.status === 403 && activeSession) {
-        hintAtScopesAddedSinceLogin(activeSession);
+        await hintAtScopesTheSessionLacks(
+          apiClient,
+          request.url,
+          computedProjectId
+        );
       }
       if (autoThrow && !response.ok) {
         const loadable = await parseResponse(response, options.parseAs);
@@ -162,11 +167,36 @@ async function logResponse(response: Response) {
   debug(responseText);
 }
 
-function hintAtScopesAddedSinceLogin(session: OAuthSessionHandle) {
-  const added = session.scopesAddedSinceLogin();
-  if (added.length) {
+const PERMISSIONS_PATH = '/v2/api-keys/current-permissions';
+
+/**
+ * `userScopes` is what the account may do on the project and `scopes` what this
+ * session may, so the gap between them is what a fresh login would add.
+ */
+async function hintAtScopesTheSessionLacks(
+  apiClient: Client<paths>,
+  forbiddenUrl: string,
+  projectId: number | undefined
+) {
+  if (forbiddenUrl.includes(PERMISSIONS_PATH)) {
+    return;
+  }
+  try {
+    const { data } = await apiClient.GET(PERMISSIONS_PATH, {
+      params: { query: projectId === undefined ? {} : { projectId } },
+    });
+    const lacking = (data?.userScopes ?? []).filter(
+      (scope) => CLI_SCOPES.includes(scope) && !data!.scopes.includes(scope)
+    );
+    if (!lacking.length) {
+      return;
+    }
     warn(
-      `The CLI now asks for ${added.join(', ')}, which your browser login predates. Run \`tolgee login\` again to approve them.`
+      `Your account has ${lacking.join(', ')} on this project, but your browser login does not. Run \`tolgee login\` again to approve it.`
+    );
+  } catch (e: any) {
+    debug(
+      `[HTTP] Could not compare the session with the account: ${e.message}`
     );
   }
 }

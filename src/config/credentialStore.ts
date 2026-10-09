@@ -12,7 +12,6 @@ export type OAuthSession = {
   accessExpires: number;
   refreshToken: string;
   scopes: string[];
-  requestedScopes?: string[];
   userName?: string;
   /**
    * The instance that issued this session; the hostname key cannot say which

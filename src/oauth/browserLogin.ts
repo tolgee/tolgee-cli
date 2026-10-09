@@ -25,14 +25,9 @@ export type BrowserLoginOptions = {
   extraHeaders?: Record<string, string>;
 };
 
-export type BrowserLoginResult = OAuthTokens & {
-  /** What was asked for, which the consent screen may have narrowed. */
-  requestedScopes: string[];
-};
-
 export async function browserLogin(
   options: BrowserLoginOptions
-): Promise<BrowserLoginResult> {
+): Promise<OAuthTokens> {
   const launching = decideLaunch(options);
 
   const metadata = await fetchAuthServerMetadata(
@@ -73,7 +68,7 @@ export async function browserLogin(
 
     const code = await waiting;
 
-    const tokens = await exchangeCode(
+    return exchangeCode(
       metadata,
       {
         clientId: CLI_CLIENT_ID,
@@ -83,7 +78,6 @@ export async function browserLogin(
       },
       options.extraHeaders
     );
-    return { ...tokens, requestedScopes: CLI_SCOPES };
   } finally {
     await server.close();
   }

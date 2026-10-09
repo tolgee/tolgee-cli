@@ -143,7 +143,6 @@ function sessionOf(
   return {
     getAccessToken: () => (typeof token === 'function' ? token() : token!),
     getProjectId: () => undefined,
-    scopesAddedSinceLogin: () => [],
     ensureFresh: async () => {},
     refreshAfterUnauthorized: onUnauthorized,
     adoptNewerSession: async () => false,
@@ -193,37 +192,28 @@ describe('createApiClient OAuth', () => {
     expect(warnings).toEqual([]);
   });
 
-  function forbidden() {
-    vi.stubGlobal(
+  function forbiddenWith(permissions: Record<string, unknown> | undefined) {
+    const json = (status: number, body: unknown) =>
+      new Response(JSON.stringify(body), {
+        status,
+        headers: { 'content-type': 'application/json' },
+      });
+    return vi.stubGlobal(
       'fetch',
-      vi.fn(
-        async () =>
-          new Response('{}', {
-            status: 403,
-            headers: { 'content-type': 'application/json' },
-          })
-      )
+      vi.fn(async (request: Request) => {
+        if (request.url.includes('/v2/api-keys/current-permissions')) {
+          return permissions ? json(200, permissions) : json(403, {});
+        }
+        return json(403, {});
+      })
     );
   }
 
-  it('hints at a fresh login when a 403 meets a login older than a scope the CLI asks for', async () => {
-    forbidden();
-    const client = createApiClient({
-      baseUrl: 'http://localhost',
-      session: {
-        ...sessionOf('tgoat_token'),
-        scopesAddedSinceLogin: () => ['keys.create'],
-      },
+  it('hints at a fresh login when the account has a CLI scope the session lacks', async () => {
+    forbiddenWith({
+      scopes: ['translations.edit'],
+      userScopes: ['translations.edit', 'keys.create', 'members.edit'],
     });
-
-    await (client as any).GET('/v2/projects');
-
-    expect(warnings.join('\n')).toContain('keys.create');
-    expect(warnings.join('\n')).toMatch(/tolgee login/);
-  });
-
-  it('leaves a 403 alone when the login asked for everything the CLI asks for', async () => {
-    forbidden();
     const client = createApiClient({
       baseUrl: 'http://localhost',
       session: sessionOf('tgoat_token'),
@@ -231,6 +221,61 @@ describe('createApiClient OAuth', () => {
 
     await (client as any).GET('/v2/projects');
 
+    expect(warnings.join('\n')).toContain('keys.create');
+    expect(warnings.join('\n')).not.toContain('members.edit');
+    expect(warnings.join('\n')).toMatch(/tolgee login/);
+  });
+
+  it('leaves a 403 alone when the session has every CLI scope the account has', async () => {
+    forbiddenWith({
+      scopes: ['translations.edit', 'keys.create'],
+      userScopes: ['translations.edit', 'keys.create', 'members.edit'],
+    });
+    const client = createApiClient({
+      baseUrl: 'http://localhost',
+      session: sessionOf('tgoat_token'),
+    });
+
+    await (client as any).GET('/v2/projects');
+
+    expect(warnings).toEqual([]);
+  });
+
+  it('leaves a 403 alone when the instance does not say what the account may do', async () => {
+    forbiddenWith({ scopes: ['translations.edit'] });
+    const client = createApiClient({
+      baseUrl: 'http://localhost',
+      session: sessionOf('tgoat_token'),
+    });
+
+    await (client as any).GET('/v2/projects');
+
+    expect(warnings).toEqual([]);
+  });
+
+  it('asks once, and not again, when the permissions lookup is itself forbidden', async () => {
+    forbiddenWith(undefined);
+    const client = createApiClient({
+      baseUrl: 'http://localhost',
+      session: sessionOf('tgoat_token'),
+    });
+
+    await (client as any).GET('/v2/projects');
+
+    expect(vi.mocked(fetch)).toHaveBeenCalledTimes(2);
+    expect(warnings).toEqual([]);
+  });
+
+  it('does not look up the permissions for an API key', async () => {
+    forbiddenWith({ scopes: [], userScopes: ['keys.create'] });
+    const client = createApiClient({
+      baseUrl: 'http://localhost',
+      apiKey: 'tgpat_key',
+    });
+
+    await (client as any).GET('/v2/projects');
+
+    expect(vi.mocked(fetch)).toHaveBeenCalledTimes(1);
     expect(warnings).toEqual([]);
   });
 });

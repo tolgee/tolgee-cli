@@ -48,7 +48,6 @@ function sessionWith(
     refreshes: 0,
     getAccessToken: () => current,
     getProjectId: () => undefined,
-    scopesAddedSinceLogin: () => [],
     async ensureFresh() {
       (this as any).refreshes += 1;
       current = afterRefresh;
