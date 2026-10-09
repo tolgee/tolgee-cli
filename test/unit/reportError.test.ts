@@ -1,5 +1,5 @@
 import { SessionExpiredError } from '#cli/oauth/session.js';
-import { OAuthError } from '#cli/oauth/authServer.js';
+import { OAuthError } from '#cli/oauth/oauthError.js';
 
 const errors: string[] = [];
 

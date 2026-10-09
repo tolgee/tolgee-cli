@@ -23,7 +23,7 @@ import {
   revokeReplacedSession,
   revokeSessionFor,
 } from '../oauth/revoke.js';
-import { OAuthError } from '../oauth/authServer.js';
+import { OAuthError } from '../oauth/oauthError.js';
 import { printApiKeyLists } from '../utils/apiKeyList.js';
 import { getStackTrace } from '../utils/getStackTrace.js';
 import { mergeHeaders } from '../utils/headers.js';

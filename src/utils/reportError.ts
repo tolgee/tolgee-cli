@@ -1,5 +1,5 @@
 import { error, exitWithError } from './logger.js';
-import { OAuthError } from '../oauth/authServer.js';
+import { OAuthError } from '../oauth/oauthError.js';
 import { SessionExpiredError } from '../oauth/session.js';
 
 export function reportError(e: any): never {

@@ -1,11 +1,11 @@
 import {
   exchangeCode,
   fetchAuthServerMetadata,
-  OAuthError,
   refreshTokens,
   revokeToken,
   type AuthServerMetadata,
 } from '#cli/oauth/authServer.js';
+import { OAuthError } from '#cli/oauth/oauthError.js';
 
 const API_URL = new URL('https://app.tolgee.io');
 

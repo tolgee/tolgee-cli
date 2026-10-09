@@ -1,5 +1,6 @@
-import { OAUTH_REQUEST_TIMEOUT_MS, USER_AGENT } from '../constants.js';
 import { tryParseUrl } from '../utils/url.js';
+import { OAuthError } from './oauthError.js';
+import { getJson, postForm, readJson, type ExtraHeaders } from './transport.js';
 
 export type AuthServerMetadata = {
   issuer: string;
@@ -26,36 +27,15 @@ export type OAuthTokens = {
  */
 const ASSUMED_LIFETIME_MS = 5 * 60 * 1000;
 
-export type OAuthErrorKind = 'unsupported' | 'no-browser' | 'oauth' | 'network';
-
-export class OAuthError extends Error {
-  constructor(
-    message: string,
-    readonly kind: OAuthErrorKind
-  ) {
-    super(message);
-    this.name = 'OAuthError';
-  }
-}
-
 export async function fetchAuthServerMetadata(
   apiUrl: URL,
-  extraHeaders?: Record<string, string>
+  extraHeaders?: ExtraHeaders
 ): Promise<AuthServerMetadata> {
-  const url = new URL('/.well-known/oauth-authorization-server', apiUrl);
-
-  let response: Response;
-  try {
-    response = await fetch(url, {
-      headers: headers(extraHeaders),
-      signal: AbortSignal.timeout(OAUTH_REQUEST_TIMEOUT_MS),
-    });
-  } catch (e: any) {
-    throw new OAuthError(
-      `Could not reach ${apiUrl.hostname}: ${e.message}`,
-      'network'
-    );
-  }
+  const response = await getJson(
+    new URL('/.well-known/oauth-authorization-server', apiUrl),
+    extraHeaders,
+    `Could not reach ${apiUrl.hostname}`
+  );
 
   if (response.status === 404) {
     throw new OAuthError(
@@ -94,7 +74,7 @@ export async function exchangeCode(
     redirectUri: string;
     codeVerifier: string;
   },
-  extraHeaders?: Record<string, string>
+  extraHeaders?: ExtraHeaders
 ): Promise<OAuthTokens> {
   const response = await postForm(
     metadata.tokenEndpoint,
@@ -114,7 +94,7 @@ export async function exchangeCode(
 export async function refreshTokens(
   metadata: AuthServerMetadata,
   params: { clientId: string; refreshToken: string },
-  extraHeaders?: Record<string, string>
+  extraHeaders?: ExtraHeaders
 ): Promise<OAuthTokens> {
   const response = await postForm(
     metadata.tokenEndpoint,
@@ -136,7 +116,7 @@ export async function refreshTokens(
 export async function revokeToken(
   metadata: AuthServerMetadata,
   params: { clientId: string; token: string },
-  extraHeaders?: Record<string, string>
+  extraHeaders?: ExtraHeaders
 ): Promise<void> {
   if (!metadata.revocationEndpoint) {
     return;
@@ -154,49 +134,6 @@ export async function revokeToken(
   if (!response.ok) {
     const body = await readJson(response);
     throwOAuthError(body, 'The authorization server refused to revoke.');
-  }
-}
-
-function headers(extra?: Record<string, string>) {
-  return {
-    ...extra,
-    'user-agent': USER_AGENT,
-    accept: 'application/json',
-  };
-}
-
-async function readJson(response: Response): Promise<any> {
-  try {
-    return await response.json();
-  } catch {
-    return undefined;
-  }
-}
-
-/**
- * OAuth 2.1 §3.2.2: the server rejects a token request carrying any query
- * string, so the URL is passed untouched.
- */
-async function postForm(
-  endpoint: string,
-  params: Record<string, string>,
-  extraHeaders?: Record<string, string>
-): Promise<Response> {
-  try {
-    return await fetch(endpoint, {
-      method: 'POST',
-      headers: {
-        ...headers(extraHeaders),
-        'content-type': 'application/x-www-form-urlencoded',
-      },
-      body: new URLSearchParams(params).toString(),
-      signal: AbortSignal.timeout(OAUTH_REQUEST_TIMEOUT_MS),
-    });
-  } catch (e: any) {
-    throw new OAuthError(
-      `Could not reach the authorization server: ${e.message}`,
-      'network'
-    );
   }
 }
 

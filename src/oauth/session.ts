@@ -8,10 +8,10 @@ import {
 import { debug } from '../utils/logger.js';
 import {
   fetchAuthServerMetadata,
-  OAuthError,
   refreshTokens,
   type AuthServerMetadata,
 } from './authServer.js';
+import { OAuthError } from './oauthError.js';
 import { CLI_CLIENT_ID } from './constants.js';
 
 const REFRESH_MARGIN_MS = 60_000;

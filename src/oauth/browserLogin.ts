@@ -5,9 +5,9 @@ import { openInBrowser, type BrowserOpener } from './browser.js';
 import {
   exchangeCode,
   fetchAuthServerMetadata,
-  OAuthError,
   type OAuthTokens,
 } from './authServer.js';
+import { OAuthError } from './oauthError.js';
 import { reasonBrowserLoginCannotWork } from './browserEnvironment.js';
 import { buildAuthorizeUrl } from './authorizeUrl.js';
 import { CLI_CLIENT_ID, CLI_SCOPES } from './constants.js';

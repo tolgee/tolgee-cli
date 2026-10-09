@@ -1,7 +1,7 @@
 import { createServer, type Server, type ServerResponse } from 'http';
 import { AddressInfo } from 'net';
 
-import { OAuthError } from './authServer.js';
+import { OAuthError } from './oauthError.js';
 import { LOGGED_IN_PAGE, LOGIN_FAILED_PAGE } from './loopbackPages.js';
 
 /**
