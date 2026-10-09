@@ -6,7 +6,6 @@ export type AuthServerMetadata = {
   authorizationEndpoint: string;
   tokenEndpoint: string;
   revocationEndpoint?: string;
-  scopesSupported?: string[];
 };
 
 export type OAuthTokens = {
@@ -84,9 +83,6 @@ export async function fetchAuthServerMetadata(
     authorizationEndpoint: body.authorization_endpoint,
     tokenEndpoint: body.token_endpoint,
     revocationEndpoint: body.revocation_endpoint,
-    scopesSupported: Array.isArray(body.scopes_supported)
-      ? body.scopes_supported.filter((s: unknown) => typeof s === 'string')
-      : undefined,
   });
 }
 

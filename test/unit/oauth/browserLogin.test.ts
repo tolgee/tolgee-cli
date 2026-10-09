@@ -3,6 +3,7 @@ import { createServer, type Server } from 'http';
 
 import { CI_VARIABLES } from '#cli/oauth/browserEnvironment.js';
 import { browserLogin } from '#cli/oauth/browserLogin.js';
+import { CLI_SCOPES } from '#cli/oauth/constants.js';
 import {
   closeServer,
   jsonWriter,
@@ -233,46 +234,17 @@ describe('browser login without a browser', () => {
   });
 });
 
-describe('browser login against an instance with fewer scopes', () => {
-  it('asks only for what the instance publishes', async () => {
-    stub.scopesSupported = ['translations.edit', 'keys.create'];
-    await browserLogin({
-      apiUrl: new URL(origin),
-      openBrowser: approving(),
-    });
-
-    expect(askedFor().get('scope')!.split(' ').sort()).toEqual([
-      'keys.create',
-      'translations.edit',
-    ]);
-  });
-
-  it('refuses before opening a browser when none of them are offered', async () => {
-    stub.scopesSupported = ['admin'];
-
-    await expect(
-      browserLogin({ apiUrl: new URL(origin), openBrowser: approving() })
-    ).rejects.toMatchObject({ kind: 'unsupported' });
-  });
-
-  it('names what it had to drop', async () => {
+describe('browser login and the scopes an instance publishes', () => {
+  it('asks for every scope the CLI knows, whatever the instance publishes', async () => {
     stub.scopesSupported = ['translations.edit'];
-
     await browserLogin({
       apiUrl: new URL(origin),
       openBrowser: approving(),
     });
 
-    expect(printed.join('\n')).toContain('branch.management');
-  });
-
-  it('asks for everything when the instance publishes no list', async () => {
-    await browserLogin({
-      apiUrl: new URL(origin),
-      openBrowser: approving(),
-    });
-
-    expect(askedFor().get('scope')).toContain('branch.protected-modify');
+    expect(askedFor().get('scope')!.split(' ').sort()).toEqual(
+      [...CLI_SCOPES].sort()
+    );
   });
 });
 

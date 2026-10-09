@@ -44,15 +44,12 @@ export async function browserLogin(
   try {
     const { verifier, challenge } = createPkcePair();
     const state = createState();
-    const scopes = askableScopes(
-      metadata.scopesSupported,
-      options.apiUrl.hostname
-    );
-
+    // The server drops the scopes it does not know, so an older instance
+    // narrows the login instead of refusing it.
     const authorizeUrl = buildAuthorizeUrl(metadata, {
       clientId: CLI_CLIENT_ID,
       redirectUri: server.redirectUri,
-      scopes,
+      scopes: CLI_SCOPES,
       state,
       codeChallenge: challenge,
       project: options.project,
@@ -86,36 +83,10 @@ export async function browserLogin(
       },
       options.extraHeaders
     );
-    return { ...tokens, requestedScopes: scopes };
+    return { ...tokens, requestedScopes: CLI_SCOPES };
   } finally {
     await server.close();
   }
-}
-
-/**
- * The server refuses the whole authorization if any requested scope is unknown
- * to it, so an instance older than a scope the CLI wants would make browser
- * login impossible rather than merely limited.
- */
-function askableScopes(supported: string[] | undefined, apiUrlHost: string) {
-  if (!supported?.length) {
-    return CLI_SCOPES;
-  }
-  const askable = CLI_SCOPES.filter((scope) => supported.includes(scope));
-  if (!askable.length) {
-    throw new OAuthError(
-      `${apiUrlHost} offers none of the permissions the CLI needs.`,
-      'unsupported'
-    );
-  }
-
-  const dropped = CLI_SCOPES.filter((scope) => !supported.includes(scope));
-  if (dropped.length) {
-    warn(
-      `${apiUrlHost} does not offer ${dropped.join(', ')}, so commands needing them will not work with this login.`
-    );
-  }
-  return askable;
 }
 
 function decideLaunch(options: BrowserLoginOptions): boolean {

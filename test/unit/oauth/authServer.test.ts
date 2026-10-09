@@ -76,10 +76,7 @@ describe('discovery', () => {
     expect(calls[0].url).toBe(
       'https://app.tolgee.io/.well-known/oauth-authorization-server'
     );
-    expect(metadata).toEqual({
-      ...METADATA,
-      scopesSupported: ['translations.view'],
-    });
+    expect(metadata).toEqual(METADATA);
   });
 
   it('reports an instance without an authorization server as unsupported', async () => {
