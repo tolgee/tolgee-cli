@@ -20,7 +20,7 @@ import { ALLOW_IN_CI } from '../oauth/browserEnvironment.js';
 import { createOAuthSessionHandle } from '../oauth/session.js';
 import {
   revokeAllSessions,
-  revokeReplacedSession,
+  revokeSession,
   revokeSessionFor,
 } from '../oauth/revoke.js';
 import { OAuthError } from '../oauth/oauthError.js';
@@ -111,7 +111,7 @@ async function loginWithBrowser(
   const replaced = await storedSessionFor(opts.apiUrl);
   await saveOAuthSession(opts.apiUrl, session);
   if (replaced) {
-    await revokeReplacedSession(replaced, opts.apiUrl, headers);
+    await revokeSession(replaced, opts.apiUrl, headers);
   }
 
   const userName = await greetableName(opts, headers, session);

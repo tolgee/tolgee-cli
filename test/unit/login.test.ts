@@ -18,7 +18,7 @@ import {
 import { browserLogin } from '#cli/oauth/browserLogin.js';
 import {
   revokeAllSessions,
-  revokeReplacedSession,
+  revokeSession,
   revokeSessionFor,
 } from '#cli/oauth/revoke.js';
 import { storedSessionFor } from '#cli/config/credentials.js';
@@ -57,7 +57,7 @@ vi.mock('#cli/config/credentials.js', () => ({
 
 vi.mock('#cli/oauth/revoke.js', () => ({
   revokeSessionFor: vi.fn(),
-  revokeReplacedSession: vi.fn(),
+  revokeSession: vi.fn(),
   revokeAllSessions: vi.fn(),
 }));
 
@@ -159,18 +159,18 @@ describe('browser login', () => {
 
     await runLogin({}, ['--api-url', 'http://localhost', 'login']);
 
-    const [session, instance] = vi.mocked(revokeReplacedSession).mock.calls[0];
+    const [session, instance] = vi.mocked(revokeSession).mock.calls[0];
     expect(session).toBe(replaced);
     expect(instance.hostname).toBe('localhost');
     expect(
-      vi.mocked(revokeReplacedSession).mock.invocationCallOrder[0]
+      vi.mocked(revokeSession).mock.invocationCallOrder[0]
     ).toBeGreaterThan(mockedSaveSession.mock.invocationCallOrder[0]);
   });
 
   it('ends nothing when no session was stored before', async () => {
     await runLogin({}, ['--api-url', 'http://localhost', 'login']);
 
-    expect(vi.mocked(revokeReplacedSession)).not.toHaveBeenCalled();
+    expect(vi.mocked(revokeSession)).not.toHaveBeenCalled();
   });
 
   it('says when an API key in the environment will win over the new login', async () => {

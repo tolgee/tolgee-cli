@@ -26,12 +26,15 @@ export async function revokeSessionFor(
 ) {
   const session = await storedSessionFor(apiUrl);
   if (session) {
-    await revokeReplacedSession(session, apiUrl, extraHeaders);
+    await revokeSession(session, apiUrl, extraHeaders);
   }
 }
 
-/** Ends a session that is no longer stored for `apiUrl`. */
-export async function revokeReplacedSession(
+/**
+ * Ends the session at the instance that issued it. The configured headers go
+ * only to `apiUrl`, which is where they belong, not to the issuer.
+ */
+export async function revokeSession(
   session: OAuthSession,
   apiUrl: URL,
   extraHeaders?: Record<string, string>
