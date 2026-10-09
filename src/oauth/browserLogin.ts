@@ -8,10 +8,7 @@ import {
   OAuthError,
   type OAuthTokens,
 } from './authServer.js';
-import {
-  detectBrowserAvailability,
-  type BrowserAvailability,
-} from './browserEnvironment.js';
+import { reasonBrowserLoginCannotWork } from './browserEnvironment.js';
 import { buildAuthorizeUrl } from './authorizeUrl.js';
 import { CLI_CLIENT_ID, CLI_SCOPES } from './constants.js';
 import { startLoopbackServer } from './loopback.js';
@@ -58,7 +55,9 @@ export async function browserLogin(
     waiting.catch(() => {});
 
     if (launching) {
-      info(`Opening ${ansi.blue(authorizeUrl)}`);
+      info(
+        `Opening a browser to sign in. If none opens, use this URL yourself:\n  ${ansi.blue(authorizeUrl)}`
+      );
       await launch(authorizeUrl, options.openBrowser);
     } else {
       info(
@@ -84,29 +83,18 @@ export async function browserLogin(
 }
 
 function decideLaunch(options: BrowserLoginOptions): boolean {
-  const availability: BrowserAvailability = options.openBrowser
-    ? { canLaunch: true }
-    : detectBrowserAvailability();
-
   // Checked before --no-browser too: that flag only moves the browser to
   // another window, and in CI there is none.
-  if (!availability.canLaunch && availability.fatal) {
+  const reason = options.openBrowser
+    ? undefined
+    : reasonBrowserLoginCannotWork();
+  if (reason) {
     throw new OAuthError(
-      `Cannot sign in through a browser: ${availability.reason}.`,
+      `Cannot sign in through a browser: ${reason}.`,
       'no-browser'
     );
   }
-
-  if (options.allowBrowserLaunch === false) {
-    return false;
-  }
-
-  if (availability.canLaunch) {
-    return true;
-  }
-
-  warn(`Not opening a browser: ${availability.reason}.`);
-  return false;
+  return options.allowBrowserLaunch !== false;
 }
 
 async function launch(url: string, opener?: BrowserOpener) {

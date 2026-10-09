@@ -261,22 +261,4 @@ describe('browser login when the browser will not open', () => {
 
     await expect(login).resolves.toMatchObject({ accessToken: 'tgoat_access' });
   });
-
-  it('does not launch one in an SSH session, and finishes anyway', async () => {
-    outsideCi();
-    vi.stubEnv('SSH_CONNECTION', '1 2 3 4');
-
-    const login = browserLogin({
-      apiUrl: new URL(origin),
-      allowBrowserLaunch: true,
-    });
-
-    await approveThePrintedUrl();
-
-    await expect(login).resolves.toMatchObject({
-      accessToken: 'tgoat_access',
-    });
-    expect(printed.join('\n')).toContain('Open this URL in a browser');
-    expect(printed.join('\n')).not.toContain('Opening ');
-  });
 });
