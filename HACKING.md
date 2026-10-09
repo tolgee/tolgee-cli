@@ -102,8 +102,9 @@ is an API key, which is what every file written before browser login existed con
 - the authorization code comes back as a browser redirect to a loopback listener the CLI starts on a port the OS
   assigns, which is why the browser has to be on (or able to reach) the same machine;
 - the access token is refreshed before a command starts if it is nearly expired, and once more if a request comes
-  back 401. Rotation happens under a lockfile, re-reading the store after taking it, so two `tolgee` processes
-  sharing a grant do not invalidate each other.
+  back 401. Two `tolgee` processes sharing a grant can refresh at the same time; the server accepts the first
+  refresh and refuses the second one, which then re-reads the store a few times and adopts the pair the first
+  one wrote.
 
 `tolgee login <API key>` does not touch any of this.
 

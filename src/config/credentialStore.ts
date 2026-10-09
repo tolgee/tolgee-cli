@@ -2,7 +2,6 @@ import { join, dirname } from 'path';
 import { mkdir, readFile, rename, rm, writeFile } from 'fs/promises';
 
 import { CONFIG_PATH } from '../constants.js';
-import { withStoreLock } from './storeLock.js';
 
 export type Token = { token: string; expires: number };
 export type ProjectDetails = { name: string };
@@ -49,8 +48,9 @@ export interface CredentialStore {
   list(): Promise<Store>;
   get(host: string): Promise<HostCredentials | undefined>;
   /**
-   * The only way to change a host's credentials; see storeLock for why the read
-   * and the write are one section.
+   * The only way to change a host's credentials. The read and the write are not
+   * one atomic step across processes, so a change that must not overwrite what
+   * another process stored meanwhile checks `current` before returning `next`.
    */
   update<T>(host: string, change: Change<T>): Promise<T>;
   /** Whether the host had anything stored. */
@@ -74,38 +74,32 @@ export const fileCredentialStore: CredentialStore = {
     return store[host];
   },
 
-  update(host, change) {
-    return withStoreLock(async () => {
-      const store = await readAll();
-      const { next, result } = await change(store[host] ?? {});
-      if (next) {
-        await writeAll(
-          holdsNothing(next) ? without(store, host) : { ...store, [host]: next }
-        );
-      }
-      return result;
-    });
+  async update(host, change) {
+    const store = await readAll();
+    const { next, result } = await change(store[host] ?? {});
+    if (next) {
+      await writeAll(
+        holdsNothing(next) ? without(store, host) : { ...store, [host]: next }
+      );
+    }
+    return result;
   },
 
   async delete(host) {
-    return withStoreLock(async () => {
-      const store = await readAll();
-      if (!store[host]) {
-        return false;
-      }
-      await writeAll(without(store, host));
-      return true;
-    });
+    const store = await readAll();
+    if (!store[host]) {
+      return false;
+    }
+    await writeAll(without(store, host));
+    return true;
   },
 
   async clear() {
-    return withStoreLock(async () => {
-      const held = Object.keys(await readAll()).length > 0;
-      if (held) {
-        await writeAll({});
-      }
-      return held;
-    });
+    const held = Object.keys(await readAll()).length > 0;
+    if (held) {
+      await writeAll({});
+    }
+    return held;
   },
 };
 

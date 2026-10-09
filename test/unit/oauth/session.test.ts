@@ -33,6 +33,7 @@ let apiCalls: string[];
 let refreshStatus: number;
 let issued: number;
 let gatewayHeaders: (string | undefined)[];
+let rotatedAway: Set<string>;
 
 beforeAll(async () => {
   ({ createOAuthSessionHandle } = await import('#cli/oauth/session.js'));
@@ -45,6 +46,7 @@ beforeEach(async () => {
   refreshStatus = 200;
   issued = 0;
   gatewayHeaders = [];
+  rotatedAway = new Set();
 
   server = createServer(async (request, response) => {
     const url = new URL(request.url ?? '/', 'http://127.0.0.1');
@@ -71,14 +73,19 @@ beforeEach(async () => {
     }
 
     if (url.pathname === '/oauth2/token') {
-      refreshRequests.push(new URLSearchParams(await readBody(request)));
-      if (refreshStatus !== 200) {
-        json(refreshStatus, { error: 'invalid_grant' });
+      const params = new URLSearchParams(await readBody(request));
+      refreshRequests.push(params);
+      const presented = params.get('refresh_token')!;
+      if (refreshStatus !== 200 || rotatedAway.has(presented)) {
+        json(refreshStatus === 200 ? 400 : refreshStatus, {
+          error: 'invalid_grant',
+        });
         return;
       }
+      rotatedAway.add(presented);
       issued += 1;
-      // A slow rotation is what lets a second process reach the lock while this
-      // one holds it.
+      // A slow answer is what lets a second process present the same token
+      // before this one has stored the new pair.
       await new Promise((resolve) => setTimeout(resolve, 30));
       json(200, {
         access_token: `tgoat_${issued}`,
@@ -147,7 +154,7 @@ describe('session refresh', () => {
     });
   });
 
-  it('lets a second process use the pair the first one just rotated to', async () => {
+  it('lets a second process adopt the pair the first one rotated to, after the server refused it', async () => {
     const initial = session({ accessExpires: Date.now() + 10_000 });
     await credentials.saveOAuthSession(apiUrl, initial);
 
@@ -156,9 +163,30 @@ describe('session refresh', () => {
 
     await Promise.all([first.ensureFresh(), second.ensureFresh()]);
 
-    expect(refreshRequests).toHaveLength(1);
+    expect(refreshRequests).toHaveLength(2);
+    expect(issued).toBe(1);
     expect(first.getAccessToken()).toBe('tgoat_1');
     expect(second.getAccessToken()).toBe('tgoat_1');
+    expect(await storedSession()).toMatchObject({ refreshToken: 'tgort_1' });
+  });
+
+  it('adopts a session stored while its own refresh was in flight, instead of overwriting it', async () => {
+    const initial = session({ accessExpires: Date.now() + 10_000 });
+    await credentials.saveOAuthSession(apiUrl, initial);
+    const handle = createOAuthSessionHandle(apiUrl, initial);
+
+    const refreshing = handle.ensureFresh();
+    await new Promise((resolve) => setTimeout(resolve, 10));
+    await credentials.saveOAuthSession(
+      apiUrl,
+      session({ accessToken: 'tgoat_login', refreshToken: 'tgort_login' })
+    );
+    await refreshing;
+
+    expect(handle.getAccessToken()).toBe('tgoat_login');
+    expect(await storedSession()).toMatchObject({
+      refreshToken: 'tgort_login',
+    });
   });
 
   it('refreshes once for concurrent callers in one process', async () => {
