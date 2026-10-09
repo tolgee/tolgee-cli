@@ -121,10 +121,10 @@ export function createOAuthSessionHandle(
           '[OAUTH] Another process stored a newer session; using its tokens'
         );
         current = now;
-        return { result: 'adopted' as const };
+        return { value: 'adopted' as const };
       }
       current = rotated;
-      return { next: { ...host, user: rotated }, result: 'refreshed' as const };
+      return { write: { ...host, user: rotated }, value: 'refreshed' as const };
     });
   }
 
@@ -152,9 +152,9 @@ export function createOAuthSessionHandle(
     return updateHostCredentials(apiUrl, async (host: HostCredentials) => {
       const now = usableSession(host, apiUrl);
       if (!now || now.refreshToken !== dead.refreshToken) {
-        return { result: undefined };
+        return { value: undefined };
       }
-      return { next: { ...host, user: undefined }, result: undefined };
+      return { write: { ...host, user: undefined }, value: undefined };
     });
   }
 

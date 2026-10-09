@@ -49,7 +49,7 @@ export interface CredentialStore {
   /**
    * The only way to change a host's credentials. The read and the write are not
    * one atomic step across processes, so a change that must not overwrite what
-   * another process stored meanwhile checks `current` before returning `next`.
+   * another process stored meanwhile checks `current` before returning `write`.
    */
   update<T>(host: string, change: Change<T>): Promise<T>;
   /** Whether the host had anything stored. */
@@ -61,8 +61,10 @@ export interface CredentialStore {
 export type Change<T> = (current: HostCredentials) => Promise<ChangeResult<T>>;
 
 export type ChangeResult<T> = {
-  next?: HostCredentials;
-  result: T;
+  /** Stored in the host's slot; leave it out to keep the slot as it is. */
+  write?: HostCredentials;
+  /** What `update` returns to its caller. */
+  value: T;
 };
 
 export const fileCredentialStore: CredentialStore = {
@@ -75,13 +77,13 @@ export const fileCredentialStore: CredentialStore = {
 
   async update(host, change) {
     const store = await readAll();
-    const { next, result } = await change(store[host] ?? {});
-    if (next) {
+    const { write, value } = await change(store[host] ?? {});
+    if (write) {
       await writeAll(
-        holdsNothing(next) ? without(store, host) : { ...store, [host]: next }
+        holdsNothing(write) ? without(store, host) : { ...store, [host]: write }
       );
     }
-    return result;
+    return value;
   },
 
   async delete(host) {

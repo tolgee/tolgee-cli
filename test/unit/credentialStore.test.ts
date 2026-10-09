@@ -41,8 +41,8 @@ function oauthSession(overrides: Record<string, unknown> = {}) {
 
 async function setHost(host: string, credentials: any) {
   await fileCredentialStore.update(host, async () => ({
-    next: credentials,
-    result: undefined,
+    write: credentials,
+    value: undefined,
   }));
 }
 
@@ -152,8 +152,8 @@ describe('credential store', () => {
     await fileCredentialStore.clear();
 
     await fileCredentialStore.update('typo.local', async (current) => ({
-      next: current,
-      result: undefined,
+      write: current,
+      value: undefined,
     }));
 
     expect(await fileCredentialStore.list()).toEqual({});
@@ -167,7 +167,7 @@ describe('credential store', () => {
 
     await fileCredentialStore.update('meow.local', async (current) => {
       delete current.projects?.['1'];
-      return { next: current, result: undefined };
+      return { write: current, value: undefined };
     });
 
     expect(await fileCredentialStore.list()).toEqual({});

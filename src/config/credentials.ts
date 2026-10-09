@@ -48,8 +48,8 @@ async function updateHost(
   update: (current: HostCredentials) => HostCredentials
 ) {
   return store.update(instance.hostname, async (current) => ({
-    next: update(current),
-    result: undefined,
+    write: update(current),
+    value: undefined,
   }));
 }
 
@@ -231,14 +231,14 @@ export async function removeProjectKey(
       !stored ||
       (onlyIfToken !== undefined && stored.token !== onlyIfToken)
     ) {
-      return { result: false };
+      return { value: false };
     }
 
     const { [id]: _dropped, ...projects } = keys;
     const { [id]: _named, ...projectDetails } = current.projectDetails ?? {};
     return {
-      next: { ...current, projects, projectDetails },
-      result: true,
+      write: { ...current, projects, projectDetails },
+      value: true,
     };
   });
 }
@@ -254,9 +254,9 @@ export async function removeUserCredential(
   return store.update(instance.hostname, async (current) => {
     const stored = current.user;
     if (!stored || isOAuthSession(stored) || stored.token !== onlyIfToken) {
-      return { result: false };
+      return { value: false };
     }
-    return { next: { ...current, user: undefined }, result: true };
+    return { write: { ...current, user: undefined }, value: true };
   });
 }
 
