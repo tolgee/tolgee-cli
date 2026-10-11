@@ -2,7 +2,18 @@ import { tmpdir } from 'os';
 
 import { join } from 'path';
 import { readFile, rm } from 'fs/promises';
-import { getApiKey, saveApiKey } from '#cli/config/credentials.js';
+import {
+  getStoredCredentials,
+  removeProjectKey,
+  removeUserCredential,
+  saveApiKey,
+  saveOAuthSession,
+} from '#cli/config/credentials.js';
+
+async function getApiKey(apiUrl: string, projectId: number) {
+  const stored = await getStoredCredentials(new URL(apiUrl), projectId);
+  return stored?.type === 'apiKey' ? stored.key : null;
+}
 
 const AUTH_FILE = join(tmpdir(), 'authentication.json');
 const TG_1 = new URL('https://app.tolgee.io');
@@ -140,6 +151,79 @@ describe('credentials', () => {
       // Check it pruned it from store
       const saved2 = await readFile(AUTH_FILE, 'utf8');
       expect(saved2).not.toContain(PAT_4.key);
+    });
+  });
+
+  describe('dropping an expired personal access token', () => {
+    afterEach(async () => {
+      await rm(AUTH_FILE, { force: true });
+    });
+
+    it('drops the token that was read', async () => {
+      await saveApiKey(TG_1, PAT_1);
+
+      expect(await removeUserCredential(TG_1, PAT_1.key)).toBe(true);
+      expect(await getApiKey(TG_1.toString(), -1)).toBeNull();
+    });
+
+    it('leaves a credential another process stored in the meantime', async () => {
+      await saveApiKey(TG_1, PAT_2);
+
+      expect(await removeUserCredential(TG_1, PAT_1.key)).toBe(false);
+      expect(await getApiKey(TG_1.toString(), -1)).toBe(PAT_2.key);
+    });
+  });
+
+  describe('removing one project key', () => {
+    afterEach(async () => {
+      await rm(AUTH_FILE, { force: true });
+    });
+
+    it('drops the key and says there was one', async () => {
+      await saveApiKey(TG_1, PAK_1);
+      await saveApiKey(TG_1, PAK_2);
+
+      expect(await removeProjectKey(TG_1, PAK_1.project.id)).toBe(true);
+
+      expect(await getApiKey(TG_1.toString(), PAK_1.project.id)).toBeNull();
+      expect(await getApiKey(TG_1.toString(), PAK_2.project.id)).toBe(
+        PAK_2.key
+      );
+    });
+
+    it('leaves a key another process stored in the meantime', async () => {
+      await saveApiKey(TG_1, PAK_1);
+
+      expect(
+        await removeProjectKey(TG_1, PAK_1.project.id, 'tgpak_stale')
+      ).toBe(false);
+      expect(await getApiKey(TG_1.toString(), PAK_1.project.id)).toBe(
+        PAK_1.key
+      );
+    });
+
+    it('says so when the project had no key', async () => {
+      await saveApiKey(TG_1, PAK_1);
+
+      expect(await removeProjectKey(TG_1, 99)).toBe(false);
+    });
+
+    it('leaves the browser session alone', async () => {
+      await saveOAuthSession(TG_1, {
+        type: 'oauth',
+        accessToken: 'tgoat_x',
+        accessExpires: Date.now() + 60_000,
+        refreshToken: 'tgort_y',
+        scopes: [],
+        apiUrl: TG_1.toString(),
+      });
+      await saveApiKey(TG_1, PAK_1);
+
+      await removeProjectKey(TG_1, PAK_1.project.id);
+
+      expect(await getStoredCredentials(TG_1, PAK_1.project.id)).toMatchObject({
+        type: 'oauth',
+      });
     });
   });
 });

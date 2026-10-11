@@ -3,10 +3,11 @@
 import { Command } from 'commander';
 import ansi from 'ansi-colors';
 
-import { getApiKey, savePak, savePat } from './config/credentials.js';
+import { getStoredCredentials } from './config/credentials.js';
+import { NO_PROJECT, resolveProjectId } from './config/projectId.js';
 import loadTolgeeRc from './config/tolgeerc.js';
 
-import { setDebug, info, error, exitWithError } from './utils/logger.js';
+import { setDebug, info, error } from './utils/logger.js';
 
 import {
   API_KEY_OPT,
@@ -23,13 +24,9 @@ import {
   PROJECT_BRANCH,
   STRICT_NAMESPACE_NEGATION,
   VERBOSE,
+  apiUrlOrDefault,
 } from './options.js';
-import {
-  API_KEY_PAK_PREFIX,
-  API_KEY_PAT_PREFIX,
-  DEFAULT_API_URL,
-  VERSION,
-} from './constants.js';
+import { API_KEY_PAK_PREFIX, VERSION } from './constants.js';
 
 import { Login, Logout } from './commands/login.js';
 import PushCommand from './commands/push.js';
@@ -47,6 +44,8 @@ import { Schema } from './schema.js';
 import { createTolgeeClient } from './client/TolgeeClient.js';
 import { projectIdFromKey } from './client/ApiClient.js';
 import { printApiKeyLists } from './utils/apiKeyList.js';
+import { createOAuthSessionHandle } from './oauth/session.js';
+import { reportError } from './utils/reportError.js';
 
 const NO_KEY_COMMANDS = ['login', 'logout', 'extract'];
 
@@ -58,74 +57,65 @@ function topLevelName(command: Command): string {
     : command.name();
 }
 
-async function loadApiKey(cmd: Command) {
+async function loadCredentials(cmd: Command, headers: Record<string, string>) {
   const opts = cmd.optsWithGlobals();
 
   // API Key is already loaded
   if (opts.apiKey) return;
 
-  // Attempt to load --api-key from config store if not specified
-  // This is not done as part of the init routine or via the mandatory flag, as this is dependent on the API URL.
-  const key = await getApiKey(opts.apiUrl, opts.projectId);
+  // Attempt to load credentials from the config store if not specified.
+  // This is not done as part of the init routine or via the mandatory flag,
+  // as this is dependent on the API URL.
+  const credentials = await getStoredCredentials(opts.apiUrl, opts.projectId);
 
-  // No key in store, stop here.
-  if (!key) return;
+  if (!credentials) return;
 
-  cmd.setOptionValue('apiKey', key);
-  program.setOptionValue('_removeApiKeyFromStore', () => {
-    if (key.startsWith(API_KEY_PAT_PREFIX)) {
-      savePat(opts.apiUrl);
-    } else {
-      savePak(opts.apiUrl, opts.projectId);
-    }
-  });
+  if (credentials.type === 'oauth') {
+    cmd.setOptionValue(
+      'oauthSession',
+      createOAuthSessionHandle(opts.apiUrl, credentials.session, headers)
+    );
+    return;
+  }
+
+  cmd.setOptionValue('apiKey', credentials.key);
 }
 
 function loadProjectId(cmd: Command) {
   const opts = cmd.optsWithGlobals();
 
-  if (opts.apiKey?.startsWith(API_KEY_PAK_PREFIX)) {
-    // Parse the key and ensure we can access the specified Project ID
-    const projectId = projectIdFromKey(opts.apiKey);
-    program.setOptionValue('projectId', projectId);
+  const { projectId, refusal } = resolveProjectId({
+    configured: opts.projectId,
+    apiKeyProject: opts.apiKey?.startsWith(API_KEY_PAK_PREFIX)
+      ? projectIdFromKey(opts.apiKey)
+      : undefined,
+    sessionProject: opts.oauthSession?.getProjectId(),
+  });
 
-    if (opts.projectId !== -1 && opts.projectId !== projectId) {
-      error(
-        'The specified API key cannot be used to perform operations on the specified project.'
-      );
-      info(
-        `The API key you specified is tied to project #${projectId}, you tried to perform operations on project #${opts.projectId}.`
-      );
-      info(
-        'Learn more about how API keys in Tolgee work here: https://tolgee.io/platform/account_settings/api_keys_and_pat_tokens'
-      );
-      process.exit(1);
-    }
+  if (refusal) {
+    error(refusal.error);
+    refusal.details.forEach(info);
+    process.exit(1);
   }
+
+  program.setOptionValue('projectId', projectId);
 }
 
 async function validateOptions(cmd: Command) {
   const opts = cmd.optsWithGlobals();
 
-  if (opts.projectId === -1) {
+  // Before the project id, which a credential can name by itself: a command
+  // aimed at an instance you are not logged in to would otherwise be reported
+  // as a missing project.
+  if (!opts.apiKey && !opts.oauthSession) {
+    const forProject =
+      opts.projectId > 0 ? ` and project ${ansi.blue(opts.projectId)}` : '';
     error(
-      'No Project ID have been specified. You must either provide one via --project-id, or by setting up a `.tolgeerc` file.'
+      `Not authenticated for host ${ansi.blue(opts.apiUrl.hostname)}${forProject}.`
     );
     info(
-      'If you provide Project Api Key (PAK) via `--api-key`, Project ID is derived automatically.'
-    );
-    info(
-      'Learn more about configuring the CLI here: https://tolgee.io/tolgee-cli/project-configuration'
-    );
-    process.exit(1);
-  }
-
-  if (!opts.apiKey) {
-    error(
-      `Not authenticated for host ${ansi.blue(opts.apiUrl.hostname)} and project ${ansi.blue(opts.projectId)}.`
-    );
-    info(
-      `You must either provide api key via --api-key or login via \`tolgee login\` (for correct api url and project)`
+      'You must either provide api key via --api-key or login via `tolgee login`. Logged in to another instance? ' +
+        'Name it with --api-url, or with apiUrl in `.tolgeerc`.'
     );
 
     console.log('\nYou are logged into these projects:');
@@ -133,26 +123,41 @@ async function validateOptions(cmd: Command) {
 
     process.exit(1);
   }
+
+  if (opts.projectId === NO_PROJECT) {
+    error(
+      'No Project ID have been specified. You must either provide one via --project-id, or by setting up a `.tolgeerc` file.'
+    );
+    info(
+      'If you provide Project Api Key (PAK) via `--api-key`, Project ID is derived automatically. So is a browser ' +
+        'login approved for a single project.'
+    );
+    info(
+      'Learn more about configuring the CLI here: https://tolgee.io/tolgee-cli/project-configuration'
+    );
+    process.exit(1);
+  }
 }
 
 const preHandler = (config: Schema) =>
   async function (prog: Command, cmd: Command) {
     if (!NO_KEY_COMMANDS.includes(topLevelName(cmd))) {
-      await loadApiKey(cmd);
+      const headers = mergeHeaders(
+        config.headers,
+        cmd.optsWithGlobals().extraHeader
+      );
+      await loadCredentials(cmd, headers);
       loadProjectId(cmd);
-      validateOptions(cmd);
+      await validateOptions(cmd);
 
       const opts = cmd.optsWithGlobals();
+      await opts.oauthSession?.ensureFresh();
       const client = createTolgeeClient({
-        baseUrl: opts.apiUrl?.toString() ?? config.apiUrl?.toString(),
+        baseUrl: opts.apiUrl.toString(),
         apiKey: opts.apiKey,
-        projectId:
-          opts.projectId !== undefined
-            ? Number(opts.projectId)
-            : config.projectId !== undefined
-              ? Number(config.projectId)
-              : undefined,
-        headers: mergeHeaders(config.headers, opts.extraHeader),
+        session: opts.oauthSession,
+        projectId: opts.projectId,
+        headers,
       });
 
       cmd.setOptionValue('client', client);
@@ -169,7 +174,7 @@ const program = new Command('tolgee')
 // get config path to update defaults
 const configPath = getSingleOption(CONFIG_OPT, process.argv);
 
-async function loadConfig(program: Command) {
+async function loadConfig() {
   const tgConfig = await loadTolgeeRc(configPath);
 
   return tgConfig ?? {};
@@ -177,15 +182,15 @@ async function loadConfig(program: Command) {
 
 async function run() {
   try {
-    const config = await loadConfig(program);
+    const config = await loadConfig();
     program.hook('preAction', preHandler(config));
 
     // Global options
     program.addOption(VERBOSE);
     program.addOption(CONFIG_OPT);
-    program.addOption(API_URL_OPT.default(config.apiUrl ?? DEFAULT_API_URL));
+    program.addOption(API_URL_OPT.default(apiUrlOrDefault(config.apiUrl)));
     program.addOption(API_KEY_OPT.default(config.apiKey));
-    program.addOption(PROJECT_ID_OPT.default(config.projectId ?? -1));
+    program.addOption(PROJECT_ID_OPT.default(config.projectId ?? NO_PROJECT));
     program.addOption(PROJECT_BRANCH.default(config.branch));
     program.addOption(FORMAT_OPT.default(config.format ?? 'JSON_TOLGEE'));
     program.addOption(EXTRACTOR.default(config.extractor));
@@ -200,7 +205,7 @@ async function run() {
     program.addCommand(
       Login(config).configureHelp({ showGlobalOptions: true })
     );
-    program.addCommand(Logout);
+    program.addCommand(Logout(config));
     program.addCommand(
       PushCommand(config).configureHelp({ showGlobalOptions: true })
     );
@@ -228,15 +233,7 @@ async function run() {
 
     await program.parseAsync();
   } catch (e: any) {
-    // If the error is uncaught, huge chance that either:
-    //  - The error should be handled here but isn't
-    //  - The error should be handled in the command but isn't
-    //  - Something went wrong with the code
-    error('An unexpected error occurred while running the command.');
-    error(
-      'Please report this to our issue tracker: https://github.com/tolgee/tolgee-cli/issues'
-    );
-    exitWithError(e);
+    reportError(e);
   }
 }
 

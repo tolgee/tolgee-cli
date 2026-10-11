@@ -83,11 +83,30 @@ logic.
 ### Config loading & validation
 
 We use [cosmiconfig](https://github.com/davidtheclark/cosmiconfig) to handle the loading of the `.tolgeerc` file.
-There is also a module that manages the authentication token store (`~/.tolgee/authentication.json`). These modules
-can be found in `src/config`.
+There is also a module that manages the authentication token store (`authentication.json`, in the OS config
+directory). These modules can be found in `src/config`.
 
 The `.tolgeerc` file is loaded at program startup, and the tokens (which depend on options) are loaded before our
 custom validation logic.
+
+The store is addressed per host through a `CredentialStore` interface, with the JSON file as its only
+implementation today. A host's user-level slot holds either an API key or a browser session; a slot with no `type`
+is an API key, which is what every file written before browser login existed contains.
+
+### Browser login (OAuth)
+
+`src/oauth` implements the authorization code flow with PKCE that backs a bare `tolgee login`:
+
+- endpoints are discovered from `/.well-known/oauth-authorization-server`, so an instance that runs no
+  authorization server is recognised as such instead of failing part-way through;
+- the authorization code comes back as a browser redirect to a loopback listener the CLI starts on a port the OS
+  assigns, which is why the browser has to be on (or able to reach) the same machine;
+- the access token is refreshed before a command starts if it is nearly expired, and once more if a request comes
+  back 401. Two `tolgee` processes sharing a grant can refresh at the same time; the server accepts the first
+  refresh and refuses the second one, which then re-reads the store a few times and adopts the pair the first
+  one wrote.
+
+`tolgee login <API key>` does not touch any of this.
 
 ### REST Client
 
