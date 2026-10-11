@@ -1,3 +1,10 @@
+# [2.21.0](https://github.com/tolgee/tolgee-cli/compare/v2.20.0...v2.21.0) (2026-10-11)
+
+
+### Features
+
+* sign in through the browser with a bare 'tolgee login' ([#210](https://github.com/tolgee/tolgee-cli/issues/210)) ([2d82b96](https://github.com/tolgee/tolgee-cli/commit/2d82b961cf1c1eb8aff8be6d704ea2eba38d654b))
+
 # [2.20.0](https://github.com/tolgee/tolgee-cli/compare/v2.19.0...v2.20.0) (2026-06-25)
 
 
