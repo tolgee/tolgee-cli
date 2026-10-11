@@ -20,7 +20,9 @@ export function createTolgeeClient(props: Props) {
 }
 
 export const handleLoadableError = (loadable: LoadableData) => {
-  if (loadable.error) {
+  // error responses with an empty body produce `error: undefined` or `error: ''`,
+  // so also check the response status to not let those slip through
+  if (loadable.error !== undefined || !loadable.response.ok) {
     throw new LoadableError(loadable);
   }
 };
